@@ -1,0 +1,41 @@
+charCode:
+
+
+input:
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CharCodeController {
+    
+    @GetMapping(value = "/charcode", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CharCodeResponse getCharCode() {
+        char firstChar = "Mule".charAt(0);
+        int charCode = (int) firstChar;
+        return new CharCodeResponse(charCode);
+    }
+    
+    // Simple POJO for JSON response
+    public static class CharCodeResponse {
+        private final int charCode;
+        
+        public CharCodeResponse(int charCode) {
+            this.charCode = charCode;
+        }
+        
+        public int getCharCode() {
+            return charCode;
+        }
+    }
+}
+
+
+
+output:
+
+ { "charCode" : 77 }
+
+

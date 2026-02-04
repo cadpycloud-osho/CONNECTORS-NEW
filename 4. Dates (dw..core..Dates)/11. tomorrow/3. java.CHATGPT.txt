@@ -1,0 +1,27 @@
+tomorrow:
+
+
+input:
+
+import java.time.LocalDate;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Get tomorrow's date
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        // Print in ISO format (yyyy-MM-dd)
+        System.out.println("\"" + tomorrow.toString() + "\"");
+    }
+}
+
+
+
+output:
+
+
+"2021-05-16"
+
+

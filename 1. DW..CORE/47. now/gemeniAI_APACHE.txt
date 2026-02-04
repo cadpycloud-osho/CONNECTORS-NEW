@@ -1,0 +1,144 @@
+now:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelNowAndTimeZone {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Get current time (Equivalent to now())
+                        ZonedDateTime now = ZonedDateTime.now();
+
+                        // 2. Shift time zone (Equivalent to >> "America/New_York")
+                        ZonedDateTime nowInNewYork = now.withZoneSameInstant(ZoneId.of("America/New_York"));
+
+                        // Build result map
+                        Map<String, String> result = new LinkedHashMap<>();
+                        result.put("nowCalled", now.toString());
+                        result.put("nowCalledSpecificTimeZone", nowInNewYork.toString());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "nowCalled": "2026-01-19T13:10:45.123+05:30",
+  "nowCalledSpecificTimeZone": "2026-01-19T02:40:45.123-05:00"
+}
+
+-------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.IsoFields;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelDateTimeComponents {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        ZonedDateTime now = ZonedDateTime.now();
+                        Map<String, Object> result = new LinkedHashMap<>();
+
+                        result.put("now", now.toString());
+                        result.put("epochTime", now.toEpochSecond());
+                        result.put("nanoseconds", now.getNano());
+                        result.put("milliseconds", now.getNano() / 1_000_000);
+                        result.put("seconds", now.getSecond());
+                        result.put("minutes", now.getMinute());
+                        result.put("hour", now.getHour());
+                        result.put("day", now.getDayOfMonth());
+                        result.put("month", now.getMonthValue());
+                        result.put("year", now.getYear());
+                        
+                        // Quarters and Days of Week/Year
+                        result.put("quarter", now.get(IsoFields.QUARTER_OF_YEAR));
+                        result.put("dayOfWeek", now.getDayOfWeek().getValue());
+                        result.put("dayOfYear", now.getDayOfYear());
+                        result.put("offsetSeconds", now.getOffset().getTotalSeconds());
+
+                        // Formatting
+                        result.put("formattedDate", now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                        result.put("formattedTime", now.format(DateTimeFormatter.ofPattern("hh:mm:ss")));
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "now": "2026-01-19T13:12:40.678+05:30",
+  "epochTime": 1737292360,
+  "nanoseconds": 678000000,
+  "milliseconds": 678,
+  "seconds": 40,
+  "minutes": 12,
+  "hour": 13,
+  "day": 19,
+  "month": 1,
+  "year": 2026,
+  "quarter": 1,
+  "dayOfWeek": 1,
+  "dayOfYear": 19,
+  "offsetSeconds": 19800,
+  "formattedDate": "2026-01-19",
+  "formattedTime": "01:12:40"
+}
+
+
+

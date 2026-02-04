@@ -1,0 +1,137 @@
+SHA1:
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class HashService {
+
+    private static final String HASH_ALGORITHM = "SHA-1";
+
+    /**
+     * Calculates the SHA-1 hash for a given data and returns the result
+     * as a lowercase hexadecimal String, matching DataWeave's output.
+     *
+     * @param data The input data (e.g., "dsasd").
+     * @return The SHA-1 hash as a hexadecimal String.
+     */
+    public String calculateSha1Hex(String data) 
+            throws NoSuchAlgorithmException {
+        
+        // 1. Get the MessageDigest instance for SHA-1
+        MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+
+        // 2. Convert the input data to bytes (using UTF-8) and calculate the hash
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        byte[] hashBytes = md.digest(dataBytes);
+        
+        // 3. Convert the raw bytes to a lowercase hex string
+        return bytesToHex(hashBytes);
+    }
+    
+    /**
+     * Helper method to convert a byte array to a lowercase hexadecimal string.
+     */
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder(2 * bytes.length);
+        for (byte b : bytes) {
+            // Formats the byte as a two-character lowercase hexadecimal string
+            String hex = String.format("%02x", b);
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+@RestController
+public class HashController {
+
+    private final HashService hashService;
+
+    public HashController(HashService hashService) {
+        this.hashService = hashService;
+    }
+
+    @GetMapping("/calculate-sha1")
+    public Map<String, String> getSha1Hash() {
+        try {
+            String data = "dsasd";
+            
+            String sha1Hex = hashService.calculateSha1Hex(data);
+            
+            return Map.of("sha1", sha1Hex);
+
+        } catch (NoSuchAlgorithmException e) {
+            // SHA-1 is standard, but exception handling is required
+            e.printStackTrace();
+            return Map.of("error", e.getMessage());
+        }
+    }
+}
+
+output:
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class Sha1Calculator {
+
+    private static final String HASH_ALGORITHM = "SHA-1";
+
+    public static String calculateSha1Hex(String data) 
+            throws NoSuchAlgorithmException {
+        
+        // 1. Get the MessageDigest instance for SHA-1
+        MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+
+        // 2. Convert the input data to bytes (using UTF-8) and calculate the hash
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        byte[] hashBytes = md.digest(dataBytes);
+        
+        // 3. Convert the raw bytes to a lowercase hex string
+        return bytesToHex(hashBytes);
+    }
+    
+    /**
+     * Helper method to convert a byte array to a lowercase hexadecimal string.
+     */
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder(2 * bytes.length);
+        for (byte b : bytes) {
+            // Formats the byte as a two-character lowercase hexadecimal string
+            String hex = String.format("%02x", b);
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    public static void main(String[] args) {
+        String data = "dsasd";
+
+        try {
+            String sha1Hex = calculateSha1Hex(data);
+
+            System.out.println("Input Data: " + data);
+            System.out.println("Algorithm: " + HASH_ALGORITHM);
+            System.out.println("---");
+            System.out.println("Java Output (Hex-encoded): {\"sha1\": \"" + sha1Hex + "\"}");
+
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Algorithm not found: " + e.getMessage());
+        }
+    }
+}
+
+

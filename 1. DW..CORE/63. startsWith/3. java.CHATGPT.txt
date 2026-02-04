@@ -1,0 +1,27 @@
+startsWith:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Boolean> result = Arrays.asList(
+                "Mari".startsWith("Mar"),
+                "Mari".startsWith("Em")
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false]
+
+

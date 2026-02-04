@@ -1,0 +1,86 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+
+public class DtdGeneratorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:generateDtd")
+            .routeId("DTD-String-Generator")
+            .process(exchange -> {
+                // 1. Define the DTD Metadata (replicating the DW input object)
+                String rootName = "cXML";
+                String systemId = "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd";
+
+                // 2. Logic: Construct the SYSTEM DOCTYPE string
+                // Format: [rootName] SYSTEM "[systemId]"
+                String dtdString = String.format("%s SYSTEM \"%s\"", rootName, systemId);
+
+                // 3. Set output as JSON (to match the DW output mode)
+                exchange.getIn().setBody(dtdString);
+            })
+            // Marshal is only needed if you want the string wrapped in JSON quotes
+            .marshal().json() 
+            .log("Generated DTD String: ${body}");
+    }
+}
+
+
+
+output:
+
+"cXML SYSTEM http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class PublicDtdRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:generatePublicDtd")
+            .routeId("Public-DTD-Generator")
+            .process(exchange -> {
+                // 1. Define the DTD Metadata
+                String rootName = "html";
+                String publicId = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+                String systemId = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+
+                // 2. Logic: Construct the PUBLIC DOCTYPE string
+                // Pattern: [rootName] PUBLIC "[publicId]" "[systemId]"
+                // Note: The public and system IDs should typically be quoted in a real XML header
+                String dtdString = String.format("%s PUBLIC %s %s", 
+                                    rootName, publicId, systemId);
+
+                // 3. Set the body
+                exchange.getIn().setBody(dtdString);
+            })
+            .marshal().json() // Wrap in JSON quotes to match DW output
+            .log("Generated Public DTD: ${body}");
+    }
+}
+
+output:
+
+"html PUBLIC -//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+
+
+-------------------------------------------------------

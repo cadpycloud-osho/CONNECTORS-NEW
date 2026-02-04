@@ -1,0 +1,59 @@
+isRegexType:
+
+
+input:
+
+
+import java.util.regex.Pattern;
+import java.lang.Boolean;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isRegexType(Type).
+     * Checks if the provided type is java.util.regex.Pattern or a subclass/implementation.
+     */
+    public static boolean isRegexType(Class<?> type) {
+        return Pattern.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ARegex' (which is Regex)
+        Class<?> aRegexClass = Pattern.class;
+
+        // 2. Mimics the type 'Regex'
+        Class<?> regexClass = Pattern.class;
+
+        // 3. Mimics the type 'Boolean'
+        Class<?> booleanClass = Boolean.class;
+        
+        // --- Execution ---
+        
+        // a: isRegexType(ARegex)
+        boolean a = isRegexType(aRegexClass); 
+
+        // b: isRegexType(Regex)
+        boolean b = isRegexType(regexClass); 
+        
+        // c: isRegexType(Boolean)
+        boolean c = isRegexType(booleanClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

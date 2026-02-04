@@ -1,0 +1,32 @@
+appendIfMissing:
+
+appendIfMissing(text: String, suffix: String): String
+
+appendIfMissing(text: String, suffix: String): String
+Appends the suffix to the end of the text if the text does not already ends with the suffix.
+
+
+Source
+%dw 2.0
+import appendIfMissing from dw::core::Strings
+output application/json
+---
+{
+  "a": appendIfMissing(null, ""),
+  "b": appendIfMissing("abc", ""),
+  "c": appendIfMissing("", "xyz") ,
+  "d": appendIfMissing("abc", "xyz") ,
+  "e": appendIfMissing("abcxyz", "xyz")
+}
+
+
+DataWeave
+Output
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+

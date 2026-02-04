@@ -1,0 +1,50 @@
+flatMap:
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class FlatMapController {
+
+    @GetMapping("/flatmap")
+    public Map<String, Object> flatMapArray() {
+
+        // Input array (similar to DataWeave input)
+        List<List<Double>> input = Arrays.asList(
+                Arrays.asList(3.0, 5.0),
+                Arrays.asList(0.9, 5.5)
+        );
+
+        // Java flatMap logic
+        List<Double> flatResult = input.stream()
+                .flatMap(List::stream)
+                .toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("output", flatResult);
+        return response;
+    }
+}
+
+
+
+OUTPUT:
+
+{
+  "output": [3.0, 5.0, 0.9, 5.5]
+}
+
+
+
+
+
+
+
+

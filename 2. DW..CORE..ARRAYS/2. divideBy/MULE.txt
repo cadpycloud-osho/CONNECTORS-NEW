@@ -1,0 +1,51 @@
+divideBy:
+
+divideBy<T>(items: Array<T>, amount: Number): Array<Array<T>>
+
+divideBy<T>(items: Array<T>, amount: Number): Array<Array<T>>
+Breaks up an array into sub-arrays that contain the specified number of elements.
+
+When there are fewer elements in the input array than the specified number, the function fills the sub-array with those elements. When there are more elements, the function fills as many sub-arrays needed with the extra elements.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+---
+{
+  "divideBy" : [
+      { "divideBy2" : [1, 2, 3, 4, 5] divideBy 2 },
+      { "divideBy2" : [1, 2, 3, 4, 5, 6] divideBy 2 },
+      { "divideBy3" : [1, 2, 3, 4, 5] divideBy 3 }
+  ]
+}
+
+
+DataWeave
+Output
+{
+ "divideBy": [
+  {
+    "divideBy2": [
+      [ 1, 2 ],
+      [ 3, 4 ],
+      [ 5 ]
+    ]
+  },
+  {
+    "divideBy2": [
+      [ 1, 2 ],
+      [ 3, 4 ],
+      [ 5, 6 ]
+    ]
+  },
+    {
+      "divideBy3": [
+        [ 1, 2, 3 ],
+        [ 4, 5 ]
+      ]
+    }
+ ]
+}

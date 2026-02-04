@@ -1,0 +1,34 @@
+attr:
+
+
+input:
+
+@RestController
+public class AttrController {
+    
+    @PostMapping("/create-attr")
+    public Map<String, Object> createAttr(@RequestBody Map<String, String> request) {
+        String namespaceUri = request.getOrDefault("namespace", "http://acme.com/foo");
+        String attrName = request.getOrDefault("name", "myAttr");
+        return createAttrObject(namespaceUri, attrName);
+    }
+    
+    private Map<String, Object> createAttrObject(String namespaceUri, String attrName) {
+        Map<String, Object> attr = new HashMap<>();
+        attr.put("kind", "Attribute");
+        attr.put("namespace", namespaceUri);
+        attr.put("selector", attrName);
+        return attr;
+    }
+}
+
+
+output:
+
+
+{
+   "kind": "Attribute",
+   "namespace": "http://acme.com/foo",
+   "selector": "myAttr"
+}
+

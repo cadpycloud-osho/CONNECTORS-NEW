@@ -1,0 +1,45 @@
+partition:
+
+
+input:
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Integer> arr = List.of(0, 1, 2, 3, 4, 5);
+
+        List<Integer> success = new ArrayList<>();
+        List<Integer> failure = new ArrayList<>();
+
+        for (Integer item : arr) {
+            if (item % 2 == 0) {
+                success.add(item);   // even
+            } else {
+                failure.add(item);   // odd
+            }
+        }
+
+        Map<String, List<Integer>> result = new LinkedHashMap<>();
+        result.put("success", success);
+        result.put("failure", failure);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "success": [0, 2, 4],
+  "failure": [1, 3, 5]
+}
+
+
+

@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "requestId",
+        "name",
+        "definitionKey",
+        "description",
+        "classification",
+        "status",
+        "createdDate",
+        "modifiedDate",
+        "content",
+        "subscriptions",
+        "options",
+        "journey"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "definitionKey": {
+          "type": "string"
+        },
+        "definitionId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "classification": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdDate": {
+          "type": "string"
+        },
+        "modifiedDate": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/content"
+        },
+        "subscriptions": {
+          "$ref": "#/definitions/subscriptions"
+        },
+        "options": {
+          "$ref": "#/definitions/options"
+        },
+        "journey": {
+          "$ref": "#/definitions/journey"
+        }
+      }
+    },
+    "content": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "customerKey"
+      ],
+      "properties": {
+        "customerKey": {
+          "type": "string"
+        }
+      }
+    },
+    "subscriptions": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "list",
+        "autoAddSubscriber",
+        "updateSubscriber"
+      ],
+      "properties": {
+        "dataExtension": {
+          "type": "string"
+        },
+        "list": {
+          "type": "string"
+        },
+        "autoAddSubscriber": {
+          "type": "boolean"
+        },
+        "updateSubscriber": {
+          "type": "boolean"
+        }
+      }
+    },
+    "options": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "trackLinks"
+      ],
+      "properties": {
+        "trackLinks": {
+          "type": "boolean"
+        },
+        "bcc": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cc": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "journey": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "interactionKey": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

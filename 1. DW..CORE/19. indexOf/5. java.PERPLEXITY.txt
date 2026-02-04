@@ -1,0 +1,79 @@
+indexOf:
+
+exanples 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> present = Arrays.asList("a", "b", "c", "d");
+        List<String> notPresent = Arrays.asList("x", "w", "x");
+        List<String> presentMoreThanOnce = Arrays.asList("a", "b", "c", "c");
+        
+        Map<String, Integer> result = Map.of(
+            "present", present.indexOf("c"),
+            "notPresent", notPresent.indexOf("c"),
+            "presentMoreThanOnce", presentMoreThanOnce.indexOf("c")
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{present=2, notPresent=-1, presentMoreThanOnce=2}
+
+
+------------------------------------------------------------
+
+
+exanples 1:
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        String present = "abcd";
+        String notPresent = "xyz";
+        String presentMoreThanOnce = "abcdc";
+        
+        Map<String, Integer> result = Map.of(
+            "present", present.indexOf("c"),
+            "notPresent", notPresent.indexOf("c"),
+            "presentMoreThanOnce", presentMoreThanOnce.indexOf("c")
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{present=2, notPresent=-1, presentMoreThanOnce=2}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

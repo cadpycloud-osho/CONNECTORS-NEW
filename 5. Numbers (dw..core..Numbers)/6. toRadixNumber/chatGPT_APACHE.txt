@@ -1,0 +1,29 @@
+toRadixNumber:
+
+
+input:
+
+from("direct:toRadixNumber")
+.process(exchange -> {
+
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+
+    // Input numbers
+    int aNum = 2;
+    int bNum = 255;
+
+    // Convert numbers to strings in the given radix/base
+    output.put("a", Integer.toString(aNum, 2)); // base 2
+    output.put("b", Integer.toString(bNum, 16)); // base 16
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+{
+  "a": "10",
+  "b": "ff"
+}
+

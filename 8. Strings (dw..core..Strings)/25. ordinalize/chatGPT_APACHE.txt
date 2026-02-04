@@ -1,0 +1,45 @@
+ordinalize:
+
+
+input:
+
+public class OrdinalizeExample {
+
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + ordinalize(1) + "\",");
+        System.out.println("  \"b\": \"" + ordinalize(2) + "\",");
+        System.out.println("  \"c\": \"" + ordinalize(5) + "\",");
+        System.out.println("  \"d\": \"" + ordinalize(103) + "\"");
+        System.out.println("}");
+    }
+
+    public static String ordinalize(int number) {
+        int mod100 = number % 100;
+
+        // Special case: 11, 12, 13
+        if (mod100 >= 11 && mod100 <= 13) {
+            return number + "th";
+        }
+
+        switch (number % 10) {
+            case 1: return number + "st";
+            case 2: return number + "nd";
+            case 3: return number + "rd";
+            default: return number + "th";
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a": "1st",
+  "b": "2nd",
+  "c": "5th",
+  "d": "103rd"
+}
+
+

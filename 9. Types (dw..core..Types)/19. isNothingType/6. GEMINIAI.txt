@@ -1,0 +1,60 @@
+isNothingType:
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.lang.Void; // Used as the Java proxy for the DataWeave Nothing type
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NothingCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isNothingType(Type).
+     */
+    private boolean isNothingType(Class<?> type) {
+        return Void.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/nothing-typecheck")
+    public Map<String, Boolean> checkNothingTypes() {
+        
+        // DataWeave type ANothing is an alias for Nothing (Conceptually Void in Java context)
+        Class<?> aNothing = Void.class;
+        
+        // DataWeave type Nothing (Conceptually Void in Java context)
+        Class<?> nothingType = Void.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isNothingType(aNothing);
+        boolean b = isNothingType(nothingType);
+        boolean c = isNothingType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

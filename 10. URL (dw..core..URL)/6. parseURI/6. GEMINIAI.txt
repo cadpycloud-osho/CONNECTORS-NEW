@@ -1,0 +1,101 @@
+parseURI:
+
+
+
+input:
+
+package com.example.demo;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+// Record class (Java 16+) or POJO to match the output structure
+public record ParsedUriResult(
+    boolean isValid,
+    String raw,
+    String host,
+    String authority,
+    String fragment,
+    String path,
+    String scheme,
+    boolean isAbsolute,
+    boolean isOpaque
+) {}
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriParseController {
+
+    private static final String INPUT_URI = "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+
+    /**
+     * Helper method mirroring DataWeave's URL::parseURI logic.
+     */
+    private ParsedUriResult parseUri(String uriString) {
+        try {
+            URI uri = new URI(uriString);
+            
+            return new ParsedUriResult(
+                true,
+                uri.toString(),
+                uri.getHost(),
+                uri.getAuthority(),
+                uri.getFragment(),
+                uri.getPath(),
+                uri.getScheme(),
+                uri.isAbsolute(),
+                uri.isOpaque()
+            );
+        } catch (URISyntaxException e) {
+            // Return an invalid result object
+            return new ParsedUriResult(
+                false,
+                uriString,
+                null, null, null, null, null, false, false
+            );
+        }
+    }
+
+    @GetMapping("/parse-uri")
+    public Map<String, ParsedUriResult> getParsedUri() {
+        
+        ParsedUriResult composition = parseUri(INPUT_URI);
+        
+        // Map the results to match the desired nested JSON structure: { "composition": {...} }
+        Map<String, ParsedUriResult> output = new HashMap<>();
+        output.put("composition", composition);
+        
+        return output; // Spring automatically serializes the Map/Record to JSON
+    }
+}
+
+
+
+
+
+output:
+
+
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+

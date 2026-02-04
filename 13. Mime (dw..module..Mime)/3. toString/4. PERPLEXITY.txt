@@ -1,0 +1,115 @@
+toString:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MimeToStringExample1 {
+    
+    @GetMapping("/mime/to-string1")
+    public String toString1() {
+        Map<String, String> parameters = new HashMap<>();
+        // parameters is empty
+        
+        String result = MimeUtils.toString("application", "json", parameters);
+        return result;
+    }
+}
+
+class MimeUtils {
+    public static String toString(String type, String subtype, Map<String, String> parameters) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        
+        if (parameters != null && !parameters.isEmpty()) {
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                sb.append(";").append(entry.getKey()).append("=").append(entry.getValue());
+            }
+        }
+        
+        return sb.toString();
+    }
+}
+
+output:
+
+"application/json"
+
+
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MimeToStringExample2 {
+    
+    @GetMapping("/mime/to-string2")
+    public String toString2() {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("boundary", "my-boundary");
+        
+        String result = MimeUtils.toString("multipart", "form-data", parameters);
+        return result;
+    }
+}
+
+class MimeUtils {
+    public static String toString(String type, String subtype, Map<String, String> parameters) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        
+        if (parameters != null && !parameters.isEmpty()) {
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                sb.append(";").append(entry.getKey()).append("=").append(entry.getValue());
+            }
+        }
+        
+        return sb.toString();
+    }
+}
+
+
+output:
+
+
+"multipart/form-data;boundary=my-boundary"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

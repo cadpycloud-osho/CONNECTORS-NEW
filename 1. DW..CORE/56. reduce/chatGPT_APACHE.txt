@@ -1,0 +1,254 @@
+reduce:
+
+example 1:
+
+input:
+
+from("direct:start")
+    .setBody(constant(java.util.Arrays.asList(2, 3)))
+    .process(e -> {
+        java.util.List<Integer> list = e.getIn().getBody(java.util.List.class);
+        int sum = list.stream().reduce(0, Integer::sum);
+        e.getIn().setBody(sum);
+    });
+
+
+output:
+
+5
+
+
+----------------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:start")
+    .process(e -> {
+        java.util.List<Integer> myNums = java.util.Arrays.asList(1, 2, 3, 4);
+        java.util.List<Integer> myEmptyList = java.util.Collections.emptyList();
+
+        Integer sum = myNums.stream().reduce(Integer::sum).orElse(null);
+        String concat = myNums.stream()
+                              .map(String::valueOf)
+                              .reduce(String::concat)
+                              .orElse(null);
+        String emptyListResult = myEmptyList.stream()
+                                            .map(String::valueOf)
+                                            .reduce(String::concat)
+                                            .orElse(null);
+
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("sum", sum);
+        result.put("concat", concat);
+        result.put("emptyList", emptyListResult);
+
+        e.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "sum": 10,
+  "concat": "1234",
+  "emptyList": null
+}
+
+
+----------------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        // Concatenation with default initial value "z"
+        java.util.List<String> letters = java.util.Arrays.asList("a","b","c","d");
+        String concat = letters.stream().reduce("z", String::concat);
+
+        // Sum with default initial value 3
+        java.util.List<Integer> nums = java.util.Arrays.asList(0,1,2,3,4,5);
+        Integer sum = nums.stream().reduce(3, Integer::sum);
+
+        // Multiply without initial value
+        java.util.List<Integer> multNums = java.util.Arrays.asList(2,3,3);
+        Integer multiply = multNums.stream().reduce((acc,item) -> acc * item).orElse(null);
+
+        // Multiply with initial value 3
+        java.util.List<Integer> multNums2 = java.util.Arrays.asList(2,2,3);
+        Integer multiplyAcc = multNums2.stream().reduce(3, (acc,item) -> acc * item);
+
+        // Build result
+        java.util.Map<String,Object> result = new java.util.LinkedHashMap<>();
+        result.put("concat", concat);
+        result.put("sum", sum);
+        result.put("multiply", multiply);
+        result.put("multiplyAcc", multiplyAcc);
+
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "concat": "zabcd",
+  "sum": 18,
+  "multiply": 18,
+  "multiplyAcc": 36
+}
+
+
+----------------------------------------------------------------
+
+example 4:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+
+        // Input variables
+        java.util.List<Integer> aList = java.util.Arrays.asList(0,1,2,3,4,5);
+        java.util.List<String> bList = java.util.Arrays.asList("a","b","c","d","e");
+        java.util.List<java.util.Map<String,String>> cList = java.util.Arrays.asList(
+            java.util.Collections.singletonMap("letter","a"),
+            java.util.Collections.singletonMap("letter","b"),
+            java.util.Collections.singletonMap("letter","c")
+        );
+        java.util.List<Boolean> dList = java.util.Arrays.asList(true,false,false,true,true);
+
+        // Compute results
+        Integer a = aList.stream().reduce(0, Integer::sum);
+        String b = bList.stream().reduce("", String::concat);
+        String c = cList.stream().reduce("z", (acc,item) -> acc + item.get("letter"), String::concat);
+        java.util.Map<String,String> d = cList.get(0); // reduce $$ returns first element
+        Boolean e = dList.stream().reduce((x,y) -> x && y).orElse(false);
+        Boolean f = dList.stream().reduce((acc,item) -> acc && item).orElse(false);
+        Boolean g = dList.stream().reduce(false, (acc,item) -> acc && item, Boolean::logicalAnd);
+        Boolean h = dList.stream().reduce((x,y) -> y).orElse(true);
+        Integer i = aList.stream().reduce(0, Integer::sum);
+        Integer j = aList.stream().reduce(0, (acc,item) -> acc + item);
+        Integer k = aList.stream().reduce(3, (acc,item) -> acc + item);
+        Integer l = aList.stream().reduce(0, Integer::sum);
+        String m = bList.stream().reduce("", String::concat);
+        String n = bList.stream().reduce("", (acc,item) -> acc + item);
+        String o = bList.stream().reduce("z", (acc,item) -> acc + item);
+        String p = bList.stream().reduce((x,y) -> y).orElse("");
+        String q = cList.stream().reduce("z", (acc,item) -> acc + item.get("letter"), String::concat);
+        java.util.Map<String,String> r = cList.get(0);
+        Boolean s = dList.stream().reduce((x,y) -> x && y).orElse(false);
+        Boolean t = dList.stream().reduce((acc,item) -> acc && item).orElse(false);
+        Boolean u = dList.stream().reduce(false, (acc,item) -> acc && item, Boolean::logicalAnd);
+        Boolean v = dList.stream().reduce((x,y) -> y).orElse(true);
+        java.util.List<Integer> w = java.util.Arrays.asList(0,1,2,3,4);
+        Object x = null;
+        Integer y = 0;
+
+        // Build result
+        java.util.Map<String,Object> result = new java.util.LinkedHashMap<>();
+        result.put("a", a);
+        result.put("b", b);
+        result.put("c", c);
+        result.put("d", d);
+        result.put("e", e);
+        result.put("f", f);
+        result.put("g", g);
+        result.put("h", h);
+        result.put("i", i);
+        result.put("j", j);
+        result.put("k", k);
+        result.put("l", l);
+        result.put("m", m);
+        result.put("n", n);
+        result.put("o", o);
+        result.put("p", p);
+        result.put("q", q);
+        result.put("r", r);
+        result.put("s", s);
+        result.put("t", t);
+        result.put("u", u);
+        result.put("v", v);
+        result.put("w", w);
+        result.put("x", x);
+        result.put("y", y);
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+{
+  "a": 0,
+  "b": "a",
+  "c": "zabc",
+  "d": { "letter": "a" },
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": true,
+  "i": 15,
+  "j": 15,
+  "k": 18,
+  "l": 0,
+  "m": "abcde",
+  "n": "abcde",
+  "o": "zabcde",
+  "p": "a",
+  "q": "zabc",
+  "r": { "letter": "a" },
+  "s": false,
+  "t": false,
+  "u": false,
+  "v": true,
+  "w": [0,1,2,3,4],
+  "x": null,
+  "y": 0
+}
+
+
+----------------------------------------------------------------
+
+example 5:
+
+input:
+
+from("direct:start")
+    .setBody(constant("hello world"))
+    .process(exchange -> {
+        String input = exchange.getIn().getBody(String.class);
+        String reversed = input.chars()
+                               .mapToObj(c -> String.valueOf((char) c))
+                               .reduce("", (item, acc) -> item + acc);
+        exchange.getIn().setBody(reversed);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+"dlrow olleh"
+
+
+----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

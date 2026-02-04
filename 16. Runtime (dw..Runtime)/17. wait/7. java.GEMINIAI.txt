@@ -1,0 +1,53 @@
+wait:
+
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+
+    private static final long WAIT_DURATION_MS = 2000;
+
+    /**
+     * Replicates the DW expression: { "user" : 1 } wait 2000
+     */
+    public static Map<String, Integer> executeWait() {
+        System.out.println("Starting execution and initiating wait...");
+        
+        try {
+            // Equivalent to DW wait 2000
+            Thread.sleep(WAIT_DURATION_MS);
+            System.out.println("Wait finished after " + WAIT_DURATION_MS + "ms.");
+            
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Execution interrupted during wait.");
+        }
+
+        // Equivalent to the expression being yielded: { "user" : 1 }
+        return Map.of("user", 1);
+    }
+
+    public static void main(String[] args) {
+        long startTime = System.currentTimeMillis();
+        Map<String, Integer> result = executeWait();
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("\n--- Pure Java Wait Simulation Output ---");
+        System.out.println("Result: " + result);
+        System.out.println("Total execution time: " + (endTime - startTime) + "ms (should be ~2000ms)");
+    }
+}
+
+output:
+
+
+Starting execution and initiating wait...
+Wait finished after 2000ms.
+
+--- Pure Java Wait Simulation Output ---
+Result: {user=1}
+Total execution time: 2002ms (should be ~2000ms)

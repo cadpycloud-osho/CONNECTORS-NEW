@@ -1,0 +1,42 @@
+prependIfMissing:
+
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class PrependController {
+    
+    @GetMapping("/prepend")
+    public Map<String, Object> prependIfMissing() {
+        return Map.of(
+            "a", prependIfMissing(null, ""),
+            "b", prependIfMissing("abc", ""),
+            "c", prependIfMissing("", "xyz"),
+            "d", prependIfMissing("abc", "xyz"),
+            "e", prependIfMissing("xyzabc", "xyz")
+        );
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> T prependIfMissing(T text, String prefix) {
+        if (text == null || prefix == null || prefix.isEmpty()) {
+            return text;
+        }
+        String strText = (String) text;
+        return strText.startsWith(prefix) ? strText : prefix + strText;
+    }
+}
+
+output:
+
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+

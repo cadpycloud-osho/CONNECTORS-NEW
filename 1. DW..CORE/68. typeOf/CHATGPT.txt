@@ -1,0 +1,76 @@
+typeOf:
+
+
+example 1:
+
+input:
+
+@GetMapping("/typeof1")
+public List<String> typeOfExample1() {
+
+    List<String> result = new ArrayList<>();
+
+    // String
+    result.add("String");
+
+    // Array
+    result.add("Array");
+
+    // Number
+    result.add("Number");
+
+    // Boolean
+    result.add("Boolean");
+
+    // Object
+    result.add("Object");
+
+    return result;
+}
+
+
+output:
+
+[
+  "String",
+  "Array",
+  "Number",
+  "Boolean",
+  "Object"
+]
+
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+
+@GetMapping("/typeof2")
+public List<String> typeOfExample2() {
+
+    Object x = "clearly a string"; // Could be string or number
+    Object y = "because"; // Literal string
+
+    return Arrays.asList(
+            x.getClass().getSimpleName(),  // -> String
+            y.getClass().getSimpleName()   // -> String
+    );
+}
+
+output:
+
+[
+  "String",
+  "String"
+]
+
+
+
+
+
+
+
+

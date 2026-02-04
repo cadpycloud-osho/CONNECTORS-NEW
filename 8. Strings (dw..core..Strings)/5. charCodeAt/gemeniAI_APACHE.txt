@@ -1,0 +1,34 @@
+charCodeAt:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Collections;
+
+public class CharCodeAtRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getCharCodeAt")
+            .process(exchange -> {
+                String input = "MuleSoft";
+                int index = 1;
+
+                // Logic: Access char at index and cast to integer
+                int code = (input != null && index >= 0 && index < input.length()) 
+                           ? (int) input.charAt(index) 
+                           : -1; // Handle out-of-bounds cases
+
+                exchange.getIn().setBody(Collections.singletonMap("charCodeAt", code));
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "charCodeAt": 117
+}
+

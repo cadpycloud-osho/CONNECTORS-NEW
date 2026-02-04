@@ -1,0 +1,46 @@
+toPeriod:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
+import java.time.Period;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class PeriodController {
+
+    @GetMapping("/periods")
+    public Map<String, String> getPeriods() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // DW toPeriod("P1D") → java.time.Period
+        Period periodEx1 = Period.parse("P1D");
+        result.put("toPeriodEx1", periodEx1.toString());
+
+        // DW toPeriod("PT1H1M") → java.time.Duration
+        Duration durationEx2 = Duration.parse("PT1H1M");
+        result.put("toPeriodEx2", durationEx2.toString());
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "toPeriodEx1": "P1D",
+  "toPeriodEx2": "PT1H1M"
+}
+
+
+

@@ -1,0 +1,62 @@
+log:
+
+log<T>(prefix: String = "", value: T): T
+
+log<T>(prefix: String = "", value: T): T
+Without changing the value of the input, log returns the input as a system log. So this makes it very simple to debug your code, because any expression or subexpression can be wrapped with log and the result will be printed out without modifying the result of the expression. The output is going to be printed in application/dw format.
+
+The prefix parameter is optional and allows to easily find the log output.
+
+Use this function to help with debugging DataWeave scripts. A Mule app outputs the results through the DefaultLoggingService, which you can see in the Studio console.
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+log("WARNING", "Houston, we have a problem")
+DataWeave
+Output
+Console Output
+
+"WARNING - Houston, we have a problem"
+XML
+
+
+Expression Output
+
+"Houston, we have a problem"
+
+
+
+_______________________________________________________________
+
+
+Source
+%dw 2.0
+output application/json
+
+var myUser = {user: {friend: {name: "Shoki"}, id: 1, name: "Tomo"}, accountId: "leansh" }
+---
+log("User", myUser.user).friend.name
+
+DataWeave
+Output
+Console output
+
+User - {
+  friend: {
+    name: "Shoki"
+  },
+  id: 1,
+  name: "Tomo"
+}
+
+Expression Output
+
+"Shoki"
+
+

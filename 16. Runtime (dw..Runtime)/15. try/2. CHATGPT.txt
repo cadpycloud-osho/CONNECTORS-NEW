@@ -1,0 +1,80 @@
+try:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class TryFailController {
+
+    @GetMapping("/randomCheck")
+    public Map<String, Object> randomCheck() {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String result = randomNumber();   // may throw exception
+
+            response.put("success", true);
+            response.put("result", result);
+
+        } catch (Exception e) {
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("kind", "UserException");
+            error.put("message", e.getMessage());
+            error.put("location", "Unknown location");
+            error.put("stack", Arrays.asList(
+                    "fail (anonymous:0:0)",
+                    "randomNumber (anonymous:1:114)",
+                    "main (anonymous:1:179)"
+            ));
+
+            response.put("success", false);
+            response.put("error", error);
+        }
+
+        return response;
+    }
+
+    private String randomNumber() {
+
+        double random = Math.random();
+
+        if (random > 0.5) {
+            throw new RuntimeException("This function is failing");
+        }
+
+        return "OK";
+    }
+}
+
+
+output:
+
+{
+  "success": false,
+  "error": {
+    "kind": "UserException",
+    "message": "This function is failing",
+    "location": "Unknown location",
+    "stack": [
+      "fail (anonymous:0:0)",
+      "randomNumber (anonymous:1:114)",
+      "main (anonymous:1:179)"
+    ]
+  }
+}
+
+
+Case 2 — randomNumber() succeeds
+{
+  "success": true,
+  "result": "OK"
+}

@@ -1,0 +1,37 @@
+isTimeType:
+
+
+input:
+
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isTimeType(Object value) {
+        return value instanceof LocalTime;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        LocalTime aTime = LocalTime.now();        // ATime
+        LocalTime timeType = LocalTime.of(12, 30); // Time
+        String str = "test";                      // String
+        
+        result.put("a", isTimeType(aTime));
+        result.put("b", isTimeType(timeType));
+        result.put("c", isTimeType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+
+

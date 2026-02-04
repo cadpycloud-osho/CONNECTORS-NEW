@@ -1,0 +1,18 @@
+remove:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "lazyness purity state higher-order stateful";
+        String result = input.replaceAll("state", "");
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+output:
+
+"lazyness purity  higher-order ful"
+

@@ -1,0 +1,258 @@
+splitBy:
+
+
+example 1:
+
+
+
+input:
+
+@RestController
+class Example1_SplitByRegex {
+
+    @GetMapping("/example1/splitByRegex")
+    public List<String> splitByRegex() {
+        String input = "192.88.99.0/24";
+        // Split by dot or slash using regex
+        return Arrays.asList(input.split("[./]"));
+    }
+}
+
+
+
+output:
+
+["192","88","99","0","24"]
+
+------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+
+@RestController
+class Example2_Splitters {
+
+    @GetMapping("/example2/splitters")
+    public Map<String, List<String>> splitters() {
+        Map<String, List<String>> result = new HashMap<>();
+
+        // split1 : "a-b-c" splitBy(/.b./)  (dot b dot means 'any char + b + any char')
+        // Remove the 'b' and its neighbors matched by /.b./, i.e. characters around 'b'
+        // We split by regex: .b.
+        String split1Input = "a-b-c";
+        List<String> split1 = Arrays.asList(split1Input.split(".b."));
+
+        // Note: The regex ".b." will split around any 3-character sequence where the middle is 'b'.
+        // But since '.' matches all except line terminators, it may behave unexpectedly in Java regex.
+        // So to exactly match DataWeave behavior, test carefully:
+        // "a-b-c".split(".b.") regex => split by 'any char b any char'
+
+        // split2 : "hello world" splitBy(/\s/)
+        List<String> split2 = Arrays.asList("hello world".split("\\s"));
+
+        // split3 : "no match" splitBy(/^s/)  No match - so whole string in one element
+        List<String> split3 = Collections.singletonList("no match");
+
+        // split4 : "no match" splitBy(/^n../) matches empty string at start? Actually, matches "no "
+        // We simulate splitting by ^n.. (start with n and next two chars)
+        // Java split does not support zero-length matches easily, use pattern match
+        String split4Input = "no match";
+        String regex4 = "^n..";
+        List<String> split4;
+        if (split4Input.matches(regex4 + ".*")) {
+            // Remove the matched substring "no "
+            String remainder = split4Input.substring(3);
+            // Split results are ["", "match"]
+            split4 = Arrays.asList("", remainder);
+        } else {
+            split4 = Collections.singletonList(split4Input);
+        }
+
+        // split5 : "a1b2c3d4A1B2C3D" splitBy(/[0-9A-Z]/)
+        String split5Input = "a1b2c3d4A1B2C3D";
+        List<String> split5 = Arrays.asList(split5Input.split("[0-9A-Z]"));
+
+        result.put("split1", split1);
+        result.put("split2", split2);
+        result.put("split3", split3);
+        result.put("split4", split4);
+        result.put("split5", split5);
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a", "c"],
+    "split2": ["hello", "world"],
+    "split3": ["no match"],
+    "split4": ["", "match"],
+    "split5": ["a", "b", "c", "d"]
+  }
+}
+
+------------------------------------------------------------------
+example 3:
+
+
+
+input:
+
+
+@RestController
+class Example3_SplitAndFirst {
+
+    @GetMapping("/example3/splitAndFirst")
+    public String splitAndFirst() {
+        String input = "192.88.99.0";
+        String[] parts = input.split("\\.");
+        return parts[0];
+    }
+}
+
+
+output:
+"192"
+
+------------------------------------------------------------------
+example 4:
+
+
+
+input:
+
+
+import java.util.regex.*;
+
+@RestController
+class Example4_ComplexSplit {
+
+    @GetMapping("/example4/complexSplit")
+    public List<String> complexSplit() {
+        String input = "root.sources.data.`test.branch.BranchSource`.source.traits";
+
+        // The DataWeave regex splits on dots not inside backticks.
+        // Java doesn't support variable-length lookbehind, so we parse manually.
+
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean insideBacktick = false;
+
+        for (char c : input.toCharArray()) {
+            if (c == '`') {
+                insideBacktick = !insideBacktick;
+                current.append(c);
+            } else if (c == '.' && !insideBacktick) {
+                result.add(current.toString());
+                current.setLength(0);
+            } else {
+                current.append(c);
+            }
+        }
+        result.add(current.toString());
+
+        return result;
+    }
+}
+
+
+output:
+
+[
+  "root",
+  "sources",
+  "data",
+  "`test.branch.BranchSource`",
+  "source",
+  "traits"
+]
+
+------------------------------------------------------------------
+example 5:
+
+
+input:
+
+
+@RestController
+class Example5_SplitByDot {
+
+    @GetMapping("/example5/splitByDot")
+    public List<String> splitByDot() {
+        String input = "192.88.99.0";
+        return Arrays.asList(input.split("\\."));
+    }
+}
+
+
+output:
+
+["192", "88", "99", "0"]
+
+------------------------------------------------------------------
+
+example 6:
+
+
+input:
+
+@RestController
+class Example6_SplittersSimple {
+
+    @GetMapping("/example6/splittersSimple")
+    public Map<String, List<String>> splittersSimple() {
+        Map<String, List<String>> result = new HashMap<>();
+
+        result.put("split1", Arrays.asList("a-b-c".split("-")));
+        // split2 with empty string separator splits into chars + empty strings between consecutive chars
+        String split2Input = "hello world";
+        List<String> split2 = new ArrayList<>();
+        for (int i = 0; i < split2Input.length(); i++) {
+            split2.add(String.valueOf(split2Input.charAt(i)));
+            if (i < split2Input.length() - 1) {
+                split2.add("");
+            }
+        }
+        result.put("split2", split2);
+
+        result.put("split3", Arrays.asList("first,middle,last".split(",")));
+        result.put("split4", Collections.singletonList("no split".split("NO")[0])); // No split so entire string
+
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a", "b", "c"],
+    "split2": [ "h","", "e","", "l","", "l","", "o","", " ","", "w","", "o","", "r","", "l","", "d" ],
+    "split3": ["first", "middle", "last"],
+    "split4": ["no split"]
+  }
+}
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+

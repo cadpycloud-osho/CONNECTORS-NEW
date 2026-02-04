@@ -1,0 +1,167 @@
+filterObjectLeafs:
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    // Input variable 'myArray'
+    // Using LinkedHashMap and Arrays.asList for safety and explicit mutability control if needed.
+    private static final List<Map<String, Object>> MY_ARRAY;
+    static {
+        Map<String, Object> map1 = new LinkedHashMap<>();
+        map1.put("name", "");
+        map1.put("id", "test");
+        
+        Map<String, Object> map2 = new LinkedHashMap<>();
+        map2.put("name", "Me");
+        map2.put("id", null);
+
+        MY_ARRAY = Collections.unmodifiableList(Arrays.asList(map1, map2));
+    }
+    
+    // --- Predicates replicating DataWeave logic ---
+    
+    // Predicate for 'a': !(value is Null or value is String)
+    private static final BiPredicate<Object, List<Object>> PREDICATE_A = 
+        (value, path) -> !(value == null || value instanceof String);
+
+    // Predicate for 'b': (value is Null)
+    private static final BiPredicate<Object, List<Object>> PREDICATE_B = 
+        (value, path) -> (value == null); 
+
+    
+    // --- Core Recursive Filter Logic ---
+
+    @SuppressWarnings("unchecked")
+    private static Object filterObjectLeafsRecursive(Object input, BiPredicate<Object, List<Object>> predicate) {
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            // Primitives are handled by the calling Map/List logic.
+            return input;
+        } else if (input instanceof Map) {
+            // Object Type - This is where the filtering happens.
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            originalMap.forEach((key, value) -> {
+                // Determine if the value is a leaf node (primitive or null)
+                if (value == null || value instanceof Number || value instanceof String || value instanceof Boolean) {
+                    // Leaf node - APPLY FILTER
+                    if (predicate.test(value, List.of())) { // Path is simplified
+                        newMap.put(key, value);
+                    }
+                } else {
+                    // Non-leaf node (List or nested Map) - RECURSE
+                    Object result = filterObjectLeafsRecursive(value, predicate);
+                    // Non-leaf structures are preserved even if they recursively become empty
+                    newMap.put(key, result);
+                }
+            });
+            // Resulting map (Object) is always preserved, even if empty.
+            return newMap;
+        } else if (input instanceof List) {
+            // Array Type - Recurse but DO NOT filter the array items themselves (per filterObjectLeafs)
+            List<Object> originalList = (List<Object>) input;
+            
+            return originalList.stream()
+                .map(item -> filterObjectLeafsRecursive(item, predicate))
+                .collect(Collectors.toList());
+        } 
+        return input; 
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    private static String toPrettyJson(Object obj, int indent) {
+        // Use spaces for indentation
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            // Handle empty map case
+            if (map.isEmpty()) return "{}";
+            
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            // Handle empty list case
+            if (list.isEmpty()) return "[]";
+            
+            String body = list.stream()
+                    .map(v -> {
+                        String jsonValue = toPrettyJson(v, indent + 1);
+                        // Only indent single-line values, multi-line values already include newlines
+                        return jsonValue.contains("\n") ? jsonValue : next + jsonValue;
+                    })
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+    public static void main(String[] args) {
+        
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // Input structure for 'a'
+        Map<String, Object> inputA = new LinkedHashMap<>();
+        inputA.put("name", "Mariano");
+        inputA.put("lastName", null);
+        inputA.put("age", 123);
+        inputA.put("friends", MY_ARRAY);
+
+        // a: filterObjectLeafs (!(value is Null or value is String))
+        output.put("a", filterObjectLeafsRecursive(inputA, PREDICATE_A));
+        
+        // b: { c : null, d : "hello" } filterObjectLeafs ((value is Null))
+        Map<String, Object> inputB = new LinkedHashMap<>();
+        inputB.put("c", null);
+        inputB.put("d", "hello");
+        output.put("b", filterObjectLeafsRecursive(inputB, PREDICATE_B));
+
+        // Output the map as JSON 
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+
+output:
+{
+  "a": {
+    "age": 123,
+    "friends": [
+      {
+        "name": {},
+        "id": {}
+      },
+      {
+        "name": {},
+        "id": {}
+      }
+    ]
+  },
+  "b": {
+    "c": null
+  }
+}
+
+
+
+

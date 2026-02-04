@@ -1,0 +1,329 @@
+join:
+
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects; // <-- This is the missing import for Objects.equals()
+import java.util.stream.Collectors;
+
+// --- Data Classes ---
+
+class User {
+    String id;
+    String name;
+
+    public User(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    public String getId() { return id; }
+
+    // toString for structured output
+    @Override
+    public String toString() {
+        // Corrected for cleaner formatting in the final output
+        return "{\n      \"id\": \"" + id + "\",\n      \"name\": \"" + name + "\"\n    }";
+    }
+}
+
+class Product {
+    String ownerId;
+    String name;
+
+    public Product(String ownerId, String name) {
+        this.ownerId = ownerId;
+        this.name = name;
+    }
+    public String getOwnerId() { return ownerId; }
+
+    // toString for structured output
+    @Override
+    public String toString() {
+        // Corrected for cleaner formatting in the final output
+        return "{\n      \"ownerId\": \"" + ownerId + "\",\n      \"name\": \"" + name + "\"\n    }";
+    }
+}
+
+class JoinedRecord {
+    User l; // Left element
+    Product r; // Right element
+
+    public JoinedRecord(User l, Product r) {
+        this.l = l;
+        this.r = r;
+    }
+
+    // toString method to match the desired JSON structure
+    @Override
+    public String toString() {
+        // Clean up the nested toString output to align with the desired format
+        String lString = l.toString().replaceAll("\n", "\n    ");
+        String rString = r.toString().replaceAll("\n", "\n    ");
+        
+        // Remove the outer curly brace indentations added by the inner toString() 
+        // for the final structure.
+        lString = lString.substring(lString.indexOf('{')); 
+        rString = rString.substring(rString.indexOf('{')); 
+
+        return "  {\n    \"l\": " + lString + ",\n    \"r\": " + rString + "\n  }";
+    }
+}
+
+// --- Execution Class ---
+
+public class Main {
+    public static void main(String[] args) {
+        // 1. Define Source Data (User and Product lists)
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"),
+            new User("2", "Emanuel"), // No matching products
+            new User("3", "Julian")
+        );
+
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"),
+            new Product("1", "BAT"),
+            new Product("3", "DataSense"),
+            new Product("4", "NoOwner") // No matching users
+        );
+
+        // 2. DataWeave Logic: Inner Join (users filter products by ownerId == id)
+        List<JoinedRecord> joinedRecords = users.stream()
+            // FlatMap combines each user with all matching products
+            .flatMap(user -> products.stream()
+                // Filter: Join condition (User.id == Product.ownerId)
+                .filter(product -> Objects.equals(user.getId(), product.getOwnerId()))
+                // Map: Create a new JoinedRecord object for each match
+                .map(product -> new JoinedRecord(user, product))
+            )
+            .collect(Collectors.toList());
+
+        // 3. Output the result in the required format
+        String result = joinedRecords.stream()
+            .map(JoinedRecord::toString)
+            .collect(Collectors.joining(",\n"));
+
+        System.out.println("[\n" + result + "\n]");
+    }
+}
+output:
+
+
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Java Code (Using Nested Loops - Imperative Style)
+This approach uses traditional nested loops to iterate through every combination of User and Product and checks the join condition.
+
+Java
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveJoinImperative {
+
+    public static List<JoinedRecord> innerJoin(List<User> leftList, List<Product> rightList) {
+        List<JoinedRecord> result = new ArrayList<>();
+
+        // Iterate over every element in the left list (users)
+        for (User user : leftList) {
+            // Iterate over every element in the right list (products)
+            for (Product product : rightList) {
+                // Check the join condition: user.id == product.ownerId
+                if (user.getId().equals(product.getOwnerId())) {
+                    // Match found: create a new JoinedRecord and add it to the result
+                    result.add(new JoinedRecord(user, product));
+                }
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        // Source data (DataWeave 'users' variable)
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"), 
+            new User("2", "Leandro"), 
+            new User("3", "Julian"), 
+            new User("5", "Julian")
+        );
+
+        // Source data (DataWeave 'products' variable)
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"), 
+            new Product("1", "BAT"), 
+            new Product("3", "DataSense"), 
+            new Product("4", "SmartConnectors")
+        );
+
+        // DataWeave Logic: inner join
+        List<JoinedRecord> result = innerJoin(users, products);
+
+        // Print the final JSON-like output structure
+        System.out.println("Output structure:");
+        System.out.println("[");
+        // Print each joined record separated by a comma (except the last one)
+        for (int i = 0; i < result.size(); i++) {
+            System.out.print(result.get(i).toString());
+            if (i < result.size() - 1) {
+                System.out.print(",\n");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("]");
+    }
+}
+2. Java Code (Using Streams and flatMap - Functional Style)
+This approach uses Java 8+ Streams to achieve the same result in a more functional way, mirroring the nested iteration using flatMap.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class DataWeaveJoinStream {
+
+    public static List<JoinedRecord> innerJoin(List<User> leftList, List<Product> rightList) {
+        return leftList.stream()
+            // Map each user to a stream of matching products
+            .flatMap(user -> rightList.stream()
+                // Filter the products to only include those matching the user's ID
+                .filter(product -> user.getId().equals(product.getOwnerId()))
+                // Map the matching product to a JoinedRecord
+                .map(product -> new JoinedRecord(user, product))
+            )
+            // Collect all JoinedRecords into a final list
+            .collect(Collectors.toList());
+    }
+
+    // ... (main method is identical to the Imperative example for data setup and printing)
+
+    public static void main(String[] args) {
+        // Source data (DataWeave 'users' variable)
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"), 
+            new User("2", "Leandro"), 
+            new User("3", "Julian"), 
+            new User("5", "Julian")
+        );
+
+        // Source data (DataWeave 'products' variable)
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"), 
+            new Product("1", "BAT"), 
+            new Product("3", "DataSense"), 
+            new Product("4", "SmartConnectors")
+        );
+
+        // DataWeave Logic: inner join
+        List<JoinedRecord> result = innerJoin(users, products);
+
+        // Print the final JSON-like output structure
+        System.out.println("Output structure:");
+        System.out.println("[");
+        // Print each joined record separated by a comma (except the last one)
+        for (int i = 0; i < result.size(); i++) {
+            System.out.print(result.get(i).toString());
+            if (i < result.size() - 1) {
+                System.out.print(",\n");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("]");
+    }
+}
+Output for Both Java Codes
+The output generated by both Java implementations is identical and correctly matches the expected DataWeave output:
+
+JSON
+
+Output structure:
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  }
+]

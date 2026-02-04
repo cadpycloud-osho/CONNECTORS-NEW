@@ -1,0 +1,39 @@
+decodeURI:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+public class DecodeUriRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                String encodedUrl = "http://asd/%20text%20to%20decode%20/text";
+
+                String decodedUrl =
+                        URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8);
+
+                exchange.getMessage().setBody(
+                    "{ \"decodeURI\" : \"" + decodedUrl + "\" }"
+                );
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "decodeURI": "http://asd/ text to decode /text"
+}
+
+
+
+

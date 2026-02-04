@@ -1,0 +1,29 @@
+randomInt:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+class RandomIntController {
+    
+    @GetMapping("/randomInt-price")
+    public Map<String, Double> randomIntPrice() {
+        Random random = new Random();
+        Map<String, Double> response = new HashMap<>();
+        response.put("price", (double) random.nextInt(1000));
+        return response;
+    }
+}
+
+
+output:
+
+
+{
+  "price": 442.0
+}

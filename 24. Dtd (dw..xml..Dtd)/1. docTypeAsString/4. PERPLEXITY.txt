@@ -1,0 +1,66 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class DtdController {
+    
+    @GetMapping("/doctype")
+    public String docTypeAsString() {
+        String rootName = "cXML";
+        String systemId = "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd";
+        return generateDocType(rootName, systemId);
+    }
+    
+    private String generateDocType(String rootName, String systemId) {
+        return String.format("%s SYSTEM %s", rootName, systemId);
+    }
+}
+
+
+
+output:
+
+cXML SYSTEM http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd
+
+
+---------------------------------------------------------------------
+
+
+example 2:
+
+@RestController
+public class XhtmlDtdController {
+    
+    @GetMapping("/xhtml-doctype")
+    public String xhtmlDocTypeAsString() {
+        String rootName = "html";
+        String publicId = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+        String systemId = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+        return generateDocType(rootName, publicId, systemId);
+    }
+    
+    private String generateDocType(String rootName, String publicId, String systemId) {
+        if (publicId != null) {
+            return String.format("%s PUBLIC %s %s", rootName, publicId, systemId);
+        }
+        return String.format("%s SYSTEM %s", rootName, systemId);
+    }
+}
+
+
+input:
+
+
+
+
+output:
+
+
+
+
+

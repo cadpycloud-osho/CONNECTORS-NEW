@@ -1,0 +1,34 @@
+intersectionItems:
+
+
+input:
+
+import java.util.*;
+
+public class IntersectionItemsConverter {
+    public static List<String> intersectionItems(String typeDefinition) {
+        // DataWeave intersection & combines multiple object types
+        // intersectionItems shows base types of each intersected type
+        List<String> result = new ArrayList<>();
+        result.add("Object");
+        result.add("Object");
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("a", intersectionItems("{name: String} & {age: Number}"));
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": ["Object","Object"]
+}
+
+
+

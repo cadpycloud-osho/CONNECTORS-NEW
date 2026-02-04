@@ -1,0 +1,50 @@
+currentMilliseconds:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    // ---------- Simple JSON formatter (pure Java) ----------
+    private static String formatTimeOutput(Map<String, Long> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        output.forEach((key, value) -> {
+            // Note: Since only one entry is expected, we don't worry about trailing commas here.
+            sb.append("  \"").append(key).append("\": ").append(value).append("\n");
+        });
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Output Simulation ---");
+
+        // Use LinkedHashMap to maintain insertion order.
+        Map<String, Long> output = new LinkedHashMap<>();
+
+        // Java equivalent of currentMilliseconds() is System.currentTimeMillis()
+        long currentMs = System.currentTimeMillis();
+
+        // Simulating the DataWeave call:
+        output.put("currentMilliseconds", currentMs);
+
+        // Output the map as JSON using the simple pure Java formatter
+        String jsonOutput = formatTimeOutput(output);
+        System.out.println(jsonOutput);
+    }
+}
+
+output:
+
+{
+  "currentMilliseconds": 1734179235456
+}
+
+

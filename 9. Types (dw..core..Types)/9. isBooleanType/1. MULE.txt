@@ -1,0 +1,57 @@
+isBooleanType:
+
+isBooleanType(t: Type): Boolean
+
+isBooleanType(t: Type): Boolean
+Returns true if the input is the Boolean type
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ABoolean = Boolean
+output application/json
+---
+{
+   a: isBooleanType(ABoolean),
+   b: isBooleanType(Boolean),
+   c: isBooleanType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

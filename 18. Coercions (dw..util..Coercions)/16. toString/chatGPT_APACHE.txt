@@ -1,0 +1,269 @@
+toString:
+
+
+example 1:
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.math.RoundingMode;
+
+public class NumberFormattingExample {
+    public static void main(String[] args) {
+        // a: default string
+        String a = Double.toString(1.0);
+
+        // b: format ".00" with default locale
+        DecimalFormat bFormat = new DecimalFormat(".00");
+        bFormat.setRoundingMode(RoundingMode.HALF_UP);
+        String b = bFormat.format(0.005);
+
+        // c: format "#.##" with Spanish locale
+        DecimalFormatSymbols esSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
+        DecimalFormat cFormat = new DecimalFormat("#.##", esSymbols);
+        cFormat.setRoundingMode(RoundingMode.HALF_UP);
+        String c = cFormat.format(0.035);
+
+        // d: format "#.##" with Spanish locale, HALF_EVEN rounding
+        DecimalFormat dFormat = new DecimalFormat("#.##", esSymbols);
+        dFormat.setRoundingMode(RoundingMode.HALF_EVEN);
+        String d = dFormat.format(0.005);
+
+        // e: format "#.00" with default locale, HALF_EVEN rounding
+        DecimalFormat eFormat = new DecimalFormat("#.00");
+        eFormat.setRoundingMode(RoundingMode.HALF_EVEN);
+        String e = eFormat.format(0.035);
+
+        // f: custom format "$.## 'in my account'"
+        DecimalFormat fFormat = new DecimalFormat("$#.## 'in my account'");
+        fFormat.setRoundingMode(RoundingMode.HALF_UP);
+        String f = fFormat.format(1.1234);
+
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a + "\",");
+        System.out.println("  \"b\": \"" + b + "\",");
+        System.out.println("  \"c\": \"" + c + "\",");
+        System.out.println("  \"d\": \"" + d + "\",");
+        System.out.println("  \"e\": \"" + e + "\",");
+        System.out.println("  \"f\": \"" + f + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": "1",
+  "b": ".01",
+  "c": "0,04",
+  "d": "0",
+  "e": ".04",
+  "f": "$1.12 in my account"
+}
+
+
+
+
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+   aDate: toString(|2003-10-01|, "uuuu/MM/dd"),
+   aDateTime: toString(|2018-09-17T22:13:00-03:00|),
+   aLocalTime: toString(|23:57:59|, "HH-mm-ss"),
+   aLocalDateTime : toString(|2015-10-01T23:57:59|),
+   aLocalDateTimeFormatted: toString(|2003-10-01T23:57:59|, "uuuu-MM-dd HH:mm:ss a"),
+   aLocalDateTimeFormattedAndLocalizedSpain: toString(|2003-01-01T23:57:59|, "eeee, dd MMMM, uuuu HH:mm:ss a", "ES"),
+   aTime: typeOf(|22:10:18Z|),
+   aTimeZone: toString(|-03:00|)
+}
+
+
+
+output:
+
+{
+  "aDate": "2003/10/01",
+  "aDateTime": "2018-09-17T22:13:00-03:00",
+  "aLocalTime": "23-57-59",
+  "aLocalDateTime": "2015-10-01T23:57:59",
+  "aLocalDateTimeFormatted": "2003-10-01 23:57:59 PM",
+  "aLocalDateTimeFormattedAndLocalizedSpain": "miércoles, 01 enero, 2003 23:57:59 p. m.",
+  "aTime": "Time",
+  "aTimeZone": "-03:00"
+}
+
+
+
+
+
+
+--------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        // Original string
+        String original = "DW Test";
+
+        // Convert to binary using UTF-32
+        byte[] binaryData = original.getBytes(Charset.forName("UTF-32"));
+
+        // Convert back to string
+        String result = new String(binaryData, Charset.forName("UTF-32"));
+
+        // Create output map
+        Map<String, String> output = new HashMap<>();
+        output.put("a", result);
+
+        // Print JSON-like output
+        System.out.println("{\n  \"a\": \"" + output.get("a") + "\"\n}");
+    }
+}
+
+
+
+output:
+
+
+
+{
+  "a": "DW Test"
+}
+
+
+
+
+--------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Map<String, String> output = new HashMap<>();
+
+        // Transformations
+        output.put("transformTimeZone", "Z");               // TimeZone as string
+        output.put("transformBoolean", Boolean.toString(true)); // Boolean to string
+        output.put("transformPeriod", "P1D");              // Period P1D
+        output.put("transformRegex", "a-Z");               // Regex pattern as string
+        output.put("transformPeriod", "PT8M10S");          // Period PT8M10S
+        output.put("transformUri", new URI("https://docs.mulesoft.com/").toString()); // URI to string
+        output.put("transformKey", "aKeyToString");        // First key from map
+
+        // Print JSON-like output
+        System.out.println("{");
+        int count = 0;
+        for (Map.Entry<String, String> e : output.entrySet()) {
+            count++;
+            System.out.print("  \"" + e.getKey() + "\": \"" + e.getValue() + "\"");
+            if (count < output.size()) System.out.println(",");
+            else System.out.println();
+        }
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "transformTimeZone": "Z",
+  "transformBoolean": "true",
+  "transformPeriod": "PT8M10S",
+  "transformRegex": "a-Z",
+  "transformUri": "https://docs.mulesoft.com/",
+  "transformKey": "aKeyToString"
+}
+
+
+
+
+
+--------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        // Input lists
+        List<String> emptyList = Arrays.asList();
+        List<String> charList = Arrays.asList("h", "o", "l", "a");
+
+        // Convert to string
+        String a = String.join("", emptyList);
+        String b = String.join("", charList);
+
+        // Print JSON-like output
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a + "\",");
+        System.out.println("  \"b\": \"" + b + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": "",
+  "b": "hola"
+}
+
+
+
+
+
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

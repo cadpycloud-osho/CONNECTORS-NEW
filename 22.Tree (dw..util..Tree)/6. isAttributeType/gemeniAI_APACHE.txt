@@ -1,0 +1,67 @@
+isAttributeType:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class AttributeInspectorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:inspectAttributePath")
+            .process(exchange -> {
+                // Scenario A: Ends in Attribute
+                List<Map<String, String>> pathA = List.of(
+                    Map.of("kind", "Object", "selector", "user"),
+                    Map.of("kind", "Attribute", "selector", "name")
+                );
+
+                // Scenario B: Ends in Array (represented as string selector here)
+                List<Map<String, String>> pathB = List.of(
+                    Map.of("kind", "Object", "selector", "user"),
+                    Map.of("kind", "Array", "selector", "name")
+                );
+
+                // Scenario C: Is just an Attribute
+                List<Map<String, String>> pathC = List.of(
+                    Map.of("kind", "Attribute", "selector", "name")
+                );
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+                result.put("a", isAttributeType(pathA));
+                result.put("b", isAttributeType(pathB));
+                result.put("c", isAttributeType(pathC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic: Inspects if the last segment of the path is an Attribute
+     */
+    private boolean isAttributeType(List<Map<String, String>> path) {
+        if (path == null || path.isEmpty()) return false;
+        
+        Map<String, String> lastSegment = path.get(path.size() - 1);
+        return "Attribute".equalsIgnoreCase(lastSegment.get("kind"));
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": false,
+  "c": true
+}
+
+
+

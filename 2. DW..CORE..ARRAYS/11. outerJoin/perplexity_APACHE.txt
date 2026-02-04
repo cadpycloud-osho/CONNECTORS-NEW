@@ -1,0 +1,101 @@
+outerJoin:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class OuterJoinRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:outerJoin")
+            .process(exchange -> {
+                List<Map<String, String>> users = Arrays.asList(
+                    Map.of("id", "1", "name", "Mariano"),
+                    Map.of("id", "2", "name", "Leandro"),
+                    Map.of("id", "3", "name", "Julian"),
+                    Map.of("id", "5", "name", "Julian")
+                );
+                
+                List<Map<String, String>> products = Arrays.asList(
+                    Map.of("ownerId", "1", "name", "DataWeave"),
+                    Map.of("ownerId", "1", "name", "BAT"),
+                    Map.of("ownerId", "3", "name", "DataSense"),
+                    Map.of("ownerId", "4", "name", "SmartConnectors")
+                );
+                
+                // Full outer join logic
+                List<Map<String, Object>> result = new ArrayList<>();
+                
+                // 1. Left side matches (same as leftJoin)
+                for (Map<String, String> user : users) {
+                    List<Map<String, String>> matchingProducts = products.stream()
+                        .filter(p -> user.get("id").equals(p.get("ownerId")))
+                        .collect(Collectors.toList());
+                    
+                    if (!matchingProducts.isEmpty()) {
+                        // One-to-many matches
+                        for (Map<String, String> product : matchingProducts) {
+                            Map<String, Object> row = new LinkedHashMap<>();
+                            row.put("l", user);
+                            row.put("r", product);
+                            result.add(row);
+                        }
+                    } else {
+                        // Users with no products
+                        Map<String, Object> row = new LinkedHashMap<>();
+                        row.put("l", user);
+                        result.add(row);
+                    }
+                }
+                
+                // 2. Right side orphans (products with no matching users)
+                Set<String> matchedOwnerIds = users.stream()
+                    .map(u -> u.get("id"))
+                    .collect(Collectors.toSet());
+                
+                for (Map<String, String> product : products) {
+                    if (!matchedOwnerIds.contains(product.get("ownerId"))) {
+                        Map<String, Object> row = new LinkedHashMap<>();
+                        row.put("r", product);
+                        result.add(row);
+                    }
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+
+[
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "DataWeave" }
+  },
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "BAT" }
+  },
+  {
+    "l": { "id": "2", "name": "Leandro" }
+  },
+  {
+    "l": { "id": "3", "name": "Julian" },
+    "r": { "ownerId": "3", "name": "DataSense" }
+  },
+  {
+    "l": { "id": "5", "name": "Julian" }
+  },
+  {
+    "r": { "ownerId": "4", "name": "SmartConnectors" }
+  }
+]
+

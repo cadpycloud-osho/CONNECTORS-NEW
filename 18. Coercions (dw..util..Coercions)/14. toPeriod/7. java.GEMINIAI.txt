@@ -1,0 +1,47 @@
+toPeriod:
+
+
+
+input:
+
+import java.time.Duration;
+import java.time.Period;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public Map<String, String> getPeriodConversionMap() {
+        
+        // --- Logic for Key 'toPeriodEx1' (P1D) ---
+        String durationString1 = "P1D";
+        Period parsedPeriod1 = Period.parse(durationString1); 
+
+        // --- Logic for Key 'toPeriodEx2' (PT1H1M) ---
+        String durationString2 = "PT1H1M";
+        Duration parsedDuration2 = Duration.parse(durationString2);
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results (toString() returns the ISO 8601 string)
+        rootMap.put("toPeriodEx1", parsedPeriod1.toString());
+        rootMap.put("toPeriodEx2", parsedDuration2.toString());
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaToPeriodConverter converter = new PureJavaToPeriodConverter();
+        Map<String, String> result = converter.getPeriodConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+{toPeriodEx1=P1D, toPeriodEx2=PT1H1M}
+
+

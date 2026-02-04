@@ -1,0 +1,62 @@
+duration:
+
+input:
+
+import java.time.Duration;
+import java.time.Instant;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        TimerResult result = measureDuration(() -> myFunction());
+        System.out.println(result);
+    }
+    
+    // DataWeave equivalent: dw::Runtime::wait("My result", 100)
+    public static String myFunction() throws InterruptedException {
+        Thread.sleep(100); // 100ms wait
+        return "My result";
+    }
+    
+    // DataWeave equivalent: dw::util::Timer::duration(() -> myFunction())
+    public static TimerResult measureDuration(ThrowingSupplier supplier) {
+        Instant start = Instant.now();
+        try {
+            String result = supplier.get();
+            Instant end = Instant.now();
+            long timeMs = Duration.between(start, end).toMillis();
+            return new TimerResult(timeMs, result);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    // Result container matching DataWeave output structure
+    public static class TimerResult {
+        public final long time;
+        public final String result;
+        
+        public TimerResult(long time, String result) {
+            this.time = time;
+            this.result = result;
+        }
+        
+        @Override
+        public String toString() {
+            return "{\"time\":" + time + ",\"result\":\"" + result + "\"}";
+        }
+    }
+    
+    // Functional interface for throwing supplier
+    @FunctionalInterface
+    public interface ThrowingSupplier {
+        String get() throws InterruptedException;
+    }
+}
+
+
+
+output:
+
+{"time":101,"result":"My result"}
+

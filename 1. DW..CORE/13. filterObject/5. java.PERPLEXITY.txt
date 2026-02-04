@@ -1,0 +1,158 @@
+filterObject:
+
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> obj = Map.of("a", "apple", "b", "banana");
+        
+        Map<String, String> result = obj.entrySet().stream()
+            .filter(entry -> entry.getValue().equals("apple"))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+{"a"="apple"}
+
+------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> obj = Map.of(
+            "letter1", "a", 
+            "letter2", "b", 
+            "id", 1
+        );
+
+        Map<String, Object> result = obj.entrySet().stream()
+            .filter(entry -> entry.getKey().startsWith("letter"))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{"letter1"="a", "letter2"="b"}
+
+------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+
+Map<String, String> obj = Map.of("1", "a", "2", "b", "3", "c");
+List<Map.Entry<String, String>> entries = new ArrayList<>(obj.entrySet());
+
+Map<String, String> result = IntStream.range(0, entries.size())
+    .filter(index -> index < 1)
+    .mapToObj(entries::get)
+    .collect(Collectors.toMap(
+        Map.Entry::getKey, 
+        Map.Entry::getValue
+    ));
+
+System.out.println(result);
+
+
+output:
+
+{"1"="a"}
+
+------------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> myObject = new HashMap<>();
+        myObject.put("str1", "String 1");
+        myObject.put("str2", "String 2");
+        myObject.put("str3", null);
+        myObject.put("str4", "String 4");
+
+        Map<String, String> result = myObject.entrySet().stream()
+            .filter(entry -> entry.getValue() != null)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "str1": "String 1",
+  "str2": "String 2",
+  "str4": "String 4"
+}
+
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

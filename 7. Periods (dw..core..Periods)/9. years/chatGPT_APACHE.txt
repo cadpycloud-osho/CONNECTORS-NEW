@@ -1,0 +1,64 @@
+years:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.Period;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class YearsProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        ZonedDateTime dateTime =
+                ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        // nextYear
+        result.put(
+                "nextYear",
+                dateTime.plusYears(1).toString()
+        );
+
+        // fourYearPeriod
+        Period fourYears = Period.ofYears(4);
+        result.put(
+                "fourYearPeriod",
+                fourYears.toString()
+        );
+
+        // addNegativeValue: years(-1) + years(2)
+        Period addNegative =
+                Period.ofYears(-1).plusYears(2);
+
+        // DataWeave returns months
+        result.put(
+                "addNegativeValue",
+                addNegative.toTotalMonths()
+        );
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:start")
+    .process(new YearsProcessor())
+    .to("log:years-example");
+
+
+output:
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 12
+}
+
+
+

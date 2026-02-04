@@ -1,0 +1,220 @@
+zip:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class CamelZipExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave input: [0, 1] and ["a", "b"]
+                        List<Integer> list1 = List.of(0, 1);
+                        List<String> list2 = List.of("a", "b");
+
+                        // Java Zip logic using IntStream
+                        // Math.min ensures we don't get IndexOutOfBounds if lists differ in size
+                        List<List<Object>> zipped = IntStream.range(0, Math.min(list1.size(), list2.size()))
+                                .mapToObj(i -> List.of(list1.get(i), list2.get(i)))
+                                .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(zipped);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[
+  [0, "a"],
+  [1, "b"]
+]
+
+
+-----------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class CamelZipMismatch {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        List<Integer> list4 = List.of(0, 1, 2, 3);
+                        List<Integer> list3 = List.of(0, 1, 2);
+                        List<String> char4 = List.of("a", "b", "c", "d");
+                        List<String> char2 = List.of("a", "b");
+                        List<String> char1 = List.of("a");
+
+                        Map<String, List<List<Object>>> results = new LinkedHashMap<>();
+
+                        // a: Equal lengths
+                        results.put("a", zip(list4, char4));
+                        // b: Left is longer (4 vs 1) -> Result length 1
+                        results.put("b", zip(list4, char1));
+                        // c: Left is longer (4 vs 2) -> Result length 2
+                        results.put("c", zip(list4, char2));
+                        // d: Right is longer (3 vs 4) -> Result length 3
+                        results.put("d", zip(list3, char4));
+
+                        exchange.getIn().setBody(results);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+
+            // Helper method for zipping two lists of any length
+            private List<List<Object>> zip(List<?> left, List<?> right) {
+                int size = Math.min(left.size(), right.size());
+                return IntStream.range(0, size)
+                        .mapToObj(i -> List.of(left.get(i), right.get(i)))
+                        .collect(Collectors.toList());
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{
+  "a": [[0,"a"],[1,"b"],[2,"c"],[3,"d"]],
+  "b": [[0,"a"]],
+  "c": [[0,"a"],[1,"b"]],
+  "d": [[0,"a"],[1,"b"],[2,"c"]]
+}
+
+
+-----------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class CamelNestedZip {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave Variables
+                        List<String> list1 = List.of("a", "b");
+                        List<Integer> list2 = List.of(1, 2, 3);
+                        List<String> list3 = List.of("aa", "bb");
+                        List<List<?>> list4 = List.of(
+                            List.of("A", "B", "C"), 
+                            List.of(11, 12), 
+                            List.of("aA", "bB")
+                        );
+
+                        // Nested Zip Logic: ((list1 zip list2) zip list3) zip list4
+                        List<?> step1 = zip(list1, list2);
+                        List<?> step2 = zip(step1, list3);
+                        List<?> result = zip(step2, list4);
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+
+            // Standard Zip helper (Shortest list wins)
+            private List<List<Object>> zip(List<?> left, List<?> right) {
+                int size = Math.min(left.size(), right.size());
+                return IntStream.range(0, size)
+                        .mapToObj(i -> List.of(left.get(i), right.get(i)))
+                        .collect(Collectors.toList());
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[
+  [
+    [ ["a", 1], "aa" ], ["A", "B", "C"]
+  ],
+  [
+    [ ["b", 2], "bb" ], [11, 12]
+  ]
+]
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+

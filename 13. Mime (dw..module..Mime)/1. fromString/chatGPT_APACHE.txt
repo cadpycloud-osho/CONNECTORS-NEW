@@ -1,0 +1,156 @@
+fromString:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import javax.activation.MimeType;
+
+public class MimeJsonRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                MimeType mime = new MimeType("application/json");
+
+                String body =
+                    "{ \"success\": true, \"result\": {"
+                  + "\"type\": \"" + mime.getPrimaryType() + "\","
+                  + "\"subtype\": \"" + mime.getSubType() + "\","
+                  + "\"parameters\": {}"
+                  + "} }";
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "application",
+    "subtype": "json",
+    "parameters": {}
+  }
+}
+
+
+-----------------------------------------
+
+
+example 2:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import javax.activation.MimeType;
+
+public class MimeMultipartRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                MimeType mime =
+                    new MimeType("multipart/form-data; boundary=the-boundary");
+
+                String body =
+                    "{ \"success\": true, \"result\": {"
+                  + "\"type\": \"" + mime.getPrimaryType() + "\","
+                  + "\"subtype\": \"" + mime.getSubType() + "\","
+                  + "\"parameters\": {"
+                  + "\"boundary\": \"" + mime.getParameter(\"boundary\") + "\""
+                  + "}"
+                  + "} }";
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "multipart",
+    "subtype": "form-data",
+    "parameters": {
+      "boundary": "the-boundary"
+    }
+  }
+}
+
+
+-----------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+
+public class InvalidMimeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                String input = "Invalid MIME type";
+
+                try {
+                    new MimeType(input);
+                } catch (MimeTypeParseException e) {
+                    exchange.getMessage().setBody(
+                        "{ \"success\": false, \"error\": {"
+                      + "\"message\": \"Unable to find a sub type in `"
+                      + input
+                      + "`.\""
+                      + "} }"
+                    );
+                }
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "success": false,
+  "error": {
+    "message": "Unable to find a sub type in `Invalid MIME type`."
+  }
+}
+
+
+-----------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

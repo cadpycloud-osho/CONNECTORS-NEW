@@ -1,0 +1,54 @@
+isNumeric:
+
+
+
+input:
+
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + isNumeric(null) + ",");
+        System.out.println("  \"b\": " + isNumeric("") + ",");
+        System.out.println("  \"c\": " + isNumeric("  ") + ",");
+        System.out.println("  \"d\": " + isNumeric("123") + ",");
+        System.out.println("  \"e\": " + isNumeric("१२३") + ",");
+        System.out.println("  \"f\": " + isNumeric("12 3") + ",");
+        System.out.println("  \"g\": " + isNumeric("ab2c") + ",");
+        System.out.println("  \"h\": " + isNumeric("12-3") + ",");
+        System.out.println("  \"i\": " + isNumeric("12.3") + ",");
+        System.out.println("  \"j\": " + isNumeric("-123") + ",");
+        System.out.println("  \"k\": " + isNumeric("+123"));
+        System.out.println("}");
+    }
+    
+    private static boolean isNumeric(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        return input.chars().allMatch(Character::isDigit);
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+
+

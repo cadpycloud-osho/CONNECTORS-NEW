@@ -1,0 +1,61 @@
+location:
+
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+
+@Component
+public class FunctionLocationService implements CommandLineRunner {
+
+    /**
+     * Replicates the dw::Runtime::location(sqrt) function.
+     * Finds the metadata (location) of the Math.sqrt method.
+     * @return A map containing method metadata (closest equivalent to DW location data).
+     */
+    public Map<String, Object> getLocationOfSqrt() {
+        try {
+            // 1. Get the Method object for Math.sqrt(double)
+            Method sqrtMethod = Math.class.getMethod("sqrt", double.class);
+
+            // 2. Extract metadata and map it to the DW output structure
+            // (Note: Line/column numbers are not available for core JDK methods)
+            String className = sqrtMethod.getDeclaringClass().getName();
+            String methodName = sqrtMethod.getName();
+
+            return Map.of(
+                "uri", className.replace('.', '/') + ".java", // Simulates the file path
+                "nameIdentifier", className + "::" + methodName, // Simulates the full name
+                "startLine", -1, // Not available
+                "startColumn", -1  // Not available
+            );
+
+        } catch (NoSuchMethodException e) {
+            System.err.println("Error: Math.sqrt method not found.");
+            return Map.of("error", e.getMessage());
+        }
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("--- Spring Boot Function Location Simulation ---");
+        System.out.println(getLocationOfSqrt());
+    }
+}
+
+
+output:
+
+--- Spring Boot Function Location Simulation ---
+{
+  "uri": "java/lang/Math.java",
+  "nameIdentifier": "java.lang.Math::sqrt",
+  "startLine": -1,
+  "startColumn": -1
+}
+

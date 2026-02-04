@@ -1,0 +1,314 @@
+mask:
+
+example 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// --- POJO Definitions Corrected ---
+
+/**
+ * Represents the source data structure for a user, including the password.
+ */
+class UserSource {
+    private String name;
+    private String password;
+
+    // Constructor - FIX APPLIED HERE
+    public UserSource(String name, String password) {
+        this.name = name; // Corrected: removed the erroneous second ".name"
+        this.password = password;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
+
+/**
+ * Represents the output data structure for a user, without the original password.
+ */
+class UserOutput {
+    private String name;
+    private String password;
+
+    // Setters
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    // Getters (used for printing)
+    public String getName() {
+        return name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
+
+// --- Main Class with Transformation Logic ---
+
+public class Main {
+
+    private static final String MASKED_VALUE = "*****";
+
+    /**
+     * Maps a list of UserSource objects to UserOutput objects, masking the password.
+     */
+    public static List<UserOutput> maskUserPasswords(List<UserSource> users) {
+        return users.stream()
+            .map(sourceUser -> {
+                // Mapping operation
+                UserOutput outputUser = new UserOutput();
+                outputUser.setName(sourceUser.getName());
+                outputUser.setPassword(MASKED_VALUE); 
+                return outputUser;
+            })
+            .collect(Collectors.toList());
+    }
+
+    public static void main(String[] args) {
+        // Source Data
+        List<UserSource> sourceData = Arrays.asList(
+            new UserSource("Peter Parker", "spidey123"),
+            new UserSource("Bruce Wayne", "batcave456")
+        );
+        
+        // Apply transformation
+        List<UserOutput> output = maskUserPasswords(sourceData);
+
+        // Print the output (Mimicking the desired JSON structure)
+        System.out.println("Output (Pure Java List):");
+        output.forEach(user -> 
+            System.out.println("{\n \"name\": \"" + user.getName() + "\",\n \"password\": \"" + user.getPassword() + "\"\n}"
+        ));
+    }
+}
+output:
+
+
+{
+ "name": "Peter Parker",
+ "password": "*****"
+}
+{
+ "name": "Bruce Wayne",
+ "password": "*****"
+}
+
+--------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// --- POJO Definitions Added ---
+
+/**
+ * Represents the source data structure for a user, including the password.
+ */
+class UserSource {
+    private String name;
+    private String password;
+
+    // Constructor
+    public UserSource(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
+
+/**
+ * Represents the output data structure for a user, without the original password.
+ */
+class UserOutput {
+    private String name;
+    private String password;
+
+    // Setters
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    // Custom toString to mimic JSON structure for simple printing
+    @Override
+    public String toString() {
+        return "{\n \"name\" : \"" + this.name + "\",\n \"password\" : \"" + this.password + "\"\n}";
+    }
+}
+
+// --- Main Class with Transformation Logic ---
+
+public class Main {
+
+    private static final String MASKED_VALUE = "*****";
+
+    /**
+     * Maps a list of UserSource objects to UserOutput objects, masking the password.
+     */
+    public static List<UserOutput> maskUserPasswords(List<UserSource> users) {
+        return users.stream()
+            .map(sourceUser -> {
+                // Transformation logic
+                UserOutput outputUser = new UserOutput();
+                outputUser.setName(sourceUser.getName());
+                outputUser.setPassword(MASKED_VALUE); 
+                return outputUser;
+            })
+            .collect(Collectors.toList());
+    }
+
+    public static void main(String[] args) {
+        // 1. Source Data
+        List<UserSource> sourceData = Arrays.asList(
+            new UserSource("Peter Parker", "spiderman"),
+            new UserSource("Bruce Wayne", "batman")
+        );
+        
+        // 2. Apply transformation
+        List<UserOutput> output = maskUserPasswords(sourceData);
+
+        // 3. Print the output in a JSON-like structure (using standard Java list formatting)
+        // NOTE: Jackson is removed to avoid dependency errors.
+        
+        System.out.println("Output (Pure Java List):");
+        
+        // Custom printing to mimic the desired JSON array output structure
+        System.out.println("[");
+        for (int i = 0; i < output.size(); i++) {
+            System.out.print(output.get(i).toString());
+            if (i < output.size() - 1) {
+                System.out.println(", ");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("]");
+    }
+}
+
+output:
+
+
+
+[ {
+  "name" : "Peter Parker",
+  "password" : "*****"
+}, {
+  "name" : "Bruce Wayne",
+  "password" : "*****"
+} ]
+
+
+--------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Target index is 1 (the second element in a 0-indexed list)
+    private static final int TARGET_INDEX = 1; 
+    // The value to replace the boolean with
+    private static final Boolean MASK_VALUE = false;
+
+    /**
+     * Iterates over a List of Lists (inner arrays) and replaces the element 
+     * at TARGET_INDEX with MASK_VALUE in each inner list.
+     */
+    public static List<List<Object>> maskInnerArrays(List<List<Object>> sourceData) {
+        
+        return sourceData.stream()
+            .map(innerList -> {
+                // 1. Create a mutable list. Arrays.asList() returns a fixed-size list 
+                //    that cannot be modified, so we copy it to an ArrayList.
+                List<Object> maskedList = new ArrayList<>(innerList);
+                
+                // 2. Check if the inner list is long enough to have the TARGET_INDEX
+                if (maskedList.size() > TARGET_INDEX) {
+                    // 3. Masking operation: replace the value at the index (index 1)
+                    maskedList.set(TARGET_INDEX, MASK_VALUE);
+                }
+                return maskedList;
+            })
+            .collect(Collectors.toList());
+    }
+
+    public static void main(String[] args) {
+        // 1. Source Data
+        List<List<Object>> sourceData = Arrays.asList(
+            Arrays.asList(123, true),
+            Arrays.asList(456, true)
+        );
+        
+        // 2. Apply transformation
+        List<List<Object>> output = maskInnerArrays(sourceData);
+
+        // 3. Print the output (Jackson dependencies removed, using standard Java printing)
+        
+        // Simple printing to match the requested output format: [ [ 123, false ], [ 456, false ] ]
+        String simpleOutput = output.stream()
+            .map(inner -> inner.toString().replace('[', '[').replace(']', ']').replace(", ", ", "))
+            .collect(Collectors.joining(", ", "[ ", " ]"));
+
+        System.out.println("Output (Pure Java List):");
+        System.out.println(simpleOutput);
+    }
+}
+
+
+output:
+
+[ [ 123, false ], [ 456, false ] ]
+
+
+
+--------------------------------------------------------------------------

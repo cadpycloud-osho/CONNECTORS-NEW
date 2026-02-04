@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "definitionKey",
+        "name",
+        "content",
+        "subscriptions"
+      ],
+      "properties": {
+        "definitionKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/content"
+        },
+        "subscriptions": {
+          "$ref": "#/definitions/subscriptions"
+        }
+      }
+    },
+    "content": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "subscriptions": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "shortCode",
+        "keyword"
+      ],
+      "properties": {
+        "shortCode": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "autoAddSubscriber": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

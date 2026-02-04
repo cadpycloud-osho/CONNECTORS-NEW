@@ -1,0 +1,44 @@
+isArrayType(t: Type): Boolean
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ArrayTypeCheckRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkArrayType")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Case A: Java Array type (String[])
+                Class<?> aType = String[].class;
+                // Case B: Simple Boolean type
+                Class<?> bType = Boolean.class;
+
+                results.put("a", aType.isArray());
+                results.put("b", bType.isArray());
+                
+                // Pro-Tip: In Camel, you might also want to check for Lists
+                // results.put("isList", List.class.isAssignableFrom(ArrayList.class));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+

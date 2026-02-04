@@ -1,0 +1,36 @@
+flatMap:
+
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        // Original nested list
+        List<List<Number>> nestedList = Arrays.asList(
+                Arrays.asList(3, 5),
+                Arrays.asList(0.9, 5.5)
+        );
+
+        // Flatten the nested list
+        List<Number> flattenedList = new ArrayList<>();
+        for (List<Number> innerList : nestedList) {
+            flattenedList.addAll(innerList);
+        }
+
+        // Print the flattened list
+        System.out.println(flattenedList);
+    }
+}
+
+
+output:
+
+
+[3, 5, 0.9, 5.5]
+
+

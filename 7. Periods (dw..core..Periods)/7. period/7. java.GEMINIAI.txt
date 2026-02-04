@@ -1,0 +1,74 @@
+period:
+
+
+
+input:
+
+
+import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Define input date/time literals
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        LocalDate baseDate = LocalDate.parse("2020-10-05");
+        
+        // Formatter for ZonedDateTime output
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        // --- 1. Date/Time Arithmetic ---
+
+        // dayBeforeDateTime: |2020-10-05T20:22:34.385Z| - period({days:1})
+        Period oneDay = Period.ofDays(1);
+        ZonedDateTime dayBeforeDateTime = baseDateTime.minus(oneDay);
+        String dayBeforeDateTimeOutput = dayBeforeDateTime.format(formatter).replace(".000Z", "Z");
+
+        // dayAfterDate: |2020-10-05| + period({days:1})
+        LocalDate dayAfterDate = baseDate.plus(oneDay);
+        String dayAfterDateOutput = dayAfterDate.toString();
+
+        // yearMonthDayAfterDate: |2020-10-05| + period({years:1, months:1, days:1})
+        Period complexPeriod = Period.of(1, 1, 1);
+        LocalDate yearMonthDayAfterDate = baseDate.plus(complexPeriod);
+        String yearMonthDayAfterDateOutput = yearMonthDayAfterDate.toString();
+
+        // --- 2. Period Construction and Extraction ---
+
+        // emptyPeriod: period({})
+        Period emptyPeriod = Period.ZERO;
+        String emptyPeriodOutput = emptyPeriod.toString(); // P0D
+
+        // constructPeriod: period({years:4, months:11, days:28})
+        Period constructedPeriod = Period.of(4, 11, 28);
+        String constructedPeriodOutput = constructedPeriod.toString(); // P4Y11M28D
+
+        // selectMonthsFromPeriod: period({years:4, months:11, days:28}).months
+        int selectMonthsFromPeriod = constructedPeriod.getMonths(); // 11
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        System.out.println("  \"dayBeforeDateTime\": \"" + dayBeforeDateTimeOutput + "\",");
+        System.out.println("  \"dayAfterDate\": \"" + dayAfterDateOutput + "\",");
+        System.out.println("  \"yearMonthDayAfterDate\": \"" + yearMonthDayAfterDateOutput + "\",");
+        System.out.println("  \"emptyPeriod\": \"" + emptyPeriodOutput + "\",");
+        System.out.println("  \"constructPeriod\": \"" + constructedPeriodOutput + "\",");
+        System.out.println("  \"selectMonthsFromPeriod\": " + selectMonthsFromPeriod);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+  "dayAfterDate": "2020-10-06",
+  "yearMonthDayAfterDate": "2021-11-06",
+  "emptyPeriod": "P0D",
+  "constructPeriod": "P4Y11M28D",
+  "selectMonthsFromPeriod": 11
+}
+

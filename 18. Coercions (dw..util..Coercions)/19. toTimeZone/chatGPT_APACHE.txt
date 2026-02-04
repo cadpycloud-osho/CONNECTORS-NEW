@@ -1,0 +1,40 @@
+toTimeZone:
+
+
+input:
+
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.TimeZone;
+
+public class Main {
+    public static void main(String[] args) {
+        // Offset like "-03:00"
+        ZoneOffset toTimeZoneOffset = ZoneOffset.of("-03:00");
+
+        // Abbreviation like "Z" (UTC)
+        ZoneOffset toTimeZoneAbbreviation = ZoneOffset.of("Z");
+
+        // Time zone by region name
+        ZoneId toTimeZoneName = ZoneId.of("America/Argentina/Buenos_Aires");
+
+        System.out.println("{");
+        System.out.println("  \"toTimeZoneOffset\": \"" + toTimeZoneOffset.toString() + "\",");
+        System.out.println("  \"toTimeZoneAbbreviation\": \"" + toTimeZoneAbbreviation.toString() + "\",");
+        System.out.println("  \"toTimeZoneName\": \"" + toTimeZoneName.toString() + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "toTimeZoneOffset": "-03:00",
+  "toTimeZoneAbbreviation": "Z",
+  "toTimeZoneName": "America/Argentina/Buenos_Aires"
+}
+

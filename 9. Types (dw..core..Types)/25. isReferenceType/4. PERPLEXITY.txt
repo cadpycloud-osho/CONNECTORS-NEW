@@ -1,0 +1,59 @@
+isReferenceType:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
+@RestController
+public class ReferenceTypeController {
+
+    private boolean isReferenceType(Object type) {
+        // Simulate DataWeave: simple Array<T> = false, nested/complex = true
+        return type instanceof List && ((List<?>) type).get(0) instanceof List;
+    }
+
+    @GetMapping("/reference-type-check")
+    public Map<String, Boolean> checkReferenceTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // a: AArray = Array<String> {n:1} → simple array → false
+        List<String> aArray = List.of("item");
+        
+        // b: arrayItem(AArray2) where AArray2=Array<AArray> → nested → true
+        List<List<String>> nestedArray = List.of(aArray);
+        List<String> arrayItemResult = nestedArray.get(0);
+        
+        // c: String → primitive → false
+        String str = "test";
+        
+        result.put("a", isReferenceType(aArray));
+        result.put("b", isReferenceType(arrayItemResult));
+        result.put("c", isReferenceType(str));
+        
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": false,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+

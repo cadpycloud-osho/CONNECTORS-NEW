@@ -1,0 +1,35 @@
+repeat:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + repeat("e", 0) + "\",");
+        System.out.println("  \"b\": \"" + repeat("e", 3) + "\",");
+        System.out.println("  \"c\": \"" + repeat("e", -2) + "\"");
+        System.out.println("}");
+    }
+    
+    private static String repeat(String str, int times) {
+        if (times <= 0) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": "",
+  "b": "eee",
+  "c": ""
+}
+
+
+

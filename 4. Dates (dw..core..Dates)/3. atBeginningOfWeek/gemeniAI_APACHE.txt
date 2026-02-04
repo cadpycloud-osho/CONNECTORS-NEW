@@ -1,0 +1,182 @@
+atBeginningOfWeek:
+
+
+example 1:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetDateTime;
+import java.time.LocalTime;
+import java.time.temporal.WeekFields;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class BeginningOfWeekRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startBeginningOfWeek")
+            .routeId("Beginning-Of-Week-Route")
+            .process(exchange -> {
+                // 1. Input string (ISO-8601 with offset)
+                String inputDT = "2020-10-06T18:23:20.351-03:00";
+
+                // 2. Parse into OffsetDateTime
+                OffsetDateTime dateTime = OffsetDateTime.parse(inputDT);
+
+                // 3. Logic: atBeginningOfWeek
+                // Use US Locale logic where Sunday is the first day of the week
+                WeekFields weekFields = WeekFields.of(Locale.US);
+                OffsetDateTime beginningOfWeek = dateTime
+                    .with(weekFields.dayOfWeek(), 1) // Set to first day of week (Sunday)
+                    .with(LocalTime.MIN);            // Set to 00:00:00
+
+                // 4. Format the output back to string
+                String result = beginningOfWeek.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+                // 5. Structure the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfWeekDateTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+  "atBeginningOfWeekDateTime": "2020-10-04T00:00:00-03:00"
+}
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.WeekFields;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class BeginningOfLocalWeekRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startLocalWeek")
+            .routeId("Beginning-Of-Local-Week-Route")
+            .process(exchange -> {
+                // 1. Input string as LocalDateTime (no offset)
+                String inputDT = "2020-10-06T18:23:20.351";
+
+                // 2. Parse into LocalDateTime
+                LocalDateTime dateTime = LocalDateTime.parse(inputDT);
+
+                // 3. Logic: atBeginningOfWeek
+                // Use US Locale logic where Sunday is the first day (Day 1)
+                WeekFields weekFields = WeekFields.of(Locale.US);
+                LocalDateTime beginningOfWeek = dateTime
+                    .with(weekFields.dayOfWeek(), 1) // Move to Sunday
+                    .with(LocalTime.MIN);            // Reset to 00:00:00
+
+                // 4. Format to match DW output (YYYY-MM-DDTHH:mm:ss)
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                String result = beginningOfWeek.format(formatter);
+
+                // 5. Structure the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfWeekLocalDateTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00:00"
+}
+
+
+-------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class BeginningOfWeekDateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startDateWeek")
+            .routeId("Beginning-Of-Week-Date-Route")
+            .process(exchange -> {
+                // 1. Input string as a plain Date (YYYY-MM-DD)
+                String inputDateStr = "2020-10-06";
+
+                // 2. Parse into LocalDate
+                LocalDate date = LocalDate.parse(inputDateStr);
+
+                // 3. Logic: atBeginningOfWeek
+                // WeekFields.of(Locale.US) sets Sunday as the first day of the week
+                WeekFields weekFields = WeekFields.of(Locale.US);
+                LocalDate beginningOfWeek = date.with(weekFields.dayOfWeek(), 1);
+
+                // 4. Format the output back to string (ISO-8601 Date format)
+                String result = beginningOfWeek.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                // 5. Structure the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfWeekDate", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDate": "2020-10-04"
+}
+
+
+-------------------------------------------------------
+
+

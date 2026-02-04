@@ -1,0 +1,237 @@
+readUrl:
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.Exchange;
+
+public class CamelReadUrlExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // The URL to fetch
+                String url = "https://jsonplaceholder.typicode.com/posts/1";
+
+                from("direct:start")
+                    // 1. Fetch data from URL (Equivalent to the 'read' part of readUrl)
+                    // We explicitly set the HTTP method to GET
+                    .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+                    .to(url)
+                    
+                    // 2. Parse JSON response (Equivalent to the 'application/json' part)
+                    .unmarshal().json(JsonLibrary.Jackson)
+                    
+                    // Log the result to console
+                    .marshal().json(JsonLibrary.Jackson) // Marshal back to string just for printing
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur..."
+}
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.CsvDataFormat;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class CamelJsonToCsvTransformation {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // Setup CSV format to include headers
+                CsvDataFormat csv = new CsvDataFormat().setUseMaps(true);
+
+                from("direct:start")
+                    // 1. Read JSON (Equivalent to readUrl classpath)
+                    .to("resource:classpath:myJsonSnippet.json")
+                    .unmarshal().json(JsonLibrary.Jackson, Map.class)
+
+                    // 2. Logic: results map(item) -> item.profile
+                    .process(exchange -> {
+                        Map<String, Object> body = exchange.getIn().getBody(Map.class);
+                        List<Map<String, Object>> results = (List<Map<String, Object>>) body.get("results");
+                        
+                        // Flattening: Extract only the "profile" Map from each result item
+                        List<Map<String, Object>> profiles = results.stream()
+                            .map(item -> (Map<String, Object>) item.get("profile"))
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(profiles);
+                    })
+
+                    // 3. Output application/csv (Equivalent to CSV output)
+                    .marshal(csv)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+--------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelCsvReadUrlNoHeader {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                String csvUrl = "https://mywebsite.com/data.csv";
+
+                from("direct:start")
+                    // 1. Fetch CSV (Equivalent to readUrl)
+                    .to(csvUrl)
+                    
+                    // 2. Unmarshal CSV (header: false returns List<List<String>>)
+                    .unmarshal().csv()
+                    
+                    // 3. Transform to Match DataWeave "column_n" format
+                    .process(exchange -> {
+                        List<List<String>> rows = exchange.getIn().getBody(List.class);
+                        
+                        List<Map<String, String>> result = rows.stream().map(row -> {
+                            Map<String, String> map = new LinkedHashMap<>();
+                            for (int i = 0; i < row.size(); i++) {
+                                map.put("column_" + i, row.get(i));
+                            }
+                            return map;
+                        }).collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    
+                    // 4. Output application/json
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  {
+    "column_0": "Max",
+    "column_1": "the Mule",
+    "column_2": "MuleSoft"
+  }
+]
+
+--------------------------------------------------------
+
+
+example 4:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelExecuteDwl {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // Input JSON structure
+                String jsonInput = "{ \"firstName\": \"Somebody\", \"lastName\": \"Special\" }";
+
+                from("direct:start")
+                    // 1. Execute DWL script from classpath (Equivalent to readUrl classpath://name.dwl)
+                    // The script name.dwl contains: output application/json --- payload
+                    .to("dataweave:classpath:name.dwl")
+                    
+                    // 2. Access property (Equivalent to .firstName)
+                    .transform().datasonnet("body.firstName")
+                    
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", jsonInput);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+"Somebody"
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+

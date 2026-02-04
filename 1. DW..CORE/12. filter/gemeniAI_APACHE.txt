@@ -1,0 +1,260 @@
+filter:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class FilterRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:startFilter")
+            // Equivalent to DataWeave 'filter'
+            .transform().groovy("request.body.findAll { it > 2 }")
+            .log("Filtered Output: ${body}");
+    }
+}
+
+
+<route>
+    <from uri="direct:startFilter"/>
+    <transform>
+        <groovy>request.body.findAll { it > 2 }</groovy>
+    </transform>
+    <log message="Filtered Output: ${body}"/>
+</route>
+
+
+output:
+
+[9, 3, 4, 5]
+-----------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:filterUsers")
+    .setBody().groovy("request.body.findAll { it.age >= 30 }")
+    .marshal().json() // To format as JSON output
+    .to("mock:result");
+<route>
+    <from uri="direct:filterUsers"/>
+    <transform>
+        <groovy>
+            request.body.findAll { user -> user.age >= 30 }
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+</route>
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+from("direct:filterUsers")
+    .transform(body().convertToString()) // Ensure body is readable
+    .process(exchange -> {
+        List<Map<String, Object>> users = exchange.getIn().getBody(List.class);
+        
+        List<Map<String, Object>> filteredUsers = users.stream()
+            .filter(user -> (int)user.get("age") >= 30)
+            .collect(Collectors.toList());
+            
+        exchange.getIn().setBody(filteredUsers);
+    });
+
+output:
+
+[
+   {
+     "name": "Mariano",
+     "age": 37
+   },
+   {
+     "name": "Shoki",
+     "age": 30
+   }
+]
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+from("direct:filterData")
+    .setBody().groovy("request.body.findAllWithIndex { val, idx -> idx > 1 && val < 5 }")
+    .marshal().json()
+    .to("mock:result");
+<route>
+    <from uri="direct:filterData"/>
+    <transform>
+        <groovy>
+            // val is $, idx is $$
+            request.body.findAllWithIndex { val, idx -> idx > 1 &amp;&amp; val < 5 }
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+</route>
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+from("direct:filterData")
+    .process(exchange -> {
+        List<Integer> input = List.of(9, 2, 3, 4, 5);
+        
+        List<Integer> result = IntStream.range(0, input.size())
+            .filter(idx -> idx > 1 && input.get(idx) < 5) // Index > 1 AND Value < 5
+            .mapToObj(input::get)
+            .collect(Collectors.toList());
+            
+        exchange.getIn().setBody(result);
+    })
+    .marshal().json();
+
+output:
+
+[3, 4]
+-----------------------------------------------------------
+
+
+example 4:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+
+public class UserFilterRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:startFilter")
+            // .unmarshal().json() // Unmarshal if the input is a raw JSON string
+            .setBody().groovy("request.body.findAll { it.error == null }")
+            .marshal().json()   // Marshal back to JSON for the final output
+            .to("mock:result");
+    }
+}
+
+<route>
+    <from uri="direct:startFilter"/>
+    <transform>
+        <groovy>
+            request.body.findAll { user -> user.error == null }
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+</route>
+
+
+output:
+[
+  {
+    "user": {
+      "name": "John",
+      "lastName": "Johnson"
+    },
+    "error": null
+  }
+]
+
+-----------------------------------------------------------
+
+
+example 5:
+
+input:
+
+from("direct:transformPayload")
+    // Unmarshal if input is JSON String, skip if already a Map
+    .unmarshal().json() 
+    .setBody().groovy("""
+        def base = request.body.profile.base
+        [
+            id          : request.body.Id,
+            markCode    : request.body.marketCode,
+            languageCode: request.body.languageCode,
+            username    : base.username,
+            // Filter and Map: finding active/primary and collecting only the 'number'
+            phoneNumber : base.phone.findAll { it.activeInd == 'Y' && it.primaryInd == 'Y' }
+                                    .collect { it.number } ?: []
+        ]
+    """)
+    .marshal().json() // Convert back to JSON for the final output
+    .log("${body}");
+
+output:
+
+{
+  "id": "1184001100000000517",
+  "markCode": "US",
+  "languageCode": "en-US",
+  "username": "TheMule",
+  "phoneNumber": [
+    "230678123",
+    "154896523"
+  ]
+}
+-----------------------------------------------------------
+
+
+example 6:
+
+input:
+
+from("direct:filterString")
+    .setBody().groovy("""
+        request.body.getChars().toList()
+            .findAllWithIndex { character, index -> index % 2 == 0 }
+            .join()
+    """)
+    .log("Filtered Result: ${body}");
+
+
+
+Alternative: Camel XML DSL
+If you are using the XML configuration, the logic is embedded like this:
+
+XML
+
+<route>
+    <from uri="direct:filterString"/>
+    <transform>
+        <groovy>
+            request.body.toCharArray().toList()
+                .findAllWithIndex { c, i -> i % 2 == 0 }
+                .join()
+        </groovy>
+    </transform>
+</route>
+
+
+
+
+output:
+"hlowrd"
+
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

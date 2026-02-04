@@ -1,0 +1,44 @@
+wrapWith:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class WrapWithRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:wrapText")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides 1:1 parity with DW behavior
+                results.put("a", StringUtils.wrap(null, "'"));
+                results.put("b", StringUtils.wrap("", "'"));
+                results.put("c", StringUtils.wrap("ab", "x"));
+                results.put("d", StringUtils.wrap("'ab'", "'"));
+                results.put("e", StringUtils.wrap("ab", "'"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}
+
+

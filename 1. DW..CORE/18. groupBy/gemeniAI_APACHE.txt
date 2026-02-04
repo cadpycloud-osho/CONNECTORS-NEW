@@ -1,0 +1,259 @@
+groupBy:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class GroupByIndexRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:groupByIndex")
+            // 1. Unmarshal JSON input ["a", "b", "c"] to a Java List
+            .unmarshal().json(JsonLibrary.Jackson)
+
+            // 2. The Pure Camel equivalent of groupBy (item, index)
+            // withIndex() provides the position, and collectEntries formats the Map
+            .transform().groovy("body.withIndex().collectEntries { item, idx -> [idx.toString(), [item]] }")
+
+            // 3. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Send to output
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+{ 
+  "0": ["a"], 
+  "1": ["b"], 
+  "2": ["c"] 
+}
+
+-------------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class GroupByPropertyRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:groupByLanguage")
+            // 1. Unmarshal JSON input to a Java List of Maps
+            .unmarshal().json(JsonLibrary.Jackson)
+
+            // 2. The Pure Camel equivalent of: myArray groupBy (item) -> item.language
+            // Groovy's groupBy creates a Map where keys are languages and values are lists of objects
+            .transform().groovy("body.groupBy { it.language }")
+
+            // 3. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Send to output
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+{
+  "Scala": [
+    { "name": "Bar", "language": "Scala" }
+  ],
+  "Java": [
+    { "name": "Foo", "language": "Java" },
+    { "name": "FooBar", "language": "Java" }
+  ]
+}
+
+-------------------------------------------------------------
+
+
+
+example 3:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class GroupByLabelRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:extractAndGroup")
+            // 1. Unmarshal JSON input to a Map structure
+            .unmarshal().json(JsonLibrary.Jackson)
+
+            // 2. The Pure Camel equivalent of (items.*label groupBy "myLabels")
+            // We collect 'label' values and filter out any null entries (like the 'internal' id)
+            .transform().groovy("""
+                def labels = body.menu.items.collect { it.label }.findAll { it != null }
+                return [ "myLabels": labels ]
+            """)
+
+            // 3. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+
+output:
+
+{
+  "myLabels": [
+    "Move Left",
+    "Move Right",
+    "Move Up",
+    "Move Down"
+  ]
+}
+
+-------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class GroupByRegexRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:groupByVowel")
+            // 1. The Pure Camel equivalent of the DataWeave groupBy logic
+            // We convert string to list, group by regex match, and join back to string
+            .transform().groovy("""
+                body.toList().groupBy { (it =~ /[aeiou]/).find() }
+                    .collectEntries { isVowel, chars -> 
+                        [isVowel.toString(), chars.join('')] 
+                    }
+            """)
+
+            // 2. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Send to output
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+{
+  "false": "hll wrld!",
+  "true": "eoo"
+}
+
+
+-------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class GroupByUpperRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:groupByUpper")
+            // 1. Unmarshal JSON input to a Java Map
+            .unmarshal().json(JsonLibrary.Jackson)
+
+            // 2. The Pure Camel equivalent of: groupBy upper($)
+            // collectEntries transforms the Map by calculating a new key (value upper)
+            // and keeping the original entry as the value
+            .transform().groovy("""
+                body.collectEntries { k, v -> 
+                    [v.toUpperCase(), [(k): v]] 
+                }
+            """)
+
+            // 3. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+{
+  "B": {
+    "a": "b"
+  },
+  "D": {
+    "c": "d"
+  }
+}
+
+-------------------------------------------------------------
+
+
+
+example 6:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class GroupByXmlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:groupByXml")
+            // 1. Replicates read(..., "application/xml")
+            // Unmarshals the XML string into a Java Map
+            .unmarshal().jacksonXml()
+
+            // 2. The Pure Camel equivalent of: myRead.prices groupBy "costs"
+            // We access the root 'prices' element and wrap it in the "costs" key
+            .transform().groovy("[ 'costs' : body ]")
+
+            // 3. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+
+output:
+
+{
+  "costs": {
+    "price": [
+      "9.99",
+      "10.99"
+    ]
+  }
+}
+
+-------------------------------------------------------------
+
+
+
+
+

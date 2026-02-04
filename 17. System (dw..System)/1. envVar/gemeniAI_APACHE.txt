@@ -1,0 +1,64 @@
+envVar:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+public class EnvVarRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getEnv")
+            .routeId("Env-Var-Route")
+            .process(exchange -> {
+                // 1. Logic: Access System Environment Variables
+                // System.getenv() returns null if the variable doesn't exist, matching DW behavior
+                String realVar = System.getenv("SHELL");
+                String fakeVar = System.getenv("FAKE_ENV_VAR");
+
+                // 2. Build the structured list
+                List<Map<String, String>> envList = new ArrayList<>();
+                
+                Map<String, String> realMap = new LinkedHashMap<>();
+                realMap.put("real", realVar);
+                envList.add(realMap);
+
+                Map<String, String> fakeMap = new LinkedHashMap<>();
+                fakeMap.put("fake", fakeVar);
+                envList.add(fakeMap);
+
+                // 3. Set the final body
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("envVars", envList);
+                
+                exchange.getIn().setBody(response);
+            })
+            .marshal().json()
+            .log("Environment Variables: ${body}");
+            
+        // Alternative using Simple Language:
+        // .setHeader("shellPath", simple("${sysenv.SHELL}"))
+    }
+}
+
+output:
+
+
+{
+  "envVars": [
+    {
+      "real": "/bin/bash"
+    },
+    {
+      "fake": null
+    }
+  ]
+}
+
+

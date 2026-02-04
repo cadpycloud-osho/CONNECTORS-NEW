@@ -1,0 +1,67 @@
+isLowerCase:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class IsLowerCaseController {
+    
+    @GetMapping(value = "/is-lowercase", produces = MediaType.APPLICATION_JSON_VALUE)
+    public IsLowerCaseResponse isLowerCaseChecks() {
+        return new IsLowerCaseResponse(
+            isLowerCase(null),
+            isLowerCase(""),
+            isLowerCase(" "),
+            isLowerCase("abc"),
+            isLowerCase("aBC"),
+            isLowerCase("a c"),
+            isLowerCase("a1c"),
+            isLowerCase("a/c"),
+            isLowerCase("mulesöft"),
+            isLowerCase("mulesÖft")
+        );
+    }
+    
+    private boolean isLowerCase(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        return input.chars().allMatch(Character::isLowerCase);
+    }
+    
+    public static class IsLowerCaseResponse {
+        public final boolean a, b, c, d, e, f, g, h, i, j;
+        
+        public IsLowerCaseResponse(boolean a, boolean b, boolean c, boolean d, boolean e, 
+                                 boolean f, boolean g, boolean h, boolean i, boolean j) {
+            this.a = a; this.b = b; this.c = c; this.d = d; this.e = e;
+            this.f = f; this.g = g; this.h = h; this.i = i; this.j = j;
+        }
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": true,
+  "j": false
+}
+

@@ -1,0 +1,44 @@
+evaluateCompatibilityFlag:
+
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Simulates Mule's evaluateCompatibilityFlag() behavior
+    private static boolean evaluateCompatibilityFlag(String flagName) {
+        // In Mule, this flag is enabled by default
+        if ("com.mulesoft.dw.xml_reader.honourMixedContentStructure".equals(flagName)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        result.put(
+            "com.mulesoft.dw.xml_reader.honourMixedContentStructure",
+            evaluateCompatibilityFlag(
+                "com.mulesoft.dw.xml_reader.honourMixedContentStructure"
+            )
+        );
+
+        // Print JSON-style output
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}
+

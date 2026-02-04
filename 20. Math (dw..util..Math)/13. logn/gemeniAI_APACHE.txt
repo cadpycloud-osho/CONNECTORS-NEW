@@ -1,0 +1,40 @@
+logn:
+
+
+
+input:
+
+import java.util.*;
+import static java.lang.Math.*;
+import static java.lang.Double.*;
+
+public class LogNConverter {
+    public static Double safeLog(double value) {
+        if (value <= 0) {
+            return null;
+        }
+        return log(value); // Natural log (base e)
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        result.put("logn10", safeLog(10));
+        result.put("logn13", safeLog(0.13));
+        result.put("logn-20", safeLog(-20));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+   "logn10": 2.302585092994046,
+   "logn13": -2.0402208285265546,
+   "logn-20": null
+}
+
+
+

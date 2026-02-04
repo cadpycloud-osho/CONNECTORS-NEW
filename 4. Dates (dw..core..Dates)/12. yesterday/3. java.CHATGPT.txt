@@ -1,0 +1,28 @@
+yesterday:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Get yesterday's date
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        // Format as yyyy-MM-dd
+        String formatted = yesterday.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+        System.out.println("\"" + formatted + "\"");
+    }
+}
+
+
+output:
+
+"2021-05-14"
+
+

@@ -1,0 +1,60 @@
+isTypeType:
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.lang.Class; // The Java equivalent of DataWeave Type
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TypeMetaCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isTypeType(Type).
+     */
+    private boolean isTypeType(Class<?> type) {
+        // Checks if the input type object (type) is an instance of the Class meta-type.
+        return Class.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/type-meta-check")
+    public Map<String, Boolean> checkTypeMetaTypes() {
+        
+        // DataWeave type AType is an alias for Type (The meta-type, represented by Class.class)
+        Class<?> aType = Class.class;
+        
+        // DataWeave type Type (The meta-type)
+        Class<?> typeType = Class.class;
+        
+        // DataWeave type String (A concrete type identifier)
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isTypeType(aType);
+        boolean b = isTypeType(typeType);
+        boolean c = isTypeType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

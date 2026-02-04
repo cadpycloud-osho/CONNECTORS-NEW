@@ -1,0 +1,194 @@
+groupBy:
+
+example 1:
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<String> list = List.of("a", "b", "c");
+        Map<Integer, List<String>> result = new HashMap<>();
+
+        for (int i = 0; i < list.size(); i++) {
+            result.computeIfAbsent(i, k -> new ArrayList<>()).add(list.get(i));
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{0=[a], 1=[b], 2=[c]}
+
+-------------------------------------------------------------
+
+example 2:
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Map<String, String>> list = List.of(
+                Map.of("name", "Foo", "language", "Java"),
+                Map.of("name", "Bar", "language", "Scala"),
+                Map.of("name", "FooBar", "language", "Java")
+        );
+
+        Map<String, List<Map<String, String>>> result = new HashMap<>();
+
+        for (Map<String, String> item : list) {
+            result.computeIfAbsent(item.get("language"), k -> new ArrayList<>())
+                  .add(item);
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{Scala=[{name=Bar, language=Scala}], Java=[{name=Foo, language=Java}, {name=FooBar, language=Java}]}
+
+-------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<String> labels = List.of(
+                "Move Left", "Move Right", "Move Up", "Move Down"
+        );
+
+        Map<String, List<String>> result = new HashMap<>();
+        result.put("myLabels", labels);
+
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+{myLabels=[Move Left, Move Right, Move Up, Move Down]}
+
+
+-------------------------------------------------------------
+
+
+example 4:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String input = "hello world!";
+        Map<Boolean, StringBuilder> temp = new HashMap<>();
+        temp.put(true, new StringBuilder());
+        temp.put(false, new StringBuilder());
+
+        for (char c : input.toCharArray()) {
+            boolean isVowel = "aeiou".indexOf(c) >= 0;
+            temp.get(isVowel).append(c);
+        }
+
+        Map<String, String> result = new HashMap<>();
+        result.put("true", temp.get(true).toString());
+        result.put("false", temp.get(false).toString());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{false=hll wrld!, true=eoo}
+
+-------------------------------------------------------------
+
+
+example 5:
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, String> input = Map.of("a", "b", "c", "d");
+        Map<String, Map<String, String>> result = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : input.entrySet()) {
+            String key = entry.getValue().toUpperCase();
+            result.computeIfAbsent(key, k -> new HashMap<>())
+                  .put(entry.getKey(), entry.getValue());
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{B={a=b}, D={c=d}}
+
+-------------------------------------------------------------
+
+
+example 6:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, List<String>> result = new HashMap<>();
+        result.put("costs", List.of("9.99", "10.99"));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{costs=[9.99, 10.99]}
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+

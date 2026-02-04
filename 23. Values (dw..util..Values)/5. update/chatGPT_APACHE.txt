@@ -1,0 +1,371 @@
+update:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class UpdateValueRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                Map<String, Object> body = new HashMap<>();
+                body.put("name", "Mariano");
+
+                // Equivalent of DataWeave update "name" with "Data Weave"
+                body.put("name", "Data Weave");
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+
+output:
+
+
+{
+  "name": "Data Weave"
+}
+
+
+--------------------------------------------------------
+example 2:
+
+input:
+
+Map<String, Object> body = new HashMap<>();
+body.put("name", "Mariano");
+
+// Equivalent to: update field("name")
+body.put("name", "Data Weave");
+
+Map<String, Object> body = new HashMap<>();
+body.put("name", "Mariano");
+
+String fieldName = "name";
+body.put(fieldName, "Data Weave");
+
+
+output:
+
+{
+  "name": "Data Weave"
+}
+
+
+
+
+--------------------------------------------------------
+example 3:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class UpdateListRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) {
+
+                    List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3));
+
+                    // Equivalent of: update 1 with 5
+                    list.set(1, 5);
+
+                    exchange.getMessage().setBody(list);
+                }
+            })
+            .to("log:output");
+    }
+}
+
+
+
+output:
+
+[
+  1,
+  5,
+  3
+]
+
+
+
+
+--------------------------------------------------------
+example 4:
+
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.*;
+
+public class UpdateRoleRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) {
+
+                    List<Map<String, Object>> list = new ArrayList<>();
+
+                    Map<String, Object> obj1 = new LinkedHashMap<>();
+                    obj1.put("role", "a");
+                    obj1.put("name", "spiderman");
+
+                    Map<String, Object> obj2 = new LinkedHashMap<>();
+                    obj2.put("role", "b");
+                    obj2.put("name", "batman");
+
+                    list.add(obj1);
+                    list.add(obj2);
+
+                    // Equivalent of: update "role" with "Super Hero"
+                    for (Map<String, Object> item : list) {
+                        item.put("role", "Super Hero");
+                    }
+
+                    exchange.getMessage().setBody(list);
+                }
+            })
+            .to("log:output");
+    }
+}
+
+
+output:
+
+[
+  {
+    "role": "Super Hero",
+    "name": "spiderman"
+  },
+  {
+    "role": "Super Hero",
+    "name": "batman"
+  }
+]
+
+
+
+
+--------------------------------------------------------
+example 5:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class UpdateIndexRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) {
+
+                    List<Integer> list =
+                            new ArrayList<>(Arrays.asList(1, 2, 3));
+
+                    // Equivalent of: update index(1) with 5
+                    list.set(1, 5);
+
+                    exchange.getMessage().setBody(list);
+                }
+            })
+            .to("log:output");
+    }
+}
+
+
+
+output:
+
+[
+  1,
+  5,
+  3
+]
+
+
+
+
+--------------------------------------------------------
+example 6:
+
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UpdateNestedFieldRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) {
+
+                    Map<String, Object> body = new LinkedHashMap<>();
+                    Map<String, Object> user = new LinkedHashMap<>();
+
+                    user.put("name", "Mariano");
+                    body.put("user", user);
+
+                    // Equivalent of:
+                    // update ["user", field("name")] with "Data Weave"
+                    ((Map<String, Object>) body.get("user"))
+                            .put("name", "Data Weave");
+
+                    exchange.getMessage().setBody(body);
+                }
+            })
+            .to("log:output");
+    }
+}
+
+
+output:
+
+
+{
+  "user": {
+    "name": "Data Weave"
+  }
+}
+
+
+
+--------------------------------------------------------
+example 7:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
+public class UpdateXmlRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+
+                    String xml = exchange.getMessage().getBody(String.class);
+
+                    DocumentBuilderFactory factory =
+                            DocumentBuilderFactory.newInstance();
+                    DocumentBuilder builder = factory.newDocumentBuilder();
+
+                    Document doc = builder.parse(
+                            new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+
+                    NodeList languageNodes =
+                            doc.getElementsByTagName("language");
+
+                    for (int i = 0; i < languageNodes.getLength(); i++) {
+                        Node languageNode = languageNodes.item(i);
+                        String value = languageNode.getTextContent();
+
+                        // Equivalent of DW conditional update
+                        if ("English".equals(value)) {
+                            languageNode.setTextContent("Gibberish");
+                        }
+                    }
+
+                    exchange.getMessage().setBody(doc);
+                }
+            })
+            .to("log:output");
+    }
+}
+
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>English</language>
+  </user>
+</users>
+
+
+output:
+
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>Gibberish</language>
+  </user>
+</users>
+
+
+
+
+--------------------------------------------------------
+
+

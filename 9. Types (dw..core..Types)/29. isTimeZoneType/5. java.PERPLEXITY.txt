@@ -1,0 +1,37 @@
+isTimeZoneType:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+
+public class Main {
+
+    private static boolean isTimeZoneType(Object value) {
+        return value instanceof TimeZone;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        TimeZone aTimeZone = TimeZone.getTimeZone("UTC");           // ATimeZone
+        TimeZone timeZoneType = TimeZone.getTimeZone("America/New_York"); // TimeZone
+        String str = "test";                                        // String
+        
+        result.put("a", isTimeZoneType(aTimeZone));
+        result.put("b", isTimeZoneType(timeZoneType));
+        result.put("c", isTimeZoneType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+{a=true, b=true, c=false}
+
+
+
+

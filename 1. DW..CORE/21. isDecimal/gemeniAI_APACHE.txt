@@ -1,0 +1,40 @@
+isDecimal:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class IsDecimalRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkDecimal")
+            // 1. Logic to replicate isDecimal([1.1, 1, "1.1"])
+            .transform().groovy("""
+                def check = { val -> 
+                    if (val instanceof Double || val instanceof Float || val instanceof BigDecimal) return true
+                    if (val instanceof Integer || val instanceof Long) return false
+                    if (val instanceof String) return val.contains(".") && val.isNumber()
+                    return false
+                }
+                
+                return [ check(1.1), check(1), check("1.1") ]
+            """)
+
+            // 2. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+[
+  true,
+  false,
+  true
+]

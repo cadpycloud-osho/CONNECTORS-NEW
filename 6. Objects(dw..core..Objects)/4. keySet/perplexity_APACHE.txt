@@ -1,0 +1,134 @@
+keyset:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class KeySetRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:keySet")
+            .process(exchange -> {
+                Map<String, Object> input = Map.of(
+                    "a", true,
+                    "b", 1
+                );
+                
+                // Extract keys as List (matches array output)
+                List<String> keys = new ArrayList<>(input.keySet());
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("keySet", keys);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "keySet": ["a", "b"]
+}
+
+
+
+
+-----------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import java.util.*;
+import java.io.StringReader;
+
+public class KeySetXmlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:keySetXml")
+            .process(exchange -> {
+                String xml = "<users xmlns=\"http://test.com\">\n" +
+                           "  <user name=\"Mariano\" lastName=\"Achaval\"/>\n" +
+                           "  <user name=\"Stacey\" lastName=\"Duke\"/>\n" +
+                           "</users>";
+                
+                // Parse XML like DataWeave read()
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new InputSource(new StringReader(xml)));
+                
+                Element users = (Element) doc.getElementsByTagName("users").item(0);
+                NodeList userNodes = users.getElementsByTagName("user");
+                
+                List<Object> keySetResults = new ArrayList<>();
+                List<Object> nameSetResults = new ArrayList<>();
+                
+                // keySet(myVar.users) → 2 user elements
+                for (int i = 0; i < userNodes.getLength(); i++) {
+                    Element user = (Element) userNodes.item(i);
+                    
+                    // $.# → namespace
+                    keySetResults.add("http://test.com");
+                    
+                    // $.@ → attributes object
+                    Map<String, String> attrs = new LinkedHashMap<>();
+                    attrs.put("name", user.getAttribute("name"));
+                    attrs.put("lastName", user.getAttribute("lastName"));
+                    keySetResults.add(attrs);
+                }
+                
+                // nameSet equivalent → null for namespaces/attributes
+                for (int i = 0; i < 4; i++) {
+                    nameSetResults.add(null);
+                }
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("keySetExample", keySetResults);
+                result.put("nameSet", nameSetResults);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "keySetExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "nameSet": [null, null, null, null]
+}
+
+
+
+
+-----------------------------------------------
+
+
+

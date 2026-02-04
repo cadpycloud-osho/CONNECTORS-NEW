@@ -1,0 +1,71 @@
+sumBy:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+
+public class CamelSumByExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave input: [ { a: 1 }, { a: 2 }, { a: 3 } ]
+                        List<Map<String, Integer>> input = List.of(
+                            Map.of("a", 1),
+                            Map.of("a", 2),
+                            Map.of("a", 3)
+                        );
+
+                        // Java equivalent of sumBy $.a
+                        // We map the object to its numeric property and then call sum()
+                        long sumResult = input.stream()
+                                .mapToLong(item -> item.get("a"))
+                                .sum();
+
+                        // Both DataWeave calls (infix and function style) result in the same value
+                        exchange.getIn().setBody(Map.of("sumBy", List.of(sumResult, sumResult)));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+
+public class OrderCalculator {
+    public Double calculateTotal(List<Map<String, Double>> items) {
+        return items.stream()
+                    .mapToDouble(item -> item.getOrDefault("price", 0.0))
+                    .sum();
+    }
+}
+
+// In the Route:
+from("direct:getTotal")
+    .bean(OrderCalculator.class, "calculateTotal")
+    .log("The total sum is: ${body}");
+
+
+output:
+
+{
+  "sumBy": [6, 6]
+}
+

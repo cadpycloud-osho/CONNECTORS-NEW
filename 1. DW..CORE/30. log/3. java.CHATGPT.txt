@@ -1,0 +1,86 @@
+log:
+
+
+example 1:
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String message = "Houston, we have a problem";
+
+        // Simulating DataWeave log(level, message)
+        System.out.println("WARNING - " + message);
+
+        // Expression output (log returns the original value)
+        System.out.println("\"" + message + "\"");
+    }
+}
+
+
+output:
+
+WARNING - Houston, we have a problem
+"Houston, we have a problem"
+
+
+-------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Creating nested map structure
+        Map<String, Object> friend = new HashMap<>();
+        friend.put("name", "Shoki");
+
+        Map<String, Object> user = new HashMap<>();
+        user.put("friend", friend);
+        user.put("id", 1);
+        user.put("name", "Tomo");
+
+        Map<String, Object> myUser = new HashMap<>();
+        myUser.put("user", user);
+        myUser.put("accountId", "leansh");
+
+        // Simulating log("User", myUser.user)
+        System.out.println("User - " + user);
+
+        // Equivalent of .friend.name
+        Map<String, Object> loggedUser = user;
+        Map<String, Object> loggedFriend =
+                (Map<String, Object>) loggedUser.get("friend");
+
+        String friendName = (String) loggedFriend.get("name");
+
+        // Expression output
+        System.out.println("\"" + friendName + "\"");
+    }
+}
+
+
+
+output:
+
+User - {friend={name=Shoki}, id=1, name=Tomo}
+"Shoki"
+
+
+-------------------------------------------------------
+
+

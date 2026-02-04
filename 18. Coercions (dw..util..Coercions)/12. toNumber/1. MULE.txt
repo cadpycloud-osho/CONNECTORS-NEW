@@ -1,0 +1,117 @@
+toNumber:
+
+toNumber(str: String, formatters: Array<Formatter>): Number
+
+toNumber(str: String, formatters: Array<Formatter>): Number
+Transforms a String value into a Number value using the first Formatter that matches with the given value to transform.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+import * from dw::Runtime
+output application/dw
+---
+{
+  a: toNumber("0.005", [{format: "seconds"}, {format: ".00"}]),
+  b: try(() -> toNumber("0.005", [{format: "seconds"}])).error.message
+}
+
+
+DataWeave
+Output
+{
+  a: 0.005 as Number {format: ".00"},
+  b: "Could not find a valid formatter for '0.005'"
+}
+
+
+
+--------------------------------------------------------------
+
+
+toNumber(dateTime: DateTime, unit: MillisOrSecs | Null = null): Number
+
+A variant of toNumber that transforms a DateTime value into a number of seconds or milliseconds, depending on the selected unit.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+    epoch: toNumber(|2015-10-01T23:57:59Z|),
+    millis: toNumber(|2015-10-01T23:57:59Z|, "milliseconds")
+}
+
+
+DataWeave
+Output
+{
+  "epoch": 1443743879,
+  "millis": 1443743879000
+}
+
+
+--------------------------------------------------------------
+
+toNumber(period: Period, unit: PeriodUnits | Null = null): Number
+A variant of toNumber that transforms a Period value into a number of hours, minutes, seconds, milliseconds or nanoseconds (nanos).
+
+
+
+source
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+    toSecondsEx1: toNumber(|PT1H10M|, "seconds"),
+    toSecondsEx2: toNumber(|PT1M7S|, "milliseconds")
+}
+
+
+DataWeave
+Output
+{
+  "toSecondsEx1": 4200,
+  "toSecondsEx2": 67000
+}
+
+
+
+--------------------------------------------------------------
+
+toNumber(value: String | Key, format: String | Null = null, locale: String | Null = null): Number
+A variant of toNumber that transforms a String or Key value into a Number value and that accepts a format and locale.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+var myKey = keysOf({"123" : "myValue"})
+output application/json
+---
+ {
+     "default": toNumber("1.0"),
+     "withFormat": toNumber("0.005",".00"),
+     "withLocal": toNumber("1,25","#.##","ES"),
+     "withExtraPlaceholders": toNumber("5.55","####.####"),
+     "keyToNumber": toNumber(myKey[0])
+ }
+
+
+DataWeave
+Output
+{
+  "default": 1.0,
+  "withFormat": 0.005,
+  "withLocal": 1.25,
+  "withExtraPlaceholders": 5.55,
+  "keyToNumber": 123
+}
+

@@ -1,0 +1,55 @@
+years:
+
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class YearPeriodController {
+
+    @GetMapping("/year-periods")
+    public Map<String, Object> getYearPeriods() {
+
+        Map<String, Object> response = new HashMap<>();
+
+        Instant inputTime = Instant.parse("2020-10-05T20:22:34.385Z");
+
+        // Operations
+        Instant nextYear = inputTime.plus(1, ChronoUnit.YEARS);
+        Period fourYearPeriod = Period.ofYears(4);
+        int addNegativeValue = Period.ofYears(-1).plusYears(2).getYears();
+
+        response.put("nextYear", nextYear.toString());
+        response.put("fourYearPeriod", fourYearPeriod.toString());
+        response.put("addNegativeValue", addNegativeValue);
+
+        return response;
+    }
+}
+
+
+output:
+
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 1
+}
+
+
+
+

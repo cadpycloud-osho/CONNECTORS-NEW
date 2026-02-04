@@ -1,0 +1,103 @@
+nodeExists:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class NodeExistsController {
+
+    @GetMapping("/nodeExists")
+    public Map<String, Boolean> nodeExistsExample() {
+
+        Map<String, Object> myObject = buildObject();
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("mariano", nodeExists(myObject, "name", "mariano"));
+        result.put("julian", nodeExists(myObject, "name", "julian"));
+        result.put("tom", nodeExists(myObject, "name", "tom"));
+        result.put("leandro", nodeExists(myObject, "name", "leandro"));
+        result.put("peter", nodeExists(myObject, "name", "peter"));
+        result.put("wrongField", nodeExists(myObject, "wrongField", null));
+        result.put("teo", nodeExists(myObject, "name", "teo"));
+
+        return result;
+    }
+
+    // Recursive equivalent of DW nodeExists
+    private boolean nodeExists(Object node, String fieldName, String expectedValue) {
+
+        if (node instanceof Map<?, ?> map) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if (entry.getKey().equals(fieldName)) {
+                    if (expectedValue == null || expectedValue.equals(entry.getValue())) {
+                        return true;
+                    }
+                }
+                if (nodeExists(entry.getValue(), fieldName, expectedValue)) {
+                    return true;
+                }
+            }
+        }
+
+        if (node instanceof List<?> list) {
+            for (Object item : list) {
+                if (nodeExists(item, fieldName, expectedValue)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private Map<String, Object> buildObject() {
+
+        Map<String, Object> root = new HashMap<>();
+
+        root.put("user", List.of(
+                Map.of(
+                        "name", "mariano",
+                        "lastName", "achaval",
+                        "friends", List.of(
+                                Map.of("name", "julian"),
+                                Map.of("name", "tom")
+                        )
+                ),
+                Map.of(
+                        "name", "leandro",
+                        "lastName", "shokida",
+                        "friends", List.of(
+                                Map.of("name", "peter"),
+                                Map.of("name", "robert")
+                        )
+                )
+        ));
+
+        return root;
+    }
+}
+
+
+output:
+
+
+{
+  "mariano": true,
+  "julian": true,
+  "tom": true,
+  "leandro": true,
+  "peter": true,
+  "wrongField": false,
+  "teo": false
+}
+
+
+

@@ -1,0 +1,64 @@
+isObjectType:
+
+
+
+input:
+
+import java.util.Map;
+import java.lang.Boolean;
+import java.util.LinkedHashMap;
+
+public class Main {
+
+    /**
+     * Conceptual proxy class for a DataWeave object/type structure,
+     * mirroring the defined type AType = {name: String}.
+     * We use a specific Map interface implementation (Map) to represent the DataWeave Object structure.
+     */
+    // Since DataWeave AType is an Object structure, we map it to Java's Map interface
+    private static final Class<?> ATypeProxy = Map.class;
+    
+    // Java's equivalent to the Boolean type
+    private static final Class<?> BooleanType = Boolean.class;
+
+
+    /**
+     * Conceptually mirrors DataWeave's isObjectType(Type).
+     * Checks if the provided type is a Map or a subclass/implementation of Map.
+     */
+    public static boolean isObjectType(Class<?> type) {
+        // We use Map.class to check for object/map structures
+        return Map.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. AType (which is a custom object/map structure)
+        Class<?> aTypeClass = ATypeProxy;
+
+        // 2. Boolean type
+        Class<?> booleanClass = BooleanType;
+        
+        // --- Execution ---
+        
+        // a: isObjectType(AType)
+        boolean a = isObjectType(aTypeClass); 
+
+        // b: isObjectType(Boolean)
+        boolean b = isObjectType(booleanClass); 
+        
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+

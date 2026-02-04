@@ -1,0 +1,73 @@
+isReferenceType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelReferenceTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type AArray = Array<String> {n: 1}
+                        Class<?> AArray = String[].class;
+
+                        // type AArray2 = Array<AArray>
+                        Class<?> AArray2 = String[][].class;
+
+                        // Simulating DataWeave isReferenceType
+                        boolean a = isReferenceType(AArray);
+                        boolean b = isReferenceType(arrayItem(AArray2));
+                        boolean c = isReferenceType(String.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + ",\n" +
+                                "  \"c\": " + c + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Simulates DataWeave arrayItem(type)
+    private static Class<?> arrayItem(Class<?> arrayType) {
+        return arrayType.isArray() ? arrayType.getComponentType() : null;
+    }
+
+    // Helper method to simulate DataWeave isReferenceType
+    private static boolean isReferenceType(Class<?> clazz) {
+        return clazz != null && clazz.isArray() && clazz.getComponentType().isArray();
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": false
+}
+
+

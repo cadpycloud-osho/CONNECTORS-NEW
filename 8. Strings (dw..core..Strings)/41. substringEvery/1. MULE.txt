@@ -1,0 +1,38 @@
+substringEvery:
+
+substringEvery(text: String, amount: Number): Array<String>
+
+substringEvery(text: String, amount: Number): Array<String>
+Splits a string into an array of substrings equal to a specified length.
+
+The last substring can be shorter than that length. If the length is greater than or equal to the length of the string to split, the function returns the entire string.
+
+
+
+
+Source
+%dw 2.0
+import substringEvery from dw::core::Strings
+output application/json
+---
+substringEvery("substringEvery", 3)
+
+DataWeave
+Output
+["sub", "str", "ing", "Eve", "ry"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

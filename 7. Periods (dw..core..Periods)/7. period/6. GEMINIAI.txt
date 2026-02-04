@@ -1,0 +1,108 @@
+period:
+
+
+
+input:
+
+
+A. The Model (POJO)
+Java
+
+import lombok.Data; 
+// Add dependency: implementation 'org.projectlombok:lombok'
+
+@Data
+public class PeriodResult {
+    private String dayBeforeDateTime;
+    private String dayAfterDate;
+    private String yearMonthDayAfterDate;
+    private String emptyPeriod;
+    private String constructPeriod;
+    private int selectMonthsFromPeriod;
+}
+B. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class PeriodService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+    private final LocalDate baseDate = LocalDate.parse("2020-10-05");
+
+    public PeriodResult calculatePeriods() {
+        PeriodResult result = new PeriodResult();
+        
+        // --- Date/Time Arithmetic ---
+        Period oneDay = Period.ofDays(1);
+        Period complexPeriod = Period.of(1, 1, 1); // 1 year, 1 month, 1 day
+
+        // dayBeforeDateTime: |2020-10-05T20:22:34.385Z| - period({days:1})
+        ZonedDateTime dayBeforeDateTime = baseDateTime.minus(oneDay);
+        result.setDayBeforeDateTime(dayBeforeDateTime.format(instantFormatter).replace(".000Z", "Z"));
+
+        // dayAfterDate: |2020-10-05| + period({days:1})
+        LocalDate dayAfterDate = baseDate.plus(oneDay);
+        result.setDayAfterDate(dayAfterDate.toString());
+
+        // yearMonthDayAfterDate: |2020-10-05| + period({years:1, months:1, days:1})
+        LocalDate yearMonthDayAfterDate = baseDate.plus(complexPeriod);
+        result.setYearMonthDayAfterDate(yearMonthDayAfterDate.toString());
+
+        // --- Period Construction and Extraction ---
+        
+        // emptyPeriod: period({})
+        result.setEmptyPeriod(Period.ZERO.toString()); // P0D
+
+        // constructPeriod: period({years:4, months:11, days:28})
+        Period constructedPeriod = Period.of(4, 11, 28);
+        result.setConstructPeriod(constructedPeriod.toString()); // P4Y11M28D
+
+        // selectMonthsFromPeriod: period({years:4, months:11, days:28}).months
+        result.setSelectMonthsFromPeriod(constructedPeriod.getMonths()); // 11
+
+        return result;
+    }
+}
+C. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class PeriodController {
+
+    private final PeriodService periodService;
+
+    public PeriodController(PeriodService periodService) {
+        this.periodService = periodService;
+    }
+
+    @GetMapping("/api/period-calculations")
+    public PeriodResult getCalculatedPeriods() {
+        // Spring Boot automatically converts the PeriodResult object to JSON
+        return periodService.calculatePeriods();
+    }
+}
+
+
+
+Spring Boot Output (When accessing /api/period-calculations)
+JSON
+
+{
+  "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+  "dayAfterDate": "2020-10-06",
+  "yearMonthDayAfterDate": "2021-11-06",
+  "emptyPeriod": "P0D",
+  "constructPeriod": "P4Y11M28D",
+  "selectMonthsFromPeriod": 11
+}
+

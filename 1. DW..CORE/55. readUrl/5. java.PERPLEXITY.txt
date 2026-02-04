@@ -1,0 +1,195 @@
+readUrl:
+
+
+example 1:
+
+
+input:
+
+import java.net.http.*;
+import java.net.URI;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
+
+public class ReadUrlJson {
+    public static void main(String[] args) throws Exception {
+        HttpClient client = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+        
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://jsonplaceholder.typicode.com/posts/1"))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+        
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        ObjectMapper mapper = new ObjectMapper();
+        
+        var json = mapper.readTree(response.body());
+        System.out.println(mapper.writeValueAsString(json));
+    }
+}
+
+
+output:
+
+{"userId":1,"id":1,"title":"sunt aut facere repellat provident occaecati excepturi optio reprehenderit","body":"quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"}
+
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        // Simulate JSON data as string (no Jackson needed)
+        String jsonStr = """
+        {
+          "results": [
+            {
+              "profile": {
+                "firstName": "john",
+                "lastName": "doe",
+                "email": "johndoe@demo.com"
+              }
+            },
+            {
+              "profile": {
+                "firstName": "jane",
+                "lastName": "doe",
+                "email": "janedoe@demo.com"
+              }
+            }
+          ]
+        }
+        """;
+        
+        // Manual JSON parsing - extract results array
+        String resultsStr = jsonStr.split("\"results\":\\s*\\[")[1].split("\\]")[0];
+        String[] resultItems = resultsStr.split("\\},\\s*\\{");
+        
+        // CSV Header
+        System.out.println("firstName,lastName,email");
+        
+        // Parse each result item
+        for (String resultItem : resultItems) {
+            String firstName = extractValue(resultItem, "firstName");
+            String lastName = extractValue(resultItem, "lastName");
+            String email = extractValue(resultItem, "email");
+            System.out.println(firstName + "," + lastName + "," + email);
+        }
+    }
+    
+    private static String extractValue(String jsonFragment, String field) {
+        String search = "\"" + field + "\":\\s*\"([^\"]*)\"";
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile(search).matcher(jsonFragment);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return "";
+    }
+}
+
+
+output:
+
+
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.net.http.*;
+import java.net.URI;
+import java.time.Duration;
+
+public class Main {
+    public static void main(String[] args) {
+        // Simulate CSV data from https://mywebsite.com/data.csv
+        String csvData = "Max,the Mule,MuleSoft";
+        String[] columns = csvData.split(",");
+        
+        // Manual JSON output
+        System.out.print("{");
+        for (int i = 0; i < columns.length; i++) {
+            System.out.print("\"column_" + i + "\":\"" + columns[i].trim() + "\"");
+            if (i < columns.length - 1) {
+                System.out.print(",");
+            }
+        }
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{"column_0":"Max","column_1":"the Mule","column_2":"MuleSoft"}
+
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        // Simulate classpath://name.dwl (DataWeave returns JSON)
+        String dwlContent = """
+        {
+          "firstName" : "Somebody",
+          "lastName" : "Special"
+        }
+        """;
+        
+        // Manual JSON parsing - extract firstName
+        String firstName = dwlContent.split("\"firstName\"\\s*:\\s*\"")[1].split("\"")[0];
+        System.out.println("\"" + firstName + "\"");
+    }
+}
+
+output:
+
+Somebody
+
+
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

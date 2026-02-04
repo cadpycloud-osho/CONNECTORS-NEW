@@ -1,0 +1,72 @@
+isNumeric:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static boolean isNumericDW(String input) {
+        if (input == null || input.isEmpty()) return false;
+
+        // Must be ONLY Unicode digits (no signs, no decimals, no spaces)
+        return input.matches("^[\\p{Nd}]+$");
+    }
+}
+
+
+Spring Boot Controller:
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class NumericController {
+
+    @GetMapping("/isnumeric")
+    public Map<String, Boolean> checkNumeric() {
+        Map<String, Boolean> r = new LinkedHashMap<>();
+
+        r.put("a", StringUtils.isNumericDW(null));
+        r.put("b", StringUtils.isNumericDW(""));
+        r.put("c", StringUtils.isNumericDW("  "));
+        r.put("d", StringUtils.isNumericDW("123"));
+        r.put("e", StringUtils.isNumericDW("१२३")); // Hindi digits
+        r.put("f", StringUtils.isNumericDW("12 3"));
+        r.put("g", StringUtils.isNumericDW("ab2c"));
+        r.put("h", StringUtils.isNumericDW("12-3"));
+        r.put("i", StringUtils.isNumericDW("12.3"));
+        r.put("j", StringUtils.isNumericDW("-123"));
+        r.put("k", StringUtils.isNumericDW("+123"));
+
+        return r;
+    }
+}
+
+
+
+input:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+
+

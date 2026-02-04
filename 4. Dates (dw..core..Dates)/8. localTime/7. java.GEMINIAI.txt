@@ -1,0 +1,71 @@
+localTime:
+
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Constructs a LocalTime from explicit hour, minute, and second components.
+     * This mimics the DataWeave 'localTime({...})' function.
+     * @param hour The hour component (0-23).
+     * @param minute The minute component (0-59).
+     * @param second The second component (0-59).
+     * @return The resulting local time string in ISO 8601 format (HH:MM:SS).
+     */
+    public static String createNewLocalTime(int hour, int minute, int second) {
+        
+        // 1. Construct the time object (DW: localTime({...}))
+        // LocalTime.of() is the direct Java equivalent
+        LocalTime newLocalTime = LocalTime.of(hour, minute, second);
+        
+        // 2. Format the time to the standard ISO output (DW output format)
+        // DateTimeFormatter.ISO_LOCAL_TIME produces the "HH:MM:SS" format
+        return newLocalTime.format(DateTimeFormatter.ISO_LOCAL_TIME);
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // Input values from the DW source
+        int hour = 12;
+        int minutes = 30;
+        int seconds = 40;
+        
+        // Calculate the new local time string
+        String newLocalTimeString = createNewLocalTime(
+            hour, minutes, seconds
+        );
+        
+        // 3. Format the final JSON output
+        String jsonOutput = String.format("{\n  \"newLocalTime\": \"%s\"\n}", newLocalTimeString);
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Input Components: " + hour + ":" + minutes + ":" + seconds);
+        System.out.println("ISO Time String: " + newLocalTimeString);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{
+  "newLocalTime": "12:30:40"
+}
+
+
+

@@ -1,0 +1,35 @@
+isEven:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class IsEvenExampleApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IsEvenExampleApp.class, args);
+
+        List<Integer> numbers = List.of(0, 1, 1 + 1);
+
+        List<Boolean> isEvenList = numbers.stream()
+                .map(IsEvenExampleApp::isEven)
+                .collect(Collectors.toList());
+
+        System.out.println("{ \"isEven\" : " + isEvenList + " }");
+        // Output: { "isEven" : [true, false, true] }
+    }
+
+    private static boolean isEven(int number) {
+        return number % 2 == 0;
+    }
+}
+
+
+OUTPUT:
+
+{ "isEven" : [true, false, true] }

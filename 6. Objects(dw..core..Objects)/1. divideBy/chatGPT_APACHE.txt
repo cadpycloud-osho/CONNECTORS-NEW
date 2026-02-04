@@ -1,0 +1,55 @@
+divideBy:
+
+
+input:
+
+from("direct:divideByObject")
+.process(exchange -> {
+    java.util.Map<String, Object> input = new java.util.LinkedHashMap<>();
+    input.put("a", 1);
+    input.put("b", true);
+    input.put("a", 2);   // LinkedHashMap will overwrite previous "a", so consider different keys in Java
+    input.put("b", false);
+    input.put("c", 3);
+
+    int chunkSize = 2;
+    java.util.List<java.util.Map<String, Object>> chunks = new java.util.ArrayList<>();
+    java.util.Map<String, Object> current = new java.util.LinkedHashMap<>();
+    int count = 0;
+
+    for (java.util.Map.Entry<String, Object> entry : input.entrySet()) {
+        current.put(entry.getKey(), entry.getValue());
+        count++;
+        if (count == chunkSize) {
+            chunks.add(current);
+            current = new java.util.LinkedHashMap<>();
+            count = 0;
+        }
+    }
+    if (!current.isEmpty()) {
+        chunks.add(current);
+    }
+
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("divideBy", chunks);
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+
+{
+  "divideBy": [
+    {
+      "a": 2,
+      "b": false
+    },
+    {
+      "c": 3
+    }
+  ]
+}
+
+
+

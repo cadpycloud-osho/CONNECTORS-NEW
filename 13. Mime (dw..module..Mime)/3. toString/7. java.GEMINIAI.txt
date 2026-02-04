@@ -1,0 +1,67 @@
+toString:
+
+example 1:
+
+input:
+
+import java.util.Map;
+
+public class Main {
+
+    // MimeResult record/POJO
+    record MimeResult(String type, String subtype, Map<String, String> parameters) {}
+
+    /**
+     * Conceptual method to emulate the conversion of a MimeResult (type and subtype) 
+     * into a Content-Type header value string.
+     */
+    public static String convertToContentType(String type, String subtype) {
+        // Simple MIME type composition: type/subtype
+        return type + "/" + subtype;
+    }
+
+    public static void main(String[] args) {
+        
+        // Input MimeResult object
+        MimeResult simple = new MimeResult("application", "json", Map.of());
+
+        // Conversion logic
+        String result = convertToContentType(simple.type(), simple.subtype());
+
+        // Output the result as a raw string (no JSON formatting needed per requested output)
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+output:
+"application/json"
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import jakarta.mail.internet.ContentType;
+import jakarta.mail.internet.ParameterList;
+import java.util.Map;
+
+// MimeResult record/POJO...
+
+// Input MimeResult object
+MimeResult complex = new MimeResult("multipart", "form-data", 
+    Map.of("boundary", "my-boundary"));
+
+// Conversion logic
+ParameterList paramList = new ParameterList();
+paramList.set("boundary", "my-boundary");
+
+ContentType contentType = new ContentType(complex.type(), complex.subtype(), paramList);
+
+String result = contentType.toString();
+// result will be: "multipart/form-data; boundary="my-boundary""
+
+
+output:
+"multipart/form-data; boundary=\"my-boundary\""

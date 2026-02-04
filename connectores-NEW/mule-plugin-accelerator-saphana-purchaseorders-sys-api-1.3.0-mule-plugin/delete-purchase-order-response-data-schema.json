@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/ResultMessage",
+  "definitions": {
+    "ResultMessage": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "severity",
+        "code"
+      ],
+      "properties": {
+        "severity": {
+          "enum": [
+            "INFO",
+            "WARNING",
+            "ERROR"
+          ],
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "parameters": {
+          "items": {
+            "$ref": "#/definitions/ResultParameter"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "ResultParameter": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "paramName",
+        "paramValue"
+      ],
+      "properties": {
+        "paramName": {
+          "type": "string"
+        },
+        "paramValue": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

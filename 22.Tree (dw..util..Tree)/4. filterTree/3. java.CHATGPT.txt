@@ -1,0 +1,93 @@
+filterTree:
+
+
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // a
+        Map<String, Object> a = new HashMap<>();
+        a.put("name", "");
+        a.put("lastName", "Achaval");
+        List<Map<String, Object>> friends = new ArrayList<>();
+        Map<String, Object> f1 = new HashMap<>();
+        f1.put("id", "");
+        f1.put("test", true);
+        Map<String, Object> f2 = new HashMap<>();
+        f2.put("age", 123);
+        friends.add(f1);
+        friends.add(f2);
+        friends.add(new HashMap<>());
+        a.put("friends", friends);
+
+        Map<String, Object> filteredA = (Map<String, Object>) filterTree(a, value -> {
+            if (value instanceof String) return !((String) value).isEmpty();
+            if (value instanceof List) return !((List<?>) value).isEmpty();
+            return true;
+        });
+
+        // b
+        Object b = null;
+        Object filteredB = filterTree(b, value -> value instanceof String);
+
+        // c
+        List<Object> c = new ArrayList<>();
+        Map<String, Object> c1 = new HashMap<>();
+        c1.put("name", "Mariano");
+        c1.put("friends", new ArrayList<>());
+        Map<String, Object> c2 = new HashMap<>();
+        c2.put("test", Arrays.asList(1, 2, 3));
+        Map<String, Object> c3 = new HashMap<>();
+        c3.put("dw", "");
+        c.add(c1);
+        c.add(c2);
+        c.add(c3);
+
+        List<Object> filteredC = (List<Object>) filterTree(c, value -> {
+            if (value instanceof List) return !((List<?>) value).isEmpty();
+            return true;
+        });
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", filteredA);
+        result.put("b", filteredB);
+        result.put("c", filteredC);
+
+        System.out.println(result);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object filterTree(Object input, java.util.function.Predicate<Object> predicate) {
+        if (input instanceof Map<?, ?> map) {
+            Map<String, Object> newMap = new HashMap<>();
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                Object filteredValue = filterTree(entry.getValue(), predicate);
+                if (predicate.test(filteredValue)) {
+                    newMap.put(entry.getKey().toString(), filteredValue);
+                }
+            }
+            return newMap;
+        } else if (input instanceof List<?> list) {
+            return list.stream()
+                    .map(e -> filterTree(e, predicate))
+                    .filter(predicate)
+                    .collect(Collectors.toList());
+        } else {
+            return input;
+        }
+    }
+}
+
+output:
+
+
+{a={lastName=Achaval, friends=[{test=true}, {age=123}]}, b=null, c=[{name=Mariano}, {test=[1, 2, 3]}, {dw=}]}
+
+

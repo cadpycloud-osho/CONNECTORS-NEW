@@ -1,0 +1,37 @@
+decodeURIComponent:
+
+
+input:
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> inner = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+        
+        // %20 → space
+        inner.put("decodeURIComponent", URLDecoder.decode("%20PATH/%20TO%20/DECODE%20", StandardCharsets.UTF_8));
+        
+        // %3B→;, %2C→,, %2F→/, %3F→?, %3A→:, %40→@, %26→&, %3D→=
+        inner.put("decodeURIComponent", URLDecoder.decode("%3B%2C%2F%3F%3A%40%26%3D", StandardCharsets.UTF_8));
+        
+        // %2D→-, %5F→_, %2E→., %21→!, %7E→~, %2A→*, %27→', %28→(, %29→), %24→$
+        inner.put("decodeURIComponent", URLDecoder.decode("%2D%5F%2E%21%7E%2A%27%28%29%24", StandardCharsets.UTF_8));
+        
+        result.put("decodeURIComponent", inner);
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{decodeURIComponent={decodeURIComponent= PATH/ TO /DECODE , decodeURIComponent=;,/?:@&=, decodeURIComponent=-_.!~*'()$}}
+
+

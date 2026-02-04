@@ -1,0 +1,36 @@
+avg(values: Array<Number>): Number
+
+
+input:
+
+<route id="DataWeaveAvgTransformation">
+    <from uri="direct:startAvg"/>
+    
+    <setBody>
+        <groovy>
+            // Define the arrays for calculation
+            def arrayA = [1, 1000]
+            def arrayB = [1, 2, 3]
+            
+            // Groovy logic for average: (sum of elements) / (number of elements)
+            def avgA = arrayA.sum() / arrayA.size()
+            def avgB = arrayB.sum() / arrayB.size()
+            
+            // Construct and return the desired final Map (which will become the JSON object)
+            return [ a: avgA, b: avgB ]
+        </groovy>
+    </setBody>
+    
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+    <to uri="mock:avgOutput"/>
+</route>
+
+output:
+
+{
+  "a": 500.5,
+  "b": 2
+}
+

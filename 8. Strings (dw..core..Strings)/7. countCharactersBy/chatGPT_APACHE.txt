@@ -1,0 +1,28 @@
+countCharactersBy:
+
+
+input:
+
+import java.util.*;
+
+public class CountNumericCharsExample {
+
+    public static void main(String[] args) {
+
+        String input = "42 = 11 * 2 + 20";
+
+        long count = input.chars()
+                          .filter(Character::isDigit)
+                          .count();
+
+        System.out.println(count);
+    }
+}
+
+
+
+
+output:
+
+7
+

@@ -1,0 +1,53 @@
+
+indexOf:
+
+indexOf(array: Array, value: Any): Number
+
+Returns the index of the first occurrence of the specified element in this array, or -1 if this list does not contain the element.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  present: ["a","b","c","d"] indexOf "c",
+  notPresent: ["x","w","x"] indexOf "c",
+  presentMoreThanOnce: ["a","b","c","c"] indexOf "c",
+}
+
+DataWeave
+Output
+{
+   "present": 2,
+   "notPresent": -1,
+   "presentMoreThanOnce": 2
+ }
+
+
+
+
+_______________________________________________________________________
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  present: "abcd" indexOf "c",
+  notPresent: "xyz" indexOf "c",
+  presentMoreThanOnce: "abcdc" indexOf "c",
+}
+
+DataWeave
+Output
+{
+   "present": 2,
+   "notPresent": -1,
+   "presentMoreThanOnce": 2
+ }

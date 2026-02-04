@@ -1,0 +1,137 @@
+xsiType:
+
+
+input:
+
+
+import javax.xml.bind.annotation.*;
+import javax.xml.namespace.QName;
+import java.util.HashMap;
+import java.util.Map;
+
+// Define the root element and namespace
+@XmlRootElement(name = "user")
+@XmlType(propOrder = {"name", "lastName"})
+public class User {
+
+    // Define the namespace for the custom attribute and the schema location
+    private static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance";
+    private static final String ACME_NS = "http://acme.com";
+    
+    // Standard fields
+    private String name;
+    private String lastName;
+
+    // JAXB is used to add custom, non-mapped attributes.
+    // This map will hold the xsi:type attribute.
+    @XmlAnyAttribute
+    private Map<QName, Object> otherAttributes = new HashMap<>();
+
+    // Constructor to set values and the xsi:type attribute
+    public User() {
+        this.name = "Peter";
+        this.lastName = "Parker";
+        
+        // DataWeave's xsiType("user", acme) is translated to:
+        // xsi:type="acme:user" where acme maps to http://acme.com
+        
+        // 1. Define the QName for the xsi:type attribute
+        QName xsiTypeQName = new QName(XSI_NS, "type", "xsi");
+        
+        // 2. Define the value of the attribute: "acme:user"
+        String xsiTypeValue = "acme:user";
+        
+        // 3. Add the attribute to the map
+        otherAttributes.put(xsiTypeQName, xsiTypeValue);
+    }
+
+    // Getters and Setters (required by JAXB)
+    @XmlElement(name = "name")
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    @XmlElement(name = "lastName")
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+}
+
+
+
+
+2. Spring Boot Application Class
+
+
+
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
+
+@SpringBootApplication
+public class XmlMarshallingApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(XmlMarshallingApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        // 1. Create the Java object instance
+        User user = new User();
+        
+        // 2. Initialize JAXB Context
+        JAXBContext context = JAXBContext.newInstance(User.class);
+        Marshaller marshaller = context.createMarshaller();
+        
+        // 3. Configure marshaller for pretty formatting (optional)
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+        
+        // JAXB doesn't automatically add the xmlns:acme definition needed for the xsi:type attribute value.
+        // We must manually add the namespace prefix/URI mapping required in the root element.
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new CustomNamespacePrefixMapper());
+        
+        // 4. Marshal (Serialize) the object to an XML string
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(user, sw);
+        String xmlOutput = sw.toString();
+
+        System.out.println("--- DWL XML Generation Equivalent Output ---");
+        System.out.println(xmlOutput);
+    }
+    
+    // Custom Namespace Mapper to force the inclusion of xmlns:acme="http://acme.com" 
+    // and xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" in the root element.
+    public static class CustomNamespacePrefixMapper extends com.sun.xml.bind.marshaller.NamespacePrefixMapper {
+        private static final String ACME_URI = "http://acme.com";
+        private static final String XSI_URI = "http://www.w3.org/2001/XMLSchema-instance";
+        private static final String ACME_PREFIX = "acme";
+        private static final String XSI_PREFIX = "xsi";
+
+        @Override
+        public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
+            if (ACME_URI.equals(namespaceUri)) {
+                return ACME_PREFIX;
+            }
+            if (XSI_URI.equals(namespaceUri)) {
+                return XSI_PREFIX;
+            }
+            return suggestion;
+        }
+    }
+}
+
+
+output:
+
+
+--- DWL XML Generation Equivalent Output ---
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:acme="http://acme.com" xsi:type="acme:user">
+    <name>Peter</name>
+    <lastName>Parker</lastName>
+</user>
+

@@ -1,0 +1,84 @@
+leftJoin:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class LeftJoinRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:leftJoin")
+            .process(exchange -> {
+                List<Map<String, String>> users = Arrays.asList(
+                    Map.of("id", "1", "name", "Mariano"),
+                    Map.of("id", "2", "name", "Leandro"),
+                    Map.of("id", "3", "name", "Julian"),
+                    Map.of("id", "5", "name", "Julian")
+                );
+                
+                List<Map<String, String>> products = Arrays.asList(
+                    Map.of("ownerId", "1", "name", "DataWeave"),
+                    Map.of("ownerId", "1", "name", "BAT"),
+                    Map.of("ownerId", "3", "name", "DataSense"),
+                    Map.of("ownerId", "4", "name", "SmartConnectors")
+                );
+                
+                // Left join: keep ALL users, add matching products
+                List<Map<String, Object>> result = new ArrayList<>();
+                
+                for (Map<String, String> user : users) {
+                    Map<String, Object> joined = new LinkedHashMap<>();
+                    joined.put("l", user);
+                    
+                    // Find ALL matching products for this user
+                    List<Map<String, String>> matchingProducts = products.stream()
+                        .filter(p -> user.get("id").equals(p.get("ownerId")))
+                        .collect(Collectors.toList());
+                    
+                    if (!matchingProducts.isEmpty()) {
+                        // One-to-many: Mariano gets both products
+                        for (Map<String, String> product : matchingProducts) {
+                            Map<String, Object> row = new LinkedHashMap<>(joined);
+                            row.put("r", product);
+                            result.add(row);
+                        }
+                    } else {
+                        // No match: Leandro(id=2), Julian(id=5) get only "l"
+                        result.add(joined);
+                    }
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "DataWeave" }
+  },
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "BAT" }
+  },
+  {
+    "l": { "id": "2", "name": "Leandro" }
+  },
+  {
+    "l": { "id": "3", "name": "Julian" },
+    "r": { "ownerId": "3", "name": "DataSense" }
+  },
+  {
+    "l": { "id": "5", "name": "Julian" }
+  }
+]
+
+

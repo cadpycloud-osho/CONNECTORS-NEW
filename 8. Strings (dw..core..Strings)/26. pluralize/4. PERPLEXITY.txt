@@ -1,0 +1,31 @@
+pluralize:
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class PluralizeController {
+    
+    @GetMapping("/pluralize")
+    public Map<String, String> pluralizeWord() {
+        return Map.of("pluralize", pluralize("box"));
+    }
+    
+    private String pluralize(String word) {
+        if (word.endsWith("x")) {
+            return word + "es";
+        }
+        // Add more rules as needed for other words
+        return word + "s";
+    }
+}
+
+
+output:
+
+
+{
+  "pluralize": "boxes"
+}
+

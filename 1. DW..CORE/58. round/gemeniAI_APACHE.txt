@@ -1,0 +1,46 @@
+round:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CamelRoundNumbers {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [1.2, 4.6, 3.5]
+                        List<Double> inputs = Arrays.asList(1.2, 4.6, 3.5);
+
+                        // Equivalent to DataWeave round()
+                        List<Long> rounded = inputs.stream()
+                            .map(Math::round)
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(rounded);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[ 1, 5, 4 ]

@@ -1,0 +1,55 @@
+seconds:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.util.*;
+
+public class SecondsPeriodRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:secondsPeriod")
+            .process(exchange -> {
+                ZonedDateTime base = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // nextSecond: + seconds(1)
+                result.put("nextSecond", base.plusSeconds(1).toString());
+                
+                // previousSecond: - seconds(1)
+                result.put("previousSecond", base.minusSeconds(1).toString());
+                
+                // decimalInputPeriod: seconds(4.555)
+                result.put("decimalInputPeriod", "PT4.555S");
+                
+                // wholeNumberInputPeriod: seconds(4)
+                result.put("wholeNumberInputPeriod", "PT4S");
+                
+                // addNegativeValue: seconds(-1) + seconds(2) = 1s
+                result.put("addNegativeValue", 1);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+
+{
+  "nextSecond": "2020-10-05T20:22:35.385Z",
+  "previousSecond": "2020-10-05T20:22:33.385Z",
+  "decimalInputPeriod": "PT4.555S",
+  "wholeNumberInputPeriod": "PT4S",
+  "addNegativeValue": 1
+}
+
+
+

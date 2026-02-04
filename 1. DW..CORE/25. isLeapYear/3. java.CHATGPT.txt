@@ -1,0 +1,129 @@
+isLeapYear:
+
+
+
+example 1:
+
+input:
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    private static boolean isLeapYear(LocalDateTime dateTime) {
+        return dateTime.toLocalDate().isLeapYear();
+    }
+
+    public static void main(String[] args) {
+
+        List<Boolean> result = Arrays.asList(
+                isLeapYear(LocalDateTime.parse("2016-10-01T23:57:59")),
+                isLeapYear(LocalDateTime.parse("2017-10-01T23:57:59"))
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false]
+
+-----------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    private static boolean isLeapYear(LocalDate date) {
+        return date.isLeapYear();
+    }
+
+    public static void main(String[] args) {
+
+        List<Boolean> result = Arrays.asList(
+                isLeapYear(LocalDate.parse("2016-10-01")),
+                isLeapYear(LocalDate.parse("2017-10-01"))
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false]
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private static boolean isLeapYear(OffsetDateTime dateTime) {
+        return dateTime.toLocalDate().isLeapYear();
+    }
+
+    public static void main(String[] args) {
+
+        List<OffsetDateTime> dates = Arrays.asList(
+                OffsetDateTime.parse("2016-10-01T23:57:59-03:00"),
+                OffsetDateTime.parse("2016-10-01T23:57:59Z")
+        );
+
+        List<Boolean> result = dates.stream()
+                .map(Main::isLeapYear)
+                .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+[true, true]
+
+
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

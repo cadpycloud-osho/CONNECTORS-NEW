@@ -1,0 +1,63 @@
+isUnionType:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveUnionTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processUnionChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processUnionChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AType = String | Number (union type)
+        result.put("a", isUnionType(createUnionSchema()));
+        
+        // Boolean - simple type
+        result.put("b", isUnionType(Boolean.class));
+        
+        return result;
+    }
+    
+    private boolean isUnionType(Object type) {
+        // DataWeave Union type check: detects | operator types
+        if (type instanceof Map) {
+            Map<?,?> typeMap = (Map<?,?>) type;
+            // Union types have multiple member types
+            return typeMap.containsKey("union") || 
+                   ((List<?>)typeMap.get("members")).size() > 1;
+        }
+        return false;
+    }
+    
+    private Map<String, Object> createUnionSchema() {
+        // Represents String | Number union type
+        Map<String, Object> schema = new HashMap<>();
+        schema.put("type", "union");
+        schema.put("members", List.of("String", "Number"));
+        return schema;
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": true,
+  "b": false
+}
+

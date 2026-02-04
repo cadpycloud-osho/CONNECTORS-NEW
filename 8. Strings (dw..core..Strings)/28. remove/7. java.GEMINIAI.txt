@@ -1,0 +1,33 @@
+remove:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        String inputString = "lazyness purity state higher-order stateful";
+        String substringToRemove = "state";
+        
+        // --- Core DataWeave Logic ---
+        // Java's String.replaceAll() is the direct equivalent of DW's remove(String)
+        String transformedString = inputString.replaceAll(substringToRemove, "");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"result\": \"%s\"\n}",
+            transformedString
+        );
+
+        System.out.println(output);
+    }
+}
+
+output:
+
+
+{
+  "result": "lazyness purity  higher-order ful"
+}

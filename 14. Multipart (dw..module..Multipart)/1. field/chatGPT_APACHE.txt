@@ -1,0 +1,272 @@
+field:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultipartFormRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Create parts
+                Map<String, Object> parts = new HashMap<>();
+                parts.put("myFirstPart", "content for my first part");
+                parts.put("mySecondPart", "content for my second part");
+
+                // Set as message body for multipart/form-data
+                Message message = exchange.getMessage();
+                message.setBody(parts);
+
+                // Set header for multipart/form-data
+                message.setHeader(Exchange.CONTENT_TYPE, "multipart/form-data");
+            });
+    }
+}
+
+
+
+output:
+
+------=_Part_1234567890
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_1234567890
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_1234567890--
+
+
+
+
+-------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultipartOrderClientsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Create multipart parts
+                Map<String, Object> parts = new HashMap<>();
+
+                // JSON part for orders
+                String myOrderJson = "[\n" +
+                        "  {\n" +
+                        "    \"order\": 1,\n" +
+                        "    \"amount\": 2\n" +
+                        "  },\n" +
+                        "  {\n" +
+                        "    \"order\": 32,\n" +
+                        "    \"amount\": 1\n" +
+                        "  }\n" +
+                        "]";
+                Map<String, Object> orderPart = new HashMap<>();
+                orderPart.put("value", myOrderJson);
+                orderPart.put("mime", "application/json");
+                orderPart.put("fileName", "order.json");
+                parts.put("order", orderPart);
+
+                // XML part for clients
+                String myClientsXml =
+                        "<clients>\n" +
+                        "  <client>\n" +
+                        "    <id>1</id>\n" +
+                        "    <name>Mariano</name>\n" +
+                        "  </client>\n" +
+                        "  <client>\n" +
+                        "    <id>2</id>\n" +
+                        "    <name>Shoki</name>\n" +
+                        "  </client>\n" +
+                        "</clients>";
+                Map<String, Object> clientsPart = new HashMap<>();
+                clientsPart.put("value", myClientsXml);
+                clientsPart.put("mime", "application/xml");
+                parts.put("clients", clientsPart);
+
+                // Set multipart body
+                Message message = exchange.getMessage();
+                message.setBody(parts);
+                message.setHeader(Exchange.CONTENT_TYPE, "multipart/form-data");
+            });
+    }
+}
+
+
+
+output:
+
+------=_Part_123456789
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_123456789
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_123456789--
+
+
+
+
+-------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultipartOrderClientsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Create parts map
+                Map<String, Object> parts = new HashMap<>();
+
+                // Order part (JSON) with filename
+                String myOrderJson = "[\n" +
+                        "  {\n" +
+                        "    \"order\": 1,\n" +
+                        "    \"amount\": 2\n" +
+                        "  },\n" +
+                        "  {\n" +
+                        "    \"order\": 32,\n" +
+                        "    \"amount\": 1\n" +
+                        "  }\n" +
+                        "]";
+                Map<String, Object> orderPart = new HashMap<>();
+                orderPart.put("value", myOrderJson);
+                orderPart.put("mime", "application/json");
+                orderPart.put("fileName", "order.json");
+                parts.put("order", orderPart);
+
+                // Clients part (XML)
+                String myClientsXml =
+                        "<clients>\n" +
+                        "  <client>\n" +
+                        "    <id>1</id>\n" +
+                        "    <name>Mariano</name>\n" +
+                        "  </client>\n" +
+                        "  <client>\n" +
+                        "    <id>2</id>\n" +
+                        "    <name>Shoki</name>\n" +
+                        "  </client>\n" +
+                        "</clients>";
+                Map<String, Object> clientsPart = new HashMap<>();
+                clientsPart.put("value", myClientsXml);
+                clientsPart.put("mime", "application/xml");
+                parts.put("clients", clientsPart);
+
+                // Set multipart/form-data body
+                Message message = exchange.getMessage();
+                message.setBody(parts);
+                message.setHeader(Exchange.CONTENT_TYPE, "multipart/form-data");
+            });
+    }
+}
+
+
+
+output:
+
+------=_Part_123456789
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_123456789
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_123456789--
+
+
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

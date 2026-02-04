@@ -1,0 +1,53 @@
+isLiteralType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveLiteralTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processLiteralTypeChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processLiteralTypeChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ALiteralType = "Mariano" (literal string type)
+        result.put("a", isLiteralType("Mariano"));
+        
+        // Boolean - regular type
+        result.put("b", isLiteralType(Boolean.class));
+        
+        return result;
+    }
+    
+    private boolean isLiteralType(Object type) {
+        // Literal types are specific constant values like "Mariano"
+        // DataWeave literal types are quoted string/number/boolean constants
+        return type instanceof String && 
+               !((String)type).isEmpty() &&
+               !"Boolean".equals(type) &&
+               !"Key".equals(type);
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

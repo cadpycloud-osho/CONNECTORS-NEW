@@ -1,0 +1,32 @@
+isArrayType:
+
+
+input:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isArrayType(Class<?> type) {
+        return type != null && type.isArray();
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // a: Array<String>
+        result.put("a", isArrayType(String[].class));
+
+        // b: Boolean
+        result.put("b", isArrayType(Boolean.class));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+{a=true, b=false}

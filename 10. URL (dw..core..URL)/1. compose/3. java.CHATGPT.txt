@@ -1,0 +1,43 @@
+compose:
+
+
+input:
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String composeURL(String base, String path, String file) {
+        try {
+            String encodedPath = URLEncoder.encode(path, StandardCharsets.UTF_8.toString()).replace("+", "%20");
+            return base + encodedPath + file;
+        } catch (UnsupportedEncodingException e) {
+            return base + path + file;
+        }
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+        String urlPath = "content folder";
+
+        String url1 = composeURL("http://examplewebsite.com/", urlPath, "/page.html");
+        result.put("encodedURL_arrayVersion", url1);
+
+        // Template style version
+        String url2 = "http://examplewebsite.com/" + urlPath.replace(" ", "%20") + "/page.html";
+        result.put("encodedURL_templateVersion", url2);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{encodedURL_arrayVersion=http://examplewebsite.com/content%20folder/page.html, encodedURL_templateVersion=http://examplewebsite.com/content%20folder/page.html}
+
+

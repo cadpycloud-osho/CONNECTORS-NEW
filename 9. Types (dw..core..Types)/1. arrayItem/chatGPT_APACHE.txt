@@ -1,0 +1,46 @@
+arrayItem:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ArrayItemExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", arrayItem("Array<String>"));
+        result.put("b", arrayItem("Array<Number>"));
+        result.put("c", arrayItem("Array<Any>"));
+        result.put("d", arrayItem("Array"));
+
+        System.out.println(result);
+    }
+
+    public static String arrayItem(String arrayType) {
+        if (arrayType == null || arrayType.isEmpty()) {
+            return "Any";
+        }
+        // Extract type inside <>
+        if (arrayType.contains("<") && arrayType.contains(">")) {
+            return arrayType.substring(arrayType.indexOf("<") + 1, arrayType.indexOf(">"));
+        }
+        // Default type for unspecified array
+        return "Any";
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": "String",
+  "b": "Number",
+  "c": "Any",
+  "d": "Any"
+}
+
+

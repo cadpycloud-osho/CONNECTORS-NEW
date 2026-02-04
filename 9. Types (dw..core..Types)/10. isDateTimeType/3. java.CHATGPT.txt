@@ -1,0 +1,40 @@
+isDateTimeType:
+
+
+
+INPUT:
+
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isDateTimeType(Class<?> type) {
+        return type == java.time.LocalDateTime.class ||
+               type == java.time.ZonedDateTime.class ||
+               type == java.time.OffsetDateTime.class ||
+               type == java.time.Instant.class;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ADateTime = LocalDateTime.class;
+
+        result.put("a", isDateTimeType(ADateTime));
+        result.put("b", isDateTimeType(LocalDateTime.class));
+        result.put("c", isDateTimeType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+OUTPUT:
+
+{a=true, b=true, c=false}
+
+
+

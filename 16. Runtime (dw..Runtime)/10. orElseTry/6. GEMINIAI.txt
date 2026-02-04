@@ -1,0 +1,96 @@
+orElseTry:
+
+
+input:
+
+public class KeyNotFoundException extends RuntimeException {
+    public KeyNotFoundException(String message) {
+        super(message);
+    }
+}
+import org.springframework.stereotype.Service;
+import java.util.Collections;
+import java.util.Map;
+
+@Service
+public class TryOrElseTryService {
+
+    /**
+     * Helper to simulate DW's try(() -> expr) orElseTry fallbackExpr
+     * This method always returns a result object (Success/Failure)
+     * @param attemptFunction The primary attempt function.
+     * @param fallbackFunction The function to run if the primary fails.
+     * @return A Map representing the DW result object (success:boolean, result/error:Map).
+     */
+    public Map<String, Object> tryOrElseTry(Runnable attemptFunction, Runnable fallbackFunction) {
+        try {
+            attemptFunction.run();
+            // If the first attempt succeeds, return success
+            return Map.of("success", true, "result", true); // Simplifies success value
+        } catch (Exception e1) {
+            // If the first attempt fails, execute the fallback
+            try {
+                fallbackFunction.run();
+                // If the fallback succeeds, return success with the fallback result
+                return Map.of("success", true, "result", true); // Simplifies success value
+
+            } catch (Exception e2) {
+                // If the fallback also fails, return failure object with the SECOND error
+                return Map.of(
+                    "success", false,
+                    "error", Map.of("kind", e2.getClass().getSimpleName(), "message", e2.getMessage())
+                );
+            }
+        }
+    }
+    
+    // --- Utility method to simulate key access failure (like 'user.name!') ---
+    private static void simulateKeyAccess(Map<?, ?> data, String key) {
+        if (!data.containsKey(key)) {
+            throw new KeyNotFoundException("There is no key named '" + key + "'");
+        }
+    }
+    
+    // --- Main Logic ---
+    public Map<String, Object> executeTryOrElseTryLogic() {
+        // Replicate DW variables
+        final Map<String, Object> user = Collections.emptyMap();
+        final Map<String, Object> otherUser = Collections.emptyMap();
+        
+        // --- Expression 'a' ---
+        // DW: try(() -> user.name!) orElseTry otherUser.name!
+        Map<String, Object> resultA = tryOrElseTry(
+            () -> simulateKeyAccess(user, "name"), // Fails
+            () -> simulateKeyAccess(otherUser, "name") // Fails, returns this error
+        );
+        
+        // --- Expression 'b' ---
+        // DW: try(() -> user.name!) orElseTry "No User Name"
+        Map<String, Object> resultB = tryOrElseTry(
+            () -> simulateKeyAccess(user, "name"), // Fails
+            () -> { /* Success expression: "No User Name" */ } // Succeeds, returns success
+        );
+        
+        // Note: DW returns the literal value for success in 'b', we simplify to true
+        resultB = resultB.get("success").equals(true) ? Map.of("success", true, "result", "No User Name") : resultB;
+        
+        return Map.of("a", resultA, "b", resultB);
+    }
+}
+output:
+
+{
+  "a": {
+    "success": false,
+    "error": {
+      "kind": "KeyNotFoundException",
+      "message": "There is no key named 'name'"
+    }
+  },
+  "b": {
+    "success": true,
+    "result": "No User Name"
+  }
+}
+
+

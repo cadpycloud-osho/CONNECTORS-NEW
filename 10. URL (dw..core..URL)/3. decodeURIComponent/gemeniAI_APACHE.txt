@@ -1,0 +1,58 @@
+decodeURIComponent:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DecodeComponentRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:decodeComponent")
+            .routeId("URL-Component-Decode-Route")
+            .process(exchange -> {
+                // We use a List or unique keys in Java because a Map cannot have 
+                // duplicate keys ("decodeURIComponent") like the DataWeave source implies.
+                // However, to match the DW output structure:
+                Map<String, String> innerMap = new LinkedHashMap<>();
+
+                // 1. Decode Path: %20 -> Space
+                innerMap.put("path", URLDecoder.decode("%20PATH/%20TO%20/DECODE%20", StandardCharsets.UTF_8));
+
+                // 2. Decode Reserved Characters: %3B -> ; %2C -> , etc.
+                innerMap.put("reserved", URLDecoder.decode("%3B%2C%2F%3F%3A%40%26%3D", StandardCharsets.UTF_8));
+
+                // 3. Decode Marks and Symbols
+                innerMap.put("marks", URLDecoder.decode("%2D%5F%2E%21%7E%2A%27%28%29%24", StandardCharsets.UTF_8));
+
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("decodeURIComponent", innerMap);
+
+                exchange.getIn().setBody(response);
+            })
+            // Output as application/json
+            .marshal().json()
+            .log("Decoded Components: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "decodeURIComponent": {
+    "path": " PATH/ TO /DECODE ",
+    "reserved": ";,/?:@&=",
+    "marks": "-_.!~*'()$"
+  }
+}
+
+
+

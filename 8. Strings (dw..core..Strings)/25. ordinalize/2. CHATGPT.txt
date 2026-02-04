@@ -1,0 +1,62 @@
+ordinalize:
+
+
+input:
+
+package com.example.demo.util;
+
+public class NumberUtils {
+
+    public static String ordinalize(int number) {
+        int mod100 = number % 100;
+
+        // Special cases: 11,12,13 → th
+        if (mod100 >= 11 && mod100 <= 13) {
+            return number + "th";
+        }
+
+        int mod10 = number % 10;
+        switch (mod10) {
+            case 1: return number + "1st".substring(1); // "st"
+            case 2: return number + "2nd".substring(1); // "nd"
+            case 3: return number + "3rd".substring(1); // "rd"
+            default: return number + "th";
+        }
+    }
+}
+
+Spring Boot Controller:
+package com.example.demo.controller;
+
+import com.example.demo.util.NumberUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class OrdinalizeController {
+
+    @GetMapping("/ordinalize")
+    public Map<String, String> ordinalizeExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", NumberUtils.ordinalize(1));
+        result.put("b", NumberUtils.ordinalize(2));
+        result.put("c", NumberUtils.ordinalize(5));
+        result.put("d", NumberUtils.ordinalize(103));
+
+        return result;
+    }
+}
+output:
+
+
+{
+  "a": "1st",
+  "b": "2nd",
+  "c": "5th",
+  "d": "103rd"
+}
+

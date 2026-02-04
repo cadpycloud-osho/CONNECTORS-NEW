@@ -1,0 +1,48 @@
+isLowerCase:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + isLowerCase(null) + ",");
+        System.out.println("  \"b\": " + isLowerCase("") + ",");
+        System.out.println("  \"c\": " + isLowerCase(" ") + ",");
+        System.out.println("  \"d\": " + isLowerCase("abc") + ",");
+        System.out.println("  \"e\": " + isLowerCase("aBC") + ",");
+        System.out.println("  \"f\": " + isLowerCase("a c") + ",");
+        System.out.println("  \"g\": " + isLowerCase("a1c") + ",");
+        System.out.println("  \"h\": " + isLowerCase("a/c") + ",");
+        System.out.println("  \"i\": " + isLowerCase("mulesöft") + ",");
+        System.out.println("  \"j\": " + isLowerCase("mulesÖft"));
+        System.out.println("}");
+    }
+    
+    private static boolean isLowerCase(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        return input.chars().allMatch(Character::isLowerCase);
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": true,
+  "j": false
+}
+
+

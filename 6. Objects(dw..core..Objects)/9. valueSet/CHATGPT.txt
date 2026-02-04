@@ -1,0 +1,39 @@
+valueSet:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class ValueSetController {
+
+    @GetMapping("/valueSet")
+    public Map<String, List<Object>> valueSetExample() {
+
+        // Equivalent object {a: true, b: 1}
+        Map<String, Object> inputMap = new LinkedHashMap<>();
+        inputMap.put("a", true);
+        inputMap.put("b", 1);
+
+        // Extract values (like DataWeave valueSet)
+        List<Object> values = new ArrayList<>(inputMap.values());
+
+        return Map.of("valueSet", values);
+    }
+}
+
+
+output:
+
+
+{
+  "valueSet": [true, 1]
+}
+
+

@@ -1,0 +1,55 @@
+field:
+
+
+
+input:
+
+
+public class Main {
+
+    static class FieldRepresentation {
+        private final String kind;
+        private final String namespace;
+        private final String selector;
+
+        public FieldRepresentation(String namespace, String selector) {
+            this.kind = "Object"; // as per your desired output
+            this.namespace = namespace;
+            this.selector = selector;
+        }
+
+        // Convert object to JSON string
+        public String toJson() {
+            return "{\n" +
+                   "  \"kind\": \"" + kind + "\",\n" +
+                   "  \"namespace\": \"" + namespace + "\",\n" +
+                   "  \"selector\": \"" + selector + "\"\n" +
+                   "}";
+        }
+    }
+
+    private static final String NAMESPACE_URI = "http://acme.com/foo";
+    private static final String FIELD_NAME = "myFieldName";
+
+    public static void main(String[] args) {
+        // Create the FieldRepresentation object
+        FieldRepresentation field = new FieldRepresentation(NAMESPACE_URI, FIELD_NAME);
+
+        // Print the JSON output
+        System.out.println(field.toJson());
+    }
+}
+
+
+
+output:
+
+{
+  "kind": "Object",
+  "namespace": "http://acme.com/foo",
+  "selector": "myFieldName"
+}
+
+
+
+

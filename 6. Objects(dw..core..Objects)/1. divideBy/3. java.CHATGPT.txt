@@ -1,0 +1,60 @@
+divideBy:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // LinkedHashMap to preserve insertion order (like DW)
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", 1);
+        map.put("b", true);
+        map.put("a", 2);     // overwrites previous "a"
+        map.put("b", false); // overwrites previous "b"
+        map.put("c", 3);
+
+        int n = 2; // divide into chunks of 2 entries
+
+        List<Map<String, Object>> divided = new ArrayList<>();
+        Map<String, Object> currentChunk = new LinkedHashMap<>();
+        int count = 0;
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            currentChunk.put(entry.getKey(), entry.getValue());
+            count++;
+
+            if (count == n) {
+                divided.add(currentChunk);
+                currentChunk = new LinkedHashMap<>();
+                count = 0;
+            }
+        }
+
+        if (!currentChunk.isEmpty()) {
+            divided.add(currentChunk);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("divideBy", divided);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{
+  "divideBy": [
+    { "a": 2, "b": false },
+    { "c": 3 }
+  ]
+}
+
+
+

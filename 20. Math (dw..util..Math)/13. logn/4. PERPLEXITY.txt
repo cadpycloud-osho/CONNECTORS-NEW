@@ -1,0 +1,63 @@
+logn:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveMathLognApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveMathLognApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/math/logn")
+@RequiredArgsConstructor
+class LognController {
+    
+    private final MathService mathService;
+    
+    @GetMapping("/test")
+    public Map<String, Double> testLogn() {
+        return mathService.executeLognTests();
+    }
+}
+
+@Service
+class MathService {
+    
+    public Map<String, Double> executeLognTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("logn10", logn(10.0));
+        result.put("logn13", logn(0.13));
+        result.put("logn-20", logn(-20.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave logn() equivalent:
+     * Returns natural logarithm (base e) of x, or null if x <= 0
+     */
+    public Double logn(double x) {
+        // Check domain: x must be > 0
+        if (x <= 0.0) {
+            return null;
+        }
+        return Math.log(x);
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+
+

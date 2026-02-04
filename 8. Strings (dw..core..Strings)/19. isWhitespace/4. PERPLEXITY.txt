@@ -1,0 +1,57 @@
+isWhitespace:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class IsWhitespaceController {
+    
+    @GetMapping(value = "/is-whitespace", produces = MediaType.APPLICATION_JSON_VALUE)
+    public IsWhitespaceResponse isWhitespaceChecks() {
+        return new IsWhitespaceResponse(
+            isWhitespace(null),
+            isWhitespace(""),
+            isWhitespace("  "),
+            isWhitespace("abc"),
+            isWhitespace("ab2c"),
+            isWhitespace("ab-c")
+        );
+    }
+    
+    private boolean isWhitespace(String input) {
+        if (input == null) {
+            return false;
+        }
+        return input.chars().allMatch(Character::isWhitespace);
+    }
+    
+    public static class IsWhitespaceResponse {
+        public final boolean a, b, c, d, e, f;
+        
+        public IsWhitespaceResponse(boolean a, boolean b, boolean c, boolean d, boolean e, boolean f) {
+            this.a = a; this.b = b; this.c = c; this.d = d; this.e = e; this.f = f;
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+
+

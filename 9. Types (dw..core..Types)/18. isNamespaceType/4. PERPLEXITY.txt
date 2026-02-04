@@ -1,0 +1,46 @@
+isNamespaceType:
+
+
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.jar.Pack200;
+import javax.xml.namespace.NamespaceContext;
+
+@RestController
+@RequestMapping("/api")
+public class NamespaceTypeCheckController {
+    
+    @GetMapping("/namespace-type-check")
+    public Map<String, Boolean> checkNamespaceTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        NamespaceContext namespaceContext = null; // Represents Namespace equivalent
+        String testString = "test";
+        
+        result.put("a", namespaceContext instanceof NamespaceContext);
+        result.put("b", namespaceContext instanceof NamespaceContext);
+        result.put("c", testString instanceof NamespaceContext);
+        
+        return result;
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

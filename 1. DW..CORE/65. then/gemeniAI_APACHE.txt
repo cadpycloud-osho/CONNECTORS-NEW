@@ -1,0 +1,74 @@
+then:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelThenOperator {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        List<String> input = List.of("mariano", "de Achaval");
+                        Map<String, Object> finalResult = new LinkedHashMap<>();
+
+                        // 1. chainResult: reduce (concat) then sizeOf
+                        // Logic: "mariano" + "de Achaval" = "marianode Achaval" (17 chars)
+                        // Note: DW reduce order here is (item ++ acc), so "de Achavalmariano"
+                        String reduced = input.stream().reduce("", (acc, item) -> item + acc);
+                        finalResult.put("chainResult", reduced.length());
+
+                        // 2. referenceResult: map (upper) then build Object
+                        List<String> upperList = input.stream()
+                                .map(String::toUpperCase)
+                                .collect(Collectors.toList());
+                        
+                        Map<String, Object> refObj = new HashMap<>();
+                        refObj.put("name", upperList.get(0));
+                        refObj.put("lastName", upperList.get(1));
+                        refObj.put("length", upperList.size());
+                        finalResult.put("referenceResult", refObj);
+
+                        // 3. onNullReturnNull: reduce on empty list then then()
+                        // In DW, reduce on empty returns null. In Java, use Optional.
+                        Optional<String> emptyReduce = Collections.<String>emptyList()
+                                .stream().reduce((item, acc) -> item + acc);
+                        
+                        finalResult.put("onNullReturnNull", emptyReduce.isPresent() ? 
+                                         emptyReduce.get().length() : null);
+
+                        exchange.getIn().setBody(finalResult);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "chainResult": 17,
+  "referenceResult": {
+    "name": "MARIANO",
+    "lastName": "DE ACHAVAL",
+    "length": 2
+  },
+  "onNullReturnNull": null
+}
+

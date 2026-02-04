@@ -1,0 +1,95 @@
+trim:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class TrimFunctionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:trim")
+            .process(exchange -> {
+                String input = "   my really long  text     ";
+                
+                // trim() → remove leading/trailing whitespace
+                String result = input.trim();
+                
+                exchange.getIn().setBody(Map.of("trim", result));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "trim": "my really long  text" }
+
+
+
+-------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class ComprehensiveTrimRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:comprehensiveTrim")
+            .process(exchange -> {
+                exchange.getIn().setBody(Map.of(
+                    "null", trimString(null),
+                    "empty", trimString(""),
+                    "blank", trimString("     "),
+                    "noBlankSpaces", trimString("abc"),
+                    "withSpaces", trimString("    abc    ")
+                ));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private String trimString(String input) {
+        return input == null ? null : input.trim();
+    }
+}
+
+
+output:
+
+{
+  "null": null,
+  "empty": "",
+  "blank": "",
+  "noBlankSpaces": "abc",
+  "withSpaces": "abc"
+}
+
+
+
+-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

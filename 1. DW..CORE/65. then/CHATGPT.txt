@@ -1,0 +1,91 @@
+then:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class DataWeaveController {
+
+    // ----------------------------------------
+    // DataWeave: chainResult
+    // ----------------------------------------
+    @GetMapping("/chainResult")
+    public Map<String, Integer> chainResult() {
+        List<String> names = Arrays.asList("mariano", "de Achaval");
+
+        String combined = names.stream()
+                .reduce("", (a, b) -> a + b);
+
+        int length = combined.length(); // 17
+
+        return Map.of("chainResult", length);
+    }
+
+    // ----------------------------------------
+    // DataWeave: referenceResult
+    // ----------------------------------------
+    @GetMapping("/referenceResult")
+    public Map<String, Object> referenceResult() {
+        List<String> names = Arrays.asList("mariano", "de Achaval");
+        List<String> upperList = names.stream()
+                .map(String::toUpperCase)
+                .toList();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("name", upperList.get(0));
+        result.put("lastName", upperList.get(1));
+        result.put("length", upperList.size());
+
+        return Map.of("referenceResult", result);
+    }
+
+    // ----------------------------------------
+    // DataWeave: onNullReturnNull
+    // ----------------------------------------
+    @GetMapping("/onNullReturnNull")
+    public Map<String, Object> onNullReturnNull() {
+        List<String> emptyList = Collections.emptyList();
+
+        if (emptyList.isEmpty()) {
+            return Map.of("onNullReturnNull", null);
+        }
+
+        String combined = emptyList.stream()
+                .reduce("", (a, b) -> a + b);
+
+        Integer length = combined.isEmpty() ? null : combined.length();
+
+        return Map.of("onNullReturnNull", length);
+    }
+}
+
+
+output:
+
+{
+  "chainResult": 17,
+  "referenceResult": {
+    "name": "MARIANO",
+    "lastName": "DE ACHAVAL",
+    "length": 2
+  },
+  "onNullReturnNull": null
+}

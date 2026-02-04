@@ -1,0 +1,39 @@
+isLocalTimeType:
+
+
+
+
+
+input:
+
+
+@RestController
+@RequestMapping("/api")
+public class TypeCheckController {
+    
+    @GetMapping("/type-check")
+    public Map<String, Boolean> checkLocalTimeTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        LocalTime localTime = LocalTime.now();
+        Type aType = new TypeToken<LocalTime>() {}.getType();
+        Type stringType = new TypeToken<String>() {}.getType();
+        
+        result.put("a", aType.equals(localTime.getClass()));
+        result.put("b", LocalTime.class.isAssignableFrom(localTime.getClass()));
+        result.put("c", String.class.isAssignableFrom("test".getClass()));
+        
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

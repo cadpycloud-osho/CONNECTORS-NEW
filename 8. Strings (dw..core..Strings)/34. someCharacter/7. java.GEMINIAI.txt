@@ -1,0 +1,47 @@
+someCharacter:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        String inputString = "someCharacter";
+        
+        // --- Core DataWeave Logic ---
+        boolean result = checkAnyCharacterMatches(inputString);
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"result\": %s\n}",
+            // Boolean values are not quoted in JSON
+            result
+        );
+
+        System.out.println(output);
+    }
+    
+    /**
+     * Implements the logic of the DataWeave 'someCharacter isUpperCase($)' expression.
+     */
+    public static boolean checkAnyCharacterMatches(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        
+        // Use Java Streams to check if any character matches the condition.
+        return str.chars()
+                  .anyMatch(c -> Character.isUpperCase(c));
+    }
+}
+
+output:
+
+
+{
+  "result": true
+}
+
+

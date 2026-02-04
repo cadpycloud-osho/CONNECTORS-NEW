@@ -1,0 +1,46 @@
+isUpperCase:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + isUpperCase(null) + ",");
+        System.out.println("  \"b\": " + isUpperCase("") + ",");
+        System.out.println("  \"c\": " + isUpperCase("  ") + ",");
+        System.out.println("  \"d\": " + isUpperCase("ABC") + ",");
+        System.out.println("  \"e\": " + isUpperCase("aBC") + ",");
+        System.out.println("  \"f\": " + isUpperCase("A C") + ",");
+        System.out.println("  \"g\": " + isUpperCase("A1C") + ",");
+        System.out.println("  \"h\": " + isUpperCase("A/C"));
+        System.out.println("}");
+    }
+    
+    private static boolean isUpperCase(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        return input.chars().allMatch(Character::isUpperCase);
+    }
+}
+
+
+
+output:
+
+
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}

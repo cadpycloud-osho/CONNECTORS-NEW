@@ -1,0 +1,31 @@
+onNull:
+
+onNull<R>(previous: Null, callback: () -> R): R
+
+onNull<R>(previous: Null, callback: () -> R): R
+Executes a callback function if the preceding expression returns a null value and then replaces the null value with the result of the callback.
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+     "onNull": []
+             reduce ((item, accumulator) -> item ++ accumulator)
+             then ((result) -> sizeOf(result))
+             onNull "Empty Text"
+ }
+
+
+DataWeave
+Output
+{
+  "onNull": "Empty Text"
+}
+
+
+
+onNull<T>(previous: T, callback: () -> Any): T
+Helper function that enables onNull to work with a non-null value.

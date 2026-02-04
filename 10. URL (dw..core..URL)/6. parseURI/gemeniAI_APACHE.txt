@@ -1,0 +1,66 @@
+parseURI:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ParseUriRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:parseUri")
+            .routeId("URL-Parsing-Route")
+            .process(exchange -> {
+                String input = "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+                
+                // 1. Logic: parseURI()
+                // The URI constructor performs the parsing automatically
+                URI uri = new URI(input);
+
+                // 2. Map Java URI properties to DataWeave-like structure
+                Map<String, Object> composition = new LinkedHashMap<>();
+                composition.put("isValid", true); // If constructor succeeds, it's valid
+                composition.put("raw", input);
+                composition.put("host", uri.getHost());
+                composition.put("authority", uri.getAuthority());
+                composition.put("fragment", uri.getFragment());
+                composition.put("path", uri.getPath());
+                composition.put("scheme", uri.getScheme());
+                composition.put("isAbsolute", uri.isAbsolute());
+                composition.put("isOpaque", uri.isOpaque());
+
+                // 3. Wrap in root object
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("composition", composition);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Output application/json
+            .marshal().json()
+            .log("Parsed URI: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+

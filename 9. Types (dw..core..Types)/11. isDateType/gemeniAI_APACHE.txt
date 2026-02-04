@@ -1,0 +1,46 @@
+isDateType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DateTypeCheckRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkDateType")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Equivalent to 'type ADate = Date'
+                Class<?> aDate = LocalDate.class; 
+                Class<?> stringType = String.class;
+
+                results.put("a", isDateType(aDate));
+                results.put("b", isDateType(LocalDate.class));
+                results.put("c", isDateType(stringType));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    private boolean isDateType(Class<?> clazz) {
+        // LocalDate represents a date without time/timezone
+        return clazz != null && clazz.equals(LocalDate.class);
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

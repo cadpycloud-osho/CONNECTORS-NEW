@@ -1,0 +1,64 @@
+toHex:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToHexRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertToHex")
+            .routeId("To-Hex-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // 1. Logic: toHex(value)
+                results.put("a", formatHex("-1"));
+                results.put("b", formatHex("100000000000000000000000000000000000000000000000000000000000000"));
+                results.put("c", formatHex("0"));
+                results.put("d", formatHex(null));
+                results.put("e", formatHex("15"));
+
+                exchange.getIn().setBody(results);
+            })
+            // 2. Logic: output application/json
+            .marshal().json()
+            .log("Hex Result: ${body}");
+    }
+
+    /**
+     * Replicates dw::core::Numbers::toHex
+     */
+    private String formatHex(Object input) {
+        if (input == null) return null;
+        
+        try {
+            // Using BigInteger to handle values of any size
+            BigInteger val = new BigInteger(String.valueOf(input));
+            // toString(16) produces lowercase hex by default in Java
+            return val.toString(16);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": "-1",
+  "b": "3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "f"
+}
+
+
+

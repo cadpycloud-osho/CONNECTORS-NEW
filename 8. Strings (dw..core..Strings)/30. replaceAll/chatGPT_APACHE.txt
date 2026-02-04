@@ -1,0 +1,45 @@
+replaceAll:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ReplaceAllExample {
+
+    public static void main(String[] args) {
+        System.out.println(result());
+    }
+
+    public static Map<String, String> result() {
+        Map<String, String> map = new LinkedHashMap<>();
+
+        map.put("a", replaceAll("Mariano", "a", "A"));
+        map.put("b", replaceAll("AAAA", "AAA", "B"));
+        map.put("c", replaceAll(null, "aria", "A"));
+        map.put("d", replaceAll("Mariano", "j", "Test"));
+
+        return map;
+    }
+
+    public static String replaceAll(String input, String target, String replacement) {
+        if (input == null || target == null || target.isEmpty()) {
+            return input;
+        }
+        return input.replace(target, replacement);
+    }
+}
+
+
+output:
+
+{
+  "a": "MAriAno",
+  "b": "BA",
+  "c": null,
+  "d": "Mariano"
+}
+
+
+

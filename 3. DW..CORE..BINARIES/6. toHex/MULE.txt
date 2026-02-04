@@ -1,0 +1,21 @@
+toHex:
+
+toHex(content: Binary): String
+
+toHex(content: Binary): String
+Transforms a binary value into a hexadecimal string.
+
+
+Source
+%dw 2.0
+import * from dw::core::Binaries
+output application/json
+var myBinary = "Mule" as Binary
+var testType = typeOf(myBinary)
+---
+{
+   "binaryToHex" : toHex(myBinary)
+}
+DataWeave
+Output
+{ "binaryToHex": "4D756C65" }

@@ -1,0 +1,50 @@
+toBinary:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
+
+@RestController
+public class BinaryCoercionsController {
+    
+    @GetMapping(value = "/binary-coercions", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String> getBinaryCoercions() {
+        String input = "DW";
+        
+        return Map.of(
+            "UTF-16Ex", base64Encode(input.getBytes(StandardCharsets.UTF_16)),
+            "utf16Ex", base64Encode(input.getBytes(StandardCharsets.UTF_16)),
+            "UnicodeBigEx", base64Encode(input.getBytes(StandardCharsets.UTF_16BE)),
+            "UTF-32Ex", base64Encode(input.getBytes(Charset.forName("UTF-32BE"))),
+            "UTF_32Ex", base64Encode(input.getBytes(Charset.forName("UTF-32BE")))
+        );
+    }
+    
+    private String base64Encode(byte[] bytes) {
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+}
+
+
+output:
+
+{
+  "UTF-16Ex": "/v8ARABX",
+  "utf16Ex": "/v8ARABX",
+  "UnicodeBigEx": "/v8ARABX",
+  "UTF-32Ex": "AAAARAAAAFc=",
+  "UTF_32Ex": "AAAARAAAAFc="
+}
+
+
+

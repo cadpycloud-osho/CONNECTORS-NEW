@@ -1,0 +1,115 @@
+camelize:
+
+
+
+input:
+
+
+A. The Helper Method (Core Logic)
+Java
+
+public class StringUtils {
+    /**
+     * Implements DataWeave's camelize.
+     * Converts a snake_case string (e.g., customer_first_name) to camelCase (e.g., customerFirstName).
+     * Handles leading/trailing underscores by stripping them.
+     */
+    public static String camelize(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // 1. Remove leading/trailing underscores and replace multiple underscores with a single one
+        String processed = input.replaceAll("_{2,}", "_").replaceAll("^_|_$", "");
+        
+        if (processed.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = false;
+
+        for (int i = 0; i < processed.length(); i++) {
+            char currentChar = processed.charAt(i);
+
+            if (currentChar == '_') {
+                capitalizeNext = true;
+            } else {
+                if (capitalizeNext) {
+                    result.append(Character.toUpperCase(currentChar));
+                    capitalizeNext = false;
+                } else {
+                    // Ensure the first character is lowercase, unless it was intended to be capitalized
+                    // (DataWeave camelize makes the first letter lowercase if not already)
+                    if (result.length() == 0) {
+                        result.append(Character.toLowerCase(currentChar));
+                    } else {
+                        result.append(currentChar);
+                    }
+                }
+            }
+        }
+        return result.toString();
+    }
+}
+B. The Model (POJO)
+Java
+
+import lombok.Data; 
+
+@Data
+public class CamelCaseResult {
+    private String a;
+    private String b;
+}
+C. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class StringService {
+
+    public CamelCaseResult calculateCamelize() {
+        CamelCaseResult result = new CamelCaseResult();
+        
+        // "a" : camelize("customer_first_name") -> "customerFirstName"
+        result.setA(StringUtils.camelize("customer_first_name"));
+        
+        // "b" : camelize("_name_starts_with_underscore") -> "nameStartsWithUnderscore"
+        result.setB(StringUtils.camelize("_name_starts_with_underscore"));
+
+        return result;
+    }
+}
+D. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class StringController {
+
+    private final StringService stringService;
+
+    public StringController(StringService stringService) {
+        this.stringService = stringService;
+    }
+
+    @GetMapping("/api/string-camelize")
+    public CamelCaseResult getStringCamelizeResults() {
+        // Spring Boot automatically converts the CamelCaseResult object to JSON
+        return stringService.calculateCamelize();
+    }
+}
+Spring Boot Output (When accessing /api/string-camelize)
+JSON
+
+{
+  "a": "customerFirstName",
+  "b": "nameStartsWithUnderscore"
+}
+
+
+

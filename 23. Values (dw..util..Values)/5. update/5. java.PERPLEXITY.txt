@@ -1,0 +1,239 @@
+update:
+
+example 1:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> ex1 = new HashMap<>(Map.of("name", "Mariano"));
+        ex1.put("name", "Data Weave");
+        System.out.println(ex1); // {"name": "Data Weave"}
+    }
+}
+
+output:
+
+{"name": "Data Weave"}
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> input = Map.of("name", "Mariano");
+        
+        // Create field selector like DataWeave field("name")
+        // Fix: Use HashMap instead of Map.of() to allow null values
+        Map<String, String> fieldSelector = new HashMap<>(Map.of(
+            "kind", "Object",
+            "selector", "name"
+        ));
+        fieldSelector.put("namespace", null); // Safe with HashMap
+        
+        Map<String, String> result = updateWithFieldSelector(input, fieldSelector, "Data Weave");
+        System.out.println(result);
+    }
+    
+    public static Map<String, String> updateWithFieldSelector(Map<String, String> input, 
+                                                            Map<String, String> fieldSelector, 
+                                                            String newValue) {
+        Map<String, String> result = new HashMap<>(input);
+        String fieldName = fieldSelector.get("selector");
+        if (fieldName != null) {
+            result.put(fieldName, newValue);
+        }
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "name": "Data Weave"
+}
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> ex3 = new ArrayList<>(Arrays.asList(1, 2, 3));
+        ex3.set(1, 5);
+        System.out.println(ex3); // [1, 5, 3]
+    }
+}
+
+output:
+
+[1, 5, 3]
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Map<String, String>> ex4 = Arrays.asList(
+            Map.of("role", "a", "name", "spiderman"),
+            Map.of("role", "b", "name", "batman")
+        );
+        List<Map<String, String>> result4 = ex4.stream().map(item -> {
+            Map<String, String> updated = new HashMap<>(item);
+            updated.put("role", "Super Hero");
+            return updated;
+        }).collect(Collectors.toList());
+        System.out.println(result4);
+    }
+}
+
+
+
+output:
+
+[{"role": "Super Hero", "name": "spiderman"}, {"role": "Super Hero", "name": "batman"}]
+
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> input = Arrays.asList(1, 2, 3);
+        
+        // Create index selector like DataWeave index(1) - Fix: Use HashMap for null values
+        Map<String, Object> indexSelector = new HashMap<>(Map.of(
+            "kind", "Array",
+            "selector", 1
+        ));
+        indexSelector.put("namespace", null);
+        
+        List<Integer> result = updateWithIndexSelector(input, indexSelector, 5);
+        System.out.println(result);
+    }
+    
+    public static List<Integer> updateWithIndexSelector(List<Integer> input, 
+                                                      Map<String, Object> indexSelector, 
+                                                      int newValue) {
+        List<Integer> result = new ArrayList<>(input);
+        Object selectorObj = indexSelector.get("selector");
+        if (selectorObj instanceof Integer) {
+            int index = (Integer) selectorObj;
+            if (index < result.size()) {
+                result.set(index, newValue);
+            }
+        }
+        return result;
+    }
+}
+
+
+output:
+
+[1, 5, 3]
+
+---------------------------------------------------------------
+
+
+
+
+example 6:
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> ex6 = new HashMap<>(Map.of("user", Map.of("name", "Mariano")));
+        Map<String, Object> user6 = new HashMap<>((Map<String, Object>) ex6.get("user"));
+        user6.put("name", "Data Weave");
+        ex6.put("user", user6);
+        System.out.println(ex6); // {"user": {"name": "Data Weave"}}
+    }
+}
+
+
+
+output:
+
+
+{"user": {"name": "Data Weave"}}
+---------------------------------------------------------------
+
+
+
+example 7:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> ex7 = Map.of("users", Arrays.asList(
+            Map.of("name", "Phoebe", "language", "French"),
+            Map.of("name", "Joey", "language", "English")
+        ));
+        List<Map<String, Object>> users7 = (List<Map<String, Object>>) ex7.get("users");
+        List<Map<String, Object>> result7 = users7.stream().map(user -> {
+            Map<String, Object> updated = new HashMap<>(user);
+            if ("English".equals(updated.get("language"))) {
+                updated.put("language", "Gibberish");
+            }
+            return updated;
+        }).collect(Collectors.toList());
+        System.out.println(Map.of("users", result7));
+    }
+}
+
+
+output:
+
+{
+  "users": [
+    {"name": "Phoebe", "language": "French"},
+    {"name": "Joey", "language": "Gibberish"}
+  ]
+}
+
+
+---------------------------------------------------------------
+
+
+
+

@@ -1,0 +1,196 @@
+contains
+
+contains<T>(@StreamCapable items: Array<T>, element: Any): Boolean
+Returns true if an input contains a given value, false if not.
+input:
+
+package com.example.dataconverter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Arrays;
+
+@RestController
+public class DataWeaveContainsController {
+
+    @GetMapping("/contains-check")
+    public boolean checkContains() {
+        
+        // --- DW Logic: [ 1, 2, 3, 4 ] (The array/List) ---
+        List<Integer> list = Arrays.asList(1, 2, 3, 4);
+        
+        // --- DW Logic: contains(2) (The check) ---
+        // Java's List.contains() is the direct equivalent.
+        boolean result = list.contains(2);
+        
+        // The result is true
+        return result;
+    }
+}
+
+output:
+
+true
+
+------------------------------------------------------------------
+example 2:
+
+
+
+input:
+
+
+
+ Java Spring Boot Code
+
+package com.example.stringchecker;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MainApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MainApplication.class, args);
+    }
+}
+
+package com.example.stringchecker.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class StringService {
+
+    /**
+     * Implements the DataWeave logic: "mulesoft" contains("mule")
+     * @return boolean result of the string check.
+     */
+    public boolean checkStringContains() {
+        String mainString = "mulesoft";
+        String substring = "mule";
+        
+        return mainString.contains(substring);
+    }
+}
+package com.example.stringchecker.controller;
+
+import com.example.stringchecker.service.StringService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class StringController {
+
+    private final StringService stringService;
+
+    @Autowired
+    public StringController(StringService stringService) {
+        this.stringService = stringService;
+    }
+
+    /**
+     * Endpoint to execute the string contains logic.
+     * To test: Access http://localhost:8080/check-contains
+     * @return JSON response with the result.
+     */
+    @GetMapping("/check-contains")
+    public Map<String, Boolean> checkContains() {
+        boolean result = stringService.checkStringContains();
+        
+        // Outputting { "result": true }
+        return Map.of("result", result);
+    }
+}
+
+
+JSON Output
+
+
+
+{ "result": true }
+
+
+------------------------------------------------------------------------
+
+
+Java Spring Boot Code
+.
+package com.example.xmlprocessor;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MainApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MainApplication.class, args);
+    }
+}
+
+package com.example.xmlprocessor.controller;
+
+import com.example.xmlprocessor.service.XmlConversionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class XmlConversionController {
+
+    private final XmlConversionService conversionService;
+
+    @Autowired
+    public XmlConversionController(XmlConversionService conversionService) {
+        this.conversionService = conversionService;
+    }
+
+    /**
+     * Endpoint to convert the DataWeave logic.
+     * Expects XML input and returns JSON output.
+     */
+    @PostMapping(
+        value = "/convert", 
+        consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE},
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public Map<String, Boolean> convertDataWeave(@RequestBody String xmlPayload) {
+        
+        boolean result = conversionService.containsRequestedString(xmlPayload);
+        
+        // Outputting the required format: { "ContainsString": true }
+        return Map.of("ContainsString", result);
+    }
+}
+
+
+
+JSON
+
+{
+  "ContainsString": true
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,53 @@
+encodeURIComponent:
+
+
+input:
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriUtils;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class EncodeComparisonController {
+
+    @GetMapping("/encode-comparison")
+    public Map<String, Object> comparingEncodeFunctions() {
+        Map<String, Object> inner = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+        
+        String path = " PATH/ TO /ENCODE ";
+        String specialChars = ";,/?:@&=";
+        String safeChars = "-_.!~*'()";
+        
+        // Both encode spaces to %20
+        inner.put("encodeURIComponent", UriUtils.encode(path.trim(), "UTF-8"));
+        inner.put("encodeURI", UriUtils.encode(path.trim(), "UTF-8"));
+        
+        // encodeURIComponent encodes reserved chars, encodeURI leaves them
+        inner.put("encodeURIComponent_to_hex", UriUtils.encode(specialChars, "UTF-8"));
+        inner.put("encodeURI_not_to_hex", specialChars);
+        
+        // Both leave safe chars unencoded
+        inner.put("encodeURIComponent_not_encoded", safeChars);
+        inner.put("encodeURI_not_encoded", safeChars);
+        
+        result.put("comparing_encode_functions_output", inner);
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "comparing_encode_functions_output": {
+    "encodeURIComponent": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURI": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURIComponent_to_hex": "%3B%2C%2F%3F%3A%40%26%3D",
+    "encodeURI_not_to_hex": ";,/?:@&=",
+    "encodeURIComponent_not_encoded": "-_.!~*'()",
+    "encodeURI_not_encoded": "-_.!~*'()"
+  }
+}
+

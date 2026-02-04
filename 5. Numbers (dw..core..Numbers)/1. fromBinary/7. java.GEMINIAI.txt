@@ -1,0 +1,94 @@
+fromBinary:
+
+
+
+input:
+
+import java.math.BigInteger;
+
+public class Main {
+    // ... (convertBinaryToSignedDecimal method remains the same)
+
+    public static BigInteger convertBinaryToSignedDecimal(String binaryString) {
+        if (binaryString == null || binaryString.isEmpty()) {
+            return null;
+        }
+        
+        try {
+            return new BigInteger(binaryString, 2);
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing binary string: " + binaryString + " - " + e.getMessage());
+            return null; 
+        }
+    }
+
+
+    /**
+     * Simulates the full DataWeave transformation.
+     */
+    public static void runDataWeaveTransformation() {
+        // --- DW Transformation Logic ---
+
+        BigInteger a = convertBinaryToSignedDecimal("-10");
+
+        String bBinary = "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000";
+        BigInteger b = convertBinaryToSignedDecimal(bBinary);
+        
+        // c: fromBinary(0) -> 0 
+        // FIX: Declare cInput as Object so 'instanceof String' is a valid check
+        Object cInput = 0; // The boxed Integer 0 is now stored as an Object
+        
+        // This line now compiles:
+        Object c = (cInput instanceof String) ? convertBinaryToSignedDecimal(cInput.toString()) : (Object) cInput;
+        
+        // d: fromBinary(null) -> null
+        Object dInput = null;
+        Object d = dInput; 
+
+        // e: fromBinary("100") -> 4
+        BigInteger e = convertBinaryToSignedDecimal("100");
+
+        // ... (Output Generation remains the same)
+
+        System.out.println("--- DataWeave Simulation Results ---");
+        System.out.printf("\"a\": %s%n", a);
+        System.out.printf("\"b\": %s%n", b);
+        System.out.printf("\"c\": %s%n", c);
+        System.out.printf("\"d\": %s%n", d);
+        System.out.printf("\"e\": %s%n", e);
+
+        String jsonOutput = String.format(
+            "{\n" +
+            "  \"a\": %s,\n" +
+            "  \"b\": %s,\n" +
+            "  \"c\": %s,\n" +
+            "  \"d\": %s,\n" +
+            "  \"e\": %s\n" +
+            "}",
+            a,
+            "100000000000000000000000000000000000000000000000000000000000000", 
+            c,
+            d,
+            e
+        );
+        
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(jsonOutput);
+    }
+
+    public static void main(String[] args) {
+        runDataWeaveTransformation();
+    }
+}
+
+
+output:
+
+
+{
+  "a": -2,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 4
+}

@@ -1,0 +1,33 @@
+substring:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        String text = "hello world!";
+        
+        // --- Core DataWeave Logic Equivalent ---
+        // DW substring(text, 1, 5) -> "ello"
+        // Java substring(1, 5) -> starts at index 1 ('e'), ends before index 5 (' ')
+        String result = text.substring(1, 5);
+        // ------------------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"result\": \"%s\"\n}",
+            result
+        );
+
+        System.out.println(output);
+    }
+}
+
+output:
+
+{
+  "result": "ello"
+}
+

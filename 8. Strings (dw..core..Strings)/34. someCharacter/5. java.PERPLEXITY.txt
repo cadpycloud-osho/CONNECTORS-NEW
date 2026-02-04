@@ -1,0 +1,21 @@
+someCharacter:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "someCharacter";
+        boolean hasUpper = input.chars().anyMatch(ch -> Character.isUpperCase((char) ch));
+        System.out.println(hasUpper);
+    }
+}
+
+
+output:
+
+
+
+true
+
+

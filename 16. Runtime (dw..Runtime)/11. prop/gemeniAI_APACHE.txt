@@ -1,0 +1,27 @@
+prop:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class PropertyRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getProp")
+            // Equivalent to prop("user.timezone")
+            .setBody(simple("${sys.user.timezone}"))
+            .process(exchange -> {
+                String value = exchange.getIn().getBody(String.class);
+                // Wrapping it to match the requested output structure
+                exchange.getIn().setBody(java.util.Map.of("props", value));
+            });
+    }
+}
+
+output:
+
+{
+  props: "America/Los_Angeles" as String {class: "java.lang.String"}
+}

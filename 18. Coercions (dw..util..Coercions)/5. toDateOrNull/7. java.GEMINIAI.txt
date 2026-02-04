@@ -1,0 +1,91 @@
+toDateOrNull:
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private final String sourceDateString = "2023-28-03";
+
+    /**
+     * Mimics DataWeave's toDateOrNull() behavior.
+     * Tries multiple formatters and returns null if none succeed.
+     */
+    private LocalDate toDateOrNull(String dateString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // If parsing succeeds, return the result immediately.
+                return LocalDate.parse(dateString, formatter);
+            } catch (DateTimeParseException e) {
+                // Ignore the error (swallow exception) and try the next formatter
+            }
+        }
+        // If the loop finishes without returning, all formatters failed.
+        return null;
+    }
+
+    public Map<String, Object> getDateParsingMap() {
+        // Define formatters
+        // Fails: Expects yyyy/MM/dd, gets yyyy-dd-MM structure
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.US);
+        // Succeeds: Expects yyyy-dd-MM, correctly parses 2023-28-03 (March 28th)
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-dd-MM", Locale.US);
+        
+        // --- Logic for Key 'a' (Successful Chaining) ---
+        // Fails with formatter1, succeeds with formatter2 -> returns a date
+        LocalDate parsedDateA = toDateOrNull(sourceDateString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Failure to Parse) ---
+        // Fails with formatter1, no other options -> returns null
+        LocalDate parsedDateB = toDateOrNull(sourceDateString, formatter1);
+
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results. Use the ISO string format ("yyyy-MM-dd") or null.
+        rootMap.put("a", parsedDateA != null ? parsedDateA.toString() : null); // "2023-03-28"
+        rootMap.put("b", parsedDateB != null ? parsedDateB.toString() : null); // null
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Object> result = converter.getDateParsingMap();
+        
+        // Reformat the Map output to match the requested JSON-like string exactly
+        String formattedOutput = "{" + 
+            result.entrySet().stream()
+                .map(entry -> {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    
+                    if (value == null) {
+                        return String.format("\"%s\":null", key);
+                    } else {
+                        // Quote the string values
+                        return String.format("\"%s\":\"%s\"", key, value.toString());
+                    }
+                })
+                .collect(Collectors.joining(",")) + 
+            "}";
+
+        System.out.println(formattedOutput);
+    }
+}
+
+
+output:
+
+{"a":"2023-03-28","b":null}

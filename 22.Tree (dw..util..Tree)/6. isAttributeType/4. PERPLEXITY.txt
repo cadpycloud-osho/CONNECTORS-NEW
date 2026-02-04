@@ -1,0 +1,99 @@
+isAttributeType:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveTreeIsAttributeTypeApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTreeIsAttributeTypeApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/tree")
+@RequiredArgsConstructor
+class TreeController {
+    
+    private final TreeService treeService;
+    
+    @GetMapping("/isAttributeType")
+    public Map<String, Boolean> isAttributeType() {
+        return treeService.executeIsAttributeTypeTests();
+    }
+}
+
+@Service
+class TreeService {
+    
+    public Map<String, Boolean> executeIsAttributeTypeTests() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // a: [OBJECT_TYPE(user), ATTRIBUTE_TYPE(name)] → true
+        List<TreeNode> pathA = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("a", TreeTypeChecker.isAttributeType(pathA));
+        
+        // b: [OBJECT_TYPE(user), ARRAY_TYPE(name)] → false
+        List<TreeNode> pathB = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ARRAY_TYPE", "name", null)
+        );
+        result.put("b", TreeTypeChecker.isAttributeType(pathB));
+        
+        // c: [ATTRIBUTE_TYPE(name)] → true
+        List<TreeNode> pathC = Arrays.asList(
+            new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("c", TreeTypeChecker.isAttributeType(pathC));
+        
+        return result;
+    }
+    
+    public static class TreeNode {
+        private final String kind;
+        private final String selector;
+        private final String namespace;
+        
+        public TreeNode(String kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+        
+        public String getKind() { return kind; }
+        public String getSelector() { return selector; }
+        public String getNamespace() { return namespace; }
+    }
+}
+
+class TreeTypeChecker {
+    
+    /**
+     * DataWeave Tree.isAttributeType() equivalent:
+     * Returns true if path contains ATTRIBUTE_TYPE node
+     */
+    public static boolean isAttributeType(List<TreeService.TreeNode> path) {
+        return path.stream().anyMatch(node -> "ATTRIBUTE_TYPE".equals(node.getKind()));
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+{
+  "a": true,
+  "b": false,
+  "c": true
+}
+
+

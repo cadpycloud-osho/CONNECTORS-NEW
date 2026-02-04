@@ -1,0 +1,31 @@
+atan:
+
+
+
+input:
+
+import java.util.*;
+
+public class AtanExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        output.put("atan0", Math.atan(0.0));
+        output.put("atan13", Math.atan(0.13));
+        output.put("atan-1", Math.atan(-1.0));
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{
+   "atan0": 0.0,
+   "atan13": 0.12927500404814307,
+   "atan-1": -0.7853981633974483
+}
+

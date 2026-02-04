@@ -1,0 +1,56 @@
+toHex:
+
+
+INPUT:
+
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.HexFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class ToHexExample {
+
+    /**
+     * Replicates the DataWeave 'toHex(binary)' function.
+     * Converts a raw byte array into its Hexadecimal string representation.
+     *
+     * @param binaryContent The raw byte array (DataWeave 'myBinary').
+     * @return The Hexadecimal string.
+     */
+    public static String bytesToHex(byte[] binaryContent) {
+        // HexFormat.of().formatHex() is the Java equivalent of DataWeave's toHex()
+        // Note: HexFormat is available in Java 17+.
+        return HexFormat.of().formatHex(binaryContent);
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        // DataWeave Logic: var myBinary = "Mule" as Binary
+        String dwInputString = "Mule";
+        // Convert the string to a byte array using standard UTF-8 encoding
+        byte[] myBinary = dwInputString.getBytes(StandardCharsets.UTF_8);
+        
+        // DataWeave Logic: toHex(myBinary)
+        String hexOutput = bytesToHex(myBinary);
+
+        // --- Output Generation (Simulating DataWeave JSON structure) ---
+        Map<String, String> result = Map.of(
+            "binaryToHex", hexOutput
+        );
+            
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave toHex Equivalent Output ---");
+        System.out.println("Input String: \"" + dwInputString + "\"");
+        
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+}
+
+OUTPUT:
+
+{ "binaryToHex": "4D756C65" }

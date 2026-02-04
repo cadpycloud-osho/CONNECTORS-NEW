@@ -1,0 +1,192 @@
+mask:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class MaskDataRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:maskPasswords")
+            .routeId("PII-Masking-Route")
+            .process(exchange -> {
+                // 1. Input Data (List of Maps)
+                List<Map<String, String>> users = List.of(
+                    Map.of("name", "Peter Parker", "password", "spiderman"),
+                    Map.of("name", "Bruce Wayne", "password", "batman")
+                );
+
+                // 2. Masking Logic: Replicating 'mask field("password") with "*****"'
+                List<Map<String, String>> maskedUsers = users.stream()
+                    .map(user -> {
+                        // Create a mutable copy of the map
+                        Map<String, String> masked = new java.util.HashMap<>(user);
+                        if (masked.containsKey("password")) {
+                            masked.put("password", "*****");
+                        }
+                        return masked;
+                    })
+                    .collect(Collectors.toList());
+
+                // 3. Set the masked list as the output body
+                exchange.getIn().setBody(maskedUsers);
+            })
+            .marshal().json()
+            .log("Masked Result: ${body}");
+    }
+}
+
+output:
+
+[
+  {
+    "name": "Peter Parker",
+    "password": "*****"
+  },
+  {
+    "name": "Bruce Wayne",
+    "password": "*****"
+  }
+]
+
+-----------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class StringMaskingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:maskByString")
+            .routeId("String-Selector-Masking")
+            .process(exchange -> {
+                // 1. Input: List of Maps
+                List<Map<String, String>> input = List.of(
+                    Map.of("name", "Peter Parker", "password", "spiderman"),
+                    Map.of("name", "Bruce Wayne", "password", "batman")
+                );
+
+                // 2. Logic: Iterate and mask the "password" key
+                List<Map<String, String>> result = input.stream()
+                    .map(item -> {
+                        Map<String, String> mutableItem = new java.util.HashMap<>(item);
+                        // Equivalent to mask "password"
+                        mutableItem.replace("password", "*****");
+                        return mutableItem;
+                    })
+                    .collect(Collectors.toList());
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json()
+            .log("Masked Output: ${body}");
+    }
+}
+
+output:
+
+[
+  {
+    "name": "Peter Parker",
+    "password": "*****"
+  },
+  {
+    "name": "Bruce Wayne",
+    "password": "*****"
+  }
+]
+
+-----------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class NestedArrayMaskRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:maskNestedArray")
+            .routeId("Nested-Array-Masking")
+            .process(exchange -> {
+                // 1. Input: List of Lists [[123, true], [456, true]]
+                List<List<Object>> input = List.of(
+                    new ArrayList<>(List.of(123, true)),
+                    new ArrayList<>(List.of(456, true))
+                );
+
+                // 2. Logic: mask 1 with false
+                // Iterate through the outer list and update index 1 of each inner list
+                List<List<Object>> result = input.stream()
+                    .map(innerList -> {
+                        // Create a mutable copy to modify
+                        List<Object> modifiedInner = new ArrayList<>(innerList);
+                        if (modifiedInner.size() > 1) {
+                            modifiedInner.set(1, false); // Index 1 is the 2nd element
+                        }
+                        return modifiedInner;
+                    })
+                    .collect(Collectors.toList());
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json()
+            .log("Masked Array Result: ${body}");
+    }
+}
+
+output:
+
+[
+  [
+    123,
+    false
+  ],
+  [
+    456,
+    false
+  ]
+]
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

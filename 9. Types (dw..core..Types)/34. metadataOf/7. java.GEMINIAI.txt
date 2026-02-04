@@ -1,0 +1,55 @@
+metadataOf:
+
+
+
+input:
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // 1. Define the metadata map that is conceptually attached to DataWeave's AType
+    private static final Map<String, String> ATYPE_METADATA = 
+        Collections.unmodifiableMap(new LinkedHashMap<String, String>() {{
+            put("format", "YYYY-MM-dd");
+        }});
+
+    /**
+     * Conceptually mirrors DataWeave's metadataOf(Type).
+     * It returns the metadata map defined for the specific type alias (AType).
+     */
+    public static Map<String, String> metadataOf(Class<?> type) {
+        // In a real system, this would involve complex runtime lookup based on type annotations or configuration.
+        // Here, we hardcode the return value based on the DataWeave source, assuming the input type is AType's proxy.
+        return ATYPE_METADATA;
+    }
+
+    public static void main(String[] args) {
+        
+        // Use String.class as a stand-in for AType
+        Class<?> aType = String.class; 
+        
+        // --- Execution ---
+        
+        // a: metadataOf(AType)
+        Map<String, String> metadata = metadataOf(aType);
+
+        // Build the final JSON output structure
+        Map<String, Map<String, String>> output = new LinkedHashMap<>();
+        output.put("a", metadata);
+
+        // Note: For simple console output, we manually format the JSON.
+        String jsonOutput = String.format("{\n  \"a\": {\"format\": \"%s\"}\n}", metadata.get("format"));
+        
+        System.out.println(jsonOutput);
+    }
+}
+
+output:
+
+{
+  "a": {"format": "YYYY-MM-dd"}
+}
+

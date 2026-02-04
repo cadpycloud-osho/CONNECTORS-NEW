@@ -1,0 +1,219 @@
+fromString:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MimeParserRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:parseMime")
+            .routeId("Mime-Parser-Route")
+            .process(exchange -> {
+                String mimeInput = "application/json";
+                
+                // 1. Logic: Parse the String
+                // Standard format is type/subtype;parameter=value
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                try {
+                    String[] parts = mimeInput.split("/");
+                    String type = parts[0];
+                    String subtype = parts[1].split(";")[0];
+                    
+                    Map<String, String> parameters = new LinkedHashMap<>();
+                    // Handle parameters if present (e.g., application/json; charset=UTF-8)
+                    if (mimeInput.contains(";")) {
+                        String paramPart = mimeInput.split(";")[1];
+                        String[] kv = paramPart.split("=");
+                        if (kv.length == 2) {
+                            parameters.put(kv[0].trim(), kv[1].trim());
+                        }
+                    }
+
+                    // 2. Build the result structure
+                    result.put("type", type);
+                    result.put("subtype", subtype);
+                    result.put("parameters", parameters);
+
+                    // 3. Set the final body with "success" wrapper
+                    Map<String, Object> response = new LinkedHashMap<>();
+                    response.put("success", true);
+                    response.put("result", result);
+                    
+                    exchange.getIn().setBody(response);
+
+                } catch (Exception e) {
+                    exchange.getIn().setBody(Map.of("success", false));
+                }
+            })
+            .marshal().json()
+            .log("Mime Parse Result: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "application",
+    "subtype": "json",
+    "parameters": {}
+  }
+}
+
+-----------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import jakarta.activation.MimeType; // or javax.activation.MimeType
+import jakarta.activation.MimeTypeParameterList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MimeMultipartRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:parseMultipartMime")
+            .routeId("Mime-Multipart-Parser")
+            .process(exchange -> {
+                String input = "multipart/form-data; boundary=the-boundary";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                try {
+                    // 1. Logic: Parse the full MIME string
+                    MimeType mimeType = new MimeType(input);
+
+                    // 2. Extract Type and Subtype
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    result.put("type", mimeType.getPrimaryType());
+                    result.put("subtype", mimeType.getSubType());
+
+                    // 3. Extract Parameters (boundary, charset, etc.)
+                    Map<String, String> params = new LinkedHashMap<>();
+                    MimeTypeParameterList paramList = mimeType.getParameters();
+                    
+                    // Iterate through parameter names to build the map
+                    java.util.Enumeration<String> names = paramList.getNames();
+                    while (names.hasMoreElements()) {
+                        String name = names.nextElement();
+                        params.put(name, paramList.get(name));
+                    }
+                    
+                    result.put("parameters", params);
+
+                    // 4. Wrap in DataWeave-style success object
+                    response.put("success", true);
+                    response.put("result", result);
+
+                } catch (Exception e) {
+                    response.put("success", false);
+                }
+
+                exchange.getIn().setBody(response);
+            })
+            .marshal().json()
+            .log("Parsed Multipart Result: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "multipart",
+    "subtype": "form-data",
+    "parameters": {
+      "boundary": "the-boundary"
+    }
+  }
+}
+
+-----------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MimeErrorHandlingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:parseInvalidMime")
+            .routeId("Mime-Error-Route")
+            .process(exchange -> {
+                String input = "Invalid MIME type";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                try {
+                    // 1. Logic: Attempt to parse the string
+                    // This constructor will fail if there is no '/' character
+                    MimeType mimeType = new MimeType(input);
+                    
+                    response.put("success", true);
+                    // ... result building logic would go here ...
+
+                } catch (MimeTypeParseException e) {
+                    // 2. Error Logic: Replicate DataWeave error structure
+                    response.put("success", false);
+                    
+                    Map<String, String> errorDetail = new LinkedHashMap<>();
+                    // Replicating the specific DW error message format
+                    errorDetail.put("message", "Unable to find a sub type in `" + input + "`.");
+                    
+                    response.put("error", errorDetail);
+                }
+
+                exchange.getIn().setBody(response);
+            })
+            .marshal().json()
+            .log("Mime Error Response: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "success": false,
+  "error": {
+    "message": "Unable to find a sub type in `Invalid MIME type`."
+  }
+}
+
+-----------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

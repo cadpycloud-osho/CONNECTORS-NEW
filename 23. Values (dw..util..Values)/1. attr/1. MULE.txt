@@ -1,0 +1,50 @@
+attr:
+
+attr(namespace: Namespace | Null = null, name: String): PathElement
+
+attr(namespace: Namespace | Null = null, name: String): PathElement
+This function creates a PathElement to use for selecting an XML attribute and populates the type’s selector field with the given string.
+
+Some versions of the update and mask functions accept a PathElement as an argument.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::util::Values
+ns ns0 http://acme.com/fo
+---
+attr(ns0 , "myAttr")
+
+
+DataWeave
+Output
+{
+   "kind": "Attribute",
+   "namespace": "http://acme.com/foo",
+   "selector": "myAttr"
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

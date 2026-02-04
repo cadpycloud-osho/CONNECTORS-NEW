@@ -1,0 +1,44 @@
+period:
+
+
+
+input:
+
+import java.time.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        ZonedDateTime dateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        System.out.println("dayBeforeDateTime: " + dateTime.minusDays(1));
+
+        LocalDate date = LocalDate.parse("2020-10-05");
+        System.out.println("dayAfterDate: " + date.plusDays(1));
+
+        LocalDate yearMonthDayAfterDate =
+                date.plusYears(1).plusMonths(1).plusDays(1);
+        System.out.println("yearMonthDayAfterDate: " + yearMonthDayAfterDate);
+
+        Period emptyPeriod = Period.of(0, 0, 0);
+        System.out.println("emptyPeriod: " + emptyPeriod);
+
+        Period constructPeriod = Period.of(4, 11, 28);
+        System.out.println("constructPeriod: " + constructPeriod);
+
+        System.out.println("selectMonthsFromPeriod: " + constructPeriod.getMonths());
+    }
+}
+
+
+
+output:
+
+dayBeforeDateTime: 2020-10-04T20:22:34.385Z
+dayAfterDate: 2020-10-06
+yearMonthDayAfterDate: 2021-11-06
+emptyPeriod: P0D
+constructPeriod: P4Y11M28D
+selectMonthsFromPeriod: 11
+
+

@@ -1,0 +1,32 @@
+countCharactersBy:
+
+
+input:
+
+import java.util.*;
+import java.util.function.Predicate;
+
+public class CountCharactersByConverter {
+    public static long countCharactersBy(String input, Predicate<Character> predicate) {
+        if (input == null) return 0;
+        return input.chars()
+                   .mapToObj(c -> (char)c)
+                   .filter(predicate)
+                   .count();
+    }
+    
+    public static void main(String[] args) {
+        String input = "42 = 11 * 2 + 20";
+        long result = countCharactersBy(input, c -> Character.isDigit(c));
+        
+        Map<String, Long> output = new LinkedHashMap<>();
+        output.put("count", result);
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+7

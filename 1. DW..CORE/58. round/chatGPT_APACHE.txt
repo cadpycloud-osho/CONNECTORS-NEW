@@ -1,0 +1,21 @@
+round:
+
+input:
+
+from("direct:start")
+    .setBody(constant(java.util.Arrays.asList(1.2, 4.6, 3.5)))
+    .process(exchange -> {
+        java.util.List<Double> list = exchange.getIn().getBody(java.util.List.class);
+        java.util.List<Long> rounded = new java.util.ArrayList<>();
+        for(Double num : list){
+            rounded.add(Math.round(num));
+        }
+        exchange.getIn().setBody(rounded);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+
+[1, 5, 4]

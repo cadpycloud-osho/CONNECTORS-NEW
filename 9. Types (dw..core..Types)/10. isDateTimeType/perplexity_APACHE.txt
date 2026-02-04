@@ -1,0 +1,32 @@
+isDateTimeType:
+
+
+input:
+import java.util.*;
+
+public class IsDateTimeTypeConverter {
+    public static boolean isDateTimeType(String typeName) {
+        return "DateTime".equals(typeName) || "ADateTime".equals(typeName);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isDateTimeType("ADateTime"));  // type ADateTime = DateTime
+        result.put("b", isDateTimeType("DateTime"));   // built-in DateTime
+        result.put("c", isDateTimeType("String"));     // concrete type
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+

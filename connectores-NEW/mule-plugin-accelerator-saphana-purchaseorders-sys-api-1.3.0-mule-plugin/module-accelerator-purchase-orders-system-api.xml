@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="Accelerator Purchase Orders System API"
+        prefix="accelerator-purchase-orders-system-api"
+        namespace="http://www.mulesoft.org/schema/mule/accelerator-purchase-orders-system-api"
+        doc:description="SAP S/4HANA System API for working with Purchase Orders"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <property name="property_host" displayName="host" type="string"  summary="Host for consuming API"/>
+    <property name="property_port" displayName="port" type="string"  summary="Port for consuming API"/>
+    <property name="property_basePath" displayName="basePath" type="string" defaultValue="/" summary="Basepath for consuming API"/>
+    <property name="property_protocol" displayName="protocol" type="string"  summary="Protocol for consuming API"/>
+
+        <property name="property_proxyConfig" displayName="Proxy Config Reference" type="string" use="OPTIONAL" summary="Proxy config reference" tab="Proxy"/>
+        <property name="property_responseTimeout" displayName="Response timeout" type="string" defaultValue="10000" summary="Maximum time in milliseconds that the request element will block the execution of the flow waiting for the HTTP response."/>
+
+    
+    
+
+    <http:request-config
+name="accelerator-purchase-orders-system-api-httpreq-config" xmlns:connection="true"
+responseTimeout="#[vars.property_responseTimeout]"
+basePath="#[vars.property_basePath]">
+<http:request-connection
+host="#[vars.property_host]"
+protocol="#[vars.property_protocol]"
+port="#[vars.property_port]"
+proxyConfig="#[vars.property_proxyConfig]"
+>
+</http:request-connection>
+</http:request-config>
+
+
+
+
+    <operation name="get-pings"  >
+        <parameters>
+                                        <parameter name="check-dependencies"
+                                        type="boolean"
+                                        use="OPTIONAL"                    doc:description="Set to true to check and report status of all dependencies, such as system connections and downstream APIs; default is false"/>
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-purchase-orders-system-api-httpreq-config"
+              path="/ping"
+              method="GET"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:RETRY_EXHAUSTED" />
+        
+            <http:headers>
+            <![CDATA[#[ { 'Accept': 'application/json' } filterObject $ != null ]]]>
+        </http:headers>
+                    <http:query-params>
+            <![CDATA[#[ { 'checkDependencies': vars['check-dependencies'] } filterObject $ != null ]]]>
+        </http:query-params>
+    </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="get-pings-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="get-purchase-orders" displayName="Get Purchase Orders" >
+        <parameters>
+                                        <parameter name="exported"
+                                        type="string"
+                                        use="OPTIONAL"                    doc:description="Exported status"/>
+                            <parameter name="updated-date"
+                                        type="string"
+                                        use="OPTIONAL"                    doc:description="Limits returned purchase orders to these, which have newer last modifiaction date than specified"/>
+                            <parameter name="native-id"
+                                        type="string"
+                                        use="OPTIONAL"                    doc:description="External identifier"/>
+                            <parameter name="offset"
+                                        type="number"
+                    defaultValue="0"                    use="OPTIONAL"                    doc:description="Include results starting at this index position in the overall result set; the index of the first result is zero"/>
+                            <parameter name="limit"
+                                        type="number"
+                    defaultValue="20"                    use="OPTIONAL"                    doc:description="Include at most this many items in the response"/>
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-purchase-orders-system-api-httpreq-config"
+              path="/purchaseOrders"
+              method="GET"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:RETRY_EXHAUSTED" />
+        
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                    <http:query-params>
+            <![CDATA[#[ ( { 'exported': vars['exported'] } ++ { 'updatedDate': vars['updated-date'] } ++ { 'nativeId': vars['native-id'] } ++ { 'offset': vars['offset'] } ++ { 'limit': vars['limit'] } ) filterObject $ != null ]]]>
+        </http:query-params>
+    </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="get-purchase-orders-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="create-purchase-order" displayName="Create purchase order" >
+        <parameters>
+                            <parameter name="create-purchase-order-request-data" type="create-purchase-order-request-type" use="REQUIRED" role="PRIMARY" />
+                                        <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-purchase-orders-system-api-httpreq-config"
+              path="/purchaseOrders"
+              method="POST"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:RETRY_EXHAUSTED" />
+                <http:body>
+            <![CDATA[#[output application/json --- vars['create-purchase-order-request-data']]
+]]>
+        </http:body>
+    
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+            </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="create-purchase-order-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="get-purchase-order" displayName="Get purchase order" >
+        <parameters>
+                                        <parameter name="order-id"
+                                        type="string"
+                                        use="REQUIRED"                    />
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-purchase-orders-system-api-httpreq-config"
+              path="/purchaseOrders/{orderId}"
+              method="GET"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:RETRY_EXHAUSTED" />
+        
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                <http:uri-params>
+            <![CDATA[#[ { 'orderId': vars['order-id'] } filterObject $ != null ]]]>
+        </http:uri-params>
+        </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="get-purchase-order-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="update-purchase-order" displayName="Update purchase order" >
+        <parameters>
+                            <parameter name="update-purchase-order-request-data" type="update-purchase-order-request-type" use="REQUIRED" role="PRIMARY" />
+                                        <parameter name="order-id"
+                                        type="string"
+                                        use="REQUIRED"                    />
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-purchase-orders-system-api-httpreq-config"
+              path="/purchaseOrders/{orderId}"
+              method="PUT"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:RETRY_EXHAUSTED" />
+                <http:body>
+            <![CDATA[#[output application/json --- vars['update-purchase-order-request-data']]
+]]>
+        </http:body>
+    
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                <http:uri-params>
+            <![CDATA[#[ { 'orderId': vars['order-id'] } filterObject $ != null ]]]>
+        </http:uri-params>
+        </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="update-purchase-order-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="delete-purchase-order" displayName="Delete purchase order" >
+        <parameters>
+                                        <parameter name="order-id"
+                                        type="string"
+                                        use="REQUIRED"                    />
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-purchase-orders-system-api-httpreq-config"
+              path="/purchaseOrders/{orderId}"
+              method="DELETE"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PURCHASE-ORDERS-SYSTEM-API:RETRY_EXHAUSTED" />
+        
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                <http:uri-params>
+            <![CDATA[#[ { 'orderId': vars['order-id'] } filterObject $ != null ]]]>
+        </http:uri-params>
+        </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="delete-purchase-order-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+
+</module>

@@ -1,0 +1,34 @@
+isArrayType(t: Type): Boolean
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsArrayTypeExample {
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isArrayType("Array<String>"));
+        result.put("b", isArrayType("Boolean"));
+
+        System.out.println(result);
+    }
+
+    public static boolean isArrayType(String type) {
+        if (type == null) return false;
+        return type.startsWith("Array<") && type.endsWith(">");
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

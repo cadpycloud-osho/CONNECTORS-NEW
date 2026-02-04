@@ -1,0 +1,59 @@
+isUnionType:
+
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.lang.Boolean;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UnionCheckController {
+
+    /**
+     * Conceptual proxy interface for the DataWeave Union type.
+     */
+    private static interface UnionTypeProxy {}
+
+    /**
+     * Helper method for conceptual equivalence to isUnionType(Type).
+     */
+    private boolean isUnionType(Class<?> type) {
+        return UnionTypeProxy.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/union-typecheck")
+    public Map<String, Boolean> checkUnionTypes() {
+        
+        // DataWeave type AType is an alias for String | Number (Conceptually UnionTypeProxy in Java context)
+        Class<?> aType = UnionTypeProxy.class;
+        
+        // DataWeave type Boolean
+        Class<?> booleanType = Boolean.class;
+
+        // Perform the type checks
+        boolean a = isUnionType(aType);
+        boolean b = isUnionType(booleanType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+

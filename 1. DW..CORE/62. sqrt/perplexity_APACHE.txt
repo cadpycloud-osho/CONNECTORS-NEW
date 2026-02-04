@@ -1,0 +1,34 @@
+sqrt:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+
+public class SqrtFunctionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:sqrt")
+            .process(exchange -> {
+                double[] inputs = {4, 25, 100};
+                Integer[] results = Arrays.stream(inputs)
+                    .mapToDouble(Math::sqrt)
+                    .mapToInt(Double::intValue)
+                    .boxed()
+                    .toArray(Integer[]::new);
+                
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[ 2, 5, 10 ]
+
+

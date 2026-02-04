@@ -1,0 +1,49 @@
+valueSet:
+
+
+
+input:
+
+package com.example.valueset;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@SpringBootApplication
+public class ValueSetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ValueSetApplication.class, args);
+    }
+}
+
+@RestController
+class ValueSetController {
+
+    @GetMapping("/value-set")
+    public Map<String, Object> getValueSet() {
+        Map<String, Object> sampleMap = new LinkedHashMap<>();
+        sampleMap.put("a", true);
+        sampleMap.put("b", 1);
+
+        List<Object> valueSet = new ArrayList<>(sampleMap.values());
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("valueSet", valueSet);
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "valueSet": [true, 1]
+}
+
+
+

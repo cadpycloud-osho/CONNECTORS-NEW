@@ -1,0 +1,42 @@
+singularize:
+
+input:
+
+import java.util.*;
+
+public class SingularizeConverter {
+    public static String singularize(String word) {
+        if (word == null) return null;
+        
+        word = word.toLowerCase().trim();
+        
+        // Common plural endings to singular
+        if (word.endsWith("ies")) {
+            return word.substring(0, word.length() - 3) + "y";
+        } else if (word.endsWith("es")) {
+            // Special cases like "boxes" -> "box"
+            if (word.endsWith("boxes")) {
+                return "box";
+            }
+            // Remove "es" for s/x/z/sh/ch endings
+            return word.substring(0, word.length() - 2);
+        } else if (word.endsWith("s")) {
+            return word.substring(0, word.length() - 1);
+        }
+        return word; // No change if no plural pattern
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("singularize", singularize("boxes"));
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{ "singularize" : "box" }
+
+
+

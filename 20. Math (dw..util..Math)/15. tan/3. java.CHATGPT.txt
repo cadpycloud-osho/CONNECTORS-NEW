@@ -1,0 +1,29 @@
+tan:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("tan0", Math.tan(0));
+        result.put("tan13", Math.tan(0.13));
+        result.put("tan-1", Math.tan(-1));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{tan0=0.0, tan13=0.13073731800446006, tan-1=-1.5574077246549023}
+
+

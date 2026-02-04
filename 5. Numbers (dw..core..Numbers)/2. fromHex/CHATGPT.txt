@@ -1,0 +1,53 @@
+fromHex:
+
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class HexController {
+
+    @GetMapping("/fromhex")
+    public Map<String, Object> fromHexConversion() {
+
+        Map<String, Object> result = new HashMap<>();
+
+        // a: Hex -1 → Decimal -1
+        result.put("a", new BigInteger("-1", 16));
+
+        // b: Very large hex number → BigInteger conversion
+        result.put("b", new BigInteger("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000", 16));
+
+        // c: Hex 0 → Decimal 0
+        result.put("c", new BigInteger("0", 16));
+
+        // d: null remains null
+        result.put("d", null);
+
+        // e: Hex "f" → Decimal 15
+        result.put("e", new BigInteger("f", 16));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": -1,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 15
+}
+

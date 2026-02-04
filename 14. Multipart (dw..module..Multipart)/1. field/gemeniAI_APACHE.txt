@@ -1,0 +1,196 @@
+field:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import org.apache.camel.attachment.DefaultAttachment;
+import javax.activation.DataHandler;
+
+public class MultipartFormRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:createMultipart")
+            .routeId("Multipart-Generator")
+            .process(exchange -> {
+                // 1. Access the AttachmentMessage (Camel 3+)
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+
+                // 2. Logic: Create the "parts" (Fields)
+                // In Camel, form fields are often treated as attachments 
+                // when building a raw multipart body.
+                
+                // Part 1
+                am.addAttachment("myFirstPart", 
+                    new DataHandler("content for my first part", "text/plain"));
+                
+                // Part 2
+                am.addAttachment("mySecondPart", 
+                    new DataHandler("content for my second part", "text/plain"));
+            })
+            // 3. Output: multipart/form-data
+            // This marshaler handles boundary generation and header formatting
+            .marshal().mimeMultipart("form-data")
+            .log("Generated Multipart Body:\n${body}");
+    }
+}
+
+
+output:
+
+------=_Part_0_123456789.987654321
+Content-Type: text/plain
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_0_123456789.987654321
+Content-Type: text/plain
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_0_123456789.987654321--
+
+
+
+-------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import java.util.List;
+import java.util.Map;
+
+public class ComplexMultipartRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:createComplexMultipart")
+            .routeId("Complex-Multipart-Generator")
+            .process(exchange -> {
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+
+                // 1. Prepare Data for Part 1 (JSON)
+                String orderJson = "[{\"order\":1,\"amount\":2},{\"order\":32,\"amount\":1}]";
+                
+                // We use ByteArrayDataSource to specify MIME type and simulated "file" content
+                ByteArrayDataSource jsonDs = new ByteArrayDataSource(orderJson.getBytes(), "application/json");
+                jsonDs.setName("order.json"); // Sets the filename
+                am.addAttachment("order", new DataHandler(jsonDs));
+
+                // 2. Prepare Data for Part 2 (XML)
+                String clientsXml = "<clients><client><id>1</id><name>Mariano</name></client>" 
+                                  + "<client><id>2</id><name>Shoki</name></client></clients>";
+                
+                ByteArrayDataSource xmlDs = new ByteArrayDataSource(clientsXml.getBytes(), "application/xml");
+                am.addAttachment("clients", new DataHandler(xmlDs));
+            })
+            // 3. Marshal into multipart/form-data
+            // 'true' flag ensures inline headers like Content-Type are preserved for each part
+            .marshal().mimeMultipart("form-data", true, false, "UTF-8", false)
+            .log("Generated Complex Multipart:\n${body}");
+    }
+}
+
+
+output:
+
+------=_Part_1_123456789
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[{"order":1,"amount":2},{"order":32,"amount":1}]
+------=_Part_1_123456789
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>...</clients>
+------=_Part_1_123456789--
+
+
+
+-------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+
+public class MultipartMultiFormatRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:createMultiFormatMultipart")
+            .routeId("Multi-Format-Multipart-Gen")
+            .process(exchange -> {
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+
+                // 1. Logic for "order" part (JSON + Filename)
+                String orderJson = "[\n  {\"order\": 1, \"amount\": 2},\n  {\"order\": 32, \"amount\": 1}\n]";
+                ByteArrayDataSource jsonDs = new ByteArrayDataSource(orderJson.getBytes(), "application/json");
+                jsonDs.setName("order.json"); // Triggers 'filename' in Content-Disposition
+                am.addAttachment("order", new DataHandler(jsonDs));
+
+                // 2. Logic for "clients" part (XML)
+                String clientsXml = "<clients>\n  <client><id>1</id><name>Mariano</name></client>\n" 
+                                  + "  <client><id>2</id><name>Shoki</name></client>\n</clients>";
+                ByteArrayDataSource xmlDs = new ByteArrayDataSource(clientsXml.getBytes(), "application/xml");
+                am.addAttachment("clients", new DataHandler(xmlDs));
+            })
+            // 3. Output: multipart/form-data
+            // 'true' flag ensures individual part Content-Type headers are included
+            .marshal().mimeMultipart("form-data", true, false, "UTF-8", false)
+            .log("Generated Multipart Payload:\n${body}");
+    }
+}
+
+output:
+
+
+------=_Part_0_123456789.987654321
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {"order": 1, "amount": 2},
+  {"order": 32, "amount": 1}
+]
+------=_Part_0_123456789.987654321
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client><id>1</id><name>Mariano</name></client>
+  <client><id>2</id><name>Shoki</name></client>
+</clients>
+------=_Part_0_123456789.987654321--
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

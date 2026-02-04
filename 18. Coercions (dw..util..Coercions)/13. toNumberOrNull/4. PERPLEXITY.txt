@@ -1,0 +1,68 @@
+toNumberOrNull:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class NumberOrNullApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(NumberOrNullApp.class, args);
+    }
+
+    @GetMapping("/number-or-null")
+    public Map<String, Object> numberOrNull() {
+        String input = "0.005";
+        
+        // Equivalent to DataWeave 'a' - tries seconds first, falls back to .00
+        Number resultA = parseWithMultipleFormats(input);
+        
+        // Equivalent to DataWeave 'b' - only seconds format
+        Number resultB = parseWithSecondsOnly(input);
+        
+        return Map.of(
+            "a", resultA,
+            "b", resultB
+        );
+    }
+    
+    private Number parseWithMultipleFormats(String input) {
+        // Try seconds format first
+        try {
+            return parseSeconds(input);
+        } catch (Exception e) {
+            // Fallback to .00 decimal format
+            DecimalFormat decimalFormat = new DecimalFormat(".00");
+            try {
+                return decimalFormat.parse(input);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+    }
+    
+    private Number parseWithSecondsOnly(String input) {
+        try {
+            return parseSeconds(input);
+        } catch (Exception e) {
+            return null; // DataWeave toNumberOrNull behavior
+        }
+    }
+    
+    private Number parseSeconds(String input) {
+        // DataWeave seconds format parsing (simplified for this case)
+        throw new IllegalArgumentException("Seconds format not applicable for this input");
+    }
+}
+
+
+output:
+
+{
+  "a": 0.005,
+  "b": null
+}
+
+

@@ -1,0 +1,61 @@
+isTimeType:
+
+
+input:
+
+import java.time.OffsetTime;
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isTimeType(Type).
+     * Checks if the provided type is java.time.OffsetTime or a subclass/implementation.
+     * OffsetTime is used as the Java equivalent of DataWeave's Time type (Time with Time Zone).
+     */
+    public static boolean isTimeType(Class<?> type) {
+        return OffsetTime.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ATime' (which is Time)
+        Class<?> aTimeClass = OffsetTime.class;
+
+        // 2. Mimics the type 'Time'
+        Class<?> timeClass = OffsetTime.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isTimeType(ATime)
+        boolean a = isTimeType(aTimeClass); 
+
+        // b: isTimeType(Time)
+        boolean b = isTimeType(timeClass); 
+        
+        // c: isTimeType(String)
+        boolean c = isTimeType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

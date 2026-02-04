@@ -1,0 +1,29 @@
+charCode:
+
+
+input:
+
+import java.util.*;
+
+public class CharCodeConverter {
+    public static int charCode(String input) {
+        if (input == null || input.isEmpty()) {
+            throw new IllegalArgumentException("Unexpected empty string");
+        }
+        return input.charAt(0); // Unicode code point of first character
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("charCode", charCode("Mule"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{ "charCode" : 77 }
+
+

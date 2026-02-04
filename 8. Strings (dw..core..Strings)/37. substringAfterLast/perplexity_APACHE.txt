@@ -1,0 +1,45 @@
+substringAfterLast:
+
+
+input:
+
+import java.util.*;
+
+public class SubstringAfterLastConverter {
+    public static String substringAfterLast(String text, String separator) {
+        if (text == null) return null;
+        if (separator == null || separator.isEmpty()) return null;
+        if (text.isEmpty()) return "";
+        
+        int pos = text.lastIndexOf(separator);
+        if (pos == -1) return "";
+        return text.substring(pos + separator.length());
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringAfterLast(null, "'"));
+        result.put("b", substringAfterLast("", "-"));
+        result.put("c", substringAfterLast("abc", "b"));
+        result.put("d", substringAfterLast("abcba", "b"));
+        result.put("e", substringAfterLast("abc", "d"));
+        result.put("f", substringAfterLast("abc", ""));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "a",
+  "e": "",
+  "f": null
+}
+
+
+

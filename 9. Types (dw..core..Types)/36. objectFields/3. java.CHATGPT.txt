@@ -1,0 +1,152 @@
+objectFields:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    static class Name {
+        public String localName;
+        public String namespace;
+
+        public Name(String localName, String namespace) {
+            this.localName = localName;
+            this.namespace = namespace;
+        }
+
+        @Override
+        public String toString() {
+            return "{localName=" + localName + ", namespace=" + namespace + "}";
+        }
+    }
+
+    static class Attribute {
+        public Name name;
+        public String value;
+        public boolean required;
+
+        public Attribute(Name name, String value, boolean required) {
+            this.name = name;
+            this.value = value;
+            this.required = required;
+        }
+
+        @Override
+        public String toString() {
+            return "{name=" + name + ", value=" + value + ", required=" + required + "}";
+        }
+    }
+
+    static class Key {
+        public Name name;
+        public List<Attribute> attributes;
+
+        public Key(Name name, List<Attribute> attributes) {
+            this.name = name;
+            this.attributes = attributes;
+        }
+
+        @Override
+        public String toString() {
+            return "{name=" + name + ", attributes=" + attributes + "}";
+        }
+    }
+
+    static class FieldMetadata {
+        public Key key;
+        public boolean required;
+        public boolean repeated;
+        public String value;
+
+        public FieldMetadata(Key key, boolean required, boolean repeated, String value) {
+            this.key = key;
+            this.required = required;
+            this.repeated = repeated;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "{key=" + key +
+                    ", required=" + required +
+                    ", repeated=" + repeated +
+                    ", value=" + value + "}";
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, List<FieldMetadata>> result = new LinkedHashMap<>();
+
+        // a
+        result.put("a", Arrays.asList(
+                new FieldMetadata(
+                        new Key(new Name("_", null), new ArrayList<>()),
+                        true,
+                        false,
+                        "String"
+                )
+        ));
+
+        // b
+        result.put("b", Arrays.asList(
+                new FieldMetadata(
+                        new Key(
+                                new Name("name", "http://acme.com"),
+                                Arrays.asList(
+                                        new Attribute(
+                                                new Name("foo", "http://acme.com"),
+                                                "String",
+                                                true
+                                        )
+                                )
+                        ),
+                        true,
+                        false,
+                        "Object"
+                )
+        ));
+
+        // c
+        result.put("c", new ArrayList<>());
+
+        // d
+        result.put("d", Arrays.asList(
+                new FieldMetadata(
+                        new Key(
+                                new Name("name", null),
+                                Arrays.asList(
+                                        new Attribute(new Name("foo", null), "String", false),
+                                        new Attribute(new Name("l", null), "Number", true)
+                                )
+                        ),
+                        false,
+                        false,
+                        "String"
+                ),
+                new FieldMetadata(
+                        new Key(new Name("lastName", null), new ArrayList<>()),
+                        true,
+                        true,
+                        "Number"
+                )
+        ));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=[{key={name={localName=_, namespace=null}, attributes=[]}, required=true, repeated=false, value=String}], 
+ b=[{key={name={localName=name, namespace=http://acme.com}, attributes=[{name={localName=foo, namespace=http://acme.com}, value=String, required=true}]}, required=true, repeated=false, value=Object}], 
+ c=[], 
+ d=[{key={name={localName=name, namespace=null}, attributes=[{name={localName=foo, namespace=null}, value=String, required=false}, {name={localName=l, namespace=null}, value=Number, required=true}]}, required=false, repeated=false, value=String}, 
+    {key={name={localName=lastName, namespace=null}, attributes=[]}, required=true, repeated=true, value=Number}]
+}
+
+

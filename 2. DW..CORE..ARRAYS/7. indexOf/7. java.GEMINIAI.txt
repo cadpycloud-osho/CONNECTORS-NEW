@@ -1,0 +1,81 @@
+indexOf:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: indexOf(users, "Julian")
+        // Java's List.indexOf() method provides the exact same functionality.
+        int result = users.indexOf("Julian");
+
+        // The indexOf method returns -1 if the element is not found, 
+        // which matches DataWeave's behavior when a match is not found.
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result); 
+    }
+}
+
+
+output:
+2
+
+
+
+
+
+
+
+
+2. Java Code (Using an Imperative Loop)
+This approach manually implements the search logic using a standard for loop, demonstrating how the index is found.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveIndexOfImperative {
+
+    /**
+     * Helper method to manually find the index of an element.
+     * Returns the index (0-based) or -1 if not found.
+     */
+    public static <T> int findIndexOf(List<T> list, T element) {
+        for (int i = 0; i < list.size(); i++) {
+            // Check if the current element equals the search element
+            if (list.get(i).equals(element)) {
+                return i; // Found it, return the index and stop
+            }
+        }
+        return -1; // Not found after checking all elements
+    }
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: indexOf(users, "Julian")
+        int result = findIndexOf(users, "Julian");
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result);
+    }
+}
+Output for Both Java Codes
+The output for both the Java built-in method and the Java imperative loop is identical and correctly matches the expected DataWeave output:
+
+JSON
+
+2

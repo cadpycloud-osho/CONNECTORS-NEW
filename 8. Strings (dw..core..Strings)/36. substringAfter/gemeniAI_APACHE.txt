@@ -1,0 +1,43 @@
+substringAfter:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringAfterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getSuffix")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides 1:1 parity with DW behavior
+                results.put("a", StringUtils.substringAfter(null, "'"));
+                results.put("b", StringUtils.substringAfter("", "-"));
+                results.put("c", StringUtils.substringAfter("abc", "b"));
+                results.put("d", StringUtils.substringAfter("abcba", "b"));
+                results.put("e", StringUtils.substringAfter("abc", "d"));
+                results.put("f", StringUtils.substringAfter("abc", ""));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "cba",
+  "e": "",
+  "f": "abc"
+}
+

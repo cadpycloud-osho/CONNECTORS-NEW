@@ -1,0 +1,51 @@
+envVar:
+
+envVar(variableName: String): String | Null
+
+envVar(variableName: String): String | Null
+Returns an environment variable with the specified name or null if the environment variable is not defined.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::System
+output application/json
+---
+{
+    "envVars" : [
+       "real" : envVar("SHELL"),
+       "fake" : envVar("FAKE_ENV_VAR")
+    ]
+}
+
+
+DataWeave
+Output
+"envVars": [
+  {
+    "real": "/bin/bash"
+  },
+  {
+    "fake": null
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,57 @@
+tan:
+
+tan(angle: Number): Number
+
+tan(angle: Number): Number
+Returns the trigonometric tangent of an angle from a given number of radians.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Math
+output application/json
+---
+{
+   "tan0": tan(0),
+   "tan13": tan(0.13),
+   "tan-1": tan(-1)
+}
+
+
+
+DataWeave
+Output
+{
+   "tan0": 0.0,
+   "tan13": 0.13073731800446006,
+   "tan-1": -1.5574077246549023
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

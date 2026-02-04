@@ -1,0 +1,55 @@
+take:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class TakeArrayElements {
+
+    /**
+     * Replicates the DataWeave 'take(array, n)' function.
+     * Returns the first 'n' elements of the list.
+     *
+     * @param sourceList The list to take elements from.
+     * @param elementsToTake The number of elements to take from the beginning (n).
+     * @return A list containing the first 'n' elements.
+     */
+    public static <T> List<T> take(List<T> sourceList, int elementsToTake) {
+        if (sourceList == null || elementsToTake <= 0) {
+            return List.of(); 
+        }
+        
+        // Ensure we don't try to take more elements than exist in the list
+        int endIndex = Math.min(elementsToTake, sourceList.size());
+        
+        // Use subList(fromIndex, toIndex): 
+        // Starts at 0 (inclusive) and goes up to endIndex (exclusive).
+        return sourceList.subList(0, endIndex);
+    }
+
+    public static void main(String[] args) {
+        // Input array/List
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: take(users, 2)
+        List<String> takenUsers = take(users, 2);
+        
+        System.out.println("--- Input List ---");
+        System.out.println(users);
+        
+        System.out.println("\n--- DataWeave take(users, 2) Equivalent Output ---");
+        // Print the result to replicate the DataWeave JSON output format [ "Mariano", "Leandro" ]
+        System.out.println(takenUsers.toString());
+    }
+}
+
+
+output:
+
+
+[
+  "Mariano",
+  "Leandro"
+]

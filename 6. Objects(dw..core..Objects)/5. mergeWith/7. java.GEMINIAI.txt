@@ -1,0 +1,111 @@
+mergeWith:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Simulates the DataWeave mergeWith operator by merging two maps.
+     * The values from the rightMap override the values from the leftMap for common keys.
+     * The resulting map contains all entries.
+     * @param leftMap The base map (left operand).
+     * @param rightMap The map to merge in (right operand/overrider).
+     * @return A new map containing the merged result.
+     */
+    public static Map<String, Object> mergeMaps(
+            Map<String, Object> leftMap, Map<String, Object> rightMap) {
+
+        // 1. Create a new map to hold the result, preserving the order of the left map.
+        // LinkedHashMap is used to maintain insertion order, similar to how DW often handles objects.
+        Map<String, Object> mergedMap = new LinkedHashMap<>(leftMap);
+
+        // 2. Use putAll() to merge the rightMap into the new mergedMap.
+        // putAll() copies all entries from rightMap, overwriting any existing keys
+        // that were copied from leftMap.
+        mergedMap.putAll(rightMap);
+
+        return mergedMap;
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+
+        // Input 1 (Left Map): { "a" : true, "b" : 1}
+        Map<String, Object> leftMap = new LinkedHashMap<>();
+        leftMap.put("a", true);
+        leftMap.put("b", 1);
+
+        // Input 2 (Right Map): { "a" : false, "c" : "Test"}
+        Map<String, Object> rightMap = new LinkedHashMap<>();
+        rightMap.put("a", false);
+        rightMap.put("c", "Test");
+
+        // Apply the mergeWith logic
+        Map<String, Object> mergedResult = mergeMaps(leftMap, rightMap);
+
+        // --- Output Generation ---
+
+        // Format the key-value pairs of the merged map into a JSON string
+        StringBuilder contentBuilder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : mergedResult.entrySet()) {
+            String valueStr;
+            if (entry.getValue() instanceof String) {
+                valueStr = "\"" + entry.getValue() + "\"";
+            } else {
+                valueStr = entry.getValue().toString();
+            }
+
+            if (contentBuilder.length() > 0) {
+                contentBuilder.append(",\n    ");
+            }
+            contentBuilder.append(String.format("\"%s\": %s", entry.getKey(), valueStr));
+        }
+
+        // Format the final JSON structure
+        String jsonOutput = String.format(
+            "{\n  \"mergeWith\": {\n    %s\n  }\n}",
+            contentBuilder.toString()
+        );
+
+        System.out.println("--- DataWeave mergeWith Simulation ---");
+        System.out.println("Left Map: " + leftMap);
+        System.out.println("Right Map: " + rightMap);
+        System.out.println("Merged Map: " + mergedResult);
+        System.out.println("--------------------------------------");
+
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+--- DataWeave mergeWith Simulation ---
+Left Map: {a=true, b=1}
+Right Map: {a=false, c=Test}
+Merged Map: {a=false, b=1, c=Test}
+--------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "mergeWith": {
+    "a": false,
+    "b": 1,
+    "c": "Test"
+  }
+}
+
+

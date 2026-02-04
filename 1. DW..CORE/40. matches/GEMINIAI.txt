@@ -1,0 +1,45 @@
+matches:
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
+import java.util.Collections;
+
+@RestController
+public class MatchesController {
+
+    /**
+     * Equivalent to: [ ("admin123" matches /a.*\d+/), ("admin123" matches /^b.+/) ]
+     * Accessible at http://localhost:8080/regex-matches
+     */
+    @GetMapping("/regex-matches")
+    public List<Boolean> regexMatchesExample() {
+        String inputString = "admin123";
+
+        // --- Check 1: "admin123" matches /a.*\d+/ ---
+        // Java regex equivalent: "a.*\\d+"
+        // Checks if the string STARTS with 'a', followed by any characters (.*), and ENDS with one or more digits (\d+)
+        // String.matches() implicitly anchors the pattern to the start (^) and end ($) of the string.
+        boolean match1 = inputString.matches("a.*\\d+"); // true
+
+        // --- Check 2: "admin123" matches /^b.+/ ---
+        // Java regex equivalent: "^b.+"
+        // Checks if the string STARTS with 'b', followed by one or more characters (.+)
+        // The caret (^) is redundant in String.matches() but doesn't hurt.
+        boolean match2 = inputString.matches("^b.+"); // false
+
+        // 3. Return the results as a list (JSON array)
+        return Arrays.asList(match1, match2);
+    }
+}
+
+OUTPUT:
+
+[
+  true,
+  false
+]

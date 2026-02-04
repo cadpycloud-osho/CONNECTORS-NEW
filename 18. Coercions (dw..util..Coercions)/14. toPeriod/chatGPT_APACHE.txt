@@ -1,0 +1,32 @@
+toPeriod:
+
+
+input:
+
+import java.time.Period;
+import java.time.Duration;
+
+public class IsoDurationExample {
+
+    public static void main(String[] args) {
+        // Period (date-based) example
+        Period toPeriodEx1 = Period.parse("P1D");   // P1D = 1 day
+
+        // Duration (time-based) example
+        Duration toPeriodEx2 = Duration.parse("PT1H1M"); // PT1H1M = 1 hour 1 minute
+
+        System.out.println("toPeriodEx1: " + toPeriodEx1);
+        System.out.println("toPeriodEx2: " + toPeriodEx2);
+    }
+}
+
+
+
+output:
+
+toPeriodEx1: P1D
+toPeriodEx2: PT1H1M
+
+
+
+

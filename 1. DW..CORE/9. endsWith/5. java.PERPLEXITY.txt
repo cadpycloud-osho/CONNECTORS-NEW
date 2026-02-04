@@ -1,0 +1,39 @@
+endsWith:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        String text = "Mariano";
+        boolean endsWithNo = text.endsWith("no");
+        boolean endsWithTo = text.endsWith("to");
+        
+        List<Boolean> result = Arrays.asList(endsWithNo, endsWithTo);
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+[true, false]
+
+
+
+
+
+
+Alternative Stream Implementation
+
+List<String> suffixes = Arrays.asList("no", "to");
+List<Boolean> result = suffixes.stream()
+    .map(suffix -> "Mariano".endsWith(suffix))
+    .collect(Collectors.toList());
+
+System.out.println(result);

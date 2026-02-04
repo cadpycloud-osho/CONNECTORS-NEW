@@ -1,0 +1,57 @@
+toDateOrNull:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+public class DateOrNullRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceDateOrNull")
+            .process(exchange -> {
+                String input = "2023-28-03";
+
+                // Case A: Multiple formatters where the second one matches
+                List<DateTimeFormatter> formattersA = List.of(
+                    DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+                    DateTimeFormatter.ofPattern("yyyy-dd-MM", Locale.US)
+                );
+                
+                // Case B: Single formatter that fails
+                List<DateTimeFormatter> formattersB = List.of(
+                    DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                );
+
+                exchange.getIn().setBody(Map.of(
+                    "a", parseOrNull(input, formattersA),
+                    "b", parseOrNull(input, formattersB) // Returns null instead of failing
+                ));
+            });
+    }
+
+    private LocalDate parseOrNull(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDate.parse(input, formatter);
+            } catch (Exception ignored) {
+                // Try next formatter
+            }
+        }
+        return null; // Equivalent to toDateOrNull behavior
+    }
+}
+
+
+output:
+
+
+{
+  a: |2023-03-28| as Date {format: "yyyy-dd-MM", locale: "en_US"},
+  b: null
+}
+

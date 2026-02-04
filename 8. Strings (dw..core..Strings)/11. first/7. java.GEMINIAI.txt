@@ -1,0 +1,34 @@
+first:
+
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source inputs from the DataWeave example
+        String inputString = "hello world!"; 
+        int length = 5;
+        
+        // Ensure the length is valid before extraction
+        int end = Math.min(inputString.length(), length);
+        
+        // Java's substring(0, end) extracts the first 'end' characters
+        String result = inputString.substring(0, end);
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        
+        // Print the result in a string format
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+
+output:
+
+"hello"
+
+

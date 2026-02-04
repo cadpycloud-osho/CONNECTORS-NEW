@@ -1,0 +1,46 @@
+isNothingType:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NothingTypeController {
+
+    // Simulate DataWeave's Nothing type as Void
+    private boolean isNothingType(Class<?> type) {
+        return type == Void.class;
+    }
+
+    @GetMapping("/nothing-type-check")
+    public Map<String, Boolean> checkNothingTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+
+        // ANothing is an alias of Nothing → here alias of Void
+        class ANothingAlias {} // only to illustrate alias concept
+
+        // For the example, treat ANothing = Void, Nothing = Void, String != Void
+        result.put("a", isNothingType(Void.class));      // ANothing
+        result.put("b", isNothingType(Void.class));      // Nothing
+        result.put("c", isNothingType(String.class));    // String
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

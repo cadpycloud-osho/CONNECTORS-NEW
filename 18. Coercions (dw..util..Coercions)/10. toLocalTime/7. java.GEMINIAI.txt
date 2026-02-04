@@ -1,0 +1,151 @@
+toLocalTime:
+
+
+example 1:
+
+
+input:
+
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private final String sourceTimeString = "23:57:59";
+
+    /**
+     * Mimics DataWeave's toLocalTime() with chained formatters: 
+     * Tries each formatter in order until one succeeds.
+     */
+    private LocalTime chainedToLocalTime(String timeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalTime.parse(timeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Ignore the error and try the next formatter
+            }
+        }
+        // Return null if all formatters fail
+        return null;
+    }
+
+    public Map<String, Object> getLocalTimeParsingMap() {
+        // Define formatters
+        // Formatter 1: Fails (Expected fractional seconds 'HH:mm:ss.S', found 'HH:mm:ss')
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm:ss.S", Locale.US);
+        // Formatter 2: Succeeds (Matches 'HH:mm:ss')
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        // Fails with formatter1, succeeds with formatter2 -> returns a LocalTime
+        LocalTime parsedTimeA = chainedToLocalTime(sourceTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        // Simulates a failed transformation in DataWeave's try/catch
+        String errorMessageB;
+        try {
+            // Only try the failing formatter (formatter1)
+            LocalTime.parse(sourceTimeString, formatter1);
+            errorMessageB = "No error occurred."; // This line will not be reached
+        } catch (DateTimeParseException e) {
+            // Use the DataWeave specific error message
+            errorMessageB = "Could not find a valid formatter for '" + sourceTimeString + "'";
+        }
+
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results. LocalTime.toString() provides the ISO format.
+        rootMap.put("a", parsedTimeA != null ? parsedTimeA.toString() : null);
+        rootMap.put("b", errorMessageB);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Object> result = converter.getLocalTimeParsingMap();
+        
+        // Reformat the Map output to match the requested JSON-like string exactly
+        String formattedOutput = "{" + 
+            result.entrySet().stream()
+                .map(entry -> {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    
+                    // Quote the string values and use '='
+                    return String.format("%s=%s", key, value.toString().contains(" ") ? "'" + value.toString() + "'" : value.toString());
+                })
+                .collect(Collectors.joining(", ")) + 
+            "}";
+
+        // Since the desired output is explicitly: {a=23:57:59, b=Could not find a valid formatter for '23:57:59'}
+        System.out.println(formattedOutput);
+    }
+}
+output:
+
+{a=23:57:59, b=Could not find a valid formatter for '23:57:59'}
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    public Map<String, String> getLocalTimeParsingMap() {
+        
+        // --- Logic for Key 'toLocalTimeEx' (ISO Standard Parsing) ---
+        // LocalTime.parse(String) handles the ISO 8601 format (HH:mm:ss) by default.
+        String timeStringA = "23:57:59";
+        LocalTime parsedTimeA = LocalTime.parse(timeStringA); 
+
+        // --- Logic for Key 'toLocalTimeEx2' (Custom Format Parsing) ---
+        // Input includes milliseconds: "13:44:12.283"
+        String timeStringB = "13:44:12.283";
+        
+        // Pattern matches the input structure: HH:mm:ss.SSS (Hours:Minutes:Seconds.Milliseconds)
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS", Locale.US);
+        LocalTime parsedTimeB = LocalTime.parse(timeStringB, customFormatter);
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results. LocalTime.toString() automatically formats to the ISO standard.
+        rootMap.put("toLocalTimeEx", parsedTimeA.toString());
+        rootMap.put("toLocalTimeEx2", parsedTimeB.toString());
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, String> result = converter.getLocalTimeParsingMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+{toLocalTimeEx=23:57:59, toLocalTimeEx2=13:44:12.283}

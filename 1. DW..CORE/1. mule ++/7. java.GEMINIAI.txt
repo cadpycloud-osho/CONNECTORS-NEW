@@ -1,0 +1,151 @@
+++:
+
+example 1:
+
+
+input:
+
+public class Example1 {
+    public static void main(String[] args) {
+        List<Object> list1 = new ArrayList<>(List.of(0, 1, true, "my string"));
+        list1.addAll(List.of(2, List.of(3,4,5), Map.of("a",6)));
+
+        System.out.println(Map.of("a", list1));
+    }
+}
+
+
+output:
+
+{
+  "a": [0, 1, true, "my string", 2, [3, 4, 5], { "a": 6 }]
+}
+
+
+----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+public class Example2 {
+    public static void main(String[] args) {
+        LocalDateTime dt =
+            LocalDateTime.of(LocalDate.of(2017,10,1),
+                             LocalTime.of(23,57,59));
+
+        System.out.println(dt);
+    }
+}
+
+
+output:
+
+{
+  "LocalDateTime": "2017-10-01T23:57:59"
+}
+
+
+----------------------------------------------------------------
+
+example 3:
+
+
+public class Example3 {
+    public static void main(String[] args) {
+        ZonedDateTime zdt =
+            ZonedDateTime.of(
+                LocalDate.of(2017,10,1),
+                LocalTime.of(23,57,59),
+                ZoneOffset.UTC);
+
+        System.out.println(zdt);
+    }
+}
+
+
+
+output:
+
+{
+  "DateTime1": "2017-10-01T23:57:59Z"
+}
+
+
+----------------------------------------------------------------
+
+example 4:
+
+
+input:
+
+public class Example4 {
+    public static void main(String[] args) {
+        OffsetDateTime odt =
+            OffsetDateTime.of(
+                LocalDate.of(2017,10,1),
+                LocalTime.of(23,57,59),
+                ZoneOffset.of("+02:00"));
+
+        System.out.println(odt);
+    }
+}
+
+
+
+output:
+
+{
+  "DateTime3": "2017-10-01T23:57:59+02:00"
+}
+
+
+----------------------------------------------------------------
+
+
+
+
+
+example 5:
+
+
+public class Example5 {
+    public static void main(String[] args) {
+        OffsetTime time =
+            OffsetTime.of(
+                LocalTime.of(23,57),
+                ZoneOffset.of("-03:00"));
+
+        System.out.println(time);
+    }
+}
+
+
+output:
+
+{
+  "Time": "23:57:00-03:00"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

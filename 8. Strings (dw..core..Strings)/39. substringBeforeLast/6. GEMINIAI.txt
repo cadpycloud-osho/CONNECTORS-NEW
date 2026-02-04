@@ -1,0 +1,80 @@
+substringBeforeLast:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class SubstringBeforeLastController {
+
+    @GetMapping("/substring-before-last-conversion")
+    public Map<String, String> convertDataWeaveSubstringBeforeLast() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = SubstringUtil.substringBeforeLast(null, "'");
+        String b = SubstringUtil.substringBeforeLast("", "-");
+        String c = SubstringUtil.substringBeforeLast("abc", "b");
+        String d = SubstringUtil.substringBeforeLast("abcba", "b");
+        String e = SubstringUtil.substringBeforeLast("abc", "d");
+        String f = SubstringUtil.substringBeforeLast("abc", "");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'a' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e,
+            "f", f
+        );
+    }
+}
+
+public class SubstringUtil {
+
+    /**
+     * Replicates the dw::core::Strings::substringBeforeLast function.
+     * Returns the substring before the LAST occurrence of the separator.
+     */
+    public static String substringBeforeLast(String str, String separator) {
+        // 1. DataWeave Rule 'a': If input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+        
+        // 2. DataWeave Rule 'f': If separator is empty, return the string excluding the last character.
+        if (separator == null || separator.isEmpty()) {
+            // "abc" -> "ab". Use Math.max(0, ...) to handle empty or single-character strings.
+            return str.substring(0, Math.max(0, str.length() - 1)); 
+        }
+
+        // Find the index of the LAST occurrence of the separator.
+        int separatorIndex = str.lastIndexOf(separator);
+
+        // 3. DataWeave Rule 'b', 'e': If separator is not found, return empty string.
+        if (separatorIndex == -1) {
+            return "";
+        }
+
+        // 4. Return the substring before the last separator (Rules 'c', 'd').
+        // Java's substring(0, index) is exclusive of the end index.
+        return str.substring(0, separatorIndex);
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "abc",
+  "e": "",
+  "f": "ab"
+}
+

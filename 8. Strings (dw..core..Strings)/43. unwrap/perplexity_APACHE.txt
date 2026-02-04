@@ -1,0 +1,59 @@
+unwrap:
+
+
+input:
+
+import java.util.*;
+
+public class UnwrapConverter {
+    public static String unwrap(String text, char wrapper) {
+        if (text == null) return null;
+        
+        int startCount = 0, endCount = 0;
+        
+        // Count leading wrappers
+        for (int i = 0; i < text.length() && text.charAt(i) == wrapper; i++) {
+            startCount++;
+        }
+        
+        // Count trailing wrappers  
+        for (int i = text.length() - 1; i >= 0 && text.charAt(i) == wrapper; i--) {
+            endCount++;
+        }
+        
+        // Remove min(startCount, endCount) pairs from both ends
+        int pairs = Math.min(startCount, endCount);
+        if (pairs == 0) return text;
+        
+        return text.substring(pairs, text.length() - pairs);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", unwrap(null, ' '));  // null, ""
+        result.put("b", unwrap(null, '\0')); // null, \0  
+        result.put("c", unwrap("'abc'", '\'')); // "abc"
+        result.put("d", unwrap("AABabcBAA", 'A')); // "ABabcBA"
+        result.put("e", unwrap("A", '#')); // "A"
+        result.put("f", unwrap("#A", '#')); // "#A"
+        result.put("g", unwrap("A#", '#')); // "A#"
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+   "a": null,
+   "b": null,
+   "c": "abc",
+   "d": "ABabcBA",
+   "e": "A",
+   "f": "#A",
+   "g": "A#"
+}
+
+

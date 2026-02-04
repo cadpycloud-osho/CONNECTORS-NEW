@@ -1,0 +1,131 @@
+filterTree:
+
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class FilterTreeController {
+
+    @GetMapping("/filterTree")
+    public Map<String, Object> filterTreeExample() {
+        // a
+        Map<String, Object> a = new HashMap<>();
+        a.put("name", "");
+        Map<String, Object> lastNameAttr = new HashMap<>();
+        lastNameAttr.put("foo", "");
+        a.put("lastName", "Achaval"); // In DW, attributes are ignored for filtering
+        List<Map<String, Object>> friends = new ArrayList<>();
+        Map<String, Object> f1 = new HashMap<>();
+        f1.put("id", "");
+        f1.put("test", true);
+        Map<String, Object> f2 = new HashMap<>();
+        f2.put("age", 123);
+        friends.add(f1);
+        friends.add(f2);
+        friends.add(new HashMap<>()); // empty placeholder representing ""
+        a.put("friends", friends);
+
+        // Apply filterTree equivalent
+        Map<String, Object> filteredA = (Map<String, Object>) filterTree(a, value -> {
+            if (value instanceof String) {
+                return !((String) value).isEmpty();
+            } else if (value instanceof List) {
+                return !((List<?>) value).isEmpty();
+            }
+            return true;
+        });
+
+        // b
+        Object b = null;
+        Object filteredB = filterTree(b, value -> value instanceof String);
+
+        // c
+        List<Object> c = new ArrayList<>();
+        Map<String, Object> c1 = new HashMap<>();
+        c1.put("name", "Mariano");
+        c1.put("friends", new ArrayList<>());
+        Map<String, Object> c2 = new HashMap<>();
+        c2.put("test", Arrays.asList(1, 2, 3));
+        Map<String, Object> c3 = new HashMap<>();
+        c3.put("dw", "");
+        c.add(c1);
+        c.add(c2);
+        c.add(c3);
+
+        List<Object> filteredC = (List<Object>) filterTree(c, value -> {
+            if (value instanceof List) return !((List<?>) value).isEmpty();
+            return true;
+        });
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", filteredA);
+        result.put("b", filteredB);
+        result.put("c", filteredC);
+
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object filterTree(Object input, java.util.function.Predicate<Object> predicate) {
+        if (input instanceof Map<?, ?> map) {
+            Map<String, Object> newMap = new HashMap<>();
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                Object filteredValue = filterTree(entry.getValue(), predicate);
+                if (predicate.test(filteredValue)) {
+                    newMap.put(entry.getKey().toString(), filteredValue);
+                }
+            }
+            return newMap;
+        } else if (input instanceof List<?> list) {
+            List<Object> newList = list.stream()
+                    .map(e -> filterTree(e, predicate))
+                    .filter(predicate)
+                    .collect(Collectors.toList());
+            return newList;
+        } else {
+            return input;
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "lastName": "Achaval",
+    "friends": [
+      {
+        "test": true
+      },
+      {
+        "age": 123
+      }
+    ]
+  },
+  "b": null,
+  "c": [
+    {
+      "name": "Mariano"
+    },
+    {
+      "test": [1, 2, 3]
+    },
+    {
+      "dw": ""
+    }
+  ]
+}
+
+
+

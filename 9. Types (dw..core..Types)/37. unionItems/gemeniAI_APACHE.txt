@@ -1,0 +1,57 @@
+unionItems:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class UnionItemsRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:getUnionItems")
+            .process(exchange -> {
+                // In Java, we represent the union AType as a Sealed Interface
+                Class<?> AType = StringOrNumber.class;
+
+                Map<String, Object> result = new LinkedHashMap<>();
+
+                // Logic: Extract the names of the permitted subclasses
+                result.put("a", unionItems(AType));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private List<String> unionItems(Class<?> clazz) {
+        if (clazz.isSealed()) {
+            // Get all classes permitted by this sealed interface
+            return Arrays.stream(clazz.getPermittedSubclasses())
+                         .map(Class::getSimpleName)
+                         .collect(Collectors.toList());
+        }
+        // If not sealed, return just the class name (DataWeave behavior for single types)
+        return List.of(clazz.getSimpleName());
+    }
+
+    // Java representation of: type AType = String | Number
+    public sealed interface StringOrNumber permits StringWrapper, NumberWrapper {}
+    public final class StringWrapper implements StringOrNumber { String val; }
+    public final class NumberWrapper implements StringOrNumber { Number val; }
+}
+
+
+
+output:
+
+{
+  "a": ["StringWrapper", "NumberWrapper"]
+}
+
+

@@ -1,0 +1,30 @@
+sin:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("sin0", Math.sin(0));
+        result.put("sin13", Math.sin(0.13));
+        result.put("sin-1", Math.sin(-1));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{sin0=0.0, sin13=0.12963414261969486, sin-1=-0.8414709848078965}
+
+

@@ -1,0 +1,70 @@
+isRangeType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelRangeTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type ARange = Range (alias simulation)
+                        Class<?> ARange = Range.class;
+
+                        // Simulating DataWeave isRangeType
+                        boolean a = isRangeType(ARange);
+                        boolean b = isRangeType(Range.class);
+                        boolean c = isRangeType(String.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + ",\n" +
+                                "  \"c\": " + c + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave isRangeType
+    private static boolean isRangeType(Class<?> clazz) {
+        return clazz == Range.class;
+    }
+
+    // Simulating DataWeave Range type
+    interface Range {
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

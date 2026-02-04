@@ -1,0 +1,55 @@
+isTimeType:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveTimeTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processTimeChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processTimeChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ATime = Time (type alias)
+        result.put("a", isTimeType(Time.class));
+        
+        // Built-in Time type
+        result.put("b", isTimeType(Time.class));
+        
+        // String - not Time
+        result.put("c", isTimeType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isTimeType(Class<?> type) {
+        // DataWeave Time type check equivalent
+        // Returns true for Time and its aliases (time-of-day representation)
+        return type == Time.class || 
+               "Time".equals(type.getSimpleName()) ||
+               type.getName().contains("Time");
+    }
+    
+    // Time interface equivalent for DataWeave Time type simulation
+    private interface Time {}
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

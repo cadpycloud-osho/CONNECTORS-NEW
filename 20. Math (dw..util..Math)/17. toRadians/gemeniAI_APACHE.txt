@@ -1,0 +1,37 @@
+toRadians:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToRadiansRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:convertToRadians")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Mapping Java's Math.toRadians to the output structure
+                results.put("toRadians10", Math.toRadians(10));
+                results.put("toRadians013", Math.toRadians(0.13));
+                results.put("toRadians-20", Math.toRadians(-20));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "toRadians10": 0.17453292519943295,
+  "toRadians013": 0.0022689280275926286,
+  "toRadians-20": -0.3490658503988659
+}
+
+

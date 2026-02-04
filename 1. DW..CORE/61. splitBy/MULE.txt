@@ -1,0 +1,126 @@
+splitBy:
+
+splitBy(text: String, regex: Regex): Array<String>
+
+splitBy(text: String, regex: Regex): Array<String>
+Splits a string into a string array based on a value that matches part of that string. It filters out the matching part from the returned array.
+
+This version of splitBy accepts a Java regular expression (regex) to match the input string. The regex can match any character in the input string. Note that splitBy performs the opposite operation of joinBy
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+"192.88.99.0/24" splitBy(/[.\/]/)
+DataWeave
+Output
+["192", "88", "99", "0", "24"]
+
+
+--------------------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "splitters" : {
+   "split1" : "a-b-c" splitBy(/.b./),
+   "split2" : "hello world" splitBy(/\s/),
+   "split3" : "no match" splitBy(/^s/),
+   "split4" : "no match" splitBy(/^n../),
+   "split5" : "a1b2c3d4A1B2C3D" splitBy(/[0-9A-Z]/)
+  }
+}
+DataWeave
+Output
+{
+  splitters: {
+    split1: [ "a", "c" ],
+    split2: [ "hello", "world" ],
+    split3: [ "no match" ],
+    split4: [ "", "match" ],
+    split5: [ "a", "b", "c", "d" ]
+  }
+}
+
+
+
+--------------------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/json
+---
+("192.88.99.0" splitBy("."))[0]
+DataWeave
+Output
+"192"
+
+
+
+
+--------------------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/json
+---
+'root.sources.data.`test.branch.BranchSource`.source.traits' splitBy(/[.](?=(?:[^`]*`[^`]*`)*[^`]*$)/)
+DataWeave
+Output
+[
+ "root",
+ "sources",
+ "data",
+ "`test.branch.BranchSource`",
+ "source",
+ "traits"
+]
+
+--------------------------------------------------------------
+splitBy(text: String, separator: String): Array<String>
+
+
+Source
+%dw 2.0
+output application/json
+---
+"192.88.99.0" splitBy(".")
+DataWeave
+Output
+["192", "88", "99", "0"]
+
+
+--------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+{ "splitters" : {
+    "split1" : "a-b-c" splitBy("-"),
+    "split2" : "hello world" splitBy(""),
+    "split3" : "first,middle,last" splitBy(","),
+    "split4" : "no split" splitBy("NO")
+   }
+}
+DataWeave
+Output
+{
+  splitters: {
+    split1: [ "a","b","c" ],
+    split2: [ "h","e","l","l","o","","w","o","r","l","d" ],
+    split3: [ "first","middle","last"],
+    split4: [ "no split"]
+  }
+}
+
+
+
+
+

@@ -1,0 +1,41 @@
+atan:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MathAtanController {
+
+    @GetMapping("/atan")
+    public Map<String, Double> atanExample() {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("atan0", Math.atan(0));
+        result.put("atan13", Math.atan(0.13));
+        result.put("atan-1", Math.atan(-1));
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "atan0": 0.0,
+  "atan13": 0.12927500404814307,
+  "atan-1": -0.7853981633974483
+}
+
+

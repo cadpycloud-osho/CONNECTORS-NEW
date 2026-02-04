@@ -1,0 +1,47 @@
+toDateTimeOrNull:
+
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+
+public class Main {
+    public static void main(String[] args) {
+        ZonedDateTime dateA = safeParse("2003-10-01 23:57:59Z", createMultiFormatter());
+        ZonedDateTime dateB = safeParse("2003-10-01 23:57:59Z", 
+                                       DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ssz"));
+        
+        System.out.println("{\"a\":\"" + (dateA != null ? dateA : null) + 
+                          "\",\"b\":" + (dateB != null ? "\"" + dateB + "\"" : "null") + "}");
+    }
+    
+    private static ZonedDateTime safeParse(String input, DateTimeFormatter formatter) {
+        try {
+            return ZonedDateTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+    
+    private static DateTimeFormatter createMultiFormatter() {
+        return new DateTimeFormatterBuilder()
+            .appendOptional(new DateTimeFormatterBuilder()
+                .appendPattern("yyyy/MM/dd HH:mm:ssz")
+                .toFormatter())
+            .appendOptional(new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd HH:mm:ssz")
+                .toFormatter())
+            .toFormatter();
+    }
+}
+
+
+output:
+
+
+{"a":"2003-10-01T23:57:59Z","b":null}
+

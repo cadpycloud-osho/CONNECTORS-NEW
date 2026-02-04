@@ -1,0 +1,47 @@
+isArrayType:
+
+
+input:
+
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isArrayType(Class<?> type) {
+        return type != null && type.isArray();
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class TypeCheckController {
+
+    @GetMapping("/isarraytype")
+    public Map<String, Boolean> checkTypes() {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // AType = Array<String>  → In Java: String[].class
+        result.put("a", TypeUtils.isArrayType(String[].class));
+
+        // Boolean → Not an array
+        result.put("b", TypeUtils.isArrayType(Boolean.class));
+
+        return result;
+    }
+}
+
+
+output:
+{
+  "a": true,
+  "b": false
+}

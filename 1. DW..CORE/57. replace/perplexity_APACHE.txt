@@ -1,0 +1,72 @@
+replace:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.regex.Pattern;
+
+public class RegexReplaceRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:regexReplace")
+            .process(exchange -> {
+                // Simulate DataWeave input array
+                String phone = "123-456-7890";
+                String mixed = "abc123def";
+                
+                // "123-456-7890" replace /.*-/ with("") → "7890"
+                String phoneResult = phone.replaceAll(".*-", "");
+                
+                // "abc123def" replace /[b13e]/ with("-") → "a-c-2-d-f"
+                String mixedResult = mixed.replaceAll("[b13e]", "-");
+                
+                exchange.getIn().setBody(new String[]{phoneResult, mixedResult});
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[ "7890", "a-c-2-d-f" ]
+
+
+
+------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SimpleReplaceRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:simpleReplace")
+            .process(exchange -> {
+                // "admin123" replace "123" with("ID")
+                String result = "admin123".replace("123", "ID");
+                
+                exchange.getIn().setBody(Map.of("replace", result));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "replace": "adminID" }
+
+
+
+
+

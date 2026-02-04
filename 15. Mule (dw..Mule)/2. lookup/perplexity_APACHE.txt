@@ -1,0 +1,46 @@
+lookup:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+
+public class FlowLookupRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        
+        // flow1 equivalent - HTTP Listener + Transform with lookup
+        from("servlet:/source")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    // Mule::lookup('flow2', {test:'hello '}) equivalent
+                    // Direct method call to flow2 processor
+                    String result = processFlow2("hello ");
+                    exchange.getIn().setBody(result);
+                }
+            });
+        
+        // flow2 equivalent - Set Payload + Logger
+        // Named processor that can be "looked up" and called
+        from("direct:flow2")
+            .transform(simple("${body[test]} + 'world'"))
+            .log("INFO", "${body}");
+    }
+    
+    // flow2 processor method - Mule::lookup equivalent
+    private String processFlow2(String testValue) {
+        String input = testValue + "world";  // payload.test ++ "world"
+        System.out.println("LOG: " + input); // Logger equivalent
+        return input;
+    }
+}
+
+
+output:
+
+hello world
+
+

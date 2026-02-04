@@ -1,0 +1,54 @@
+someEntry:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> mapA = new HashMap<>();
+        Map<String, Object> mapB = Map.of("a", "", "b", "123");
+        Map<String, Object> mapC = Map.of("a", "", "b", 123);
+        Map<String, Object> mapD = Map.of("a", "", "b", 123);
+        Map<String, Object> mapE = Map.of("a", "");
+        Map<String, Object> mapF = null;
+
+        System.out.println("{");
+        System.out.println("  \"a\": " + someEntry(mapA, (k,v) -> v instanceof String) + ",");
+        System.out.println("  \"b\": " + someEntry(mapB, (k,v) -> v instanceof String) + ",");
+        System.out.println("  \"c\": " + someEntry(mapC, (k,v) -> v instanceof String) + ",");
+        System.out.println("  \"d\": " + someEntry(mapD, (k,v) -> k.equals("a")) + ",");
+        System.out.println("  \"e\": " + someEntry(mapE, (k,v) -> k.equals("b")) + ",");
+        System.out.println("  \"f\": " + someEntry(mapF, (k,v) -> k.equals("a")));
+        System.out.println("}");
+    }
+
+    static boolean someEntry(Map<String, Object> map, EntryPredicate predicate) {
+        if (map == null) return false;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (predicate.test(entry.getKey(), entry.getValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    interface EntryPredicate {
+        boolean test(String key, Object value);
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+

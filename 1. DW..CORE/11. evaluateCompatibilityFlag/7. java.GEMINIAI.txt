@@ -1,0 +1,53 @@
+evaluateCompatibilityFlag:
+
+
+
+
+input:
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    // 1. Simulate the Mule Runtime Configuration Store
+    // In a real Java app, this would be loaded from a properties file, environment variables, etc.
+    private static final Map<String, Boolean> MULE_COMPATIBILITY_FLAGS = Map.of(
+        "com.mulesoft.dw.xml_reader.honourMixedContentStructure", true,
+        "some.other.flag", false
+    );
+
+    /**
+     * Simulates the DataWeave evaluateCompatibilityFlag() function.
+     * Checks a predefined map for the boolean value of a given flag name.
+     * @param flagName The name of the compatibility flag.
+     * @return The boolean value of the flag, or false if not found (default behavior).
+     */
+    private static boolean evaluateCompatibilityFlag(String flagName) {
+        // We use .getOrDefault() to simulate a configuration lookup
+        // assuming 'false' is the safe default if the flag isn't explicitly set.
+        return MULE_COMPATIBILITY_FLAGS.getOrDefault(flagName, false);
+    }
+
+    public static void main(String[] args) {
+        // DataWeave Source: evaluateCompatibilityFlag("com.mulesoft.dw.xml_reader.honourMixedContentStructure")
+
+        String flagToCheck = "com.mulesoft.dw.xml_reader.honourMixedContentStructure";
+
+        // 2. Apply the simulated evaluation function
+        boolean flagValue = evaluateCompatibilityFlag(flagToCheck);
+
+        // 3. Construct the final output object
+        Map<String, Boolean> output = new HashMap<>();
+        output.put(flagToCheck, flagValue);
+
+        // Print the result
+        System.out.println("Output:");
+        System.out.println(output);
+    }
+}
+
+output:
+
+{com.mulesoft.dw.xml_reader.honourMixedContentStructure: true}
+

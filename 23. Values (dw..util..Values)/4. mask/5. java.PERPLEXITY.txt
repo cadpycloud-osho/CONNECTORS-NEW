@@ -1,0 +1,158 @@
+mask:
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Map<String, String>> users = createUsers();
+        System.out.println(users);
+    }
+    
+    public static List<Map<String, String>> createUsers() {
+        List<Map<String, String>> users = new ArrayList<>();
+        
+        Map<String, String> peter = new HashMap<>();
+        peter.put("name", "Peter Parker");
+        peter.put("password", "*****");
+        users.add(peter);
+        
+        Map<String, String> bruce = new HashMap<>();
+        bruce.put("name", "Bruce Wayne");
+        bruce.put("password", "*****");
+        users.add(bruce);
+        
+        return users;
+    }
+}
+
+
+
+output:
+
+
+[
+   {
+     "name": "Peter Parker",
+     "password": "*****"
+   },
+   {
+     "name": "Bruce Wayne",
+     "password": "*****"
+   }
+]
+
+
+--------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Map<String, String>> input = Arrays.asList(
+            Map.of("name", "Peter Parker", "password", "spiderman"),
+            Map.of("name", "Bruce Wayne", "password", "batman")
+        );
+        
+        String[] fieldsToMask = {"password"};
+        String maskValue = "*****";
+        List<Map<String, String>> result = maskFields(input, fieldsToMask, maskValue);
+        System.out.println(result);
+    }
+    
+    public static List<Map<String, String>> maskFields(List<Map<String, String>> data, 
+                                                     String[] fieldsToMask, String maskValue) {
+        return data.stream().map(record -> {
+            Map<String, String> masked = new HashMap<>(record);
+            for (String field : fieldsToMask) {
+                masked.put(field, maskValue);
+            }
+            return masked;
+        }).collect(Collectors.toList());
+    }
+}
+
+
+
+output:
+
+
+[
+   {
+     "name": "Peter Parker",
+     "password": "*****"
+   },
+   {
+     "name": "Bruce Wayne",
+     "password": "*****"
+   }
+]
+
+
+
+
+--------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(123, true),
+            Arrays.asList(456, true)
+        );
+        
+        int indexToMask = 1;
+        Object maskValue = false;
+        List<List<Object>> result = maskArrayElements(input, indexToMask, maskValue);
+        System.out.println(result);
+    }
+    
+    public static List<List<Object>> maskArrayElements(List<List<Object>> arrays, 
+                                                     int indexToMask, Object maskValue) {
+        return arrays.stream().map(array -> {
+            List<Object> maskedArray = new ArrayList<>(array);
+            if (maskedArray.size() > indexToMask) {
+                maskedArray.set(indexToMask, maskValue);
+            }
+            return maskedArray;
+        }).collect(Collectors.toList());
+    }
+}
+
+
+
+output:
+
+[
+   [
+     123,
+     false
+   ],
+   [
+     456,
+     false
+   ]
+]
+
+
+
+
+--------------------------------------------------------------------------

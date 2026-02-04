@@ -1,0 +1,57 @@
+isOdd:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+public class IsOddProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<Object> inputNumbers = exchange.getIn().getBody(List.class);
+        List<Boolean> result = new ArrayList<>();
+        
+        for (Object num : inputNumbers) {
+            if (num instanceof Number) {
+                BigDecimal bd = new BigDecimal(num.toString());
+                result.add(bd.remainder(BigDecimal.valueOf(2)).abs().compareTo(BigDecimal.ZERO) != 0);
+            } else {
+                result.add(false);
+            }
+        }
+        
+        exchange.getIn().setBody(new IsOddResult(result));
+    }
+    
+    public static class IsOddResult {
+        public List<Boolean> isOdd;
+        
+        public IsOddResult(List<Boolean> isOdd) {
+            this.isOdd = isOdd;
+        }
+    }
+}
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class IsOddRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .unmarshal().json(JsonLibrary.Jackson, List.class)
+            .process(new IsOddProcessor())
+            .marshal().json()
+            .to("mock:output");
+    }
+}
+[0, 1, 4]
+
+
+output:
+
+{"isOdd": [false, true, false]}
+

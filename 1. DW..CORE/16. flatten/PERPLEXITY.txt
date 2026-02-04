@@ -1,0 +1,109 @@
+FLATTEN:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class FlattenArraysApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FlattenArraysApp.class, args);
+
+        List<List<Integer>> arrayOfArrays = Arrays.asList(
+                Arrays.asList(1, 2, 3),
+                Arrays.asList(4, 5, 6),
+                Arrays.asList(7, 8, 9)
+        );
+
+        List<Integer> flattened = arrayOfArrays.stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        System.out.println(flattened); // Output: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    }
+}
+
+
+OUTPUT:
+
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+________________________________________________________________________
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class FlattenObjectsApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FlattenObjectsApp.class, args);
+
+        class Person {
+            String name;
+            int id;
+
+            Person(String name, int id) {
+                this.name = name;
+                this.id = id;
+            }
+
+            @Override
+            public String toString() {
+                return "{\"name\":\"" + name + "\", \"id\":" + id + "}";
+            }
+        }
+
+        class Group {
+            String group;
+            List<Person> myarray;
+
+            Group(String group, List<Person> myarray) {
+                this.group = group;
+                this.myarray = myarray;
+            }
+        }
+
+        List<Group> user = Arrays.asList(
+                new Group("dev", Arrays.asList(
+                        new Person("Shoki", 5678),
+                        new Person("Mariano", 9123)
+                )),
+                new Group("test", Arrays.asList(
+                        new Person("Sai", 2001),
+                        new Person("Peter", 2002)
+                ))
+        );
+
+        List<Person> flattened = new ArrayList<>();
+        for (Group group : user) {
+            flattened.addAll(group.myarray);
+        }
+
+        System.out.println(flattened);
+        // Output: [{...}, {...}, {...}, {...}] as shown below
+    }
+}
+
+
+OUTPUT:
+
+[
+  {"name":"Shoki", "id":5678},
+  {"name":"Mariano", "id":9123},
+  {"name":"Sai", "id":2001},
+  {"name":"Peter", "id":2002}
+]

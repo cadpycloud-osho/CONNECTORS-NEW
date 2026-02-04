@@ -1,0 +1,71 @@
+between:
+
+
+input:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class PeriodBetweenApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(PeriodBetweenApplication.class, args);
+    }
+}
+
+@RestController
+class PeriodController {
+
+    private String periodBetween(LocalDate startDate, LocalDate endDate) {
+        Period period = Period.between(startDate, endDate);
+        // Format the period similar to ISO-8601 period format
+        StringBuilder sb = new StringBuilder("P");
+        if (period.getYears() != 0) {
+            sb.append(period.getYears()).append("Y");
+        }
+        if (period.getMonths() != 0) {
+            sb.append(period.getMonths()).append("M");
+        }
+        if (period.getDays() != 0) {
+            sb.append(period.getDays()).append("D");
+        }
+        // If period is zero, add 0D to indicate zero duration
+        if (sb.length() == 1) {
+            sb.append("0D");
+        }
+        return sb.toString();
+    }
+
+    @GetMapping("/periods")
+    public Map<String, String> getPeriods() {
+        Map<String, String> response = new LinkedHashMap<>();
+
+        // Notice the order for start and end date to simulate DataWeave's behavior
+        // DataWeave between(a, b) works as period between a and b (a - b).
+        // Java's Period.between(start, end) calculates end - start.
+        // So if we want same result as DataWeave, we use Period.between(end, start).
+
+        response.put("a", periodBetween(LocalDate.parse("2010-12-12"), LocalDate.parse("2010-12-10")));
+        response.put("b", periodBetween(LocalDate.parse("2011-12-11"), LocalDate.parse("2010-11-10")));
+        response.put("c", periodBetween(LocalDate.parse("2020-02-29"), LocalDate.parse("2020-03-30")));
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "a": "P2D",
+  "b": "P1Y1M1D",
+  "c": "P-1M-1D"
+}
+

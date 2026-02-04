@@ -1,0 +1,60 @@
+fromBinary:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BinaryToDecimalRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertBinary")
+            .routeId("Binary-To-Decimal-Route")
+            .process(exchange -> {
+                // 1. Helper function for fromBinary logic
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                results.put("a", parseBinary("-10"));
+                results.put("b", parseBinary("11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000"));
+                results.put("c", parseBinary("0"));
+                results.put("d", parseBinary(null));
+                results.put("e", parseBinary("100"));
+
+                exchange.getIn().setBody(results);
+            })
+            // 2. Logic: output application/json
+            .marshal().json()
+            .log("Conversion Result: ${body}");
+    }
+
+    /**
+     * Replicates dw::core::Numbers::fromBinary
+     */
+    private Object parseBinary(Object input) {
+        if (input == null) return null;
+        
+        String strInput = String.valueOf(input);
+        try {
+            // Java's BigInteger constructor handles the radix (base) 
+            // and supports leading minus signs automatically.
+            return new BigInteger(strInput, 2);
+        } catch (NumberFormatException e) {
+            return null; // Or handle as error depending on requirements
+        }
+    }
+}
+
+
+output:
+{
+  "a": -2,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 4
+}

@@ -1,0 +1,49 @@
+toUri:
+
+toUri(str: String): Uri
+
+toUri(str: String): Uri
+Transforms a String value into a Uri value.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+  toUriExample: toUri("https://www.google.com/")
+}
+
+
+DataWeave
+Output
+{
+  "toUriExample": "https://www.google.com/"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

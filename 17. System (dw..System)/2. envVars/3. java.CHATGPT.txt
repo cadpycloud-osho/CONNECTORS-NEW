@@ -1,0 +1,30 @@
+
+envVars():
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Equivalent of dw::System::envVars().SHELL
+        String shell = System.getenv("SHELL");
+
+        Map<String, String> output = new HashMap<>();
+        output.put("envVars", shell);
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+{envVars=/bin/bash}
+
+

@@ -1,0 +1,72 @@
+countMatches:
+
+example 1:
+
+
+input:
+
+import java.util.regex.*;
+
+public class CountMatchesConverter {
+    public static int countMatches(String input, String pattern) {
+        if (input == null || pattern == null) return 0;
+        Matcher matcher = Pattern.compile(Pattern.quote(pattern)).matcher(input);
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("countMatches", countMatches("hello worlo!", "lo"));
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{"countMatches": 2}
+
+
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class RegexCountRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:countVowels")
+            .process(exchange -> {
+                String input = "hello, ciao!";
+                // Define the regex pattern for vowels
+                Pattern pattern = Pattern.compile("[aeiou]");
+                Matcher matcher = pattern.matcher(input);
+
+                int count = 0;
+                while (matcher.find()) {
+                    count++;
+                }
+
+                exchange.getIn().setBody(count);
+            });
+    }
+}
+
+output:
+
+5
+
+
+----------------------------------------------------------

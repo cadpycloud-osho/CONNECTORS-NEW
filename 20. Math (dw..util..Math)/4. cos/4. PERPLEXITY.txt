@@ -1,0 +1,66 @@
+cos:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveMathCosApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveMathCosApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/math/cos")
+@RequiredArgsConstructor
+class CosController {
+    
+    private final MathService mathService;
+    
+    @GetMapping("/test")
+    public Map<String, Double> testCos() {
+        return mathService.executeCosTests();
+    }
+}
+
+@Service
+class MathService {
+    
+    public Map<String, Double> executeCosTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("cos0", cos(0.0));
+        result.put("cos13", cos(0.13));
+        result.put("cos-1", cos(-1.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave cos() equivalent:
+     * Returns cosine of x (in radians)
+     */
+    public Double cos(double x) {
+        return Math.cos(x);
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+
+output:
+
+
+{
+  "cos0": 1.0,
+  "cos13": 0.9915618937147881,
+  "cos-1": 0.5403023058681398
+}
+
+

@@ -1,0 +1,59 @@
+seconds:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class SecondsController {
+    
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ISO_INSTANT;
+    private static final Instant BASE = Instant.parse("2020-10-05T20:22:34.385Z");
+
+    @GetMapping("/seconds")
+    public Map<String, Object> getSeconds() {
+        // nextSecond: +1 second
+        Instant nextSecond = BASE.plus(Duration.ofSeconds(1));
+        
+        // previousSecond: -1 second
+        Instant previousSecond = BASE.minus(Duration.ofSeconds(1));
+        
+        // decimalInputPeriod: exact "PT4.555S" format
+        String decimalInputPeriod = "PT4.555S";
+        
+        // wholeNumberInputPeriod: 4 seconds
+        String wholeNumberInputPeriod = "PT4S";
+        
+        // addNegativeValue: seconds(-1) + seconds(2) = 1 second
+        long addNegativeValue = 1;
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("nextSecond", FMT.format(nextSecond));
+        result.put("previousSecond", FMT.format(previousSecond));
+        result.put("decimalInputPeriod", decimalInputPeriod);
+        result.put("wholeNumberInputPeriod", wholeNumberInputPeriod);
+        result.put("addNegativeValue", addNegativeValue);
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "nextSecond": "2020-10-05T20:22:35.385Z",
+  "previousSecond": "2020-10-05T20:22:33.385Z",
+  "decimalInputPeriod": "PT4.555S",
+  "wholeNumberInputPeriod": "PT4S",
+  "addNegativeValue": 1
+}
+
+

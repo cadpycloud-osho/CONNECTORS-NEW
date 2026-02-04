@@ -1,0 +1,41 @@
+repeat:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String repeat(String value, int times) {
+        if (value == null || times <= 0) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            sb.append(value);
+        }
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", repeat("e", 0));
+        result.put("b", repeat("e", 3));
+        result.put("c", repeat("e", -2));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=, b=eee, c=}
+
+
+

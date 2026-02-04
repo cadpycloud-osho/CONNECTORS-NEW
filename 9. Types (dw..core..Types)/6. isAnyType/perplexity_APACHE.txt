@@ -1,0 +1,32 @@
+isAnyType:
+
+input:
+
+import java.util.*;
+
+public class IsAnyTypeConverter {
+    // Simulates DataWeave type system - Any vs concrete types
+    public static boolean isAnyType(String typeName) {
+        return "Any".equals(typeName) || "AAny".equals(typeName);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isAnyType("AAny"));    // type AAny = Any
+        result.put("b", isAnyType("Any"));     // built-in Any
+        result.put("c", isAnyType("String"));  // concrete type
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true, 
+  "c": false
+}
+
+

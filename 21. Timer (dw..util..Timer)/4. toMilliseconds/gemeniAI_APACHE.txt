@@ -1,0 +1,43 @@
+toMilliseconds:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.util.Map;
+
+public class DateTimeToMillisRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertDate")
+            .routeId("Date-To-Millis-Converter")
+            .process(exchange -> {
+                // 1. Logic: Parse the ISO-8601 String
+                // Replicating |2018-07-23T22:03:04.829Z|
+                String dateStr = "2018-07-23T22:03:04.829Z";
+                
+                // 2. Convert to Instant and get Epoch Milliseconds
+                long millis = Instant.parse(dateStr).toEpochMilli();
+
+                // 3. Set the output body as a Map
+                exchange.getIn().setBody(Map.of("toMilliseconds", millis));
+            })
+            .marshal().json()
+            .log("Converted Output: ${body}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "toMilliseconds": 1532383384829
+}
+
+

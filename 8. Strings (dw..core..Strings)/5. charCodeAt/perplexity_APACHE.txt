@@ -1,0 +1,29 @@
+charCodeAt:
+
+
+input:
+
+import java.util.*;
+
+public class CharCodeAtConverter {
+    public static int charCodeAt(String input, int index) {
+        if (input == null || index < 0 || index >= input.length()) {
+            throw new StringIndexOutOfBoundsException("Invalid index: " + index);
+        }
+        return input.charAt(index);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("charCodeAt", charCodeAt("MuleSoft", 1)); // 'u' = 117
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{ "charCodeAt": 117 }
+
+

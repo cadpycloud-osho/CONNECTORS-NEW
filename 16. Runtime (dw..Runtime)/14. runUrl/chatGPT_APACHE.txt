@@ -1,0 +1,58 @@
+runUrl:
+
+input:
+
+
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+
+public class RunUrlSimulation {
+
+    static ObjectMapper mapper = new ObjectMapper();
+
+    static ObjectNode success(String value) {
+        ObjectNode node = mapper.createObjectNode();
+        node.put("success", true);
+        node.put("value", value);
+        node.put("mimeType", "application/dw");
+        node.put("encoding", "UTF-8");
+        node.set("logs", mapper.createArrayNode());
+        return node;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        // Simulated JSON payload
+        String jsonPayload = "{\"name\":\"Mariano\"}";
+        JsonNode payload = mapper.readTree(jsonPayload);
+
+        // Equivalent of example.dwl logic → payload.name
+        String result = payload.get("name").asText();
+
+        ObjectNode output = mapper.createObjectNode();
+        output.set("execute_ok", success("\"" + result + "\""));
+
+        // Final output
+        System.out.println(
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(output)
+        );
+    }
+}
+
+
+
+output:
+
+
+{
+  "execute_ok" : {
+    "success" : true,
+    "value" : "\"Mariano\"",
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  }
+}
+
+
+

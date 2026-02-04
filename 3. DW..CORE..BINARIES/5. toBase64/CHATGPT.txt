@@ -1,0 +1,56 @@
+toBase64:
+
+INPUT:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.xml.bind.DatatypeConverter;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class GravatarController {
+
+    @GetMapping("/gravatar")
+    public Map<String, String> getGravatarBase64() {
+        try {
+            String email = "achaval@gmail.com".trim().toLowerCase();
+
+            // 1️⃣ MD5 of email
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hashBytes = md.digest(email.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            String md5Hash = sb.toString();
+
+            // 2️⃣ Download gravatar image
+            String imageUrl = "https://www.gravatar.com/avatar/" + md5Hash;
+            InputStream in = new URL(imageUrl).openStream();
+            byte[] imageBytes = in.readAllBytes();
+
+            // 3️⃣ Convert to Base64
+            String base64Image = DatatypeConverter.printBase64Binary(imageBytes);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("gravatarBase64", base64Image);
+            return response;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error processing gravatar request", e);
+        }
+    }
+}
+
+OUTPUT:
+
+{
+  "gravatarBase64": "/9j/4AAQSkZJRgABAQEAYABgAAD//2Q==..."
+}

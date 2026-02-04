@@ -1,0 +1,105 @@
+findDataFormatDescriptorByMime:
+
+
+input:
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Component
+public class DataFormatDiscoveryService implements CommandLineRunner {
+
+    private final List<HttpMessageConverter<?>> converters;
+
+    // Inject all available HttpMessageConverters
+    public DataFormatDiscoveryService(ObjectProvider<HttpMessageConverter<?>> converterProvider) {
+        this.converters = converterProvider.orderedStream().collect(Collectors.toList());
+    }
+
+    /**
+     * Replicates dw::Runtime::findDataFormatDescriptorByMime(mimeType).
+     * Searches for a converter that supports the given primaryType/subtype.
+     * Note: This simplifies the complex DW pattern matching but achieves the same goal.
+     */
+    public Optional<Map<String, String>> findDataFormatDescriptorByMime(String primaryType, String subType) {
+        MediaType targetType = null;
+        try {
+            targetType = new MediaType(primaryType, subType);
+        } catch (Exception e) {
+            // Handle invalid MIME type formats
+            return Optional.empty();
+        }
+
+        for (HttpMessageConverter<?> converter : converters) {
+            for (MediaType supportedType : converter.getSupportedMediaTypes()) {
+                // Check if the converter supports the target type, handling wildcards ('*')
+                if (supportedType.isCompatibleWith(targetType)) {
+                    // Found a compatible converter.
+                    // Determine the format name (simplified based on converter class)
+                    String name = converter.getClass().getSimpleName().contains("Json") ? "json" :
+                                  converter.getClass().getSimpleName().contains("Xml") ? "xml" :
+                                  "generic";
+                                  
+                    // Get the default MIME type (simplified to the first supported type)
+                    String defaultMimeType = supportedType.toString();
+                    
+                    // Return the simplified descriptor structure
+                    return Optional.of(Map.of(
+                        "name", name, 
+                        "defaultMimeType", defaultMimeType
+                    ));
+                }
+            }
+        }
+        return Optional.empty(); // Not found (replicates Null in DW)
+    }
+
+    /**
+     * Replicates the main DataWeave script execution.
+     */
+    public Map<String, Map<String, String>> runDiscoveryTests() {
+        // var jsonDF = findDataFormatDescriptorByMime({'type': "*", subtype: "json", parameters: {}})
+        Optional<Map<String, String>> jsonDF = findDataFormatDescriptorByMime("*", "json");
+
+        // var unknownDF = findDataFormatDescriptorByMime({'type': "*", subtype: "*", parameters: {}})
+        // Note: Searching for */* will always find the first generic converter (e.g., String or Octet-Stream),
+        // but we simulate the lookup process.
+        Optional<Map<String, String>> unknownDF = findDataFormatDescriptorByMime("*", "*");
+
+
+        // fun simplify(df: DataFormatDescriptor | Null) = ...
+        Map<String, String> jsonResult = jsonDF.orElseGet(() -> Map.of("name", "unknown", "defaultMimeType", "unknown"));
+        Map<String, String> unknownResult = unknownDF.orElseGet(() -> Map.of("name", "unknown", "defaultMimeType", "unknown"));
+        
+        Map<String, Map<String, String>> finalOutput = new HashMap<>();
+        finalOutput.put("json", jsonResult);
+        finalOutput.put("unknown", unknownResult);
+        
+        return finalOutput;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("--- Spring Boot Data Format Discovery Simulation ---");
+        System.out.println(runDiscoveryTests());
+    }
+}
+
+output:
+
+
+--- Spring Boot Data Format Discovery Simulation ---
+{
+  json={name=json, defaultMimeType=application/json}, 
+  unknown={name=generic, defaultMimeType=text/plain} 
+}
+

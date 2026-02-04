@@ -1,0 +1,49 @@
+substringBefore:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringBeforeExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringBefore(null, "'"));
+        result.put("b", substringBefore("", "-"));
+        result.put("c", substringBefore("abc", "b"));
+        result.put("d", substringBefore("abc", "c"));
+        result.put("e", substringBefore("abc", "d"));
+        result.put("f", substringBefore("abc", ""));
+
+        System.out.println(result);
+    }
+
+    public static String substringBefore(String value, String delimiter) {
+        if (value == null) {
+            return null;
+        }
+        if (delimiter == null || delimiter.isEmpty()) {
+            return "";
+        }
+        int index = value.indexOf(delimiter);
+        if (index == -1) {
+            return "";
+        }
+        return value.substring(0, index);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab",
+  "e": "",
+  "f": ""
+}
+
+

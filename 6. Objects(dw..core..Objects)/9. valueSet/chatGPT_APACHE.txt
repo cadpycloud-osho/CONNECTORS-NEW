@@ -1,0 +1,45 @@
+valueSet:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ValueSetProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        // Use LinkedHashMap to preserve insertion order (like DataWeave)
+        Map<String, Object> obj = new LinkedHashMap<>();
+        obj.put("a", true);
+        obj.put("b", 1);
+
+        // valueSet → extract only values
+        List<Object> valueSet = new ArrayList<>(obj.values());
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("valueSet", valueSet);
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:start")
+    .process(new ValueSetProcessor())
+    .to("log:result");
+
+
+output:
+
+
+
+{
+  "valueSet": [ true, 1 ]
+}

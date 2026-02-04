@@ -1,0 +1,62 @@
+isLocalTimeType:
+
+
+
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class LocalDateTimeCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isLocalDateTimeType(Type).
+     */
+    private boolean isLocalDateTimeType(Class<?> type) {
+        return LocalDateTime.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/datetime-typecheck")
+    public Map<String, Boolean> checkDateTimeTypes() {
+        
+        // DataWeave type ALocalDateTime is an alias for LocalDateTime
+        Class<?> aLocalDateTime = LocalDateTime.class;
+        
+        // DataWeave type LocalDateTime
+        Class<?> localDateTime = LocalDateTime.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isLocalDateTimeType(aLocalDateTime);
+        boolean b = isLocalDateTimeType(localDateTime);
+        boolean c = isLocalDateTimeType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

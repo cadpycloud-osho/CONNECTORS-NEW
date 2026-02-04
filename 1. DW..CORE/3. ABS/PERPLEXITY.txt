@@ -1,0 +1,38 @@
+abs(number: Number): Number
+Returns the absolute value of a number.
+
+INPUT:
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class DataWeaveController {
+    @GetMapping("/dataweave-key-removal")
+    public Map<String, String> getKeyRemoval() {
+        Map<String, String> original = Map.of(
+            "hello", "world", 
+            "name", "DW"
+        );
+        
+        // Remove "hello" key (equivalent to ["hello" as Key])
+        return Map.of("name", original.get("name"));
+    }
+}
+
+
+OUTPUT:
+{
+  "name": "DW"
+}

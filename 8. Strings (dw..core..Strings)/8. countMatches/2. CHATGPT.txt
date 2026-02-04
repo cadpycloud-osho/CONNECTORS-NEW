@@ -1,0 +1,68 @@
+countMatches:
+
+
+example 1:
+
+
+
+input: 
+
+@GetMapping("/countMatches1")
+public Map<String, Object> countMatches1() {
+    String text = "hello worlo!";
+    String pattern = "lo";
+
+    int count = 0;
+    int index = 0;
+
+    while ((index = text.indexOf(pattern, index)) != -1) {
+        count++;
+        index += pattern.length();
+    }
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("count", count);
+
+    return result;
+}
+
+
+output:
+
+{
+  "count": 2
+}
+
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+
+input: 
+
+@GetMapping("/countMatches2")
+public Map<String, Object> countMatches2() {
+    String text = "hello, ciao!";
+    String regex = "[aeiou]";
+
+    int count = 0;
+    var matcher = java.util.regex.Pattern.compile(regex).matcher(text);
+
+    while (matcher.find()) {
+        count++;
+    }
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("count", count);
+
+    return result;
+}
+
+
+output:
+{
+  "count": 5
+}

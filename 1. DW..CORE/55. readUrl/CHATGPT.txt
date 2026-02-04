@@ -1,0 +1,211 @@
+readUrl:
+
+
+example 1:
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import java.util.Map;
+
+@RestController
+public class ExternalJsonController {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @GetMapping("/example1")
+    public Map<String, Object> getExternalJson() {
+        String url = "https://jsonplaceholder.typicode.com/posts/1";
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut ...",
+  "body": "quia et..."
+}
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+package com.example.demo;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.InputStream;
+import java.util.*;
+
+@RestController
+public class ClasspathJsonToCsvController {
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @GetMapping(value = "/example2", produces = "text/csv")
+    public String getCsvFromJson() throws Exception {
+        // Read JSON from classpath
+        InputStream is = new ClassPathResource("myJsonSnippet.json").getInputStream();
+        JsonNode root = mapper.readTree(is);
+        JsonNode results = root.path("results");
+        if (!results.isArray()) {
+            return "";  // or handle error
+        }
+
+        StringBuilder sb = new StringBuilder();
+        // Header
+        sb.append("firstName,lastName,email\n");
+
+        for (JsonNode item : results) {
+            JsonNode profile = item.path("profile");
+            String first = profile.path("firstName").asText("");
+            String last  = profile.path("lastName").asText("");
+            String email = profile.path("email").asText("");
+            sb.append(first).append(",").append(last).append(",").append(email).append("\n");
+        }
+
+        return sb.toString();
+    }
+}
+
+
+
+Expected CSV Output :
+
+
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+-----------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
+
+@RestController
+public class ExternalCsvToJsonController {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @GetMapping("/example3")
+    public List<Map<String, String>> getCsvAsJson() {
+        String url = "https://mywebsite.com/data.csv";
+        String csvData = restTemplate.getForObject(url, String.class);
+
+        List<Map<String, String>> result = new ArrayList<>();
+
+        if (csvData != null && !csvData.isEmpty()) {
+            String[] columns = csvData.split(",");
+
+            Map<String, String> row = new LinkedHashMap<>();
+            for (int i = 0; i < columns.length; i++) {
+                row.put("column_" + i, columns[i]);
+            }
+            result.add(row);
+        }
+        return result;
+    }
+}
+
+
+
+output:
+
+[
+  {
+    "column_0": "Max",
+    "column_1": "the Mule",
+    "column_2": "MuleSoft"
+  }
+]
+
+
+-----------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+
+package com.example.demo;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.InputStream;
+
+@RestController
+public class ClasspathFirstNameController {
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @GetMapping("/example4")
+    public String getFirstName() throws Exception {
+        InputStream is = new ClassPathResource("name.dwl").getInputStream();
+        JsonNode node = mapper.readTree(is);
+        String firstName = node.path("firstName").asText(null);
+        // Return as JSON (just a plain string)
+        return mapper.writeValueAsString(firstName);
+    }
+}
+
+
+output:
+
+"Somebody"
+
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

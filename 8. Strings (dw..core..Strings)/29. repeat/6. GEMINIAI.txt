@@ -1,0 +1,51 @@
+repeat:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class RepeatController {
+
+    @GetMapping("/repeat-conversion")
+    public Map<String, String> convertDataWeaveRepeat() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = repeatString("e", 0);
+        String b = repeatString("e", 3);
+        String c = repeatString("e", -2); // DW treats negative as 0
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot automatically converts to the required JSON
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c
+        );
+    }
+    
+    /**
+     * Implements the logic of the DataWeave 'repeat' function, handling 
+     * non-negative counts and translating negative counts to 0.
+     */
+    private String repeatString(String str, int count) {
+        // DataWeave behavior: if count < 0, it behaves as count = 0.
+        int effectiveCount = Math.max(0, count);
+        
+        // Use the Java 11+ String.repeat() method.
+        return str.repeat(effectiveCount);
+    }
+}
+
+output:
+
+{
+  "a": "",
+  "b": "eee",
+  "c": ""
+}
+
+

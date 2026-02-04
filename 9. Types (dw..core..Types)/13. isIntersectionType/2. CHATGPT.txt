@@ -1,0 +1,61 @@
+isIntersectionType:
+
+
+
+INPUT:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isIntersectionType(Class<?> type) {
+        // We treat "intersection type" as a marker interface type
+        return IntersectionType.class.isAssignableFrom(type);
+    }
+
+    // Marker interface representing intersection types
+    public interface IntersectionType {}
+}
+
+package com.example.demo.types;
+
+import com.example.demo.util.TypeUtils.IntersectionType;
+
+public interface AType extends IntersectionType {
+    String getName();
+    int getAge();
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.types.AType;
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class IntersectionTypeController {
+
+    @GetMapping("/isIntersectionType")
+    public Map<String, Boolean> checkIntersectionTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", TypeUtils.isIntersectionType(AType.class));
+        result.put("b", TypeUtils.isIntersectionType(Boolean.class));
+
+        return result;
+    }
+}
+
+OUTPUT:
+
+
+{
+  "a": true,
+  "b": false
+}
+

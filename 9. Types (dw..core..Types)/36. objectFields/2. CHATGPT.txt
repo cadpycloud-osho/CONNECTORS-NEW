@@ -1,0 +1,148 @@
+objectFields:
+
+
+input:
+
+package com.example.demo.model;
+
+import java.util.List;
+
+public class FieldMetadata {
+    public Key key;
+    public boolean required;
+    public boolean repeated;
+    public String value;
+
+    public FieldMetadata(Key key, boolean required, boolean repeated, String value) {
+        this.key = key;
+        this.required = required;
+        this.repeated = repeated;
+        this.value = value;
+    }
+
+    public static class Key {
+        public Name name;
+        public List<Attribute> attributes;
+
+        public Key(Name name, List<Attribute> attributes) {
+            this.name = name;
+            this.attributes = attributes;
+        }
+    }
+
+    public static class Name {
+        public String localName;
+        public String namespace;
+
+        public Name(String localName, String namespace) {
+            this.localName = localName;
+            this.namespace = namespace;
+        }
+    }
+
+    public static class Attribute {
+        public Name name;
+        public String value;
+        public boolean required;
+
+        public Attribute(Name name, String value, boolean required) {
+            this.name = name;
+            this.value = value;
+            this.required = required;
+        }
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.model.FieldMetadata;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+import static com.example.demo.model.FieldMetadata.*;
+
+@RestController
+public class ObjectFieldsController {
+
+    @GetMapping("/objectFields")
+    public Map<String, List<FieldMetadata>> getObjectFields() {
+        Map<String, List<FieldMetadata>> result = new LinkedHashMap<>();
+
+        // a: ADictionary {_ : String}
+        result.put("a", Arrays.asList(
+                new FieldMetadata(
+                        new Key(new Name("_", null), new ArrayList<>()),
+                        true,
+                        false,
+                        "String"
+                )
+        ));
+
+        // b: ASchema {ns0#name @(ns0#foo: String): {}}
+        result.put("b", Arrays.asList(
+                new FieldMetadata(
+                        new Key(
+                                new Name("name", "http://acme.com"),
+                                Arrays.asList(new FieldMetadata.Attribute(
+                                        new Name("foo", "http://acme.com"),
+                                        "String",
+                                        true
+                                ))
+                        ),
+                        true,
+                        false,
+                        "Object"
+                )
+        ));
+
+        // c: Object → empty
+        result.put("c", new ArrayList<>());
+
+        // d: AUser {name @(foo?: String,l: Number)?: String, lastName*: Number}
+        result.put("d", Arrays.asList(
+                new FieldMetadata(
+                        new Key(
+                                new Name("name", null),
+                                Arrays.asList(
+                                        new FieldMetadata.Attribute(new Name("foo", null), "String", false),
+                                        new FieldMetadata.Attribute(new Name("l", null), "Number", true)
+                                )
+                        ),
+                        false,
+                        false,
+                        "String"
+                ),
+                new FieldMetadata(
+                        new Key(
+                                new Name("lastName", null),
+                                new ArrayList<>()
+                        ),
+                        true,
+                        true,
+                        "Number"
+                )
+        ));
+
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "a": [
+    {"key":{"name":{"localName":"_","namespace":null},"attributes":[]},"required":true,"repeated":false,"value":"String"}
+  ],
+  "b": [
+    {"key":{"name":{"localName":"name","namespace":"http://acme.com"},"attributes":[{"name":{"localName":"foo","namespace":"http://acme.com"},"value":"String","required":true}]},"required":true,"repeated":false,"value":"Object"}
+  ],
+  "c": [],
+  "d": [
+    {"key":{"name":{"localName":"name","namespace":null},"attributes":[{"name":{"localName":"foo","namespace":null},"value":"String","required":false},{"name":{"localName":"l","namespace":null},"value":"Number","required":true}]},"required":false,"repeated":false,"value":"String"},
+    {"key":{"name":{"localName":"lastName","namespace":null},"attributes":[]},"required":true,"repeated":true,"value":"Number"}
+  ]
+}
+

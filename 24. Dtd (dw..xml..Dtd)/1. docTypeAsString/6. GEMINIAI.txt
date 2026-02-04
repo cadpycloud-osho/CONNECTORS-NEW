@@ -1,0 +1,106 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class DtdService {
+
+    private static final String ROOT_NAME = "cXML";
+    private static final String SYSTEM_ID = "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd";
+    private static final String DTD_TYPE = "SYSTEM";
+
+    /**
+     * Mimics DataWeave's docTypeAsString by concatenating the parts 
+     * required for a DTD SYSTEM declaration string.
+     */
+    public String generateDocTypeString() {
+        // Concatenates "rootName" + " SYSTEM " + "systemId"
+        return String.format("%s %s %s", ROOT_NAME, DTD_TYPE, SYSTEM_ID);
+    }
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveController {
+
+    private final DtdService dtdService;
+
+    public DataWeaveController(DtdService dtdService) {
+        this.dtdService = dtdService;
+    }
+
+    @GetMapping("/doctype-string")
+    public String getDocTypeString() {
+        // The output is a raw string, matching the DataWeave output type.
+        return dtdService.generateDocTypeString();
+    }
+}
+
+output:
+
+
+---------------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class DtdService {
+
+    private static final String ROOT_NAME = "html";
+    private static final String PUBLIC_ID = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+    private static final String SYSTEM_ID = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+    private static final String DTD_TYPE = "PUBLIC";
+
+    /**
+     * Mimics DataWeave's docTypeAsString for a PUBLIC DTD declaration string.
+     */
+    public String generatePublicDocTypeString() {
+        // Concatenates "rootName" + " PUBLIC " + "publicId" + " systemId"
+        // Note: Public DTDs require quotation marks around the IDs in the final DTD string, 
+        // but the DataWeave output implies the function handles those if needed for XML. 
+        // We replicate the exact DW output format (no quotes around IDs in the final string).
+        return String.format("%s %s %s %s", ROOT_NAME, DTD_TYPE, PUBLIC_ID, SYSTEM_ID);
+    }
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveController {
+
+    private final DtdService dtdService;
+
+    public DataWeaveController(DtdService dtdService) {
+        this.dtdService = dtdService;
+    }
+
+    @GetMapping("/doctype-public-string")
+    public String getPublicDocTypeString() {
+        // The output is a raw string, matching the DataWeave output.
+        return dtdService.generatePublicDocTypeString();
+    }
+}
+output:
+
+
+"html PUBLIC -//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+
+

@@ -1,0 +1,43 @@
+locationString:
+
+locationString(value: Any): String
+
+locationString(value: Any): String
+Returns the location string of a given value.
+
+
+
+Source
+%dw 2.0
+import * from dw::Runtime
+var a = 123
+output application/json
+---
+locationString(a)
+
+
+DataWeave
+Output
+"var a = 123"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

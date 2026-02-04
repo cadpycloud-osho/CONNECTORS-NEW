@@ -1,0 +1,309 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "customerKey": {
+      "type": "string"
+    },
+    "objectID": {
+      "type": "string"
+    },
+    "contentType": {
+      "type": "string"
+    },
+    "assetType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      }
+    },
+    "name": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "userid": {
+          "type": "string"
+        }
+      }
+    },
+    "createdDate": {
+      "description": "The value is a timestamp.",
+      "type": "string"
+    },
+    "createdBy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "userid": {
+          "type": "string"
+        }
+      }
+    },
+    "modifiedDate": {
+      "description": "The value is a timestamp.",
+      "type": "string"
+    },
+    "modifiedBy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "userid": {
+          "type": "string"
+        }
+      }
+    },
+    "enterpriseId": {
+      "type": "integer"
+    },
+    "memberId": {
+      "type": "integer"
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "thumbnail": {
+      "type": "object",
+      "properties": {
+        "thumbnailUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": "integer"
+        }
+      }
+    },
+    "views":{
+      "type": "object",
+      "properties": {
+        "html": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "type": "object",
+              "properties": {
+
+              }
+            },
+            "modelVersion": {
+              "type": "integer"
+            }
+          }
+        },
+        "text": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "type": "object",
+              "properties": {
+
+              }
+            },
+            "content": {
+              "type": "string"
+            },
+            "modelVersion": {
+              "type": "integer"
+            }
+          }
+        },
+        "subjectline": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "type": "object",
+              "properties": {
+
+              }
+            },
+            "content": {
+              "type": "string"
+            },
+            "modelVersion": {
+              "type": "integer"
+            }
+          }
+        },
+        "preheader": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "type": "object",
+              "properties": {
+
+              }
+            },
+            "modelVersion": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "availableViews": {
+      "type": "array",
+      "items": {
+        "type" : "string"
+      }
+    },
+    "data":{
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "object",
+          "properties": {
+            "options": {
+              "type": "object",
+              "properties": {
+                "characterEncoding": {
+                  "type": "string"
+                }
+              }
+            },
+            "legacy": {
+              "type": "object",
+              "properties": {
+                "legacyId": {
+                  "type": "integer"
+                },
+                "legacyKey": {
+                  "type": "string"
+                },
+                "legacyType": {
+                  "type": "string"
+                },
+                "legacyCategoryId": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "text": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "type": "object",
+              "properties": {
+
+              }
+            },
+            "content": {
+              "type": "string"
+            },
+            "modelVersion": {
+              "type": "integer"
+            }
+          }
+        },
+        "subjectline": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "type": "object",
+              "properties": {
+
+              }
+            },
+            "content": {
+              "type": "string"
+            },
+            "modelVersion": {
+              "type": "integer"
+            }
+          }
+        },
+        "preheader": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "type": "object",
+              "properties": {
+
+              }
+            },
+            "modelVersion": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "legacyData": {
+      "type": "object",
+      "properties": {
+        "legacyId": {
+          "type": "integer"
+        },
+        "legacyKey": {
+          "type": "string"
+        },
+        "legacyType": {
+          "type": "string"
+        },
+        "legacyCategoryId": {
+          "type": "integer"
+        }
+      }
+    },
+    "modelVersion": {
+      "type": "integer"
+    }
+  }
+}

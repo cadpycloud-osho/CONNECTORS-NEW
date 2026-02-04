@@ -1,0 +1,156 @@
+atBeginningOfMonth:
+
+
+example 1:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a ZonedDateTime to the start of its month, preserving the time zone.
+     * This mimics the DataWeave 'atBeginningOfMonth(DateTime)' function.
+     * @param dateTimeString The input date-time string with offset.
+     * @return The resulting date-time string at the first of the month, at midnight.
+     */
+    public static String calculateBeginningOfMonthZoned(String dateTimeString) {
+        // 1. Parse the input string into a ZonedDateTime object
+        // The ISO_OFFSET_DATE_TIME formatter handles the offset (-03:00)
+        ZonedDateTime originalZdt = ZonedDateTime.parse(dateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        // 2. Adjust the date to the first day of the month and the time to midnight
+        ZonedDateTime beginningOfMonthZdt = originalZdt
+            .with(TemporalAdjusters.firstDayOfMonth()) // Sets the day to 01
+            .with(LocalTime.MIN);                       // Sets the time to 00:00:00
+        
+        // 3. Format the result back to the desired output string format
+        return beginningOfMonthZdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351-03:00";
+        String output = calculateBeginningOfMonthZoned(input);
+        
+        System.out.println("--- Scenario 1: ZonedDateTime (with Offset) ---");
+        System.out.println("Input (DW: DateTime):   " + input);
+        System.out.println("Java Output:            " + output);
+    }
+}
+
+
+output:
+
+
+2020-10-01T00:00:00-03:00
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a LocalDateTime to the start of its month.
+     * This mimics the DataWeave 'atBeginningOfMonth(LocalDateTime)' function.
+     * @param dateTimeString The input local date-time string.
+     * @return The resulting local date-time string at the first of the month, at midnight.
+     */
+    public static String calculateBeginningOfMonthLocal(String dateTimeString) {
+        // 1. Parse the input string into a LocalDateTime object
+        LocalDateTime originalLdt = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        // 2. Adjust the date to the first day of the month and the time to midnight
+        LocalDateTime beginningOfMonthLdt = originalLdt
+            .with(TemporalAdjusters.firstDayOfMonth()) // Sets the day to 01
+            .with(LocalTime.MIN);                       // Sets the time to 00:00:00
+        
+        // 3. Format the result back to the desired output string format
+        return beginningOfMonthLdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351";
+        String output = calculateBeginningOfMonthLocal(input);
+        
+        System.out.println("\n--- Scenario 2: LocalDateTime (without Offset) ---");
+        System.out.println("Input (DW: LocalDateTime): " + input);
+        System.out.println("Java Output:               " + output);
+    }
+}
+
+
+output:
+
+2020-10-01T00:00:00
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a LocalDate to the first day of its month.
+     * This mimics the DataWeave 'atBeginningOfMonth(Date)' function.
+     * @param dateString The input date string.
+     * @return The resulting date string at the first of the month.
+     */
+    public static String calculateBeginningOfMonthDate(String dateString) {
+        // 1. Parse the input string into a LocalDate object
+        LocalDate originalDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        // 2. Adjust the date to the first day of the month
+        LocalDate beginningOfMonthDate = originalDate
+            .with(TemporalAdjusters.firstDayOfMonth()); // Sets the day to 01
+        
+        // 3. Format the result back to the desired output string format
+        return beginningOfMonthDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06";
+        String output = calculateBeginningOfMonthDate(input);
+        
+        System.out.println("\n--- Scenario 3: Date (without Time/Offset) ---");
+        System.out.println("Input (DW: Date):          " + input);
+        System.out.println("Java Output:               " + output);
+    }
+}
+
+
+output:
+
+2020-10-01
+
+
+---------------------------------------------------------------
+
+
+
+
+
+

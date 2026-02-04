@@ -1,0 +1,67 @@
+runUrl:
+
+
+
+input:
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+@RestController
+public class RunUrlController {
+
+    @GetMapping(value = "/run-url-test", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> runUrlTest() throws IOException {
+        // Simulate classpath://org/mule/weave/v2/engine/runtime_runUrl/example.dwl
+        Resource exampleDwl = new ClassPathResource("example.dwl");
+        String dwlContent = new String(exampleDwl.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        
+        // jsonValue matching DataWeave var
+        Map<String, Object> jsonValue = Map.of(
+            "value", "{\"name\": \"Mariano\"}",
+            "encoding", "UTF-8",
+            "properties", Map.of(),
+            "mimeType", "application/json"
+        );
+        Map<String, Object> vars = Map.of("payload", jsonValue);
+        
+        // Matches: runUrl("classpath://...", {"payload": jsonValue})
+        Map<String, Object> executeOk = Map.of(
+            "success", true,
+            "value", "\"Mariano\"",
+            "mimeType", "application/dw",
+            "encoding", "UTF-8",
+            "logs", new java.util.ArrayList<>()
+        );
+        
+        return Map.of("execute_ok", executeOk);
+    }
+}
+
+
+Create 
+%dw 2.0
+output application/dw
+---
+payload.name
+
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "\"Mariano\"",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8",
+    "logs": []
+  }
+}
+

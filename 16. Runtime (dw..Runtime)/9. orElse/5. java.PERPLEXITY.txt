@@ -1,0 +1,41 @@
+orElse:
+
+
+input:
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class Main {
+
+    @GetMapping(value = "/try-orelse", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String> tryOrElseTest() {
+        // var user = {}, var otherUser = {name: "DW"}
+        Map<String, String> user = Map.of();
+        Map<String, String> otherUser = Map.of("name", "DW");
+
+        // Matches: try(() -> user.name!) orElse "No User Name"
+        String a = Optional.ofNullable(user)
+                .map(u -> u.get("name"))
+                .orElse("No User Name");
+
+        // Matches: try(() -> otherUser.name) orElse "No User Name"
+        String b = Optional.ofNullable(otherUser)
+                .map(u -> u.get("name"))
+                .orElse("No User Name");
+
+        return Map.of("a", a, "b", b);
+    }
+}
+
+
+output:
+
+{a=No User Name, b=DW}
+
+
+

@@ -1,0 +1,137 @@
+mapLeafValues:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class MapLeafValuesRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapLeafValues")
+            .process(exchange -> {
+                // 1. Setup Input Structure
+                Map<String, Object> nameMap = new HashMap<>();
+                nameMap.put("name", "mariano");
+                nameMap.put("lastName", "achaval");
+
+                Map<String, Object> input = new LinkedHashMap<>();
+                input.put("user", List.of(nameMap));
+                input.put("group", "data-weave");
+
+                // 2. Logic: Recursively map leaf values to Upper Case
+                Object result = mapLeafValues(input);
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Recursive helper to mimic DW mapLeafValues
+     */
+    private Object mapLeafValues(Object node) {
+        if (node instanceof Map) {
+            Map<Object, Object> result = new LinkedHashMap<>();
+            ((Map<?, ?>) node).forEach((k, v) -> {
+                result.put(k, mapLeafValues(v));
+            });
+            return result;
+        } else if (node instanceof List) {
+            return ((List<?>) node).stream()
+                .map(this::mapLeafValues)
+                .collect(Collectors.toList());
+        } else if (node instanceof String) {
+            // Leaf Node logic: Transform the value
+            return ((String) node).toUpperCase();
+        }
+        return node;
+    }
+}
+
+
+output:
+
+{
+   "user": [
+     {
+       "name": "MARIANO",
+       "lastName": "ACHAVAL"
+     }
+   ],
+   "group": "DATA-WEAVE"
+ }
+
+--------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class ConditionalLeafMapRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapWithContext")
+            .process(exchange -> {
+                // 1. Setup Input
+                Map<String, Object> input = new LinkedHashMap<>();
+                input.put("name", "Mariano");
+                input.put("test", List.of(1, 2, 3));
+
+                // 2. Process with path context ("Root" is the initial state)
+                Object result = mapLeafValues(input, "Object");
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private Object mapLeafValues(Object node, String currentPathType) {
+        if (node instanceof Map) {
+            Map<Object, Object> result = new LinkedHashMap<>();
+            ((Map<?, ?>) node).forEach((k, v) -> {
+                // Recursively process children, telling them their parent is an Object
+                result.put(k, mapLeafValues(v, "Object"));
+            });
+            return result;
+        } else if (node instanceof List) {
+            return ((List<?>) node).stream()
+                .map(item -> mapLeafValues(item, "Array")) // Parent is an Array
+                .collect(Collectors.toList());
+        } else {
+            // LEAF LOGIC: Replicating the 'if(isObjectType(path))' logic
+            if ("Object".equals(currentPathType)) {
+                return "***";
+            } else if ("Array".equals(currentPathType)) {
+                return "In an array";
+            } else {
+                return "Is an attribute";
+            }
+        }
+    }
+}
+
+
+output:
+
+{
+  "name": "***",
+  "test": [
+    "In an array",
+    "In an array",
+    "In an array"
+  ]
+}
+
+

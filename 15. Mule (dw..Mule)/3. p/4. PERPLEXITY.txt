@@ -1,0 +1,48 @@
+p:
+
+Spring Boot uses @Value injection to access server port and logs it matching Mule::p('http.port').
+
+input:
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@SpringBootApplication
+public class PortLoggerApp {
+    public static void main(String[] args) {
+        SpringApplication.run(PortLoggerApp.class, args);
+    }
+}
+
+@Configuration
+class SimpleFlow {
+    private static final Logger logger = LoggerFactory.getLogger(SimpleFlow.class);
+    
+    @Value("${local.server.port:8080}")
+    private int httpPort;
+    
+    @Bean
+    public Runnable simpleFlow() {
+        return () -> {
+            // Matches: <logger level="INFO" message="#[Mule::p('http.port')]"/>
+            logger.info("HTTP Port: {}", httpPort);
+        };
+    }
+}
+
+
+output:
+
+INFO: HTTP Port: 8080 (or actual random port)
+
+
+Set http.port=9090 system property for custom port:
+
+bash
+java -Dhttp.port=9090 PureJavaSimpleFlow
+Output: INFO: HTTP Port: 9090

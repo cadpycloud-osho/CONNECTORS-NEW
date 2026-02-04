@@ -1,0 +1,300 @@
+file:
+
+
+example 1:
+
+
+input:
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    // Hardcoded XML content to simulate the file content
+    private static final String XML_CONTENT = """
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>""";
+    
+    // Generates a map-like structure mimicking the DataWeave application/dw output
+    public static String generateFilePartStructure() {
+        
+        String fileName = "orders.xml";
+        String mimeType = "application/xml";
+        String partName = "file";
+        
+        // The content needs to be escaped for the final string literal in the DW structure.
+        // We replace newlines with '\n' and remove carriage returns.
+        String escapedContent = XML_CONTENT.replace("\n", "\\n").replace("\r", "");
+
+        // Mimic the DataWeave output structure
+        String output = String.format(
+            "{\n" +
+            "  headers: {\n" +
+            "    \"Content-Type\": \"%s\",\n" +
+            "    \"Content-Disposition\": {\n" +
+            "      name: \"%s\",\n" +
+            "      filename: \"%s\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  content: \"%s\"\n" +
+            "}", 
+            mimeType, partName, fileName, escapedContent
+        );
+        
+        return output;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Simulated DataWeave Output ---");
+        System.out.println(generateFilePartStructure());
+    }
+}
+
+output:
+
+--- Pure Java Simulated DataWeave Output ---
+{
+  headers: {
+    "Content-Type": "application/xml",
+    "Content-Disposition": {
+      name: "file",
+      filename: "orders.xml"
+    }
+  },
+  content: "<orders>\n  <order>\n    <item>\n      <id>1001</id>\n      <qty>1</qty>\n      <price>$100</price>\n    </item>\n    <item>\n      <id>2001</id>\n      <qty>2</qty>\n      <price>$50</price>\n    </item>\n  </order>\n</orders>"
+}
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private static final String MIME_TYPE = "application/xml";
+    private static final String PART_NAME = "file";
+    private static final String TARGET_FILENAME = "myorders.xml";
+
+    // Hardcoded XML content to simulate the file content
+    private static final String XML_CONTENT = """
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>""";
+    
+    // Generates the raw multipart/form-data output
+    public static String generateRawMultipartOutput() {
+        try {
+            String dynamicBoundaryValue = "JavaBoundary-" + System.nanoTime();
+            String boundary = dynamicBoundaryValue;
+            String CRLF = "\r\n";
+            
+            // 1. Read Content (Simulated)
+            String xmlContent = XML_CONTENT;
+            
+            // 2. Assembly
+            StringBuilder body = new StringBuilder();
+
+            // Append boundary
+            body.append("--").append(boundary).append(CRLF);
+            
+            // Append headers
+            body.append("Content-Type: ").append(MIME_TYPE).append(CRLF);
+            body.append("Content-Disposition: form-data; name=\"").append(PART_NAME)
+                .append("\"; filename=\"").append(TARGET_FILENAME).append("\"").append(CRLF);
+            body.append(CRLF); // Header/Content separator
+            
+            // Append content
+            body.append(xmlContent).append(CRLF);
+
+            // Append closing boundary
+            body.append("--").append(boundary).append("--").append(CRLF);
+            
+            // Replace the dynamic boundary with the <TIMESTAMP> placeholder 
+            return body.toString().replace(dynamicBoundaryValue, "<TIMESTAMP>");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error during generation: " + e.getMessage();
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Simulated Multipart Output ---");
+        System.out.println(generateRawMultipartOutput());
+    }
+}
+
+
+
+output:
+
+--- Pure Java Simulated Multipart Output ---
+--JavaBoundary-<TIMESTAMP>
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+--JavaBoundary-<TIMESTAMP>--
+
+-------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed file path constants
+    private static final String PART_NAME = "myFile";
+    private static final String TARGET_FILENAME = "partMyClients.json";
+    private static final String MIME_TYPE = "application/json";
+
+    // Hardcoded JSON content to simulate the file content
+    private static final String JSON_CONTENT = """
+{
+    "clients": {
+        "client": [
+            { "id": 1, "name": "Mariano" },
+            { "id": 2, "name": "Shoki" }
+        ]
+    }
+}""";
+    
+    // Generates the raw multipart/form-data output
+    public static String generateRawMultipartOutput() {
+        try {
+            String dynamicBoundaryValue = "JavaBoundary-" + System.nanoTime();
+            String boundary = dynamicBoundaryValue;
+            String CRLF = "\r\n";
+            
+            // 2. Assembly
+            StringBuilder body = new StringBuilder();
+
+            // Append boundary
+            body.append("--").append(boundary).append(CRLF);
+            
+            // Append headers
+            body.append("Content-Type: ").append(MIME_TYPE).append(CRLF);
+            body.append("Content-Disposition: form-data; name=\"").append(PART_NAME)
+                .append("\"; filename=\"").append(TARGET_FILENAME).append("\"").append(CRLF);
+            body.append(CRLF); // Header/Content separator
+            
+            // Append hardcoded content
+            body.append(JSON_CONTENT).append(CRLF);
+
+            // Append closing boundary
+            body.append("--").append(boundary).append("--").append(CRLF);
+            
+            // Replace the dynamic boundary with the <TIMESTAMP> placeholder 
+            return body.toString().replace(dynamicBoundaryValue, "<TIMESTAMP>");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error during generation: " + e.getMessage();
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Simulated Multipart Output ---");
+        System.out.println(generateRawMultipartOutput());
+    }
+}
+
+
+
+output:
+
+--- Pure Java Simulated Multipart Output ---
+--JavaBoundary-<TIMESTAMP>
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+    "clients": {
+        "client": [
+            { "id": 1, "name": "Mariano" },
+            { "id": 2, "name": "Shoki" }
+        ]
+    }
+}
+--JavaBoundary-<TIMESTAMP>--
+
+-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

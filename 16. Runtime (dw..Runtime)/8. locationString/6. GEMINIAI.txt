@@ -1,0 +1,39 @@
+locationString:
+
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+public class LocationStringService implements CommandLineRunner {
+
+    // Manual storage of the source code snippet (Replicating the literal source data)
+    private static final String VARIABLE_A_SOURCE_DEFINITION = "var a = 123";
+
+    /**
+     * Simulates the dw::Runtime::locationString(a) function.
+     * Since the source code is lost in compilation, we return the stored string.
+     * In a full DW SDK environment, this would involve parsing and accessing the AST.
+     * @return The source code snippet of the variable 'a'.
+     */
+    public String getLocationStringOfVariableA() {
+        return VARIABLE_A_SOURCE_DEFINITION;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("--- Spring Boot LocationString Simulation ---");
+        System.out.println(getLocationStringOfVariableA());
+    }
+}
+
+output:
+
+var a = 123
+
+

@@ -1,0 +1,64 @@
+isAttributeType:
+
+
+input:
+
+import java.util.*;
+
+public class IsAttributeTypeExample {
+
+    public static void main(String[] args) {
+
+        // Example arrays of tree nodes
+        List<Map<String, Object>> aList = Arrays.asList(
+                node("OBJECT_TYPE", "user", null),
+                node("ATTRIBUTE_TYPE", "name", null)
+        );
+
+        List<Map<String, Object>> bList = Arrays.asList(
+                node("OBJECT_TYPE", "user", null),
+                node("ARRAY_TYPE", "name", null)
+        );
+
+        List<Map<String, Object>> cList = Arrays.asList(
+                node("ATTRIBUTE_TYPE", "name", null)
+        );
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", isAttributeType(aList));
+        output.put("b", isAttributeType(bList));
+        output.put("c", isAttributeType(cList));
+
+        System.out.println(output);
+    }
+
+    private static Map<String, Object> node(String kind, Object selector, String namespace) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("kind", kind);
+        map.put("selector", selector);
+        map.put("namespace", namespace);
+        return map;
+    }
+
+    private static boolean isAttributeType(List<Map<String, Object>> nodes) {
+        for (Map<String, Object> node : nodes) {
+            if ("ATTRIBUTE_TYPE".equals(node.get("kind"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false,
+  "c": true
+}
+
+
+

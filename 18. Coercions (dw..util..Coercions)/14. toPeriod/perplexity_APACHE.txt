@@ -1,0 +1,49 @@
+toPeriod:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.Period;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToPeriodRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // toPeriodEx1: toPeriod("P1D")
+                    Period period1 = Period.parse("P1D");
+                    result.put("toPeriodEx1", "P1D"); // ISO-8601 string representation
+                    
+                    // toPeriodEx2: toPeriod("PT1H1M")
+                    Duration duration1 = Duration.parse("PT1H1M");
+                    result.put("toPeriodEx2", "PT1H1M"); // ISO-8601 string representation
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+output:
+
+
+{
+  "toPeriodEx1": "P1D",
+  "toPeriodEx2": "PT1H1M"
+}
+
+
+

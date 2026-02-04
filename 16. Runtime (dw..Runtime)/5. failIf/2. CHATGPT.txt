@@ -1,0 +1,94 @@
+failIf:
+
+examples 1:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class FailIfController {
+
+    @GetMapping("/failIfExample")
+    public ResponseEntity<Map<String, String>> failIfExample() {
+
+        Map<String, Object> result = Collections.emptyMap(); // equivalent to {}
+
+        // Equivalent of: failIf(isEmpty(result))
+        if (result.isEmpty()) {
+            throw new RuntimeException("Failed because result is empty");
+        }
+
+        return new ResponseEntity<>(Collections.singletonMap("result", "SUCCESS"), HttpStatus.OK);
+    }
+}
+
+
+output:
+
+When result is empty:
+HTTP 500 Internal Server Error
+Body:
+"Failed because result is empty"
+
+When result has content:
+{
+  "result": "SUCCESS"
+}
+----------------------------------------------------------------
+
+
+
+examples 2:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class FailIfController {
+
+    @GetMapping("/failIfNonEmpty")
+    public ResponseEntity<Map<String, Object>> failIfNonEmpty() {
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", "test"); // equivalent to {"a":"test"}
+
+        // failIf(isEmpty($)) → throw if empty
+        if (result.isEmpty()) {
+            throw new RuntimeException("Failed because result is empty");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", result);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+}
+
+
+output:
+
+{
+  "result": {
+    "a": "test"
+  }
+}
+

@@ -1,0 +1,42 @@
+round:
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class RoundingExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RoundingExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        System.out.println("--- DataWeave Rounding Equivalent Output ---");
+        
+        // 1. round(1.2) -> 1
+        long result1 = Math.round(1.2); 
+
+        // 2. round(4.6) -> 5
+        long result2 = Math.round(4.6); 
+
+        // 3. round(3.5) -> 4 (DataWeave's default behavior, matched by Java's Math.round())
+        long result3 = Math.round(3.5); 
+
+        // The DWL output is an array of numbers (Integers in JSON).
+        // Java's Math.round() returns a 'long' for 'double' input, 
+        // but it is an integer type, so we collect them in a list.
+        List<Long> finalOutput = Arrays.asList(result1, result2, result3);
+        
+        System.out.println("DWL Equivalent Output: " + finalOutput); 
+    }
+}
+
+output:
+
+[1, 5, 4]

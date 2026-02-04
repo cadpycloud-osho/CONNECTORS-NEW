@@ -1,0 +1,34 @@
+isAnyType:
+
+input:
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsAnyTypeExample {
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isAnyType("Any"));
+        result.put("b", isAnyType("Any"));
+        result.put("c", isAnyType("String"));
+
+        System.out.println(result);
+    }
+
+    public static boolean isAnyType(String type) {
+        if (type == null) return false;
+        return type.equals("Any");
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

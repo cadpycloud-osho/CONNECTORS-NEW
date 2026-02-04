@@ -1,0 +1,65 @@
+prop:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.*;
+
+public class DwPropTest {
+
+    // Simulate Java System property access (equivalent to Mule prop("user.timezone"))
+    static String prop(String key) {
+        return System.getProperty(key, "unknown");
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new PropRoute());
+        context.start();
+
+        // Set test timezone for consistent output
+        System.setProperty("user.timezone", "America/Los_Angeles");
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class PropRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Simulate: { "props" : prop("user.timezone") }
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        String timezone = prop("user.timezone");
+                        result.put("props", timezone);
+
+                        // Format output to match DataWeave application/dw style
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+{"props":"America/Los_Angeles"}
+

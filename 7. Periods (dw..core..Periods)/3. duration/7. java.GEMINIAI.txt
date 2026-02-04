@@ -1,0 +1,85 @@
+duration:
+
+
+input:
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Define the input ZonedDateTime (UTC)
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        
+        // Formatter for ZonedDateTime output in ISO 8601 format
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        // --- Date/Time Arithmetic ---
+        
+        // dayAfterDateTime: |2020-10-05T20:22:34.385Z| + duration({days: 1})
+        ZonedDateTime dayAfterDateTime = baseDateTime.plusDays(1);
+        
+        // dayAndHourBeforeDateTime: |2020-10-05T20:22:34.385Z| - duration({days: 1, hours: 1})
+        Duration oneDayOneHour = Duration.ofDays(1).plusHours(1);
+        ZonedDateTime dayAndHourBeforeDateTime = baseDateTime.minus(oneDayOneHour);
+        
+        // pointInTimeBefore: |2020-10-05T20:22:34.385Z| - duration({days: 1, hours: 1, minutes: 20, seconds: 10})
+        Duration complexDuration = Duration.ofDays(1)
+                                           .plusHours(1)
+                                           .plusMinutes(20)
+                                           .plusSeconds(10);
+        ZonedDateTime pointInTimeBefore = baseDateTime.minus(complexDuration);
+        
+        // --- Duration Construction and Extraction ---
+
+        // emptyDuration: duration({})
+        Duration emptyDuration = Duration.ZERO;
+
+        // constructDuration: duration({days:4, hours:11, minutes:28})
+        // DW calculates total hours: 4 days (96h) + 11 hours = 107 hours.
+        Duration constructDuration = Duration.ofDays(4).plusHours(11).plusMinutes(28);
+
+        // selectHoursFromDuration: duration({days:4, hours:11, minutes:28}).hours
+        // Java's toHoursPart() extracts the hours component (0-23)
+        Duration hoursDuration = Duration.ofHours(11);
+        long selectHoursFromDuration = hoursDuration.toHoursPart(); // 11
+
+        // decimalAsPeriod: duration({seconds: 30.5})
+        // 30.5 seconds = 30500 milliseconds
+        Duration decimalAsPeriod = Duration.ofMillis(30500);
+
+        // addNegativeValue: duration({ minutes : 1 }) + duration({ seconds : -1 })
+        // (60 seconds) + (-1 second) = 59 seconds
+        Duration combinedDuration = Duration.ofMinutes(1).plusSeconds(-1);
+        long addNegativeValue = combinedDuration.getSeconds(); // 59
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        // Output formatting: DW omits ".000" if milliseconds are zero, so we use replace() to match
+        System.out.println("  \"dayAfterDateTime\": \"" + dayAfterDateTime.format(formatter).replace(".000Z", "Z") + "\",");
+        System.out.println("  \"dayAndHourBeforeDateTime\": \"" + dayAndHourBeforeDateTime.format(formatter).replace(".000Z", "Z") + "\",");
+        System.out.println("  \"pointInTimeBefore\": \"" + pointInTimeBefore.format(formatter).replace(".000Z", "Z") + "\",");
+        System.out.println("  \"emptyDuration\": \"" + emptyDuration.toString() + "\",");
+        System.out.println("  \"constructDuration\": \"" + constructDuration.toString() + "\",");
+        System.out.println("  \"selectHoursFromDuration\": " + selectHoursFromDuration + ",");
+        System.out.println("  \"decimalAsPeriod\": \"" + decimalAsPeriod.toString() + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "dayAfterDateTime": "2020-10-06T20:22:34.385Z",
+  "dayAndHourBeforeDateTime": "2020-10-04T19:22:34.385Z",
+  "pointInTimeBefore": "2020-10-04T19:02:24.385Z",
+  "emptyDuration": "PT0S",
+  "constructDuration": "PT107H28M",
+  "selectHoursFromDuration": 11,
+  "decimalAsPeriod": "PT30.5S",
+  "addNegativeValue": 59
+}

@@ -1,0 +1,31 @@
+matches:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.regex.*;
+
+@RestController
+public class RegexController {
+
+    @GetMapping("/regex-check")
+    public List<Boolean> checkRegex() {
+        String value = "admin123";
+
+        boolean firstCheck = Pattern.matches("a.*\\d+", value);
+        boolean secondCheck = Pattern.matches("b.+", value);
+
+        return Arrays.asList(firstCheck, secondCheck);
+    }
+}
+
+
+OUTPUT:
+
+[ true, false ]
+
+

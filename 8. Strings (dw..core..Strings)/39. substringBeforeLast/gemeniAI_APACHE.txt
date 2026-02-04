@@ -1,0 +1,45 @@
+substringBeforeLast:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringBeforeLastRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getDirectoryPath")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides 1:1 parity with DW
+                results.put("a", StringUtils.substringBeforeLast(null, "'"));
+                results.put("b", StringUtils.substringBeforeLast("", "-"));
+                results.put("c", StringUtils.substringBeforeLast("abc", "b"));
+                results.put("d", StringUtils.substringBeforeLast("abcba", "b"));
+                results.put("e", StringUtils.substringBeforeLast("abc", "d"));
+                results.put("f", StringUtils.substringBeforeLast("abc", ""));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "abc",
+  "e": "",
+  "f": "ab"
+}
+
+
+

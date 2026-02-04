@@ -1,0 +1,31 @@
+countCharactersBy:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CountNumericController {
+    
+    @GetMapping(value = "/count-numeric", produces = MediaType.APPLICATION_JSON_VALUE)
+    public int countNumericCharacters() {
+        String input = "42 = 11 * 2 + 20";
+        return (int) input.chars()
+                         .mapToObj(c -> (char) c)
+                         .filter(Character::isDigit)
+                         .count();
+    }
+}
+
+
+output:
+
+
+7
+

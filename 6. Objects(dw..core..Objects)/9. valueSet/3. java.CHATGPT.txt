@@ -1,0 +1,37 @@
+valueSet:
+
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Input map
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", true);
+        map.put("b", 1);
+
+        // Extract values as a list
+        List<Object> valueSet = new ArrayList<>(map.values());
+
+        // Wrap in a result map like DW output
+        Map<String, Object> result = new HashMap<>();
+        result.put("valueSet", valueSet);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{valueSet=[true, 1]}
+
+

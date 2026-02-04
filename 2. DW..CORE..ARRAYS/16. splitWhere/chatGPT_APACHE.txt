@@ -1,0 +1,41 @@
+splitWhere:
+
+
+input:
+
+from("direct:splitWhereExample")
+.process(exchange -> {
+    List<String> users = List.of("Mariano", "Leandro", "Julian", "Tomo");
+
+    // Find the index where the condition is true
+    int splitIndex = 0;
+    for (int i = 0; i < users.size(); i++) {
+        if (users.get(i).startsWith("Jul")) {
+            splitIndex = i;
+            break;
+        }
+    }
+
+    // Split the list at that index
+    List<String> left = users.subList(0, splitIndex);
+    List<String> right = users.subList(splitIndex, users.size());
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("l", left);
+    result.put("r", right);
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+
+output:
+
+{
+  "l": ["Mariano", "Leandro"],
+  "r": ["Julian", "Tomo"]
+}
+
+
+

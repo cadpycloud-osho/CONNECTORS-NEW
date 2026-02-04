@@ -1,0 +1,61 @@
+read:
+
+read(stringToParse: String | Binary, contentType: String = "application/dw", readerProperties: Object = {}): Any
+
+read(stringToParse: String | Binary, contentType: String = "application/dw", readerProperties: Object = {}): Any
+Reads a string or binary and returns parsed content.
+
+This function can be useful if the reader cannot determine the content type by default.
+
+
+
+
+
+Source
+%dw 2.0
+output application/xml
+---
+read('{ "hello" : "world" }','application/json')
+
+dw
+Output
+<?xml version='1.0' encoding='UTF-8'?><hello>world</hello>
+
+
+-----------------------------------------------------------
+
+
+Source
+%dw 2.0
+var myVar = "Some, Body"
+output application/json
+---
+read(myVar,"application/csv",{header:false})[0]
+
+DataWeave
+Output
+{ "column_0": "Some", "column_1": " Body" }
+
+
+-----------------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/xml
+---
+{
+   "XML" : read("<prices><basic>9.99</basic></prices>",
+                "application/xml",
+                { indexedReader: "false" })."prices"
+}
+
+DataWeave
+Output
+<?xml version='1.0' encoding='UTF-8'?>
+<XML>
+  <basic>9.99</basic>
+</XML>
+
+
+

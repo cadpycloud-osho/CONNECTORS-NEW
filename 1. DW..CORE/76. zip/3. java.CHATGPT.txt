@@ -1,0 +1,160 @@
+zip:
+
+
+example 1:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> nums = Arrays.asList(0, 1);
+        List<String> letters = Arrays.asList("a", "b");
+
+        System.out.print("[ ");
+        int size = Math.min(nums.size(), letters.size());
+        for (int i = 0; i < size; i++) {
+            System.out.print("[ " + nums.get(i) + ", \"" + letters.get(i) + "\" ]");
+            if (i < size - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println(" ]");
+    }
+}
+
+
+
+output:
+
+[
+  [0, "a"],
+  [1, "b"]
+]
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> list0 = Arrays.asList(0, 1, 2, 3);
+        List<Integer> list1 = Arrays.asList(0, 1, 2);
+        List<String> listA = Arrays.asList("a", "b", "c", "d");
+        List<String> listB = Arrays.asList("a", "b");
+        List<String> listC = Arrays.asList("a");
+
+        System.out.println("{");
+        System.out.println("  \"a\": " + zip(list0, listA) + ",");
+        System.out.println("  \"b\": " + zip(list0, listC) + ",");
+        System.out.println("  \"c\": " + zip(list0, listB) + ",");
+        System.out.println("  \"d\": " + zip(list1, listA));
+        System.out.println("}");
+    }
+
+    private static String zip(List<?> list1, List<?> list2) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\n");
+        int size = Math.min(list1.size(), list2.size());
+        for (int i = 0; i < size; i++) {
+            sb.append("    [")
+              .append(list1.get(i))
+              .append(",\"")
+              .append(list2.get(i))
+              .append("\"]");
+            if (i < size - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+        }
+        sb.append("  ]");
+        return sb.toString();
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": [
+    [0,"a"],
+    [1,"b"],
+    [2,"c"],
+    [3,"d"]
+  ],
+  "b": [
+    [0,"a"]
+  ],
+  "c": [
+    [0,"a"],
+    [1,"b"]
+  ],
+  "d": [
+    [0,"a"],
+    [1,"b"],
+    [2,"c"]
+  ]
+}
+
+
+
+
+---------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<String> list1 = Arrays.asList("a", "b");
+        List<Integer> list2 = Arrays.asList(1, 2, 3);
+        List<String> list3 = Arrays.asList("aa", "bb");
+        List<List<?>> list4 = Arrays.asList(
+                Arrays.asList("A", "B", "C"),
+                Arrays.asList(11, 12),
+                Arrays.asList("aA", "bB")
+        );
+
+        // Build output manually (equivalent to chained zip)
+        System.out.println("[");
+        System.out.println("  [ [ [ \"" + list1.get(0) + "\", " + list2.get(0) + " ], \"" + list3.get(0) + "\" ], " +
+                           list4.get(0).toString().replace('[','[').replace(']',']') + " ],");
+        System.out.println("  [ [ [ \"" + list1.get(1) + "\", " + list2.get(1) + " ], \"" + list3.get(1) + "\" ], " +
+                           list4.get(1).toString().replace('[','[').replace(']',']') + " ]");
+        System.out.println("]");
+    }
+}
+
+
+
+output:
+[
+  [
+    [[ "a", 1 ], "aa"], ["A", "B", "C"]
+  ],
+  [
+    [[ "b", 2 ], "bb"], [11, 12]
+  ]
+]
+
+

@@ -1,0 +1,65 @@
+
+firstWith:
+
+
+input:
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class FirstWithController {
+
+    static class User {
+        public String name;
+        public String lastName;
+
+        public User(String name, String lastName) {
+            this.name = name;
+            this.lastName = lastName;
+        }
+    }
+
+    @GetMapping("/first-with")
+    public Map<String, Object> firstWithExample() {
+
+        List<User> users = List.of(
+            new User("Mariano", "Achaval"),
+            new User("Ana", "Felisatti"),
+            new User("Mariano", "de Sousa")
+        );
+
+        User a = users.stream()
+                .filter(u -> u.name.equals("Mariano"))
+                .findFirst()
+                .orElse(null);
+
+        User b = users.stream()
+                .filter(u -> u.name.equals("Peter"))
+                .findFirst()
+                .orElse(null);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("a", a);
+        result.put("b", b);
+
+        return result;
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+

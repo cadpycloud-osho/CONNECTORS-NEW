@@ -1,0 +1,61 @@
+fromBase64:
+
+
+INPUT:
+
+
+import java.util.Base64;
+import java.util.Arrays;
+
+public class FromBase64Example {
+
+    /**
+     * Replicates DataWeave's fromBase64(payload) function.
+     * Decodes a Base64-encoded string into its raw byte array representation.
+     *
+     * @param base64String The Base64 encoded string.
+     * @return The raw byte array.
+     */
+    public static byte[] decodeBase64(String base64String) {
+        // Use the standard Java Base64 decoder
+        return Base64.getDecoder().decode(base64String);
+    }
+
+    public static void main(String[] args) {
+        
+        // --- Example 1: Decoding a simple string "Hello" ---
+        // Base64 for "Hello": SGVsbG8=
+        String inputBase64_1 = "SGVsbG8=";
+        byte[] rawBytes1 = decodeBase64(inputBase64_1);
+        
+        // Convert raw bytes to a String for human-readable output demonstration
+        String decodedString1 = new String(rawBytes1);
+        
+        System.out.println("--- Example 1: Decoding 'Hello' ---");
+        System.out.println("Input (Base64 Payload): " + inputBase64_1);
+        System.out.println("Output (Raw Bytes - interpreted as String): " + decodedString1);
+        System.out.println("Output (Raw Bytes Hex): " + bytesToHex(rawBytes1));
+        System.out.println();
+
+
+        // --- Example 2: Decoding a sample binary data (e.g., from our previous CAFEABCD example) ---
+        // Base64 for 0xCAFEABCD: yv6rzQ==
+        String inputBase64_2 = "yv6rzQ==";
+        byte[] rawBytes2 = decodeBase64(inputBase64_2);
+        
+        System.out.println("--- Example 2: Decoding Sample Binary Data ---");
+        System.out.println("Input (Base64 Payload): " + inputBase64_2);
+        System.out.println("Output (Raw Bytes Hex): " + bytesToHex(rawBytes2));
+    }
+
+    // Helper method to display byte array as hexadecimal string (0xCA, 0xFE, etc.)
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X ", b));
+        }
+        return sb.toString().trim();
+    }
+}
+
+

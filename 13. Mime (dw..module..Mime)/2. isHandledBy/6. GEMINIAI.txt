@@ -1,0 +1,136 @@
+isHandledBy:
+
+<dependency>
+    <groupId>jakarta.mail</groupId>
+    <artifactId>jakarta.mail-api</artifactId>
+    <version>2.1.3</version> 
+</dependency>
+input:
+
+import java.util.Map;
+import jakarta.mail.internet.ContentType;
+import jakarta.mail.internet.ParameterList;
+
+// Record/POJO structure for a MIME type's components
+public record MimeResult(
+    String type, 
+    String subtype, 
+    Map<String, String> parameters
+) {
+    // Helper to create ContentType for the matcher logic
+    public ContentType toContentType() {
+        ParameterList paramList = new ParameterList();
+        if (parameters != null) {
+            parameters.forEach((k, v) -> paramList.set(k, v));
+        }
+        return new ContentType(type, subtype, paramList);
+    }
+}
+import jakarta.mail.internet.ContentType;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MimeService {
+
+    /**
+     * Custom implementation of DataWeave's dw::module::Mime::isHandledBy(source, target).
+     * Determines if a source MIME type is handled by a target MIME type.
+     * The rule is: The target type must be at least as specific as the source type.
+     *
+     * @param source The MIME type being handled (e.g., application/json).
+     * @param target The MIME type acting as the handler (e.g., */*).
+     * @return true if the source is handled by the target, false otherwise.
+     */
+    public boolean isHandledBy(MimeResult source, MimeResult target) {
+        
+        // 1. Convert MimeResult to ContentType for parsing utility
+        ContentType sourceCt = source.toContentType();
+        ContentType targetCt = target.toContentType();
+
+        // --- Type Matching Logic (Main Rule: Target must cover Source) ---
+
+        // 1a. Primary Type Check (e.g., application vs application)
+        String sourceType = sourceCt.getPrimaryType();
+        String targetType = targetCt.getPrimaryType();
+        
+        // If the target type is not a wildcard and doesn't match the source type, it fails.
+        if (!targetType.equals("*") && !targetType.equals(sourceType)) {
+            return false;
+        }
+
+        // 1b. Subtype Check (e.g., json vs json, or * vs json)
+        String sourceSubtype = sourceCt.getSubType();
+        String targetSubtype = targetCt.getSubType();
+        
+        // If the target subtype is not a wildcard and doesn't match the source subtype, it fails.
+        // This handles cases like: isHandledBy(JSON, MULTIPART) (json != form-data) -> false
+        if (!targetSubtype.equals("*") && !targetSubtype.equals(sourceSubtype)) {
+            
+            // Handle Structured Suffix matching (e.g., *+xml vs soap+xml)
+            if (targetSubtype.startsWith("*+")) {
+                String targetSuffix = targetSubtype.substring(2);
+                if (sourceSubtype.endsWith("+" + targetSuffix)) {
+                    // Example g: *+xml matches soap+xml
+                    return true;
+                }
+            }
+            // If no match found, standard failure
+            return false;
+        }
+        
+        // Note: The DataWeave function ignores parameter comparison, so we skip it here.
+        
+        // If all checks pass (type and subtype either match or target is a wildcard), return true.
+        return true;
+    }
+}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class MimeController {
+
+    private final MimeService mimeService;
+
+    public MimeController(MimeService mimeService) {
+        this.mimeService = mimeService;
+    }
+
+    @GetMapping("/test-ishandledby")
+    public Map<String, Boolean> testIsHandledBy() {
+        
+        // Define MimeResults matching the DataWeave vars
+        MimeResult JSON = new MimeResult("application", "json", Map.of());
+        MimeResult MULTIPART = new MimeResult("multipart", "form-data", Map.of("boundary", "my-boundary"));
+        MimeResult ALL = new MimeResult("*", "*", Map.of());
+        MimeResult APP_WILDCARD_JSON = new MimeResult("*", "json", Map.of());
+        MimeResult APPLICATION_WILDCARD = new MimeResult("application", "*", Map.of());
+        MimeResult WILDCARD_XML = new MimeResult("application", "*+xml", Map.of());
+        MimeResult SOAP_XML = new MimeResult("application", "soap+xml", Map.of());
+
+        // Execute tests matching the DataWeave output structure
+        return Map.of(
+            "a", mimeService.isHandledBy(JSON, JSON), // true
+            "b", mimeService.isHandledBy(JSON, APP_WILDCARD_JSON), // true (Target subtype is json)
+            "c", mimeService.isHandledBy(JSON, APPLICATION_WILDCARD), // true
+            "d", mimeService.isHandledBy(MULTIPART, ALL), // true
+            "e", mimeService.isHandledBy(ALL, MULTIPART), // false (Target is too specific)
+            "f", mimeService.isHandledBy(MULTIPART, JSON), // false (Types don't match)
+            "g", mimeService.isHandledBy(SOAP_XML, WILDCARD_XML) // true (Structured Suffix Match)
+        );
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": true
+}
+

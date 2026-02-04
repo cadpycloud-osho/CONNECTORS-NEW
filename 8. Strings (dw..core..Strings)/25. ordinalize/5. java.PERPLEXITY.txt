@@ -1,0 +1,41 @@
+ordinalize:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + ordinalize(1) + "\",");
+        System.out.println("  \"b\": \"" + ordinalize(2) + "\",");
+        System.out.println("  \"c\": \"" + ordinalize(5) + "\",");
+        System.out.println("  \"d\": \"" + ordinalize(103) + "\"");
+        System.out.println("}");
+    }
+    
+    private static String ordinalize(int number) {
+        String numStr = String.valueOf(number);
+        char lastDigit = numStr.charAt(numStr.length() - 1);
+        
+        if (lastDigit >= '1' && lastDigit <= '3') {
+            switch (lastDigit) {
+                case '1': return numStr + "st";
+                case '2': return numStr + "nd";
+                case '3': return numStr + "rd";
+            }
+        }
+        return numStr + "th";
+    }
+}
+
+
+output:
+
+
+
+{
+  "a": "1st",
+  "b": "2nd",
+  "c": "5th",
+  "d": "103rd"
+}

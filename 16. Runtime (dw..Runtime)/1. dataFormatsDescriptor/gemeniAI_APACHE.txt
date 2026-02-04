@@ -1,0 +1,73 @@
+dataFormatsDescriptor:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.model.DataFormatDefinition;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class DataFormatDescriptorProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Access the registry or model to get defined data formats
+        Map<String, DataFormatDefinition> dataFormats = exchange.getContext()
+                                                               .getModelReifierFactory()
+                                                               .getRouteFilter() // Mocking the discovery logic
+                                                               .getContext()
+                                                               .adapt(org.apache.camel.model.ModelCamelContext.class)
+                                                               .getDataFormats();
+
+        // Map the internal Camel model to a descriptor format
+        var output = dataFormats.entrySet().stream().map(entry -> {
+            return Map.of(
+                "id", entry.getKey(),
+                "type", entry.getValue().getDataFormatName(),
+                "properties", entry.getValue().getProperties()
+            );
+        }).collect(Collectors.toList());
+
+        exchange.getMessage().setBody(output);
+    }
+}
+
+output:
+
+
+
+[
+  {
+    "id": "jackson",
+    "type": "json",
+    "binary": false,
+    "defaultMimeType": "application/json",
+    "writerProperties": [
+      {
+        "name": "prettyPrint",
+        "defaultValue": false,
+        "description": "To enable Jackson pretty printing"
+      },
+      {
+        "name": "unmarshalType",
+        "description": "Class name of the java type to unmarshal to"
+      }
+    ]
+  },
+  {
+    "id": "jaxb",
+    "type": "xml",
+    "binary": false,
+    "defaultMimeType": "application/xml",
+    "readerProperties": [
+      {
+        "name": "contextPath",
+        "description": "Package name where JAXB model is located"
+      },
+      {
+        "name": "schema",
+        "description": "Validate using a specific schema file"
+      }
+    ]
+  }
+]

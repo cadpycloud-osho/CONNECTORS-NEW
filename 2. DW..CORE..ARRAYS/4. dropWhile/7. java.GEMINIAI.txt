@@ -1,0 +1,82 @@
+dropWhile:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 3, 2, 1);
+        
+        // DataWeave Logic: arr dropWhile $ < 3
+        // We use the Java 9+ Stream.dropWhile() method with a Predicate.
+        List<Integer> result = arr.stream()
+            .dropWhile(n -> n < 3) // Stop dropping when n is NOT less than 3 (i.e., n >= 3)
+            .collect(Collectors.toList());
+
+        // Output the result in the JSON array format
+        System.out.println("Output structure:");
+        System.out.println(result); 
+    }
+}
+
+
+output:
+
+[3, 2, 1]
+
+
+
+
+
+
+2. Java Code (Using an Imperative Loop)
+This approach uses a loop to find the index of the first element that does not satisfy the condition, and then uses subList to extract the rest of the array.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveDropWhileImperative {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 3, 2, 1);
+        
+        // The index where we stop dropping and start taking elements
+        int startIndex = 0; 
+        
+        // DataWeave Logic: arr dropWhile $ < 3
+        // 1. Find the first element that violates the condition (n < 3)
+        for (int i = 0; i < arr.size(); i++) {
+            if (!(arr.get(i) < 3)) { // Check if the element is NOT less than 3 (i.e., >= 3)
+                startIndex = i;
+                break; // Found the start, exit the loop
+            }
+            // If the loop completes without 'break', it means all elements were dropped, 
+            // and startIndex will be equal to arr.size(), resulting in an empty list.
+            startIndex = arr.size(); 
+        }
+
+        // 2. Extract the resulting sub-list
+        List<Integer> result = arr.subList(startIndex, arr.size());
+
+        // Output the result in the JSON array format
+        System.out.println("Output structure:");
+        System.out.println(result);
+    }
+}
+
+Output for Both Java Codes
+The output for both the Java Stream and the Java Imperative approaches is identical, and correctly represents the DataWeave result:
+
+JSON
+
+[3, 2, 1]
+

@@ -1,0 +1,50 @@
+sqrt:
+
+sqrt(number: Number): Number
+
+sqrt(number: Number): Number
+Returns the square root of a number.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[ sqrt(4), sqrt(25), sqrt(100) ]
+
+
+DataWeave
+Output
+[ 2, 5, 10 ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,102 @@
+time:
+
+
+input:
+
+package com.example.service;
+
+import org.springframework.stereotype.Service;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.function.Supplier;
+
+@Service
+public class TimerService {
+
+    // Helper function to simulate dw::Runtime::wait("My result", 100)
+    private String myFunction() {
+        try {
+            // Simulate the 100ms wait
+            Thread.sleep(100);
+            return "My result";
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return "Error";
+        }
+    }
+
+    // Helper function to simulate sum([1,2,3,4])
+    private int myFunction2() {
+        return List.of(1, 2, 3, 4).stream().mapToInt(Integer::intValue).sum();
+    }
+
+    /**
+     * Replicates dw::util::Timer::time(() -> expression)
+     */
+    private Map<String, Object> time(Supplier<Object> supplier) {
+        String start = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
+        Object result = supplier.get();
+        String end = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
+
+        Map<String, Object> timerResult = new LinkedHashMap<>();
+        timerResult.put("start", start);
+        timerResult.put("result", result);
+        timerResult.put("end", end);
+        return timerResult;
+    }
+
+    public Map<String, Object> runTimerSimulation() {
+        Map<String, Object> output = new LinkedHashMap<>();
+        
+        // Simulating the DataWeave calls:
+        output.put("testing", List.of(
+            time(this::myFunction),
+            time(this::myFunction2)
+        ));
+
+        return output;
+    }
+}
+package com.example.controller;
+
+import com.example.service.TimerService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class TimerController {
+
+    private final TimerService timerService;
+
+    public TimerController(TimerService timerService) {
+        this.timerService = timerService;
+    }
+
+    @GetMapping("/timing")
+    public Map<String, Object> getTimedResults() {
+        return timerService.runTimerSimulation();
+    }
+}
+output:
+
+
+{
+  "testing": [
+    {
+      "start": "2025-12-13T09:42:44.000Z",
+      "result": "My result",
+      "end": "2025-12-13T09:42:44.102Z"
+    },
+    {
+      "start": "2025-12-13T09:42:44.102Z",
+      "result": 10,
+      "end": "2025-12-13T09:42:44.102Z"
+    }
+  ]
+}
+
+

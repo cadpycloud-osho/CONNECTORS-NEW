@@ -1,0 +1,163 @@
+maxBy:
+
+EXAMPLE 1:
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+
+@RestController
+public class MaxByController {
+
+    // Helper class to represent the input object structure
+    public static class DataObject {
+        public int a;
+        public DataObject(int a) { this.a = a; }
+        public int getA() { return a; }
+    }
+
+    /**
+     * DataWeave Source: [ { "a" : 1 }, { "a" : 3 }, { "a" : 2 } ] maxBy ((item) -> item.a)
+     * Accessible at http://localhost:8080/maxby/object-field
+     */
+    @GetMapping("/maxby/object-field")
+    public DataObject maxByObjectField() {
+        // 1. Input List
+        List<DataObject> dataList = Arrays.asList(
+            new DataObject(1),
+            new DataObject(3),
+            new DataObject(2)
+        );
+
+        // 2. Perform the maxBy equivalent using Stream API and Comparator.comparing
+        // The criterion is item.a, so we compare based on the getA() method.
+        DataObject result = dataList.stream()
+            .max(Comparator.comparing(DataObject::getA))
+            .orElse(null); // Return null if the list is empty
+
+        return result;
+    }
+
+    // ... other methods will be added below ...
+}
+
+OUTPUT:
+
+{
+  "a": 3
+}
+-------------------------------------------------------------------
+
+
+EXAMPLE 2:
+
+INPUT:
+
+// ... inside the MaxByController class ...
+
+import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+    /**
+     * DataWeave Source: maxBy on DateTime, Date, Time, and empty array.
+     * Accessible at http://localhost:8080/maxby/datetime
+     */
+    @GetMapping("/maxby/datetime")
+    public Map<String, Object> maxByDateTime() {
+        // Input DateTime values (ZonedDateTime handles the time zone offset -03:00)
+        ZonedDateTime myDateTime1 = ZonedDateTime.parse("2017-10-01T22:57:59-03:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        ZonedDateTime myDateTime2 = ZonedDateTime.parse("2018-10-01T23:57:59-03:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+        // --- 1. byDateTime: maxBy ((item) -> item) ---
+        List<ZonedDateTime> dateTimeList = Arrays.asList(myDateTime1, myDateTime2);
+        // max() on ZonedDateTime uses its natural ordering (latest date/time)
+        String maxDateTime = dateTimeList.stream()
+            .max(Comparator.naturalOrder())
+            .map(ZonedDateTime::toString) // Convert back to string for output
+            .orElse(null);
+
+        // --- 2. byDate: maxBy ((item) -> item) ---
+        // DataWeave maps to Date, which loses time component but keeps date comparison
+        List<LocalDate> dateList = Arrays.asList(myDateTime1.toLocalDate(), myDateTime2.toLocalDate());
+        String maxDate = dateList.stream()
+            .max(Comparator.naturalOrder())
+            .map(LocalDate::toString)
+            .orElse(null);
+
+        // --- 3. byTime: maxBy ((item) -> item) ---
+        // DataWeave extracts Time (with offset), we use ZonedDateTime's time component
+        List<LocalTime> timeList = Arrays.asList(myDateTime1.toLocalTime(), myDateTime2.toLocalTime());
+        // max() on LocalTime finds the latest time of day
+        // NOTE: DW keeps the offset, Java LocalTime discards it, but comparison holds.
+        String maxTime = timeList.stream()
+            .max(Comparator.naturalOrder())
+            .map(LocalTime::toString)
+            .orElse(null);
+
+        // --- 4. emptyArray: [] maxBy ((item) -> item) ---
+        List<Object> emptyList = new ArrayList<>();
+        // max() on an empty list returns Optional.empty, which we map to null
+        String emptyArrayResult = emptyList.stream().max(Comparator.comparing(item -> item)).orElse(null);
+
+
+        // Construct the nested JSON output map
+        Map<String, Object> innerMap = new LinkedHashMap<>();
+        innerMap.put("byDateTime", maxDateTime);
+        innerMap.put("byDate", maxDate);
+        innerMap.put("byTime", maxTime);
+        innerMap.put("emptyArray", emptyArrayResult);
+
+        return Collections.singletonMap("myMaxBy", innerMap);
+    }
+
+OUTPUT:
+
+{
+  "myMaxBy": {
+    "byDateTime": "2018-10-01T23:57:59-03:00",
+    "byDate": "2018-10-01",
+    "byTime": "23:57:59",
+    "emptyArray": null
+  }
+}
+-------------------------------------------------------------------
+
+
+EXAMPLE 3:
+
+INPUT:
+
+// ... inside the MaxByController class ...
+
+    /**
+     * DataWeave Source: [ "A", "B", "C" ] maxBy ((item) -> item)
+     * Accessible at http://localhost:8080/maxby/strings
+     */
+    @GetMapping("/maxby/strings")
+    public String maxByStrings() {
+        List<String> stringList = Arrays.asList("A", "B", "C");
+
+        // max() on String uses natural ordering (alphabetical/lexicographical order)
+        // The selector (item) -> item is achieved by using Comparator.naturalOrder()
+        String result = stringList.stream()
+            .max(Comparator.naturalOrder())
+            .orElse(null);
+
+        return result;
+    }
+}
+
+OUTPUT:
+
+"C"

@@ -1,0 +1,39 @@
+index:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SelectorMetadataRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getSelectorInfo")
+            .routeId("Selector-Metadata-Route")
+            .process(exchange -> {
+                // 1. Create a structure mimicking the DW Selector Object
+                Map<String, Object> selectorInfo = new LinkedHashMap<>();
+                selectorInfo.put("kind", "Array");
+                selectorInfo.put("namespace", null);
+                selectorInfo.put("selector", 0);
+
+                // 2. Set as the message body
+                exchange.getIn().setBody(selectorInfo);
+            })
+            .marshal().json()
+            .log("Selector Metadata: ${body}");
+    }
+}
+
+output:
+
+{
+  "kind": "Array",
+  "namespace": null,
+  "selector": 0
+}
+
+

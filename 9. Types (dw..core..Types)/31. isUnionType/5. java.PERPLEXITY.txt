@@ -1,0 +1,42 @@
+isUnionType:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+// Marker interface simulating DataWeave union type
+interface UnionType {}
+
+public class Main {
+
+    private static boolean isUnionType(Object value) {
+        return value instanceof UnionType;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AType = String | Number equivalent
+        class ATypeUnion implements UnionType {}
+        ATypeUnion aType = new ATypeUnion();
+        
+        // Boolean (not union)
+        Boolean boolValue = true;
+        
+        result.put("a", isUnionType(aType));
+        result.put("b", isUnionType(boolValue));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=false}
+
+

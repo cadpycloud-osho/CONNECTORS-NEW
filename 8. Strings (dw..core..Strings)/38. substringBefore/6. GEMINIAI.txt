@@ -1,0 +1,80 @@
+substringBefore:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class SubstringBeforeController {
+
+    @GetMapping("/substring-before-conversion")
+    public Map<String, String> convertDataWeaveSubstringBefore() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = SubstringUtil.substringBefore(null, "'");
+        String b = SubstringUtil.substringBefore("", "-");
+        String c = SubstringUtil.substringBefore("abc", "b");
+        String d = SubstringUtil.substringBefore("abc", "c");
+        String e = SubstringUtil.substringBefore("abc", "d");
+        String f = SubstringUtil.substringBefore("abc", "");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'a' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e,
+            "f", f
+        );
+    }
+}
+
+public class SubstringUtil {
+
+    /**
+     * Replicates the dw::core::Strings::substringBefore function.
+     * Returns the substring before the first occurrence of the separator.
+     */
+    public static String substringBefore(String str, String separator) {
+        // 1. DataWeave Rule 'a': If input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+        
+        // 2. DataWeave Rule 'f': If separator is empty, return empty string.
+        if (separator == null || separator.isEmpty()) {
+            return "";
+        }
+
+        // Find the index of the first occurrence of the separator.
+        int separatorIndex = str.indexOf(separator);
+
+        // 3. DataWeave Rule 'b', 'e': If separator is not found, return empty string.
+        if (separatorIndex == -1) {
+            return "";
+        }
+
+        // 4. Return the substring before the separator (Rules 'c', 'd').
+        // Java's substring(0, index) is exclusive of the end index.
+        return str.substring(0, separatorIndex);
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab",
+  "e": "",
+  "f": ""
+}
+

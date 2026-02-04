@@ -1,0 +1,39 @@
+substringEvery:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class ChunkStringRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:chunkText")
+            .process(exchange -> {
+                String input = "substringEvery";
+                int size = 3;
+                
+                List<String> chunks = new ArrayList<>();
+                // Regex pattern that matches any character up to 'size' times
+                Matcher m = Pattern.compile(".{1," + size + "}").matcher(input);
+                
+                while (m.find()) {
+                    chunks.add(m.group());
+                }
+
+                exchange.getIn().setBody(chunks);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+["sub", "str", "ing", "Eve", "ry"]
+

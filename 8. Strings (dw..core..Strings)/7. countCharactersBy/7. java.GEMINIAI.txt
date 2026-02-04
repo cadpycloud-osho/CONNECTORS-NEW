@@ -1,0 +1,49 @@
+countCharactersBy:
+
+
+input:
+
+public class Main {
+
+    /**
+     * Method to emulate DataWeave's countCharactersBy(isNumeric($)) function.
+     */
+    public static int countNumericCharacters(String input) {
+        if (input == null) {
+            return 0;
+        }
+        
+        int count = 0;
+        
+        // Iterate over every character in the string
+        for (char c : input.toCharArray()) {
+            // Use the built-in Java function to check if the character is a digit
+            if (Character.isDigit(c)) { 
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static void main(String[] args) {
+        // The hardcoded input string from the DataWeave example
+        String inputString = "42 = 11 * 2 + 20";
+        
+        int numericCount = countNumericCharacters(inputString);
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        
+        // Print the result to match the DataWeave output structure
+        System.out.println(numericCount);
+    }
+}
+
+
+output:
+
+
+{
+  "countCharactersByNumeric": 7
+}
+

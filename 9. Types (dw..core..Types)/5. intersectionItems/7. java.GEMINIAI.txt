@@ -1,0 +1,64 @@
+intersectionItems:
+
+
+
+input:
+
+import java.util.List;
+import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper; // Requires Jackson library
+
+public class Main {
+
+    // 1. Emulate the type structure for AType
+    private static final List<String> ATYPE_INTERSECTION_ITEMS = List.of(
+        "Object", // Corresponds to {name: String}
+        "Object"  // Corresponds to {age: Number}
+    );
+
+    /**
+     * Pure Java method to mimic the DataWeave intersectionItems(AType) function.
+     */
+    public static List<String> getIntersectionItems(String typeName) {
+        // Explicitly returns the defined components for the type
+        return switch (typeName) {
+            case "AType" -> ATYPE_INTERSECTION_ITEMS;
+            default -> List.of();
+        };
+    }
+
+    public static void main(String[] args) {
+        try {
+            // 2. Define the input type
+            final String AType = "AType";
+
+            // 3. Perform the transformation
+            List<String> resultA = getIntersectionItems(AType);
+
+            // 4. Structure the final output map: { "a": resultA }
+            Map<String, List<String>> output = Map.of("a", resultA);
+
+            // 5. Print the result as formal JSON using Jackson 
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonOutput = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(output);
+
+            System.out.println("DataWeave Output Emulation:");
+            System.out.println(jsonOutput);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Note: This pure Java code requires the Jackson library for accurate JSON output.");
+        }
+    }
+}
+
+output:
+
+DataWeave Output Emulation:
+{
+  "a": [
+    "Object",
+    "Object"
+  ]
+}
+

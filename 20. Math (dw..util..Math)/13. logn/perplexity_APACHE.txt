@@ -1,0 +1,46 @@
+logn:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathLognRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateLogn")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Natural Log (base e) of 10
+                results.put("logn10", Math.log(10));
+                
+                // Natural Log (base e) of 0.13
+                results.put("logn13", Math.log(0.13));
+
+                // Java returns NaN for negatives and -Infinity for 0.
+                // We map these to null for DataWeave parity.
+                double lognNeg = Math.log(-20);
+                results.put("logn-20", (Double.isNaN(lognNeg) || Double.isInfinite(lognNeg)) ? null : lognNeg);
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "logn10": 2.302585092994046,
+  "logn13": -2.0402208285265546,
+  "logn-20": null
+}
+
+

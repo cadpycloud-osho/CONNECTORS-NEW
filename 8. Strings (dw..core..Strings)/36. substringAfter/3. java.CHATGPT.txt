@@ -1,0 +1,48 @@
+substringAfter:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String substringAfterDW(String input, String delimiter) {
+
+        if (input == null) return null;
+
+        if (delimiter == null) delimiter = "";
+
+        if (delimiter.isEmpty()) return input;
+
+        int index = input.indexOf(delimiter);
+
+        if (index == -1) return "";
+
+        return input.substring(index + delimiter.length());
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", substringAfterDW(null, "'"));
+        result.put("b", substringAfterDW("", "-"));
+        result.put("c", substringAfterDW("abc", "b"));
+        result.put("d", substringAfterDW("abcba", "b"));
+        result.put("e", substringAfterDW("abc", "d"));
+        result.put("f", substringAfterDW("abc", ""));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{a=null, b=, c=c, d=cba, e=, f=abc}
+

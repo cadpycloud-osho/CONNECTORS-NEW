@@ -1,0 +1,59 @@
+
+
+
+isIntersectionType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.rest.RestParamType;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IntersectionCheckRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:start")
+            .process(exchange -> {
+                // In Java, an intersection is typically represented by an object 
+                // implementing multiple interfaces (e.g., Serializable & Runnable)
+                Object complexType = new IntersectionSample();
+                Object simpleType = Boolean.TRUE;
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+                
+                // Logic: Check if it satisfies multiple specific type requirements
+                result.put("a", isIntersectionMatch(complexType));
+                result.put("b", isIntersectionMatch(simpleType));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    // Helper to simulate the DataWeave intersection check
+    private boolean isIntersectionMatch(Object obj) {
+        // Checking if the object satisfies multiple types (Nameable AND Ageable)
+        return obj instanceof Nameable && obj instanceof Ageable;
+    }
+
+    // Mock interfaces for the demo
+    interface Nameable { String getName(); }
+    interface Ageable { int getAge(); }
+    class IntersectionSample implements Nameable, Ageable {
+        public String getName() { return "Example"; }
+        public int getAge() { return 30; }
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+

@@ -1,0 +1,58 @@
+arrayItem:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+
+public class TypeIntrospectionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getArrayItemType")
+            .process(exchange -> {
+                // In Java, we define types like this:
+                Type arrayOfString = new TypeReference<List<String>>(){}.getType();
+                Type arrayOfNumber = new TypeReference<List<Number>>(){}.getType();
+                Type arrayOfAny = new List[0].getClass(); // Generic List
+
+                exchange.getIn().setBody(Map.of(
+                    "a", getElementTypeName(arrayOfString),
+                    "b", getElementTypeName(arrayOfNumber),
+                    "c", "Any", // Java's equivalent to Array<Any>
+                    "d", "Any"
+                ));
+            })
+            .marshal().json();
+    }
+
+    private String getElementTypeName(Type type) {
+        if (type instanceof ParameterizedType) {
+            Type actualType = ((ParameterizedType) type).getActualTypeArguments()[0];
+            // Simplifies "java.lang.String" to "String"
+            return actualType.getTypeName().substring(actualType.getTypeName().lastIndexOf(".") + 1);
+        }
+        return "Any";
+    }
+    
+    // Helper to capture Generic Types at runtime
+    static abstract class TypeReference<T> {
+        Type getType() { return ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]; }
+    }
+}
+
+
+output:
+
+{
+  "a": "String",
+  "b": "Number",
+  "c": "Any",
+  "d": "Any"
+}
+
+

@@ -1,0 +1,31 @@
+toUri:
+
+
+input:
+
+
+import java.net.URI;
+
+public class Main {
+    public static void main(String[] args) {
+        // Convert string to URI
+        URI toUriExample = URI.create("https://www.google.com/");
+
+        // Output as JSON-like format
+        System.out.println("{");
+        System.out.println("  \"toUriExample\": \"" + toUriExample.toString() + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "toUriExample": "https://www.google.com/"
+}
+
+
+

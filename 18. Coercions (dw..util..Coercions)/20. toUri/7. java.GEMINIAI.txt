@@ -1,0 +1,55 @@
+toUri:
+
+
+
+input:
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private final String sourceUriString = "https://www.google.com/";
+
+    /**
+     * Mimics DataWeave's toUri() behavior.
+     * Parses the string into a URI object and returns its string representation.
+     */
+    private String toUriString(String uriString) {
+        // URI.create() parses the string and throws an IllegalArgumentException 
+        // if the string cannot be parsed as a URI (similar to DataWeave's exception on failure).
+        URI uri = URI.create(uriString);
+        // URI.toString() returns the string representation.
+        return uri.toString();
+    }
+
+    public Map<String, String> getUriConversionMap() {
+        
+        // --- Logic for 'toUriExample' ---
+        String resultUri = toUriString(sourceUriString);
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the result
+        rootMap.put("toUriExample", resultUri);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        Map<String, String> result = converter.getUriConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+{toUriExample=https://www.google.com/}
+
+

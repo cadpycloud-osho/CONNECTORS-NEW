@@ -1,0 +1,50 @@
+pow:
+
+
+
+input:
+
+
+package com.example.math;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.lang.Math;
+import java.util.stream.Collectors;
+
+@RestController
+public class PowerController {
+
+    @GetMapping("/calculate-powers")
+    public List<Integer> calculatePowers() {
+        
+        // 1. Define the base and exponent pairs (Equivalent to the array elements)
+        // (2 pow 3)
+        double result1 = Math.pow(2, 3); 
+        
+        // (3 pow 2)
+        double result2 = Math.pow(3, 2); 
+        
+        // (7 pow 3)
+        double result3 = Math.pow(7, 3); 
+
+        // 2. Collect the results and cast them to Integer
+        // Math.pow returns a double, so we cast to int to match the expected DW integer output.
+        List<Integer> powerResults = List.of(
+            (int) result1,
+            (int) result2,
+            (int) result3
+        );
+        
+        return powerResults;
+    }
+}
+
+output:
+
+[
+  8,
+  9,
+  343
+]

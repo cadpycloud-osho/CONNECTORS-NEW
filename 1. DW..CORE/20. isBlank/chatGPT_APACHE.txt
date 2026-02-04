@@ -1,0 +1,34 @@
+isBlank:
+
+
+input:
+
+from("direct:isBlankExample")
+.setProperty("someString", constant("something"))
+.setProperty("nullString", constant(null))
+
+.setBody(simple(
+    "{"
+  + " \"emptyString\": ${'' == null || ''.trim() == ''},"
+  + " \"stringWithSpaces\": ${'      '.trim() == ''},"
+  + " \"textString\": ${exchangeProperty.someString == null || exchangeProperty.someString.trim() == ''},"
+  + " \"somePayloadValue\": ${body?.nonExistingValue == null || body?.nonExistingValue.trim() == ''},"
+  + " \"nullString\": ${exchangeProperty.nullString == null || exchangeProperty.nullString.trim() == ''},"
+  + " \"notEmptyTextString\": ${!' 1234'.trim().isEmpty()},"
+  + " \"notEmptyTextStringTwo\": ${!(''.trim() == '')}"
+  + "}"
+));
+
+output:
+
+{
+  "emptyString": true,
+  "stringWithSpaces": true,
+  "textString": false,
+  "somePayloadValue": true,
+  "nullString": true,
+  "notEmptyTextString": true,
+  "notEmptyTextStringTwo": false
+}
+
+

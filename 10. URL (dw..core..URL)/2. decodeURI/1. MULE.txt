@@ -1,0 +1,47 @@
+decodeURI:
+
+decodeURI(text: String): String
+
+decodeURI(text: String): String
+Decodes the escape sequences (such as %20) in a URI.
+
+The function replaces each escape sequence in the encoded URI with the character that it represents, but does not decode escape sequences that could not have been introduced by encodeURI. The character # is not decoded from escape sequences.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::URL
+output application/json
+---
+{
+  "decodeURI" : decodeURI('http://asd/%20text%20to%20decode%20/text')
+}
+DataWeave
+Output
+{
+  "decodeURI": "http://asd/ text to decode /text"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

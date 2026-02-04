@@ -1,0 +1,83 @@
+causedBy:
+
+
+
+input:
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    // --- Specific error handling for HTTP:UNAUTHORIZED (401) ---
+    // Maps to Mule: #[Mule::causedBy(error, 'HTTP:UNAUTHORIZED')]
+    // Catches exceptions related to failed authentication (no valid credentials)
+    @ExceptionHandler({AuthenticationException.class})
+    public ResponseEntity<Map<String, Object>> handleUnauthorized(AuthenticationException ex) {
+        // Output similar to DataWeave's error object, showing the status and description
+        Map<String, Object> errorBody = new HashMap<>();
+        errorBody.put("status", "401");
+        errorBody.put("errorType", "SECURITY:UNAUTHORIZED");
+        errorBody.put("message", "Authentication Failed or Missing Credentials.");
+        
+        System.err.println("UNAUTHORIZED Error caught: " + ex.getMessage());
+        
+        return new ResponseEntity<>(errorBody, HttpStatus.UNAUTHORIZED);
+    }
+
+    // --- Specific error handling for HTTP:FORBIDDEN (403) ---
+    // Maps to Mule: #[Mule::causedBy('HTTP:FORBIDDEN')]
+    // Catches exceptions related to lack of permissions (user is known, but access is denied)
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<Map<String, Object>> handleForbidden(AccessDeniedException ex) {
+        // Output similar to DataWeave's error object
+        Map<String, Object> errorBody = new HashMap<>();
+        errorBody.put("status", "403");
+        errorBody.put("errorType", "SECURITY:FORBIDDEN");
+        errorBody.put("message", "Access Denied: You do not have permission for this resource.");
+        
+        System.err.println("FORBIDDEN Error caught: " + ex.getMessage());
+
+        return new ResponseEntity<>(errorBody, HttpStatus.FORBIDDEN);
+    }
+    
+    // --- General SECURITY error handling (Default Case) ---
+    // The general Mule 'SECURITY' type is handled implicitly if a specific security exception 
+    // isn't caught by the above handlers, or a generic security exception is used here.
+    // For simplicity, we use the AccessDeniedException handler above to cover the core 
+    // 'SECURITY' concerns (403), as 401 is covered by AuthenticationException.
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.AccessDeniedException;
+
+@RestController
+public class TestController {
+
+    @GetMapping("/secure-data")
+    public String getSecureData() {
+        // Example: If a user fails permission checks, manually throw the 403 exception
+        if (Math.random() > 0.5) {
+             throw new AccessDeniedException("User role is insufficient.");
+        }
+        return "Secret data accessed successfully.";
+    }
+}
+output:
+
+{
+    "status": "401",
+    "errorType": "SECURITY:UNAUTHORIZED",
+    "message": "Authentication Failed or Missing Credentials."
+}
+
+

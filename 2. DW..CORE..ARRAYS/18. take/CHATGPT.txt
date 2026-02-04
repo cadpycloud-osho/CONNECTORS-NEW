@@ -1,0 +1,31 @@
+take:
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class TakeController {
+
+    @GetMapping("/take")
+    public List<String> takeExample() {
+
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+
+        int limit = 2;
+        return users.subList(0, limit);
+    }
+}
+
+output:
+
+
+[
+    "Mariano",
+    "Leandro"
+]

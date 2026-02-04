@@ -1,0 +1,79 @@
+toBinary:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.io.IOException;
+
+public class DataWeaveToBinaryConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceString = "DW";
+
+    /**
+     * Mimics DataWeave's toBinary(String, Charset) and converts the result to Base64.
+     * @param charsetName The Java character set name (e.g., "UTF-16BE", "UTF-32BE").
+     * @return The Base64 encoded string.
+     */
+    private String toBinaryBase64(String charsetName) {
+        try {
+            // Get the byte array using the specified character set
+            byte[] bytes = sourceString.getBytes(charsetName);
+            
+            // Encode the byte array to Base64 (DataWeave's output format)
+            return Base64.getEncoder().encodeToString(bytes);
+        } catch (UnsupportedEncodingException e) {
+            // Handle cases where the encoding is not supported (unlikely for standard ones)
+            return "Error: " + e.getMessage();
+        }
+    }
+    
+    /**
+     * DataWeave's 'UTF-16', 'utf16', and 'UnicodeBig' often map to Java's 'UTF-16BE' 
+     * (Big Endian) for consistent results unless BOM (Byte Order Mark) is explicitly included.
+     * Mule's DataWeave behavior for UTF-16 usually defaults to Big Endian.
+     * UTF-32 defaults to UTF-32BE (Big Endian) in DataWeave when a specific endianness isn't provided.
+     */
+    public String getBinaryJson() throws IOException {
+        String utf16Base64 = toBinaryBase64("UTF-16BE");
+        String utf32Base64 = toBinaryBase64("UTF-32BE");
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // "/v8ARABX" corresponds to the UTF-16 Big Endian encoding of "DW"
+        root.put("UTF-16Ex", utf16Base64);
+        root.put("utf16Ex", utf16Base64);
+        root.put("UnicodeBigEx", utf16Base64);
+        
+        // "AAAARAAAAFc=" corresponds to the UTF-32 Big Endian encoding of "DW"
+        root.put("UTF-32Ex", utf32Base64);
+        root.put("UTF_32Ex", utf32Base64);
+
+        // Convert the root object to a JSON string (using Jackson's default non-indented output)
+        return objectMapper.writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToBinaryConverter converter = new DataWeaveToBinaryConverter();
+        try {
+            String jsonOutput = converter.getBinaryJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{"UTF-16Ex":"/v8ARABX","utf16Ex":"/v8ARABX","UnicodeBigEx":"/v8ARABX","UTF-32Ex":"AAAARAAAAFc=","UTF_32Ex":"AAAARAAAAFc="}
+
+

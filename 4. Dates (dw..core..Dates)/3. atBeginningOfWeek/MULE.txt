@@ -1,0 +1,71 @@
+atBeginningOfWeek:
+
+atBeginningOfWeek(dateTime: DateTime): DateTime
+
+atBeginningOfWeek(dateTime: DateTime): DateTime
+Returns a new DateTime value that changes the Day and Time values from the input to the beginning of the first day of the specified week.
+
+The function treats Sunday as the first day of the week.
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfWeekDateTime: atBeginningOfWeek(|2020-10-06T18:23:20.351-03:00|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfWeekDateTime": "2020-10-04T00:00:00-03:00"
+}
+
+------------------------------------------------------------------
+
+atBeginningOfWeek(localDateTime: LocalDateTime): LocalDateTime
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfWeekLocalDateTime: atBeginningOfWeek(|2020-10-06T18:23:20.351|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00:00"
+}
+
+
+------------------------------------------------------------------
+
+atBeginningOfWeek(date: Date): Date
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfWeekDate: atBeginningOfWeek(|2020-10-06|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfWeekDate": "2020-10-04"
+}
+
+
+
+
+
+

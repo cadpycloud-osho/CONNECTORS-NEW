@@ -1,0 +1,165 @@
+isEmpty:
+
+EXAMPLE 1:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsEmptyArrayController {
+
+    @GetMapping("/isempty-array")
+    public List<Boolean> checkEmptyArrays() {
+
+        List<Boolean> result = new ArrayList<>();
+
+        List<?> emptyList = Collections.emptyList();
+        List<Integer> nonEmptyList = List.of(1);
+
+        result.add(emptyList.isEmpty());
+        result.add(nonEmptyList.isEmpty());
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+[ true, false ]
+
+
+
+
+
+_________________________________________________________________
+EXAMPLE 2:
+
+isEmpty:
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsEmptyStringController {
+
+    private boolean isEmpty(String str) {
+        return (str == null || str.isEmpty());
+    }
+
+    @GetMapping("/isempty-string")
+    public List<Boolean> checkEmptyStrings() {
+
+        return List.of(
+                isEmpty(""),
+                isEmpty("DataWeave")
+        );
+    }
+}
+
+
+OUTPUT:
+
+[ true, false ]
+
+
+
+
+
+_________________________________________________________________
+EXAMPLE 3:
+
+
+isEmpty:
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsEmptyObjectController {
+
+    @GetMapping("/isempty-object")
+    public List<Boolean> checkEmptyObjects() {
+
+        Map<String, String> emptyObj = Collections.emptyMap();
+        Map<String, String> nonEmptyObj = Map.of("name", "DataWeave");
+
+        return List.of(
+                emptyObj.isEmpty(),
+                nonEmptyObj.isEmpty()
+        );
+    }
+}
+
+
+OUTPUT:
+
+[ true, false ]
+
+
+
+
+
+_________________________________________________________________
+EXAMPLE 4:
+
+
+isEmpty:
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsEmptyNullController {
+
+    private boolean isEmpty(String str) {
+        return (str == null || str.isEmpty());
+    }
+
+    @GetMapping("/isempty-null")
+    public Map<String, Boolean> checkNullValue() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("nullValue", isEmpty(null));
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "nullValue": true
+}
+
+
+
+
+
+
+

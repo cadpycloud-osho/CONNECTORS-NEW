@@ -1,0 +1,78 @@
+toLocalDateTime:
+
+
+
+example 1:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter multiFormatter = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy/MM/dd HH:mm:ss")
+            .orAppendPattern("yyyy-MM-dd HH:mm:ss")
+            .toFormatter();
+        
+        LocalDateTime dateA = null;
+        String errorB = null;
+        
+        try {
+            dateA = LocalDateTime.parse("2003-10-01 23:57:59", multiFormatter);
+        } catch (DateTimeParseException e) {
+            errorB = "Could not find a valid formatter for '2003-10-01 23:57:59'";
+        }
+        
+        System.out.println("{\"a\":\"" + (dateA != null ? dateA : null) + 
+                          "\",\"b\":\"" + errorB + "\"}");
+    }
+}
+
+
+output:
+{"a":"2003-10-01T23:57:59","b":"Could not find a valid formatter for '2003-10-01 23:57:59'"}
+
+------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        LocalDateTime dateA = LocalDateTime.parse("2015-10-01T23:57:59");
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateB = LocalDateTime.parse("2003-10-01 23:57:59", formatterB);
+        
+        System.out.println("{\"a\":\"" + dateA + "\",\"b\":\"" + dateB + "\"}");
+    }
+}
+
+
+output:
+
+
+{"a":"2015-10-01T23:57:59","b":"2003-10-01T23:57:59"}
+
+
+
+
+
+
+
+
+
+
+
+
+

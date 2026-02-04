@@ -1,0 +1,33 @@
+collapse:
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class CollapseConverter {
+    public static List<String> collapse(String input) {
+        List<String> result = new ArrayList<>();
+        Matcher matcher = Pattern.compile("(.+?)(?=\\s+(?=[^\\s])|\\s*(?=$))", Pattern.DOTALL).matcher(input);
+        
+        while (matcher.find()) {
+            result.add(matcher.group());
+        }
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("collapse", collapse("a  b babb a"));
+        
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+["a", "  ", "b", " ", "b", "a", "bb", " ", "a"]
+
+

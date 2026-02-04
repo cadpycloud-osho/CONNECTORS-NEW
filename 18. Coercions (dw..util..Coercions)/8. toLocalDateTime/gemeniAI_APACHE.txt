@@ -1,0 +1,62 @@
+toLocalDateTime:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class LocalDateTimeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceLocalDateTime")
+            .process(exchange -> {
+                String input = "2003-10-01 23:57:59";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                // Formatters equivalent to the DW source patterns
+                List<DateTimeFormatter> formatters = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss"),
+                    DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+                );
+
+                // Scenario A: Success via fallback
+                response.put("a", parseLocalOrError(input, formatters));
+
+                // Scenario B: Failure (Only providing the wrong formatter)
+                List<DateTimeFormatter> failingFormat = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss")
+                );
+                try {
+                    parseLocalOrError(input, failingFormat);
+                } catch (Exception e) {
+                    response.put("b", e.getMessage());
+                }
+
+                exchange.getIn().setBody(response);
+            });
+    }
+
+    private LocalDateTime parseLocalOrError(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDateTime.parse(input, formatter);
+            } catch (Exception ignored) {}
+        }
+        throw new IllegalArgumentException("Could not find a valid formatter for '" + input + "'");
+    }
+}
+
+output:
+
+
+{
+  a: |2003-10-01T23:57:59| as LocalDateTime {format: "uuuu-MM-dd HH:mm:ss"},
+  b: "Could not find a valid formatter for '2003-10-01 23:57:59'"
+}
+
+

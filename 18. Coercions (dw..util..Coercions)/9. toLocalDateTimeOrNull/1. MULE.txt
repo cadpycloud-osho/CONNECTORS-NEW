@@ -1,0 +1,53 @@
+toLocalDateTimeOrNull:
+
+toLocalDateTimeOrNull(str: String, formatters: Array<Formatter>): LocalDateTime | Null
+
+toLocalDateTimeOrNull(str: String, formatters: Array<Formatter>): LocalDateTime | Null
+Transforms a String value into a LocalDateTime value using the first Formatter that matches with the given value to transform.
+
+If none of the Formatter matches with the given value, the function returns a null value.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+  a: toLocalDateTimeOrNull("2003-10-01 23:57:59", [{format: "uuuu/MM/dd HH:mm:ss"}, {format: "uuuu-MM-dd HH:mm:ss"}]),
+  b: toLocalDateTimeOrNull("2003-10-01 23:57:59", [{format: "uuuu/MM/dd HH:mm:ss"}])
+}
+
+
+DataWeave
+Output
+{
+  a: |2003-10-01T23:57:59| as LocalDateTime {format: "uuuu-MM-dd HH:mm:ss"},
+  b: null
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

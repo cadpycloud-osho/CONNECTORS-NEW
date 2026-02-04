@@ -1,0 +1,288 @@
+field:
+
+
+example 1:
+
+
+input:
+
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SimpleMultipartService {
+
+    /**
+     * Builds a MultiValueMap that represents the multipart/form-data body.
+     * In Spring, this map is then automatically converted to the raw byte stream 
+     * with boundaries and headers when making an HTTP call.
+     * @return MultiValueMap representing the multipart body parts.
+     */
+    public MultiValueMap<String, ?> buildSimpleMultipartBody() {
+        String firstPartContent = "content for my first part";
+        String secondPartContent = "content for my second part";
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        
+        // DataWeave defined the part name in the 'name' attribute of the field.
+        // Spring's builder uses the key to set the 'name' attribute.
+        
+        // Add the first form field: name="myFirstPart"
+        builder.part("myFirstPart", firstPartContent); 
+        
+        // Add the second form field: name="mySecondPart"
+        builder.part("mySecondPart", secondPartContent);
+
+        return builder.build();
+    }
+}
+
+output:
+Content-Type: multipart/form-data; boundary=...
+--<GENERATED_BOUNDARY>
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+--<GENERATED_BOUNDARY>
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+--<GENERATED_BOUNDARY>--
+---------------------------------------------------------------
+example 2:
+
+
+input:
+
+// Data Model for 'myOrder' (JSON)
+public class OrderItem {
+    private int order;
+    private int amount;
+    // Getters, Setters, and Constructors (omitted for brevity)
+    public OrderItem() {}
+    public OrderItem(int order, int amount) {
+        this.order = order;
+        this.amount = amount;
+    }
+    public int getOrder() { return order; }
+    public void setOrder(int order) { this.order = order; }
+    public int getAmount() { return amount; }
+    public void setAmount(int amount) { this.amount = amount; }
+}
+
+// Data Model for 'myClients' (XML - Requires JAXB annotations for correct XML structure)
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
+public class Client {
+    private int id;
+    private String name;
+    public Client() {}
+    public Client(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    @XmlElement public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    @XmlElement public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@XmlRootElement(name = "clients") // Defines the root tag <clients>
+public class ClientList {
+    private List<Client> client;
+    public ClientList() {}
+    @XmlElement(name = "client") // Defines the repeated tag <client>
+    public List<Client> getClient() { return client; }
+    public void setClient(List<Client> client) { this.client = client; }
+}
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import java.util.List;
+
+@Service
+public class ComplexMultipartService {
+
+    /**
+     * Builds a MultiValueMap that represents the complex multipart/form-data body.
+     * @return MultiValueMap representing the parts, ready for WebClient/RestTemplate.
+     */
+    public MultiValueMap<String, HttpEntity<?>> buildComplexMultipartBody() {
+        // 1. Prepare Data
+        List<OrderItem> myOrderData = List.of(
+            new OrderItem(1, 2),
+            new OrderItem(32, 1)
+        );
+        
+        ClientList myClientsData = new ClientList();
+        myClientsData.setClient(List.of(
+            new Client(1, "Mariano"),
+            new Client(2, "Shoki")
+        ));
+
+        // 2. Define Headers for Part 1 (JSON)
+        HttpHeaders orderHeaders = new HttpHeaders();
+        orderHeaders.setContentType(MediaType.APPLICATION_JSON);
+        // Content-Disposition: form-data; name="order"; filename="order.json"
+        orderHeaders.setContentDispositionFormData("order", "order.json");
+
+        // 3. Define Headers for Part 2 (XML)
+        HttpHeaders clientHeaders = new HttpHeaders();
+        clientHeaders.setContentType(MediaType.APPLICATION_XML);
+        // Content-Disposition: form-data; name="clients" (filename is null/omitted)
+        clientHeaders.setContentDispositionFormData("clients", null);
+        
+        // 4. Build the Body
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // Add Part 1: JSON payload with custom headers
+        // Spring marshals 'myOrderData' list to JSON
+        builder.part("order", myOrderData, MediaType.APPLICATION_JSON)
+               .headers(h -> h.addAll(orderHeaders));
+
+        // Add Part 2: XML payload with custom headers
+        // Spring marshals 'myClientsData' object to XML
+        builder.part("clients", myClientsData, MediaType.APPLICATION_XML)
+               .headers(h -> h.addAll(clientHeaders));
+        
+        return builder.build();
+    }
+}
+output:
+
+Content-Type: multipart/form-data; boundary=...
+--<GENERATED_BOUNDARY>
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[{"order":1,"amount":2},{"order":32,"amount":1}]
+--<GENERATED_BOUNDARY>
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients><client><id>1</id><name>Mariano</name></client><client><id>2</id><name>Shoki</name></client></clients>
+--<GENERATED_BOUNDARY>--
+---------------------------------------------------------------
+example 3:
+
+
+input:
+
+// Data Model for 'myOrder' (JSON)
+public class OrderItem {
+    private int order;
+    private int amount;
+
+    // Standard constructor, getters, and setters omitted for brevity
+    public OrderItem() {}
+    public OrderItem(int order, int amount) {
+        this.order = order;
+        this.amount = amount;
+    }
+    public int getOrder() { return order; }
+    public void setOrder(int order) { this.order = order; }
+    public int getAmount() { return amount; }
+    public void setAmount(int amount) { this.amount = amount; }
+}
+
+// Data Models for 'myClients' (XML - JAXB required for correct XML structure)
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
+public class Client {
+    private int id;
+    private String name;
+    public Client() {}
+    public Client(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    @XmlElement public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    @XmlElement public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@XmlRootElement(name = "clients")
+public class ClientList {
+    private List<Client> client;
+    public ClientList() {}
+    @XmlElement(name = "client")
+    public List<Client> getClient() { return client; }
+    public void setClient(List<Client> client) { this.client = client; }
+}
+
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import java.util.List;
+
+@Service
+public class ComplexMultipartService {
+
+    public MultiValueMap<String, HttpEntity<?>> buildComplexMultipartBody() {
+        // 1. Prepare Data
+        List<OrderItem> myOrderData = List.of(
+            new OrderItem(1, 2),
+            new OrderItem(32, 1)
+        );
+        
+        ClientList myClientsData = new ClientList();
+        myClientsData.setClient(List.of(
+            new Client(1, "Mariano"),
+            new Client(2, "Shoki")
+        ));
+
+        // 2. Define Headers for Part 1 (JSON)
+        HttpHeaders orderHeaders = new HttpHeaders();
+        orderHeaders.setContentType(MediaType.APPLICATION_JSON);
+        // Content-Disposition: form-data; name="order"; filename="order.json"
+        orderHeaders.setContentDispositionFormData("order", "order.json");
+
+        // 3. Define Headers for Part 2 (XML)
+        HttpHeaders clientHeaders = new HttpHeaders();
+        clientHeaders.setContentType(MediaType.APPLICATION_XML);
+        // Content-Disposition: form-data; name="clients" (filename is omitted)
+        clientHeaders.setContentDispositionFormData("clients", null);
+        
+        // 4. Build the Body
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // Add Part 1: JSON payload
+        builder.part("order", myOrderData, MediaType.APPLICATION_JSON)
+               .headers(h -> h.addAll(orderHeaders));
+
+        // Add Part 2: XML payload
+        builder.part("clients", myClientsData, MediaType.APPLICATION_XML)
+               .headers(h -> h.addAll(clientHeaders));
+        
+        return builder.build();
+    }
+}
+
+output:
+
+Content-Type: multipart/form-data; boundary=...
+--<GENERATED_SPRING_BOUNDARY>
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[{"order":1,"amount":2},{"order":32,"amount":1}]
+--<GENERATED_SPRING_BOUNDARY>
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients><client><id>1</id><name>Mariano</name></client><client><id>2</id><name>Shoki</name></client></clients>
+--<GENERATED_SPRING_BOUNDARY>--

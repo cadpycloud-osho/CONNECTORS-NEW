@@ -1,0 +1,63 @@
+isAlphanumeric:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class IsAlphanumericController {
+
+    /**
+     * Custom method to emulate DataWeave's isAlphanumeric(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY letters or digits.
+     */
+    private boolean isAlphanumericString(String input) {
+        // DataWeave's isAlphanumeric returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // Check if ALL characters in the string are letters OR digits.
+        return input.chars() // Get an IntStream of character codes
+                    .allMatch(Character::isLetterOrDigit); // Check if every code is a letter or digit
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/check-is-alphanumeric")
+    public Map<String, Boolean> checkIsAlphanumericExamples() {
+        // Use LinkedHashMap to preserve the output order
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Testing various inputs:
+        result.put("a", isAlphanumericString(null));
+        result.put("b", isAlphanumericString(""));
+        result.put("c", isAlphanumericString("  ")); // Contains space/non-breaking space (fails)
+        result.put("d", isAlphanumericString("abc")); // Contains only letters (passes)
+        result.put("e", isAlphanumericString("ab c")); // Contains standard space (fails)
+        result.put("f", isAlphanumericString("ab2c")); // Contains letters and digits (passes)
+        result.put("g", isAlphanumericString("ab-c")); // Contains hyphen (fails)
+        
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": true,
+  "g": false
+}

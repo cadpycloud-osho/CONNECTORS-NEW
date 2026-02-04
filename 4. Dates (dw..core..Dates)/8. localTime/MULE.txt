@@ -1,0 +1,40 @@
+localTime:
+
+localTime(parts: LocalTimeFactory): LocalTime
+
+localTime(parts: LocalTimeFactory): LocalTime
+Creates a LocalTime value from values specified for hour, minutes, and seconds fields.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  newLocalTime: localTime({ hour: 12, minutes: 30, seconds: 40})
+}
+
+
+DataWeave
+Output
+{
+   "newLocalTime": "12:30:40"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

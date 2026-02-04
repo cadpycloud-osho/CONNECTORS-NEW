@@ -1,0 +1,187 @@
+objectFields:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+import java.util.*;
+
+public class CamelObjectFieldsCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                        .process(exchange -> {
+
+                            // ADictionary = {_ : String}
+                            List<Map<String, Object>> a = objectFields_ADictionary();
+
+                            // ASchema = {ns0#name @(ns0#foo: String): {}}
+                            List<Map<String, Object>> b = objectFields_ASchema();
+
+                            // Object (empty fields)
+                            List<Map<String, Object>> c = new ArrayList<>();
+
+                            // AUser
+                            List<Map<String, Object>> d = objectFields_AUser();
+
+                            Map<String, Object> result = new LinkedHashMap<>();
+                            result.put("a", a);
+                            result.put("b", b);
+                            result.put("c", c);
+                            result.put("d", d);
+
+                            exchange.getMessage().setBody(result);
+                        })
+                        .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Simulate ADictionary
+    private static List<Map<String, Object>> objectFields_ADictionary() {
+        Map<String, Object> key = Map.of(
+                "name", Map.of("localName", "_", "namespace", null),
+                "attributes", List.of()
+        );
+        Map<String, Object> field = Map.of(
+                "key", key,
+                "required", true,
+                "repeated", false,
+                "value", "String"
+        );
+        return List.of(field);
+    }
+
+    // Simulate ASchema
+    private static List<Map<String, Object>> objectFields_ASchema() {
+        Map<String, Object> attribute = Map.of(
+                "name", Map.of("localName", "foo", "namespace", "http://acme.com"),
+                "value", "String",
+                "required", true
+        );
+        Map<String, Object> key = Map.of(
+                "name", Map.of("localName", "name", "namespace", "http://acme.com"),
+                "attributes", List.of(attribute)
+        );
+        Map<String, Object> field = Map.of(
+                "key", key,
+                "required", true,
+                "repeated", false,
+                "value", "Object"
+        );
+        return List.of(field);
+    }
+
+    // Simulate AUser
+    private static List<Map<String, Object>> objectFields_AUser() {
+        Map<String, Object> attr1 = Map.of(
+                "name", Map.of("localName", "foo", "namespace", null),
+                "value", "String",
+                "required", false
+        );
+        Map<String, Object> attr2 = Map.of(
+                "name", Map.of("localName", "l", "namespace", null),
+                "value", "Number",
+                "required", true
+        );
+        Map<String, Object> key1 = Map.of(
+                "name", Map.of("localName", "name", "namespace", null),
+                "attributes", List.of(attr1, attr2)
+        );
+        Map<String, Object> field1 = Map.of(
+                "key", key1,
+                "required", false,
+                "repeated", false,
+                "value", "String"
+        );
+
+        Map<String, Object> key2 = Map.of(
+                "name", Map.of("localName", "lastName", "namespace", null),
+                "attributes", List.of()
+        );
+        Map<String, Object> field2 = Map.of(
+                "key", key2,
+                "required", true,
+                "repeated", true,
+                "value", "Number"
+        );
+
+        return List.of(field1, field2);
+    }
+}
+
+
+
+output:
+
+{
+  "a": [
+    {
+      "key": {
+        "name": {"localName": "_", "namespace": null},
+        "attributes": []
+      },
+      "required": true,
+      "repeated": false,
+      "value": "String"
+    }
+  ],
+  "b": [
+    {
+      "key": {
+        "name": {"localName": "name", "namespace": "http://acme.com"},
+        "attributes": [
+          {
+            "name": {"localName": "foo", "namespace": "http://acme.com"},
+            "value": "String",
+            "required": true
+          }
+        ]
+      },
+      "required": true,
+      "repeated": false,
+      "value": "Object"
+    }
+  ],
+  "c": [],
+  "d": [
+    {
+      "key": {
+        "name": {"localName": "name", "namespace": null},
+        "attributes": [
+          {
+            "name": {"localName": "foo", "namespace": null},
+            "value": "String",
+            "required": false
+          },
+          {
+            "name": {"localName": "l", "namespace": null},
+            "value": "Number",
+            "required": true
+          }
+        ]
+      },
+      "required": false,
+      "repeated": false,
+      "value": "String"
+    },
+    {
+      "key": {
+        "name": {"localName": "lastName", "namespace":
+
+
+

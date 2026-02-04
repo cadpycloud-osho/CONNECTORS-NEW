@@ -1,0 +1,52 @@
+nameOf:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static String nameOf(Class<?> type, String alias) {
+        // Return alias if provided (simulates DW type alias), else simple class name
+        return alias != null ? alias : type.getSimpleName();
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class NameOfController {
+
+    @GetMapping("/nameOf")
+    public Map<String, String> getTypeNames() {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        // Simulate DataWeave type aliases
+        result.put("a", TypeUtils.nameOf(String.class, "AArray"));
+        result.put("b", TypeUtils.nameOf(String.class, "AArray2"));
+        result.put("c", TypeUtils.nameOf(String.class, null));
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+   "a": "AArray",
+   "b": "AArray2",
+   "c": "String"
+}
+
+

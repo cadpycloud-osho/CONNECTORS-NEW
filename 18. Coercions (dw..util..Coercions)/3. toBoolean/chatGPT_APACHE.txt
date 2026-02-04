@@ -1,0 +1,45 @@
+toBoolean:
+
+
+input:
+
+import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ToBooleanSimulation {
+
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, Boolean> output = new LinkedHashMap<>();
+
+        // Strings to convert
+        output.put("a", toBoolean("true"));
+        output.put("b", toBoolean("false"));
+        output.put("c", toBoolean("FALSE"));
+        output.put("d", toBoolean("TrUe"));
+
+        // Print JSON
+        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(output));
+    }
+
+    // Case-insensitive conversion
+    private static boolean toBoolean(String value) {
+        return "true".equalsIgnoreCase(value);
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false,
+  "c": false,
+  "d": true
+}
+
+
+
+

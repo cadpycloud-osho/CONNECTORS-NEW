@@ -1,0 +1,231 @@
+toNumber:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class NumberConversionRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    String input = "0.005";
+                    
+                    // Equivalent to 'a': try multiple formats - seconds or .00
+                    Number parsedNumber = null;
+                    String[] formats = {"0.000", "0.00"}; // seconds -> 0.000, .00 -> 0.00
+                    for (String format : formats) {
+                        try {
+                            parsedNumber = new DecimalFormat(format).parse(input);
+                            break;
+                        } catch (ParseException e) {
+                            // Try next format
+                        }
+                    }
+                    result.put("a", parsedNumber != null ? parsedNumber.doubleValue() : null);
+                    
+                    // Equivalent to 'b': try single format "seconds" and capture error
+                    try {
+                        Number singleFormatNumber = new DecimalFormat("0.000").parse(input);
+                        result.put("b", "Success");
+                    } catch (ParseException e) {
+                        result.put("b", "Could not find a valid formatter for '" + input + "'");
+                    }
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "a": 0.005,
+  "b": "Could not find a valid formatter for '0.005'"
+}
+
+
+
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class EpochConversionRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    String inputDateTime = "2015-10-01T23:57:59Z";
+                    
+                    // Parse ZonedDateTime from ISO string
+                    ZonedDateTime zdt = ZonedDateTime.parse(inputDateTime);
+                    
+                    // 'a': epoch seconds (default - toNumber)
+                    result.put("epoch", zdt.toEpochSecond());
+                    
+                    // 'b': epoch milliseconds (explicit unit)
+                    result.put("millis", zdt.toInstant().toEpochMilli());
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "epoch": 1443743879,
+  "millis": 1443743879000
+}
+
+-----------------------------------------------------------------
+
+
+
+
+example 3:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DurationToNumberRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // Ex1: PT1H10M -> 4200 seconds (1h10m = 70m * 60 = 4200s)
+                    Duration duration1 = Duration.parse("PT1H10M");
+                    result.put("toSecondsEx1", duration1.getSeconds());
+                    
+                    // Ex2: PT1M7S -> 67000 milliseconds (1m7s = 67s * 1000 = 67000ms)
+                    Duration duration2 = Duration.parse("PT1M7S");
+                    result.put("toSecondsEx2", duration2.toMillis());
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+
+output:
+{
+  "toSecondsEx1": 4200,
+  "toSecondsEx2": 67000
+}
+
+
+-----------------------------------------------------------------
+
+example 4:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class ToNumberVariousFormatsRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // "default": toNumber("1.0")
+                    result.put("default", Double.parseDouble("1.0"));
+                    
+                    // "withFormat": toNumber("0.005",".00")
+                    result.put("withFormat", new DecimalFormat("0.00").parse("0.005").doubleValue());
+                    
+                    // "withLocal": toNumber("1,25","#.##","ES")
+                    DecimalFormatSymbols esSymbols = new DecimalFormatSymbols(Locale.forLanguageTag("es"));
+                    result.put("withLocal", new DecimalFormat("#.##", esSymbols).parse("1,25").doubleValue());
+                    
+                    // "withExtraPlaceholders": toNumber("5.55","####.####")
+                    result.put("withExtraPlaceholders", new DecimalFormat("####.####").parse("5.55").doubleValue());
+                    
+                    // "keyToNumber": toNumber(keysOf({"123" : "myValue"})[0])
+                    result.put("keyToNumber", Double.parseDouble("123"));
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "default": 1.0,
+  "withFormat": 0.005,
+  "withLocal": 1.25,
+  "withExtraPlaceholders": 5.55,
+  "keyToNumber": 123.0
+}
+
+-----------------------------------------------------------------
+
+

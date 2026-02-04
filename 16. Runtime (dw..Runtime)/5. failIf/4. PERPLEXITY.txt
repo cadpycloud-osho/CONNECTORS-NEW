@@ -1,0 +1,114 @@
+failIf:
+
+examples 1:
+
+input:
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Map;
+
+@RestController
+public class FailIfChainController {
+
+    @GetMapping("/fail-if-chain")
+    public Map<String, String> failIfChain() {
+        Map<String, String> result = Map.of(); // Empty object matching var result = {}
+        
+        // Matches: { "result" : "SUCCESS" failIf (isEmpty(result)) }
+        return new SuccessResponse("SUCCESS").failIf(result.isEmpty(), "Failed");
+    }
+}
+
+class SuccessResponse {
+    private final String value;
+    
+    public SuccessResponse(String value) {
+        this.value = value;
+    }
+    
+    public SuccessResponse failIf(boolean condition, String message) {
+        if (condition) {
+            throw new FailIfException(message);
+        }
+        return this;
+    }
+    
+    public Map<String, String> toMap() {
+        return Map.of("result", value);
+    }
+}
+
+class FailIfException extends RuntimeException {
+    public FailIfException(String message) {
+        super(message);
+    }
+}
+
+@RestControllerAdvice
+class FailIfHandler {
+    @ExceptionHandler(FailIfException.class)
+    public String handleFailIf(FailIfException ex) {
+        return "ERROR: " + ex.getMessage();
+    }
+}
+
+
+output:
+
+Expected Output
+Spring Boot (GET /fail-if-chain):
+
+text
+ERROR: Failed
+
+----------------------------------------------------------------
+
+
+
+examples 2:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class FailIfController {
+
+    @GetMapping("/fail-if-example")
+    public Map<String, Object> getResult() {
+        Map<String, Object> result = Map.of("a", "test");  // var result = {"a":"test"}
+
+        // Equivalent to: result failIf isEmpty($)
+        Map<String, Object> safeResult = failIfEmpty(result, "Failed");
+
+        return Map.of("result", safeResult);
+    }
+
+    private <T> T failIfEmpty(T value, String message) {
+        // Treat null or empty Map / Collection as "empty"
+        if (value == null
+            || (value instanceof java.util.Map && ((java.util.Map<?, ?>) value).isEmpty())
+            || (value instanceof java.util.Collection && ((java.util.Collection<?>) value).isEmpty())) {
+            throw new IllegalStateException(message);
+        }
+        return value;
+    }
+}
+
+
+output:
+
+{
+  "result": {
+    "a": "test"
+  }
+}
+

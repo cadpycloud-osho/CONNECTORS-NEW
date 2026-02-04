@@ -1,0 +1,138 @@
+map:
+
+example 1:
+
+
+input:
+
+@RestController
+@RequestMapping("/example1")
+public class Example1Controller {
+
+    @GetMapping
+    public List<Map<String, String>> process() {
+        List<String> input = List.of("jose", "pedro", "mateo");
+        List<Map<String, String>> result = new ArrayList<>();
+
+        for (int i = 0; i < input.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            map.put(String.valueOf(i), input.get(i));
+            result.add(map);
+        }
+        return result;
+    }
+}
+
+output:
+
+[
+  { "0": "jose" },
+  { "1": "pedro" },
+  { "2": "mateo" }
+]
+
+____________________________________________________________________________
+
+
+example 2:
+
+
+input:
+
+@RestController
+@RequestMapping("/example2")
+public class Example2Controller {
+
+    @GetMapping
+    public List<String> process() {
+        List<String> input = List.of("a", "b", "c");
+        List<String> result = new ArrayList<>();
+
+        for (int i = 0; i < input.size(); i++) {
+            result.add((i + 1) + "_" + input.get(i));
+        }
+        return result;
+    }
+}
+
+output:
+
+[ "1_a", "2_b", "3_c" ]
+
+____________________________________________________________________________
+
+
+
+example 3:
+
+
+input:
+
+@RestController
+@RequestMapping("/example3")
+public class Example3Controller {
+
+    @GetMapping
+    public List<Map<String, String>> process() {
+        List<String> input = List.of("joe", "pete", "matt");
+        List<Map<String, String>> result = new ArrayList<>();
+
+        for (int i = 0; i < input.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            map.put(String.valueOf(i), input.get(i));
+            result.add(map);
+        }
+        return result;
+    }
+}
+
+output:
+
+[
+  { "0": "joe" },
+  { "1": "pete" },
+  { "2": "matt" }
+]
+
+____________________________________________________________________________
+
+
+
+example 4:
+
+
+input:
+
+@RestController
+@RequestMapping("/example4")
+public class Example4Controller {
+
+    @GetMapping(produces = "text/csv")
+    public String process() {
+        List<Map<String, Object>> data = List.of(
+                Map.of("age", 14, "name", "Claire"),
+                Map.of("age", 56, "name", "Max"),
+                Map.of("age", 89, "name", "John")
+        );
+
+        StringBuilder csv = new StringBuilder("age,name\n");
+
+        for (Map<String, Object> row : data) {
+            csv.append(row.get("age")).append(",").append(row.get("name")).append("\n");
+        }
+
+        return csv.toString();
+    }
+}
+
+Output (CSV):
+
+
+age,name
+14,Claire
+56,Max
+89,John
+
+
+
+

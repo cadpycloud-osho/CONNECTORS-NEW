@@ -1,0 +1,28 @@
+localTime:
+
+
+input:
+
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/create-local-time")
+    public Map<String, String> createNewLocalTime() {
+        LocalTime newLocalTime = LocalTime.of(12, 30, 40);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("newLocalTime", newLocalTime.toString());
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "newLocalTime": "12:30:40"
+}
+

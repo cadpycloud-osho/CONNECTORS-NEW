@@ -1,0 +1,96 @@
+atBeginningOfWeek:
+
+example 1:
+
+
+input:
+
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+
+public class Main {
+    public static void main(String[] args) {
+
+        ZonedDateTime input =
+                ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+        ZonedDateTime beginningOfWeek =
+                input.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+                     .toLocalDate()
+                     .atStartOfDay(input.getZone());
+
+        System.out.println(beginningOfWeek);
+    }
+}
+
+
+output:
+
+2020-10-04T00:00-03:00
+
+
+------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+
+public class Main {
+    public static void main(String[] args) {
+
+        LocalDateTime input =
+                LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+        LocalDateTime beginningOfWeek =
+                input.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+                     .toLocalDate()
+                     .atStartOfDay();
+
+        System.out.println(beginningOfWeek);
+    }
+}
+
+
+
+output:
+
+2020-10-04T00:00
+
+------------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+
+public class Main {
+    public static void main(String[] args) {
+
+        LocalDate input = LocalDate.parse("2020-10-06");
+
+        LocalDate beginningOfWeek =
+                input.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+
+        System.out.println(beginningOfWeek);
+    }
+}
+
+
+
+output:
+
+"2020-10-04"
+
+------------------------------------------------------------------
+

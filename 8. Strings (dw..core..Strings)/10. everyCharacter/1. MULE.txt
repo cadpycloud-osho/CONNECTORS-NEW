@@ -1,0 +1,45 @@
+everyCharacter:
+
+everyCharacter(text: String, condition: (character: String) -> Boolean): Boolean
+
+everyCharacter(text: String, condition: (character: String) -> Boolean): Boolean
+Checks whether a condition is valid for every character in a string.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+"12 34  56" everyCharacter $ == " " or isNumeric($)
+
+DataWeave
+Output
+true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

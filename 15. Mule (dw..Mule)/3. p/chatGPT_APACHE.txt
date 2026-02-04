@@ -1,0 +1,27 @@
+p:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SimpleLoggerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // Load properties from application.properties automatically
+        // Example property: http.port=8081
+
+        from("direct:start")
+            .log("HTTP Port is: {{http.port}}");
+    }
+}
+
+
+output:
+
+
+HTTP Port is: 8081
+
+
+

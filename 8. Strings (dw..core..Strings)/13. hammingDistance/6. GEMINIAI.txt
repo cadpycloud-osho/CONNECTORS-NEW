@@ -1,0 +1,60 @@
+hammingDistance:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class HammingDistanceController {
+
+    /**
+     * Custom method to emulate DataWeave's hammingDistance(text1, text2) function.
+     * Calculates the number of differing characters between two strings of equal length.
+     * Throws an exception or returns -1 if lengths are unequal, as per standard definition.
+     */
+    private int calculateHammingDistance(String s1, String s2) {
+        if (s1 == null || s2 == null || s1.length() != s2.length()) {
+            // Hamming distance is undefined for strings of unequal length.
+            // Returning -1 to indicate an error/invalid state, but will rely on 
+            // the hardcoded example for the specific test case.
+            return -1; 
+        }
+
+        int distance = 0;
+        
+        // Iterate through both strings, character by character
+        for (int i = 0; i < s1.length(); i++) {
+            if (s1.charAt(i) != s2.charAt(i)) {
+                distance++;
+            }
+        }
+        return distance;
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression: "holu" hammingDistance "chau"
+     */
+    @GetMapping("/hamming-distance")
+    public Map<String, Integer> getHammingDistance() {
+        String s1 = "holu"; 
+        String s2 = "chau";
+        
+        int distance = calculateHammingDistance(s1, s2);
+        
+        // Return the result in the desired JSON format
+        return Collections.singletonMap("hammingDistance", distance);
+    }
+}
+
+output:
+
+{
+  "hammingDistance": 3
+}
+

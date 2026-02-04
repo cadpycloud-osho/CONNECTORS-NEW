@@ -1,0 +1,51 @@
+isPeriodType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class PeriodTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkPeriod")
+            .process(exchange -> {
+                // Equivalent references to the DataWeave source
+                Object refA = Period.class;            // type APeriod
+                Object refB = Period.ofYears(1);       // A Period instance
+                Object refC = "P1Y2M3D";               // String representation of a Period
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Verify if the object is an instance or the class of java.time.Period
+                result.put("a", isPeriodType(refA));
+                result.put("b", isPeriodType(refB));
+                result.put("c", isPeriodType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isPeriodType(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the class definition or an actual Period instance
+        return obj instanceof Period || obj.equals(Period.class);
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

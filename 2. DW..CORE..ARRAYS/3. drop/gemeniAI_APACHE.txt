@@ -1,0 +1,56 @@
+drop:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CamelDropExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: var users = ["Mariano", "Leandro", "Julian"]
+                        List<String> users = List.of("Mariano", "Leandro", "Julian");
+                        
+                        // Java equivalent of drop(users, 2)
+                        List<String> result = users.stream()
+                                .skip(2)
+                                .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+
+from("direct:input")
+    // Note: To use .stream() in Simple, you usually need a small bean 
+    // or use the method call directly if the body is a List
+    .setBody(simple("${body.subList(2, body.size())}")) 
+    .to("mock:result");
+
+output:
+
+[
+  "Julian"
+]

@@ -1,0 +1,69 @@
+find:
+
+INPUT:
+
+@GetMapping("/find1")
+public List<Integer> findBond() {
+    List<String> list = List.of("Bond", "James", "Bond");
+    List<Integer> result = new ArrayList<>();
+
+    for (int i = 0; i < list.size(); i++) {
+        if (list.get(i).equals("Bond")) {
+            result.add(i);
+        }
+    }
+    return result;
+}
+
+
+OUTPUT:
+
+[0,2]
+
+____________________________________________________________
+
+INPUT:
+
+@GetMapping("/find2")
+public List<List<Integer>> findRegex() {
+    String input = "I heart DataWeave";
+    String regex = "\\w*ea\\w*\\b";
+    java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+    java.util.regex.Matcher matcher = pattern.matcher(input);
+
+    List<List<Integer>> result = new ArrayList<>();
+    while (matcher.find()) {
+        result.add(List.of(matcher.start(), matcher.end()));
+    }
+    return result;
+}
+
+
+OUTPUT:
+
+[[2,7],[8,17]]
+
+____________________________________________________________
+
+INPUT:
+
+@GetMapping("/find3")
+public List<Integer> findA() {
+    String input = "aabccdbce";
+    String target = "a";
+
+    List<Integer> result = new ArrayList<>();
+    for (int i = 0; i < input.length(); i++) {
+        if (String.valueOf(input.charAt(i)).equals(target)) {
+            result.add(i);
+        }
+    }
+    return result;
+}
+
+
+OUTPUT:
+
+
+[0,1]
+

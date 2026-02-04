@@ -1,0 +1,57 @@
+isUpperCase:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsUpperCaseRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:validateUpperCase")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                results.put("a", isStrictUpperCase(null));
+                results.put("b", isStrictUpperCase(""));
+                results.put("c", isStrictUpperCase("  "));
+                results.put("d", isStrictUpperCase("ABC"));
+                results.put("e", isStrictUpperCase("aBC"));
+                results.put("f", isStrictUpperCase("A C"));
+                results.put("g", isStrictUpperCase("A1C"));
+                results.put("h", isStrictUpperCase("A/C"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic for strict uppercase alphabetic parity:
+     * 1. Check if null or empty (false)
+     * 2. Validate every character is a letter AND uppercase
+     */
+    private boolean isStrictUpperCase(String input) {
+        if (input == null || input.isEmpty()) return false;
+        
+        return input.chars().allMatch(c -> 
+            Character.isLetter(c) && Character.isUpperCase(c)
+        );
+    }
+}
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}

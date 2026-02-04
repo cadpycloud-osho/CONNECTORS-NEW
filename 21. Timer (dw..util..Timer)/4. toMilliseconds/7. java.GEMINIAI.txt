@@ -1,0 +1,54 @@
+toMilliseconds:
+
+
+
+input:
+
+
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Collections;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+    private static final String INPUT_TIMESTAMP = "2018-07-23T22:03:04.829Z";
+
+    // ---------- Simple JSON formatter (pure Java) ----------
+    private static String formatTimeOutput(Map<String, Long> output) {
+        // Simple manual formatting for the key/value pair expected
+        // since only one entry is present.
+        Map.Entry<String, Long> entry = output.entrySet().iterator().next();
+        
+        return "{\n  \"" + entry.getKey() + "\": " + entry.getValue() + "\n}";
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Output Simulation ---");
+
+        // Use LinkedHashMap to maintain insertion order.
+        Map<String, Long> output = new LinkedHashMap<>();
+
+        // 1. Parse the ISO 8601 string into a Java Instant object.
+        // This is the input to dw::util::Timer::toMilliseconds()
+        Instant instant = Instant.parse(INPUT_TIMESTAMP);
+
+        // 2. Convert the Instant to milliseconds since the epoch.
+        // This is the Java equivalent of dw::util::Timer::toMilliseconds()
+        long milliseconds = instant.toEpochMilli();
+
+        // Simulating the DataWeave call:
+        output.put("toMilliseconds", milliseconds);
+
+        // Output the map as JSON using the pure Java formatter
+        String jsonOutput = formatTimeOutput(output);
+        System.out.println(jsonOutput);
+    }
+}
+output:
+
+{
+  "toMilliseconds": 1532383384829
+}
+

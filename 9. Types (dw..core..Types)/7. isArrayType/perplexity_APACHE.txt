@@ -1,0 +1,32 @@
+isArrayType(t: Type): Boolean
+
+
+input:
+
+import java.util.*;
+
+public class IsArrayTypeConverter {
+    public static boolean isArrayType(String typeName) {
+        // Check if type represents Array<T> pattern
+        return typeName.startsWith("Array<") || "Array".equals(typeName);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isArrayType("Array<String>"));  // AType = Array<String>
+        result.put("b", isArrayType("Boolean"));        // Concrete type
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

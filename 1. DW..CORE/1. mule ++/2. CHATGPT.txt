@@ -1,0 +1,177 @@
+++:
+
+example 1:
+
+
+input:
+
+@GetMapping("/example1")
+public Map<String, Object> example1() {
+    List<Object> list1 = new ArrayList<>(List.of(0, 1, true, "my string"));
+    List<Object> list2 = List.of(2, List.of(3,4,5), Map.of("a", 6));
+
+    list1.addAll(list2);
+    return Map.of("a", list1);
+}
+
+
+output:
+
+{
+  "a": [0, 1, true, "my string", 2, [3, 4, 5], { "a": 6 }]
+}
+
+
+----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+@GetMapping("/example2")
+public String example2() {
+    LocalDate date = LocalDate.of(2017,10,1);
+    LocalTime time = LocalTime.of(23,57,59);
+
+    return LocalDateTime.of(date, time).toString();
+}
+
+
+output:
+
+{
+  "LocalDateTime": "2017-10-01T23:57:59"
+}
+
+
+----------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+@GetMapping("/example3")
+public String example3() {
+    return ZonedDateTime.of(
+        LocalDate.of(2017,10,1),
+        LocalTime.of(23,57,59),
+        ZoneOffset.UTC
+    ).toString();
+}
+
+
+output:
+
+{
+  "DateTime1": "2017-10-01T23:57:59Z"
+}
+
+
+----------------------------------------------------------------
+
+example 4:
+
+
+input:
+
+@GetMapping("/example4")
+public String example4() {
+    return OffsetDateTime.of(
+        LocalDate.of(2017,10,1),
+        LocalTime.of(23,57,59),
+        ZoneOffset.of("+02:00")
+    ).toString();
+}
+
+
+
+output:
+
+{
+  "DateTime3": "2017-10-01T23:57:59+02:00"
+}
+
+
+----------------------------------------------------------------
+
+
+
+
+
+example 5:
+
+
+input:
+
+@GetMapping("/example5")
+public String example5() {
+    return OffsetTime.of(
+        LocalTime.of(23,57),
+        ZoneOffset.of("-03:00")
+    ).toString();
+}
+
+
+output:
+
+{
+  "Time": "23:57:00-03:00"
+}
+
+
+----------------------------------------------------------------
+
+
+
+example 6:
+
+
+input:
+
+
+
+output:
+
+
+
+----------------------------------------------------------------
+
+
+
+example 7:
+
+
+input:
+
+
+
+output:
+
+
+
+----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

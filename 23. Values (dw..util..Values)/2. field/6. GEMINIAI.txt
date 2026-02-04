@@ -1,0 +1,58 @@
+field:
+
+
+
+input:
+
+public class FieldRepresentation {
+    private String kind;
+    private String namespace;
+    private String selector;
+
+    // Constructor to mimic the DataWeave function call
+    public FieldRepresentation(String namespace, String selector) {
+        // The kind is fixed to "Object" for the 'field' function output
+        this.kind = "Object"; 
+        this.namespace = namespace;
+        this.selector = selector;
+    }
+
+    // Getters (needed for Jackson serialization)
+    public String getKind() {
+        return kind;
+    }
+    public String getNamespace() {
+        return namespace;
+    }
+    public String getSelector() {
+        return selector;
+    }
+}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveController {
+
+    // The namespace defined in DataWeave
+    private static final String NAMESPACE_URI = "http://acme.com/foo";
+    private static final String FIELD_NAME = "myFieldName";
+
+    @GetMapping("/create-field")
+    public FieldRepresentation createField() {
+        // This instantiates the Java object, mimicking the DataWeave 'field' function
+        return new FieldRepresentation(NAMESPACE_URI, FIELD_NAME);
+    }
+}
+
+output:
+
+{
+  "kind": "Object",
+  "namespace": "http://acme.com/foo",
+  "selector": "myFieldName"
+}
+
+
+
+

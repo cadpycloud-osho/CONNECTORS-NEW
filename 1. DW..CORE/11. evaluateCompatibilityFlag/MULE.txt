@@ -1,0 +1,26 @@
+evaluateCompatibilityFlag:
+
+
+evaluateCompatibilityFlag(flag: String): Boolean
+Returns the value of the compatibility flag with the specified name.
+
+
+
+Source:
+%dw 2.0
+output application/json
+---
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": evaluateCompatibilityFlag("com.mulesoft.dw.xml_reader.honourMixedContentStructure")
+}
+
+
+DataWeave
+Output:
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}
+
+
+
+

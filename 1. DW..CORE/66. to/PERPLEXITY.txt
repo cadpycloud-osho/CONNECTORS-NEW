@@ -1,0 +1,59 @@
+to:
+
+example 1:
+
+input:
+
+@RestController
+class Example1_Range {
+
+    @GetMapping("/range")
+    public List<Integer> range() {
+        // Create list from 1 to 10 inclusive
+        return java.util.stream.IntStream.rangeClosed(1, 10)
+                .boxed()
+                .toList();
+    }
+}
+
+output:
+{ "myRange": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+
+-------------------------------------------------------------
+example 2:
+
+input:
+
+@RestController
+class Example2_StringSlices {
+
+    @GetMapping("/stringSlices")
+    public Map<String, String> stringSlices() {
+        String myVar = "Hello World!";
+
+        // indices 2 to 6 (inclusive) == substring(2,7)
+        String indices2to6 = myVar.substring(2, 7);
+
+        // indices 6 to -1 means 6 to last character (interpreting -1 as last index)
+        // substring(6, length)
+        String indicesFromEnd = myVar.substring(6);
+
+        // reversal via indices 11 to -0 means 11 down to 0 reversed
+        // We'll reverse full string "Hello World!" == length 12, last index 11
+        String reversal = new StringBuilder(myVar).reverse().toString();
+
+        return Map.of(
+                "indices2to6", indices2to6,
+                "indicesFromEnd", indicesFromEnd,
+                "reversal", reversal);
+    }
+}
+
+output:
+
+{
+  "indices2to6": "llo W",
+  "indicesFromEnd": "World!",
+  "reversal": "!dlroW olleH"
+}
+

@@ -1,0 +1,52 @@
+HMACBinary:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+public class HmacBinaryRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateHmac")
+            .routeId("HMAC-Binary-Route")
+            .process(exchange -> {
+                // 1. Inputs (converted to bytes)
+                String key = "xxxxx";
+                String message = "confidential";
+                String algorithm = "HmacSHA512";
+
+                // 2. Logic: Initialize the HMAC Mac instance
+                SecretKeySpec secretKey = new SecretKeySpec(
+                    key.getBytes(StandardCharsets.UTF_8), 
+                    algorithm
+                );
+                Mac mac = Mac.getInstance(algorithm);
+                mac.init(secretKey);
+
+                // 3. Generate the raw binary hash (byte array)
+                byte[] rawHmac = mac.doFinal(message.getBytes(StandardCharsets.UTF_8));
+
+                // 4. DataWeave Output Observation: 
+                // The DW output shows a JSON string full of \ufffd and unicode escapes.
+                // This happens when raw binary is serialized directly to a String.
+                String dwMimicString = new String(rawHmac, StandardCharsets.UTF_8);
+
+                exchange.getIn().setBody(Map.of("HMACBinary", dwMimicString));
+            })
+            .marshal().json()
+            .log("HMAC Result: ${body}");
+    }
+}
+
+output:
+
+{
+  "HMACBinary": "\ufffd\ufffd\ufffd\ufffd^h\ufffd!3\u0005\ufffd֎\u00017\ufffd\ufffd\ufffd`\ufffd8?\ufffdjn7\ufffdbs;\t\ufffdƅ\ufffd\ufffd\ufffdx&g\ufffd~\ufffd\ufffd%\ufffd7>1\ufffdK\u000e@\ufffdC\u0011\ufffdT\ufffd}W"
+}
+

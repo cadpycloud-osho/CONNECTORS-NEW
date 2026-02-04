@@ -1,0 +1,64 @@
+some:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class SomeFunctionController {
+
+    private boolean some(List<Integer> list, java.util.function.Predicate<Integer> condition) {
+        for (Integer num : list) {
+            if (condition.test(num)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @GetMapping("/someFunction")
+    public Map<String, Object> someFunctionExample() {
+
+        List<Boolean> okResults = new ArrayList<>();
+        List<Boolean> errResults = new ArrayList<>();
+
+        okResults.add(some(Arrays.asList(1, 2, 3), i -> i % 2 == 0));
+        okResults.add(some(Arrays.asList(1, 2, 3), i -> i % 2 == 0));
+        okResults.add(some(Arrays.asList(1, 2, 3), i -> i % 2 == 1));
+        okResults.add(some(Arrays.asList(1,2,3,4,5,6,7,8), i -> i == 2));
+        okResults.add(some(Arrays.asList(1, 2, 3), i -> i == 1));
+        okResults.add(some(Arrays.asList(1, 1, 1), i -> i == 1));
+        okResults.add(some(Arrays.asList(1), i -> i == 1));
+
+        // ❌ Error cases
+        errResults.add(some(Arrays.asList(1,2,3), i -> i == 100));
+        errResults.add(some(Arrays.asList(1), i -> i == 2));
+
+        Map<String, Object> okMap = new HashMap<>();
+        okMap.put("ok", okResults);
+
+        Map<String, Object> errMap = new HashMap<>();
+        errMap.put("err", errResults);
+
+        return Map.of("results", Arrays.asList(okMap, errMap));
+    }
+}
+
+output:
+
+
+{
+  "results": [
+    {
+      "ok": [ true, true, true, true, true, true, true ]
+    },
+    {
+      "err": [ false, false ]
+    }
+  ]
+}
+

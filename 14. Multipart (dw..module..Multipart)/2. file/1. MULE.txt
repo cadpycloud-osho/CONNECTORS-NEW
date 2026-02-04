@@ -1,0 +1,160 @@
+file:
+
+file(opts: {| name: String, path: String, mime?: String, fileName?: String |})
+
+file(opts: {| name: String, path: String, mime?: String, fileName?: String |})
+Creates a MultipartPart data structure from a resource file.
+
+This version of the file function accepts as argument an object containing key/value pairs, enabling you to enter the key/value pairs in any order, for example:
+
+
+
+Source
+%dw 2.0
+import dw::module::Multipart
+output application/dw
+var ordersFilePath = "./orders.xml"
+---
+Multipart::file{ name: "file", path: ordersFilePath, mime: "application/xml", fileName: "orders.xml" }
+
+
+DataWeave
+Input
+A file called orders.xml located in src/main/resources with the following content:
+
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>\$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>\$50</price>
+    </item>
+  </order>
+</orders>
+xml
+
+Output
+{
+headers: {
+    "Content-Type": "application/xml",
+    "Content-Disposition": {
+      name: "file",
+      filename: "orders.xml"
+    }
+  },
+  content: "<?xml version='1.0' encoding='UTF-8'?>\n<orders>\n  <order>\n    <item>\n      <id>1001</id>\n      <qty>1</qty>\n      <price>\$100</price>\n    </item>\n    <item>\n      <id>2001</id>\n      <qty>2</qty>\n      <price>\$50</price>\n    </item>\n  </order>\n</orders>"
+}
+
+
+-------------------------------------------------------------------
+
+Source
+%dw 2.0
+import dw::module::Multipart
+output multipart/form-data
+var ordersFilePath = "./orders.xml"
+var myArgs = { name: "file", path: ordersFilePath, mime: "application/xml", fileName: "myorders.xml"}
+---
+Multipart::form([
+  Multipart::file(myArgs)
+])
+
+
+
+DataWeave
+Output
+------=_Part_5349_1228640551.1560391284935
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_5349_1228640551.1560391284935--
+
+
+
+
+-------------------------------------------------------------------
+
+file(fieldName: String, path: String, mime: String = 'application/octet-stream', sentFileName: String = 'filename')
+
+
+
+
+
+Source
+%dw 2.0
+import dw::module::Multipart
+var myClients = "myClients.json"
+output multipart/form-data
+---
+Multipart::form([
+ Multipart::file("myFile", myClients, 'application/json', "partMyClients.json")
+])
+
+
+
+DataWeave
+Input
+A file called myClients.json and located in src/main/resources with the following content.
+
+clients: {
+    client: {
+      id: 1,
+      name: "Mariano"
+    },
+    client: {
+      id: 2,
+      name: "Shoki"
+    }
+  }
+
+
+
+JSON
+Output
+------=_Part_1586_1887987980.1542569342438
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+   clients: {
+     client: {
+       id: 1,
+       name: "Mariano"
+     },
+     client: {
+       id: 2,
+       name: "Shoki"
+     }
+   }
+}
+------=_Part_1586_1887987980.1542569342438--
+
+
+
+
+
+
+
+
+
+
+

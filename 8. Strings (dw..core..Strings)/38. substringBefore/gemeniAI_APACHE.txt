@@ -1,0 +1,42 @@
+substringBefore:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringBeforeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getPrefix")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides exact parity with DataWeave logic
+                results.put("a", StringUtils.substringBefore(null, "'"));
+                results.put("b", StringUtils.substringBefore("", "-"));
+                results.put("c", StringUtils.substringBefore("abc", "b"));
+                results.put("d", StringUtils.substringBefore("abc", "c"));
+                results.put("e", StringUtils.substringBefore("abc", "d"));
+                results.put("f", StringUtils.substringBefore("abc", ""));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab",
+  "e": "",
+  "f": ""
+}

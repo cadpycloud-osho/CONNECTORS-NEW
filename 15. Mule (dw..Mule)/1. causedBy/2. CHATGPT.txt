@@ -1,0 +1,85 @@
+causedBy:
+
+
+
+input:
+
+
+public class UnauthorizedException extends RuntimeException {
+    public UnauthorizedException(String message) {
+        super(message);
+    }
+}
+
+public class ForbiddenException extends RuntimeException {
+    public ForbiddenException(String message) {
+        super(message);
+    }
+}
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    // Equivalent of Mule: Mule::causedBy(error, 'HTTP:UNAUTHORIZED')
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<String> handleUnauthorized(UnauthorizedException ex) {
+        return new ResponseEntity<>("Handled: HTTP UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+    }
+
+    // Equivalent of Mule: Mule::causedBy('HTTP:FORBIDDEN')
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<String> handleForbidden(ForbiddenException ex) {
+        return new ResponseEntity<>("Handled: HTTP FORBIDDEN", HttpStatus.FORBIDDEN);
+    }
+
+    // General error handling for all SECURITY-like errors
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneralSecurity(Exception ex) {
+        return new ResponseEntity<>("GENERAL SECURITY ERROR HANDLED", HttpStatus.BAD_REQUEST);
+    }
+}
+@RestController
+public class TestController {
+
+    @GetMapping("/test")
+    public String test(@RequestParam String type) {
+
+        if (type.equals("401")) {
+            throw new UnauthorizedException("Unauthorized access");
+        }
+        if (type.equals("403")) {
+            throw new ForbiddenException("Forbidden access");
+        }
+
+        throw new RuntimeException("Other security error");
+    }
+}
+
+
+output:
+
+
+Spring Boot Outputs
+If you hit:
+/test?type=401
+
+
+Output:
+
+Handled: HTTP UNAUTHORIZED
+
+If you hit:
+/test?type=403
+
+
+Output:
+
+Handled: HTTP FORBIDDEN
+
+If you hit:
+/test?type=anythingElse
+
+
+Output:
+
+GENERAL SECURITY ERROR HANDLED
+

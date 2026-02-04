@@ -1,0 +1,51 @@
+orElse:
+
+orElse<T, E, R>(previous: Result<T, E>, orElse: () -> R): T | R
+
+orElse<T, E, R>(previous: Result<T, E>, orElse: () -> R): T | R
+Returns the result of the orElse argument if the previous argument to try fails. Otherwise, the function returns the value of the previous argument.
+
+
+
+Source
+%dw 2.0
+import * from dw::Runtime
+var user = {}
+var otherUser = {name: "DW"}
+output application/json
+---
+{
+    a: try(() -> user.name!) orElse "No User Name",
+    b: try(() -> otherUser.name) orElse "No User Name"
+}
+
+DataWeave
+Output
+{
+  "a": "No User Name",
+  "b": "DW"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

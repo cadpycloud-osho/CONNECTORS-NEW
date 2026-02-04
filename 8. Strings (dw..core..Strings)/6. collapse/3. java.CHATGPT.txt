@@ -1,0 +1,64 @@
+collapse:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String input = "a  b babb a";
+        List<String> result = new ArrayList<>();
+
+        StringBuilder current = new StringBuilder();
+        current.append(input.charAt(0));
+
+        for (int i = 1; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            if (c == current.charAt(0)) {
+                current.append(c);  // consecutive repeat → accumulate
+            } else {
+                result.add(current.toString());
+                current = new StringBuilder();
+                current.append(c);
+            }
+        }
+
+        result.add(current.toString()); // add last segment
+
+        // Print output
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+[
+  "a",
+  "  ",
+  "b",
+  " ",
+  "b",
+  "a",
+  "bb",
+  " ",
+  "a"
+]
+
+
+
+
+
+
+
+
+
+
+

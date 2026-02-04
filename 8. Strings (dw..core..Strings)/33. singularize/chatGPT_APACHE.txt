@@ -1,0 +1,43 @@
+singularize:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SingularizeExample {
+
+    public static void main(String[] args) {
+        System.out.println(result());
+    }
+
+    public static Map<String, String> result() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("singularize", singularize("boxes"));
+        return map;
+    }
+
+    // Simple singularize logic matching DataWeave example
+    public static String singularize(String value) {
+        if (value == null) {
+            return null;
+        }
+        if (value.endsWith("es")) {
+            return value.substring(0, value.length() - 2);
+        }
+        if (value.endsWith("s")) {
+            return value.substring(0, value.length() - 1);
+        }
+        return value;
+    }
+}
+
+
+output:
+
+{
+  "singularize": "box"
+}
+
+
+

@@ -1,0 +1,165 @@
+reduce:
+
+reduce<T>(@StreamCapable items: Array<T>, callback: (item: T, accumulator: T) -> T): T | Null
+
+reduce<T>(@StreamCapable items: Array<T>, callback: (item: T, accumulator: T) -> T): T | Null
+Applies a reduction expression to the elements in an array.
+
+For each element of the input array, in order, reduce applies the reduction lambda expression (function), then replaces the accumulator with the new result. The lambda expression can use both the current input array element and the current accumulator value.
+
+Note that if the array is empty and no default value is set on the accumulator parameter, a null value is returned.
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[2, 3] reduce ($ + $$)
+
+DataWeave
+Output
+5
+
+------------------------------------------------------------------------
+
+
+
+Source
+%dw 2.0
+var myNums = [1,2,3,4]
+var myEmptyList = []
+output application/json
+---
+{
+   "sum" : myNums reduce ($$ + $),
+   "concat" : myNums reduce ($$ ++ $),
+   "emptyList" : myEmptyList reduce ($$ ++ $)
+}
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+{ "sum": 10, "concat": "1234", "emptyList": null }
+
+
+
+
+------------------------------------------------------------------------
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+   "concat" : ["a", "b", "c", "d"] reduce ((item, acc = "z") -> acc ++ item),
+   "sum": [0, 1, 2, 3, 4, 5] reduce ((item, acc = 3) -> acc + item),
+   "multiply" : [2,3,3] reduce ((item, acc) -> acc * item),
+   "multiplyAcc" : [2,2,3] reduce ((item, acc = 3) -> acc * item)
+}
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+{ "concat": "zabcd", "sum": 18, "multiply": 18, "multiplyAcc": 36 }
+
+
+------------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+var myVar =
+{
+  "a": [0, 1, 2, 3, 4, 5],
+  "b": ["a", "b", "c", "d", "e"],
+  "c": [{ "letter": "a" }, { "letter": "b" }, { "letter": "c" }],
+  "d": [true, false, false, true, true]
+}
+---
+{
+  "a" : [0, 1, 2, 3, 4, 5] reduce $$,
+  "b": ["a", "b", "c", "d", "e"] reduce $$,
+  "c": [{ "letter": "a" }, { "letter": "b" }, { "letter": "c" }] reduce ((item, acc = "z") -> acc ++ item.letter),
+  "d": [{ letter: "a" }, { letter: "b" }, { letter: "c" }] reduce $$,
+  "e": [true, false, false, true, true] reduce ($$ and $),
+  "f": [true, false, false, true, true] reduce ((item, acc) -> acc and item),
+  "g": [true, false, false, true, true] reduce ((item, acc = false) -> acc and item),
+  "h": [true, false, false, true, true] reduce $$,
+  "i": myVar.a reduce ($$ + $),
+  "j": myVar.a reduce ((item, acc) -> acc + item),
+  "k": myVar.a reduce ((item, acc = 3) -> acc + item),
+  "l": myVar.a reduce $$,
+  "m": myVar.b reduce ($$ ++ $),
+  "n": myVar.b reduce ((item, acc) -> acc ++ item),
+  "o": myVar.b reduce ((item, acc = "z") -> acc ++ item),
+  "p": myVar.b reduce $$,
+  "q": myVar.c reduce ((item, acc = "z") -> acc ++ item.letter),
+  "r": myVar.c reduce $$,
+  "s": myVar.d reduce ($$ and $),
+  "t": myVar.d reduce ((item, acc) -> acc and item),
+  "u": myVar.d reduce ((item, acc = false) -> acc and item),
+  "v": myVar.d reduce $$,
+  "w": ([0, 1, 2, 3, 4] reduce ((item, acc = {}) -> acc ++ { a: item })) pluck $,
+  "x": [] reduce $$,
+  "y": [] reduce ((item,acc = 0) -> acc + item)
+}
+DataWeave
+copy icon
+✓ Copied
+Expand content
+Copy link to clipboardOutput
+"a": 0,
+"b": "a",
+"c": "zabc",
+"d": { "letter": "a" },
+"e": false,
+"f": false,
+"g": false,
+"h": true,
+"i": 15,
+"j": 15,
+"k": 18,
+"l": 0,
+"m": "abcde",
+"n": "abcde",
+"o": "zabcde",
+"p": "a",
+"q": "zabc",
+"r": { "letter": "a" },
+"s": false,
+"t": false,
+"u": false,
+"v": true,
+"w": [ 0,1,2,3,4 ],
+"x": null,
+"y": 0
+}
+JSON
+
+
+
+------------------------------------------------------------------------
+reduce<T, A>(@StreamCapable items: Array<T>, callback: (item: T, accumulator: A) -> A): A
+
+reduce(@StreamCapable text: String, callback: (item: String, accumulator: String) -> String): String
+
+
+Source
+%dw 2.0
+output application/json
+---
+"hello world" reduce (item, acc = "") -> item ++ acc
+DataWeave
+Output
+"dlrow olleh"
+
+
+------------------------------------------------------------------------
+
+
+

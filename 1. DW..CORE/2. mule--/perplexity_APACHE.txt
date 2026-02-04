@@ -1,0 +1,42 @@
+--:
+
+example 1:
+
+input:
+
+from("direct:start")
+  .unmarshal().json(JsonLibrary.Jackson)
+  .setBody(jsonpath("$.a[?(@ == 0)]"))
+  .setBody(simple("{ \"a\": ${body} }"))
+  .to("mock:result");
+
+
+
+
+output:
+
+{
+  "a": [0]
+}
+
+
+----------------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:start")
+  .setBody(jsonpath("$.good"))
+  .marshal().json(JsonLibrary.Jackson, Map.class)
+  .setHeader("good", simple("${body}"))
+  .setBody(simple("{ \"good\": ${header.good} }"))
+  .to("mock:result");
+
+
+
+
+output:
+
+
+{ "name": "DW" }

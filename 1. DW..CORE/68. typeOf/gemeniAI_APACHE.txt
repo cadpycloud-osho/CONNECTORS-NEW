@@ -1,0 +1,120 @@
+typeOf:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class CamelTypeOfExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave inputs
+                        List<Object> inputs = List.of(
+                            "A b",              // String
+                            List.of(1, 2),      // Array/List
+                            34,                 // Number/Integer
+                            true,               // Boolean
+                            Map.of("a", 5)      // Object/Map
+                        );
+
+                        // Map Java classes to DW type strings
+                        List<String> types = inputs.stream()
+                            .map(obj -> {
+                                if (obj instanceof String) return "String";
+                                if (obj instanceof List) return "Array";
+                                if (obj instanceof Number) return "Number";
+                                if (obj instanceof Boolean) return "Boolean";
+                                if (obj instanceof Map) return "Object";
+                                return "Unknown";
+                            })
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(types);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[ "String", "Array", "Number", "Boolean", "Object" ]
+
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+
+public class CamelUnionTypeCheck {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // var x: String | Number = "clearly a string"
+                        // In Java, we use Object to hold multiple possible types
+                        Object x = "clearly a string";
+                        
+                        // var y: "because" = "because"
+                        // Literal types are just Strings at runtime
+                        Object y = "because";
+
+                        // Map to their simple type names
+                        List<String> results = List.of(
+                            x.getClass().getSimpleName(), // Returns "String"
+                            y.getClass().getSimpleName()  // Returns "String"
+                        );
+
+                        exchange.getIn().setBody(results);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+["String", "String"]
+
+
+-------------------------------------------------------

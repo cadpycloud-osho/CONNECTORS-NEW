@@ -1,0 +1,109 @@
+partition:
+
+
+input:
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+        
+        // DataWeave Logic: arr partition (item) -> isEven(item)
+        // Collectors.partitioningBy splits the stream based on the predicate (n % 2 == 0)
+        Map<Boolean, List<Integer>> partitionedMap = arr.stream()
+            .collect(Collectors.partitioningBy(n -> n % 2 == 0));
+
+        List<Integer> success = partitionedMap.get(true);  // Even numbers
+        List<Integer> failure = partitionedMap.get(false); // Odd numbers
+
+        // Print the final JSON-like output structure
+        System.out.println("Output structure:");
+        System.out.println("{");
+        System.out.println("  \"success\": " + success + ",");
+        System.out.println("  \"failure\": " + failure);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+Output structure:
+{
+  "success": [0, 2, 4],
+  "failure": [1, 3, 5]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Java Code (Using an Imperative Loop)
+This traditional approach uses a single loop and explicitly sorts the elements into two separate lists.
+
+Java
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+        
+        // Initialize two lists for the results
+        List<Integer> success = new ArrayList<>(); // Even numbers
+        List<Integer> failure = new ArrayList<>(); // Odd numbers
+
+        // DataWeave Logic: arr partition (item) -> isEven(item)
+        for (int item : arr) {
+            // Predicate check: isEven(item)
+            if (item % 2 == 0) {
+                success.add(item);
+            } else {
+                failure.add(item);
+            }
+        }
+
+        // Print the final JSON-like output structure
+        System.out.println("Output structure:");
+        System.out.println("{");
+        System.out.println("  \"success\": " + success + ",");
+        System.out.println("  \"failure\": " + failure);
+        System.out.println("}");
+    }
+}
+
+
+
+Output for Both Java Codes
+The output for both the Java Stream and the Java Imperative approaches is identical and correctly matches the expected DataWeave output:
+
+JSON
+
+Output structure:
+{
+  "success": [0, 2, 4],
+  "failure": [1, 3, 5]
+}

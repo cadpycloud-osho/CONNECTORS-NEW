@@ -1,0 +1,72 @@
+encodeURIComponent:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class EncodeComparisonRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:compareEncoding")
+            .routeId("Encoding-Comparison-Route")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // 1. encodeURI behavior: Uses java.net.URI
+                // Preserves slashes and colons.
+                String path = " PATH/ TO /ENCODE ";
+                results.put("encodeURI", new URI(null, null, path, null).toASCIIString());
+
+                // 2. encodeURIComponent behavior: Uses java.net.URLEncoder
+                // Encodes structural characters like / , : ?
+                String reserved = ";,/?:@&=";
+                String encodedComp = URLEncoder.encode(reserved, StandardCharsets.UTF_8)
+                                               .replace("+", "%20")   // Space fix
+                                               .replace("*", "%2A")   // Match DW behavior
+                                               .replace("%7E", "~");  // Match DW behavior
+
+                results.put("encodeURIComponent_to_hex", encodedComp);
+
+                // 3. encodeURI ignoring structural characters
+                results.put("encodeURI_not_to_hex", reserved);
+
+                // 4. Unreserved characters (both leave these alone)
+                String unreserved = "-_.!~*'()";
+                results.put("encodeURIComponent_not_encoded", unreserved);
+                results.put("encodeURI_not_encoded", unreserved);
+
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("comparing_encode_functions_output", results);
+                exchange.getIn().setBody(response);
+            })
+            .marshal().json()
+            .log("Encoding Comparison: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "comparing_encode_functions_output": {
+    "encodeURIComponent": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURI": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURIComponent_to_hex": "%3B%2C%2F%3F%3A%40%26%3D",
+    "encodeURI_not_to_hex": ";,/?:@&=",
+    "encodeURIComponent_not_encoded": "-_.!~*'()",
+    "encodeURI_not_encoded": "-_.!~*'()"
+  }
+}
+
+
+

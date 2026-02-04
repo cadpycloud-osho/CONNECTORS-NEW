@@ -1,0 +1,75 @@
+between:
+
+
+input:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class DataWeaveDurationConverterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveDurationConverterApplication.class, args);
+        // The application will start on port 8080 (by default).
+        // Access http://localhost:8080/calculate-duration to see the output.
+    }
+}
+
+/**
+ * REST Controller to implement the DataWeave 'between' function logic.
+ */
+@RestController
+class DurationController {
+
+    /**
+     * DataWeave: between(date1, date2) = date1 - date2
+     * Java: Period.between(start, end) = end - start
+     * * We use Period.between(date2, date1) to match the DataWeave behavior.
+     * * @return A map representing the JSON output: {"a": "P2D", "b": "P1Y1M1D", "c": "P-1M-1D"}
+     */
+    @GetMapping("/calculate-duration")
+    public Map<String, String> getDurations() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        // a: between(|2010-12-12|,|2010-12-10|) -> P2D
+        String a = Period.between(
+            LocalDate.parse("2010-12-10"), 
+            LocalDate.parse("2010-12-12")
+        ).toString(); 
+
+        // b: between(|2011-12-11|,|2010-11-10|) -> P1Y1M1D
+        String b = Period.between(
+            LocalDate.parse("2010-11-10"), 
+            LocalDate.parse("2011-12-11")
+        ).toString(); 
+
+        // c: between(|2020-02-29|,|2020-03-30|) -> P-1M-1D
+        // Note the date reversal (end, start) to match the negative period
+        String c = Period.between(
+            LocalDate.parse("2020-03-30"), 
+            LocalDate.parse("2020-02-29")
+        ).toString(); 
+
+        result.put("a", a);
+        result.put("b", b);
+        result.put("c", c);
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": "P2D",
+  "b": "P1Y1M1D",
+  "c": "P-1M-1D"
+}

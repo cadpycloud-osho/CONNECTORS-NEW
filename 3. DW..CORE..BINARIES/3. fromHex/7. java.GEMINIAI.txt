@@ -1,0 +1,85 @@
+fromHex:
+
+
+
+input:
+
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    /**
+     * Converts a hexadecimal string into a byte array.
+     * This mimics the DataWeave 'fromHex()' function.
+     * @param hexString The hexadecimal input string.
+     * @return The decoded raw byte array.
+     */
+    public static byte[] fromHex(String hexString) {
+        // Ensure the hex string has an even length
+        if (hexString.length() % 2 != 0) {
+            throw new IllegalArgumentException("Hex string must have an even length.");
+        }
+
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+
+        // Process two hex characters at a time
+        for (int i = 0; i < len; i += 2) {
+            // Parse two characters as a single byte
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                                 + Character.digit(hexString.charAt(i+1), 16));
+        }
+        return data;
+    }
+
+    /**
+     * Executes the full DataWeave transformation.
+     */
+    public static String runDataWeaveTransformation() {
+        // 1. Define the input hex string
+        String hexInput = "4D756C65";
+        
+        // 2. Convert Hex to Binary (DW: fromHex("4D756C65"))
+        byte[] rawBytes = fromHex(hexInput); // rawBytes = {0x4D, 0x75, 0x6C, 0x65}
+        
+        // 3. Convert Binary to Base64 String (DW: as Binary {base: "64"})
+        String base64Output = Base64.getEncoder().encodeToString(rawBytes); // "TXVsZQ=="
+        
+        // Optional: Check what the raw bytes represent (Mule in ASCII)
+        String decodedText = new String(rawBytes, StandardCharsets.UTF_8);
+        
+        // 4. Format the final JSON output object (DW: { "hexToBinary": ... })
+        String jsonOutput = String.format("{\n\t\"hexToBinary\": \"%s\"\n}", base64Output);
+        
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Hex Input: " + hexInput);
+        System.out.println("Raw Bytes (ASCII): " + decodedText);
+        System.out.println("Base64 Output: " + base64Output);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+output:
+
+
+--- Intermediate Data (For Context) ---
+Hex Input: 4D756C65
+Raw Bytes (ASCII): Mule
+Base64 Output: TXVsZQ==
+---------------------------------------
+
+DataWeave JSON Output in Java:
+{
+	"hexToBinary": "TXVsZQ=="
+}
+
+

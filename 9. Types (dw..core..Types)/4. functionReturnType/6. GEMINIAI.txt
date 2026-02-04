@@ -1,0 +1,78 @@
+functionReturnType:
+
+
+input:
+
+package com.example.returnconverter.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class ReturnTypeConverterService {
+
+    /**
+     * Helper method to simulate DataWeave's functionReturnType() introspection.
+     * This logic explicitly maps the DW function type name to its return type.
+     */
+    private String functionReturnType(String functionTypeName) {
+        // Emulating the introspection based on the DW type definitions
+        // AFunction = (String, Number) -> Number
+        // AFunction2 = () -> Number
+        
+        return switch (functionTypeName) {
+            case "AFunction", "AFunction2" -> "Number";
+            default -> "Unknown";
+        };
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, String> convertReturnTypes() {
+        
+        // Define the types corresponding to the DW script's imports
+        final String AFunction = "AFunction";
+        final String AFunction2 = "AFunction2";
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: functionReturnType(AFunction), b: functionReturnType(AFunction2) }
+        return Map.of(
+            "a", functionReturnType(AFunction),
+            "b", functionReturnType(AFunction2)
+        );
+    }
+}
+
+
+package com.example.returnconverter.controller;
+
+import com.example.returnconverter.service.ReturnTypeConverterService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final ReturnTypeConverterService returnTypeConverterService;
+
+    public DataWeaveController(ReturnTypeConverterService returnTypeConverterService) {
+        this.returnTypeConverterService = returnTypeConverterService;
+    }
+
+    // Maps to http://localhost:8080/get-return-types
+    @GetMapping("/get-return-types")
+    public Map<String, String> getReturnTypes() {
+        // Calls the service method that holds the transformation logic
+        return returnTypeConverterService.convertReturnTypes();
+    }
+}
+
+output:
+
+{
+  "a": "Number",
+  "b": "Number"
+}
+

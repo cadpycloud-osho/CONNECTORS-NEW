@@ -1,0 +1,102 @@
+orElseTry:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    /* ---------- Result Models ---------- */
+
+    static Map<String, Object> success(Object result) {
+        return Map.of(
+                "success", true,
+                "result", result
+        );
+    }
+
+    static Map<String, Object> failure(String kind, String message) {
+        return Map.of(
+                "success", false,
+                "error", Map.of(
+                        "kind", kind,
+                        "message", message,
+                        "location", "user.name!",
+                        "stack", List.of("main")
+                )
+        );
+    }
+
+    /* ---------- Strict field access ---------- */
+
+    static Object strictGet(Map<String, Object> map, String key) {
+        if (!map.containsKey(key)) {
+            throw new NoSuchElementException(
+                    "There is no key named '" + key + "'"
+            );
+        }
+        return map.get(key);
+    }
+
+    /* ---------- MAIN ---------- */
+
+    public static void main(String[] args) {
+
+        Map<String, Object> user = new HashMap<>();
+        Map<String, Object> otherUser = new HashMap<>();
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        /* ---- a: try(user.name!) orElseTry otherUser.name! ---- */
+        try {
+            Object v1 = strictGet(user, "name");
+            output.put("a", success(v1));
+        } catch (Exception e1) {
+            try {
+                Object v2 = strictGet(otherUser, "name");
+                output.put("a", success(v2));
+            } catch (Exception e2) {
+                output.put(
+                        "a",
+                        failure(
+                                "KeyNotFoundException",
+                                e2.getMessage()
+                        )
+                );
+            }
+        }
+
+        /* ---- b: try(user.name!) orElseTry "No User Name" ---- */
+        try {
+            Object v1 = strictGet(user, "name");
+            output.put("b", success(v1));
+        } catch (Exception e) {
+            output.put("b", success("No User Name"));
+        }
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "success": false,
+    "error": {
+      "kind": "KeyNotFoundException",
+      "message": "There is no key named 'name'",
+      "location": "user.name!",
+      "stack": ["main"]
+    }
+  },
+  "b": {
+    "success": true,
+    "result": "No User Name"
+  }
+}
+
+
+

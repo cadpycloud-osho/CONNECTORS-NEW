@@ -1,0 +1,36 @@
+isTimeZoneType:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TimeZone;
+
+public class Main {
+
+    public static boolean isTimeZoneType(Class<?> type) {
+        return TimeZone.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ATimeZone = TimeZone.class;
+
+        result.put("a", isTimeZoneType(ATimeZone));
+        result.put("b", isTimeZoneType(TimeZone.class));
+        result.put("c", isTimeZoneType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+
+

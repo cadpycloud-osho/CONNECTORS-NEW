@@ -1,0 +1,57 @@
+drop:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class DropArrayElements {
+
+    /**
+     * Replicates the DataWeave 'drop(array, n)' function.
+     * Returns a new List starting from the element at the specified index 'n'.
+     *
+     * @param sourceList The list to drop elements from.
+     * @param elementsToDrop The number of elements to drop from the beginning (n).
+     * @return A list containing the remaining elements.
+     */
+    public static <T> List<T> drop(List<T> sourceList, int elementsToDrop) {
+        if (sourceList == null || elementsToDrop >= sourceList.size()) {
+            // Return an empty list if null, or if n is greater than or equal to list size
+            return List.of(); 
+        }
+        if (elementsToDrop <= 0) {
+            // Return the original list if n is 0 or less
+            return sourceList; 
+        }
+        
+        // Use subList(fromIndex, toIndex) to get the section starting at 'elementsToDrop'
+        // The subList starts at the index 'elementsToDrop' and goes to the end of the list (sourceList.size()).
+        return sourceList.subList(elementsToDrop, sourceList.size());
+    }
+
+    public static void main(String[] args) {
+        // Input array/List
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: drop(users, 2)
+        List<String> remainingUsers = drop(users, 2);
+        
+        System.out.println("--- Input List ---");
+        System.out.println(users);
+        
+        System.out.println("\n--- DataWeave drop(users, 2) Equivalent Output ---");
+        // Print the result to replicate the DataWeave JSON output format [ "Julian" ]
+        System.out.println(remainingUsers.toString());
+    }
+}
+
+output:
+
+
+
+[
+  "Julian"
+]

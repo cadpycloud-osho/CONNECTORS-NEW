@@ -1,0 +1,58 @@
+evalUrl:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.support.builder.Namespaces;
+
+public class EvalUrlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        // Equivalent to evalUrl
+        from("direct:executeEval")
+            .doTry()
+                // Loads script from classpath and executes it using DataSonnet (Camel's DW equivalent)
+                // 'payload' is automatically mapped from the exchange body
+                .to("datasonnet:resource:classpath:scripts/example.ds")
+                .process(exchange -> {
+                    // Wrap in the "Success" structure seen in your DW output
+                    Object body = exchange.getIn().getBody();
+                    exchange.getIn().setBody(java.util.Map.of(
+                        "success", true,
+                        "value", body,
+                        "logs", java.util.Collections.emptyList()
+                    ));
+                })
+            .doCatch(Exception.class)
+                .process(exchange -> {
+                    Exception cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                    exchange.getIn().setBody(java.util.Map.of(
+                        "success", false,
+                        "error", cause.getMessage()
+                    ));
+                })
+            .end();
+    }
+}
+
+
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  },
+  "execute_ok_withValue": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  }
+}
+
+
+

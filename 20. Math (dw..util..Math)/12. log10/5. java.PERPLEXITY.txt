@@ -1,0 +1,48 @@
+log10:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = executeLog10Tests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Double> executeLog10Tests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("log1010", log10(10.0));
+        result.put("log1013", log10(0.13));
+        result.put("log10-20", log10(-20.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave log10() equivalent:
+     * Returns base-10 logarithm of x, or null if x <= 0
+     */
+    public static Double log10(double x) {
+        // Check domain: x must be > 0
+        if (x <= 0.0) {
+            return null;
+        }
+        return Math.log10(x);
+    }
+}
+
+
+output:
+
+
+{
+  log1010=1.0,
+  log1013=-0.8860566476931632,
+  log10-20=null
+}
+

@@ -1,0 +1,41 @@
+logn:
+
+
+
+input:
+
+import java.util.*;
+
+public class LognExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        output.put("logn10", safeLogn(10.0));
+        output.put("logn13", safeLogn(0.13));
+        output.put("logn-20", safeLogn(-20.0)); // invalid, convert to null
+
+        System.out.println(output);
+    }
+
+    private static Double safeLogn(double value) {
+        if (value <= 0) {
+            return null; // DataWeave returns null for negative or zero
+        }
+        return Math.log(value); // natural logarithm
+    }
+}
+
+
+
+output:
+
+{
+   "logn10": 2.302585092994046,
+   "logn13": -2.0402208285265546,
+   "logn-20": null
+}
+
+
+

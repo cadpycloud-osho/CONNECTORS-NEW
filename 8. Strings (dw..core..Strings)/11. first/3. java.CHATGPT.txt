@@ -1,0 +1,25 @@
+first:
+
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        String input = "hello world!";
+        String result = input.substring(0, 5);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+hello
+
+
+

@@ -1,0 +1,91 @@
+compose:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class UrlEncodeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                String urlPath = "content folder";
+
+                String encodedPath = URLEncoder.encode(urlPath, StandardCharsets.UTF_8);
+                encodedPath = encodedPath.replace("+", "%20"); // match DataWeave behavior
+
+                String result =
+                        "http://examplewebsite.com/" +
+                        encodedPath +
+                        "/page.html";
+
+                exchange.getMessage().setBody(
+                    "{ \"encodedURL\" : \"" + result + "\" }"
+                );
+            });
+    }
+}
+
+
+
+
+output:
+
+{
+  "encodedURL": "http://examplewebsite.com/content%20folder/page.html"
+}
+
+
+
+---------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class UrlComposeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                String urlPath = "content folder";
+
+                String encodedPath = URLEncoder
+                        .encode(urlPath, StandardCharsets.UTF_8)
+                        .replace("+", "%20"); // align with DataWeave encoding
+
+                String url = "http://examplewebsite.com/"
+                        + encodedPath
+                        + "/page.html";
+
+                exchange.getMessage().setBody(
+                        "{ \"encodedURL\" : \"" + url + "\" }"
+                );
+            });
+    }
+}
+
+
+
+
+output:
+
+{
+  "encodedURL": "http://examplewebsite.com/content%20folder/page.html"
+}
+
+
+
+---------------------------------------------------------

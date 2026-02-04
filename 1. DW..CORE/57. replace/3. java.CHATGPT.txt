@@ -1,0 +1,90 @@
+replace:
+
+example 1:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String first = "123-456-7890".replaceAll(".*-", "");
+        String second = "abc123def".replaceAll("[b13e]", "-");
+
+        List<Object> result = Arrays.asList(
+                Integer.parseInt(first), // converts "7890" → 7890
+                second
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[7890, a-c-2-d-f]
+
+------------------------------------------------------------------------
+
+example 2:
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String value = "admin123".replace("123", "ID");
+
+        Map<String, String> result = new HashMap<>();
+        result.put("replace", value);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{replace=adminID}
+
+------------------------------------------------------------------------
+
+
+
+example 3:
+
+input:
+
+
+
+
+
+output:
+
+
+------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

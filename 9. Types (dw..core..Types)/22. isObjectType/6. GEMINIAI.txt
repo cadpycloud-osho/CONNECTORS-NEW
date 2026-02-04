@@ -1,0 +1,54 @@
+isObjectType:
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map; // Proxy for DataWeave Object/Structure
+import java.lang.Boolean;
+import java.util.HashMap;
+
+@RestController
+public class ObjectCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isObjectType(Type).
+     */
+    private boolean isObjectType(Class<?> type) {
+        // Check if the type is a Map, which is the Java equivalent of a DataWeave Object structure.
+        return Map.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/object-typecheck")
+    public Map<String, Boolean> checkObjectTypes() {
+        
+        // DataWeave type AType is an alias for {name: String}, which is a structure/Map in Java context
+        Class<?> aType = Map.class;
+        
+        // DataWeave type Boolean
+        Class<?> booleanType = Boolean.class;
+
+        // Perform the type checks
+        boolean a = isObjectType(aType);
+        boolean b = isObjectType(booleanType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+

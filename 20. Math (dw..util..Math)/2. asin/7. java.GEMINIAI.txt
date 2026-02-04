@@ -1,0 +1,90 @@
+asin:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    /**
+     * Helper function to replicate DataWeave's asin behavior (returning null for out-of-range input)
+     * @param x The value to calculate the arc sine for.
+     * @return The arc sine value in radians, or null if x is outside [-1, 1].
+     */
+    private static Object asin(double x) {
+        // DataWeave's asin returns null if x is outside the range [-1, 1].
+        if (x < -1.0 || x > 1.0) {
+            return null;
+        }
+        // Math.asin returns the arc sine of a value in the range [-pi/2, pi/2] radians.
+        return Math.asin(x);
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    @SuppressWarnings("unchecked")
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        
+        // Use String.valueOf for Numbers and Booleans to preserve decimal precision
+        if (obj instanceof Number || obj instanceof Boolean) return String.valueOf(obj);
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> toPrettyJson(v, indent + 1))
+                    .map(s -> s.contains("\n") ? s : next + s)
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return String.valueOf(obj);
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Output Simulation ---");
+
+        // Use LinkedHashMap to maintain insertion order.
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // Simulating the DataWeave calls:
+        output.put("asin0", asin(0));
+        output.put("asin13", asin(0.13));
+        output.put("asin-1", asin(-1));
+        output.put("asin1.1", asin(1.1));
+
+        // Output the map using the pure Java JSON printer
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+
+
+output:
+
+
+{
+  "asin0": 0.0,
+  "asin13": 0.1303689797031455,
+  "asin-1": -1.5707963267948966,
+  "asin1.1": null
+}

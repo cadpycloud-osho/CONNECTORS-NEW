@@ -1,0 +1,50 @@
+envVar:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+
+public class EnvVarProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Get environment variables (System.getenv equivalent)
+        String shellVar = System.getenv("SHELL");
+        String fakeVar = System.getenv("FAKE_ENV_VAR");
+        
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> envVars = List.of(
+            Map.of("real", shellVar != null ? shellVar : null),
+            Map.of("fake", fakeVar)
+        );
+        
+        result.put("envVars", envVars);
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:envVars")
+    .process(new EnvVarProcessor())
+    .log("${body}");
+
+
+output:
+
+
+{
+  "envVars": [
+    {
+      "real": "/bin/bash"
+    },
+    {
+      "fake": null
+    }
+  ]
+}
+
+
+

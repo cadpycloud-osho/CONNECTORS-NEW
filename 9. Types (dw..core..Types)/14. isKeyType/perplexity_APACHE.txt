@@ -1,0 +1,61 @@
+isKeyType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveKeyTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processKeyTypeChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processKeyTypeChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AKey = Key (alias/derived key type)
+        result.put("a", isKeyType(Key.class));
+        
+        // Built-in Key type
+        result.put("b", isKeyType(Key.class));
+        
+        // Boolean - not a key type
+        result.put("c", isKeyType(Boolean.class));
+        
+        return result;
+    }
+    
+    private boolean isKeyType(Class<?> type) {
+        // DataWeave Key types represent string-like keys used in objects/maps
+        // Camel simulates this with String-based header/message key handling
+        return type == String.class || 
+               type == Key.class || 
+               "Key".equals(type.getSimpleName()) ||
+               CharSequence.class.isAssignableFrom(type);
+    }
+    
+    // Key interface equivalent for DataWeave Key type simulation
+    private interface Key extends CharSequence {}
+}
+
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

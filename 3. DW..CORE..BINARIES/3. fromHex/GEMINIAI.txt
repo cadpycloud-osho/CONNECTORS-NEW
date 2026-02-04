@@ -1,0 +1,62 @@
+fromHex:
+
+
+INPUT:
+
+import java.util.Base64;
+import java.util.Map;
+import java.util.HexFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class FromHexExample {
+
+    /**
+     * Replicates DataWeave's fromHex(string) logic.
+     * Decodes a Hex string into a byte array, and then encodes the result in Base64
+     * to match the default DataWeave binary output format.
+     *
+     * @param hexString The Hexadecimal encoded string.
+     * @return The Base64 encoded string.
+     */
+    public static String hexToBase64(String hexString) {
+        
+        // 1. Decode Hex String to Byte Array
+        // HexFormat.of().parseHex() is the equivalent of DataWeave's fromHex()
+        // NOTE: HexFormat is available in Java 17+. For Java 8, use DatatypeConverter.parseHexBinary or Apache Commons Codec.
+        byte[] rawBytes = HexFormat.of().parseHex(hexString); 
+        
+        // 2. Encode the raw byte array to Base64 (DataWeave output format)
+        return Base64.getEncoder().encodeToString(rawBytes);
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        String inputHex = "4D756C65"; // ASCII for "Mule"
+        
+        String base64Output = hexToBase64(inputHex);
+
+        // --- Output Generation (Simulating DataWeave JSON structure) ---
+        
+        // The DataWeave output structure is: { hexToBinary: "TXVsZQ==" as Binary {base: "64"} }
+        // In Java, we represent this as a Map containing the Base64 string.
+        Map<String, String> result = Map.of(
+            "hexToBinary", base64Output + " as Binary {base: \"64\"}"
+        );
+            
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave fromHex Equivalent Output ---");
+        System.out.println("Input (Hex): " + inputHex);
+        
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+}
+
+OUTPUT:
+
+{
+   "hexToBinary": "TXVsZQ==" as Binary {base: "64"}
+}

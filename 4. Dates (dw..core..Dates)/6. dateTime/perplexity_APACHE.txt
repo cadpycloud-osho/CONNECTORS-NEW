@@ -1,0 +1,28 @@
+dateTime:
+
+
+input:
+
+from("direct:newDateTime")
+    .process(exchange -> {
+        ZonedDateTime newDateTime = ZonedDateTime.of(2012, 10, 11, 12, 30, 40, 0, 
+            ZoneOffset.ofHours(-3));
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("newDateTime", newDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+
+{
+   "newDateTime": "2012-10-11T12:30:40-03:00"
+}
+
+
+
+
+

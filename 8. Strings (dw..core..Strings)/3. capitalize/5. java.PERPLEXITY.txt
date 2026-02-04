@@ -1,0 +1,49 @@
+capitalize:
+
+input:
+
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + capitalize("customer") + "\",");
+        System.out.println("  \"b\": \"" + capitalize("customer_first_name") + "\",");
+        System.out.println("  \"c\": \"" + capitalize("customer NAME") + "\",");
+        System.out.println("  \"d\": \"" + capitalize("customerName") + "\",");
+        System.out.println("  \"e\": \"" + capitalize("a*s_b's") + "\"");
+        System.out.println("}");
+    }
+    
+    private static String capitalize(String input) {
+        if (input == null || input.isEmpty()) return input;
+        
+        String[] words = input.split("[_\\s]+");
+        StringBuilder result = new StringBuilder();
+        
+        for (int i = 0; i < words.length; i++) {
+            if (i > 0) {
+                result.append(" ");
+            }
+            String word = words[i];
+            if (!word.isEmpty()) {
+                result.append(Character.toUpperCase(word.charAt(0)))
+                      .append(word.substring(1).toLowerCase());
+            }
+        }
+        return result.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": "Customer",
+  "b": "Customer First Name",
+  "c": "Customer Name",
+  "d": "Customer Name",
+  "e": "A*s B's"
+}
+
+

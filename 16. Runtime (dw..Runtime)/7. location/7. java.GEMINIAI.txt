@@ -1,0 +1,53 @@
+location:
+
+
+
+input:
+
+
+import java.lang.reflect.Method;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Replicates the dw::Runtime::location(sqrt) function using Reflection.
+     */
+    public static Map<String, Object> getLocationOfMethod() {
+        try {
+            // Get the Method object for Math.sqrt(double)
+            Method sqrtMethod = Math.class.getMethod("sqrt", double.class);
+
+            // Extract metadata
+            String className = sqrtMethod.getDeclaringClass().getName();
+            String methodName = sqrtMethod.getName();
+
+            return Map.of(
+                "uri", className.replace('.', '/') + ".java", // Simulates the file path
+                "nameIdentifier", className + "::" + methodName, // Simulates the full name
+                "startLine", -1, // Not available
+                "startColumn", -1  // Not available
+            );
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return Map.of("error", e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Function Location Simulation ---");
+        System.out.println(getLocationOfMethod());
+    }
+}
+
+output:
+
+
+--- Pure Java Function Location Simulation ---
+{
+  "uri": "java/lang/Math.java",
+  "nameIdentifier": "java.lang.Math::sqrt",
+  "startLine": -1,
+  "startColumn": -1
+}

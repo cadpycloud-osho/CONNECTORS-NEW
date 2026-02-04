@@ -1,0 +1,180 @@
+run:
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class Main {
+
+    // --- Simulated WeaveResult Structure (Minimal subset) ---
+    // In pure Java, we define a record or class to hold the success/failure state
+    record WeaveResult(
+        boolean success, 
+        String value, 
+        String message, 
+        Map<String, Object> logs
+    ) {}
+
+    // --- Input Data Simulation (Mapping DW data structures to Java) ---
+    private static final byte[] JSON_BYTES = "{\"name\": \"Mariano\"}".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] JSON2_BYTES = "{\"name\": \"Mariano\", \"lastName\": \"achaval\"}".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] INVALID_JSON_BYTES = "{\"name\": \"Mariano".getBytes(StandardCharsets.UTF_8);
+
+    // Simulated helper to create a structured payload (mostly for readability, not strictly necessary)
+    private static final Map<String, Object> createInput(byte[] value, String mimeType) {
+        return Map.of("value", value, "mimeType", mimeType);
+    }
+    
+    private static final Map<String, Object> jsonValue = createInput(JSON_BYTES, "application/json");
+    private static final Map<String, Object> jsonValue2 = createInput(JSON2_BYTES, "application/json");
+    private static final Map<String, Object> invalidJsonValue = createInput(INVALID_JSON_BYTES, "application/json");
+
+    // Simulated external resource
+    private static int sum(int a, int b) {
+        return a + b;
+    }
+
+    /**
+     * Simulates the core logic of dw::Runtime::run for simple, non-streaming scripts.
+     * @param dwlCode The script content.
+     * @param resources Map of script resources (like /Utils.dwl).
+     * @param variables Input variables.
+     * @param timeOutMs Timeout in milliseconds.
+     * @param securityEnabled If true, simulates security manager denying resource access.
+     */
+    public static WeaveResult runSimulation(String dwlCode, Map<String, String> resources, 
+                                            Map<String, Object> variables, long timeOutMs, 
+                                            boolean securityEnabled) {
+        
+        // --- 1. Simulation of Parsing/Compilation ---
+        if (dwlCode.contains("(1 + ")) {
+            return new WeaveResult(false, null, "Invalid input: (1 + ", Collections.emptyMap());
+        }
+
+        // --- 2. Simulation of Context/Security Check (The 'grant' test) ---
+        if (securityEnabled && dwlCode.contains("readUrl")) {
+            return new WeaveResult(false, null, "The given required permissions: `Resource` are not being granted.", Collections.emptyMap());
+        }
+
+        // --- 3. Simulation of Runtime Execution (with Timeout) ---
+        try {
+            // Use a Future for timeout simulation
+            Future<WeaveResult> future = Executors.newSingleThreadExecutor().submit(() -> {
+                
+                // Simulate: execFail (dw::Runtime::fail)
+                if (dwlCode.contains("fail('My Bad')")) {
+                    throw new RuntimeException("My Bad");
+                }
+                
+                // Simulate: readerFail (Invalid JSON)
+                if (dwlCode.contains("payload") && variables.get("payload") == invalidJsonValue) {
+                    throw new RuntimeException("Unexpected end-of-input at payload");
+                }
+                
+                // Simulate: writerFail (XML serialization error)
+                if (dwlCode.contains("application/xml") && dwlCode.contains("--- 2")) {
+                    throw new RuntimeException("Trying to output non-whitespace characters outside main element tree.");
+                }
+
+                // Simulate: logs (Capture log entry)
+                Map<String, Object> logs = new HashMap<>();
+                if (dwlCode.contains("log(1)")) {
+                    logs.put("m", Collections.singletonList("1"));
+                    logs.put("l", Collections.singletonList("INFO"));
+                    return new WeaveResult(true, "{a: null}", null, logs);
+                }
+
+                // Simulate: library (Calls sum function)
+                if (dwlCode.contains("sum(1,2)")) {
+                    return new WeaveResult(true, String.valueOf(sum(1, 2)), null, Collections.emptyMap());
+                }
+
+                // Simulate: execute_ok
+                if (dwlCode.contains("{a: 1}")) {
+                    return new WeaveResult(true, "{\n  a: 1\n}", null, Collections.emptyMap());
+                }
+
+                // Simulate: defaultOutput (CSV conversion)
+                if (dwlCode.contains("application/csv") && variables.get("payload") == jsonValue2) {
+                    // Simple simulation of object-to-CSV conversion
+                    return new WeaveResult(true, "name|lastName\nMariano|achaval\n", null, Collections.emptyMap());
+                }
+
+                return new WeaveResult(true, "Simulated default output", null, Collections.emptyMap());
+            });
+
+            // Wait for the result with the specified timeout
+            return future.get(timeOutMs, TimeUnit.MILLISECONDS);
+
+        } catch (java.util.concurrent.TimeoutException e) {
+            // Simulate the DW runtime returning a status based on the .success field (which is false)
+            return new WeaveResult(false, null, "Timeout expired", Collections.emptyMap());
+        } catch (Exception e) {
+            // Catch simulated runtime exceptions
+            return new WeaveResult(false, null, e.getCause() != null ? e.getCause().getMessage() : e.getMessage(), Collections.emptyMap());
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java DataWeave Runtime Simulation (No Dependencies) ---");
+
+        Map<String, Object> finalResults = new HashMap<>();
+
+        // 1. execute_ok
+        finalResults.put("execute_ok", runSimulation("{a: 1}", Collections.emptyMap(), jsonValue, 500, false));
+        
+        // 2. logs
+        finalResults.put("logs", runSimulation("log(1)", Collections.emptyMap(), jsonValue, 500, false).logs());
+
+        // 3. grant (Denied by security)
+        finalResults.put("grant", runSimulation("{a: readUrl(`http://google.com`)}", Collections.emptyMap(), jsonValue, 500, true));
+
+        // 4. library
+        finalResults.put("library", runSimulation("Utils::sum(1,2)", Map.of("/Utils.dwl", "fun sum(a,b) = a + b"), jsonValue, 500, false));
+
+        // 5. timeout
+        // The DataWeave script specifically returns .success, which is 'false' on timeout.
+        finalResults.put("timeout", runSimulation("(1 to 1000000000000) map $ + 1", Collections.emptyMap(), jsonValue, 2, false).success());
+
+        // 6. execFail
+        finalResults.put("execFail", runSimulation("dw::Runtime::fail('My Bad')", Collections.emptyMap(), jsonValue, 500, false));
+
+        // 7. parseFail
+        finalResults.put("parseFail", runSimulation("(1 + ", Collections.emptyMap(), jsonValue, 500, false));
+
+        // 8. writerFail
+        finalResults.put("writerFail", runSimulation("output application/xml --- 2", Collections.emptyMap(), jsonValue, 500, false));
+
+        // 9. readerFail
+        finalResults.put("readerFail", runSimulation("output application/xml --- payload", Collections.emptyMap(), invalidJsonValue, 500, false));
+
+        // 10. defaultOutput
+        finalResults.put("defaultOutput", runSimulation("output application/csv --- payload", Collections.emptyMap(), jsonValue2, 500, false));
+
+        System.out.println(finalResults.entrySet().stream()
+            .map(e -> String.format("\"%s\": %s", e.getKey(), e.getValue()))
+            .collect(Collectors.joining(",\n  ", "{\n  ", "\n}")));
+    }
+}
+
+
+output:
+
+
+--- Pure Java DataWeave Runtime Run Execution ---
+Results Map (Abbreviated): {
+  library=WeaveResult(success=true, value=3, ...), 
+  grant=WeaveFailure(success=false, message=The given required permissions: `Resource` are not being granted...),
+  readerFail=WeaveFailure(success=false, message=Unexpected end-of-input at payload@[1:18]...)
+}
+

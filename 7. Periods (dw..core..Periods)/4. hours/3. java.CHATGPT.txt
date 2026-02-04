@@ -1,0 +1,74 @@
+hours:
+
+
+input:
+
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        ZonedDateTime originalDate =
+                ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("nextHour", originalDate.plusHours(1).toString());
+        result.put("previousHour", originalDate.minusHours(1).toString());
+
+        LocalTime inputTime = LocalTime.parse("20:22");
+
+        result.put("threeHoursLater", inputTime.plusHours(3).toString());
+        result.put("addDecimalInput",
+                inputTime.plusMinutes((long) (3.5 * 60)).toString());
+
+        Duration decimalDuration =
+                Duration.ofSeconds((long) (4.555 * 3600));
+        result.put("decimalInputAsPeriod", decimalDuration.toString());
+
+        result.put("fourHourPeriod", Duration.ofHours(4).toString());
+
+        Duration addNegativeValue =
+                Duration.ofHours(-1).plusHours(2);
+        result.put("addNegativeValue", addNegativeValue.getSeconds());
+
+        // Print output in JSON-like format
+        System.out.println(toJson(result));
+    }
+
+    private static String toJson(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder("{\n");
+        int i = 0;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            sb.append("  \"").append(entry.getKey()).append("\": ");
+            if (entry.getValue() instanceof String) {
+                sb.append("\"").append(entry.getValue()).append("\"");
+            } else {
+                sb.append(entry.getValue());
+            }
+            if (++i < map.size()) sb.append(",");
+            sb.append("\n");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+}
+
+
+output:
+
+{
+  "nextHour": "2020-10-05T21:22:34.385Z",
+  "previousHour": "2020-10-05T19:22:34.385Z",
+  "threeHoursLater": "23:22",
+  "addDecimalInput": "23:52",
+  "decimalInputAsPeriod": "PT4H33M18S",
+  "fourHourPeriod": "PT4H",
+  "addNegativeValue": 3600
+}
+

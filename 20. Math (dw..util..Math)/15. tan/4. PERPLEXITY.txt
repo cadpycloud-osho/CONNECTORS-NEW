@@ -1,0 +1,64 @@
+tan:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveMathTanApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveMathTanApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/math/tan")
+@RequiredArgsConstructor
+class TanController {
+    
+    private final MathService mathService;
+    
+    @GetMapping("/test")
+    public Map<String, Double> testTan() {
+        return mathService.executeTanTests();
+    }
+}
+
+@Service
+class MathService {
+    
+    public Map<String, Double> executeTanTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("tan0", tan(0.0));
+        result.put("tan13", tan(0.13));
+        result.put("tan-1", tan(-1.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave tan() equivalent:
+     * Returns tangent of x (in radians)
+     */
+    public Double tan(double x) {
+        return Math.tan(x);
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+{
+  "tan0": 0.0,
+  "tan13": 0.13073731800446006,
+  "tan-1": -1.5574077246549023
+}
+
+
+

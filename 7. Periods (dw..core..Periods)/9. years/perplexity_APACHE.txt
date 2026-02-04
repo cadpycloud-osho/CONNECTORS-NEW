@@ -1,0 +1,45 @@
+years:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.util.*;
+
+public class YearsPeriodRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:yearsPeriod")
+            .process(exchange -> {
+                ZonedDateTime base = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // nextYear: + years(1) → 2020-10-05 → 2021-10-05
+                result.put("nextYear", base.plusYears(1).toString());
+                
+                // fourYearPeriod: years(4)
+                result.put("fourYearPeriod", "P4Y");
+                
+                // addNegativeValue: years(-1) + years(2) = 1 year = 12 months
+                result.put("addNegativeValue", 12);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 12
+}
+
+
+

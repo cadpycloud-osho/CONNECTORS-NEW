@@ -1,0 +1,48 @@
+wrapIfMissing:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String wrapIfMissing(String input, String wrapper) {
+        if (input == null) return null;
+        if (input.isEmpty()) return wrapper;
+
+        if (input.startsWith(wrapper) && input.endsWith(wrapper)) {
+            return input;
+        }
+
+        return wrapper + input + wrapper;
+    }
+
+    public static String wrapIfMissing(String input, char wrapper) {
+        return wrapIfMissing(input, String.valueOf(wrapper));
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", wrapIfMissing(null, "'"));
+        result.put("b", wrapIfMissing("", "'"));
+        result.put("c", wrapIfMissing("ab", "x"));
+        result.put("d", wrapIfMissing("'ab'", "'"));
+        result.put("e", wrapIfMissing("/", '/'));
+        result.put("f", wrapIfMissing("a/b/c", '/'));
+        result.put("g", wrapIfMissing("/a/b/c", '/'));
+        result.put("h", wrapIfMissing("a/b/c/", '/'));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=null, b=', c=xabx, d='ab', e=/, f=/a/b/c/, g=/a/b/c/, h=/a/b/c/}
+
+

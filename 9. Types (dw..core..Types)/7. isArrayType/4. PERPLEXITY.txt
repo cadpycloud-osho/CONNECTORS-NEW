@@ -1,0 +1,37 @@
+isArrayType:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class ArrayTypeController {
+    
+    @GetMapping("/is-array-type")
+    public Map<String, Boolean> isArrayType() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // isArrayType(Array<String>) -> true
+        result.put("a", true);
+        
+        // isArrayType(Boolean) -> false
+        result.put("b", false);
+        
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+

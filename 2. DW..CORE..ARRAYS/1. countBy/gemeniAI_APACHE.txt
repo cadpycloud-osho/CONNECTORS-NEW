@@ -1,0 +1,51 @@
+countBy:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+
+public class CamelCountByExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave input: [1, 2, 3, 4]
+                        List<Integer> input = List.of(1, 2, 3, 4);
+                        
+                        // Java equivalent of countBy: filter then count
+                        // ($ mod 2) == 0 becomes n % 2 == 0
+                        long count = input.stream()
+                                          .filter(n -> n % 2 == 0)
+                                          .count();
+
+                        exchange.getIn().setBody(Map.of("countBy", count));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{
+  "countBy": 2
+}
+

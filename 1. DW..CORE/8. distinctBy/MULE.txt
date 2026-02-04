@@ -1,0 +1,162 @@
+distinctBy:
+
+distinctBy<T>(@StreamCapable items: Array<T>, criteria: (item: T, index: Number) -> Any): Array<T>
+Iterates over the input and returns the unique elements in it.
+
+DataWeave uses the result of the provided lambda as the uniqueness criteria.
+
+This version of distinctBy finds unique values in an array. Other versions act on an object and handle a null value.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[0, 1, 2, 3, 3, 2, 1, 4] distinctBy (value) -> { "unique" : value }
+
+
+Output
+[ 0, 1, 2, 3, 4]
+
+
+
+______________________________________________________
+
+
+
+
+
+
+
+
+Example:
+This example removes duplicates of "Kurt Cagle" from an array.
+
+Source:
+
+%dw 2.0
+output application/json
+var record =  {
+  "title": "XQuery Kick Start",
+  "author": [
+    "James McGovern",
+    "Per Bothner",
+    "Kurt Cagle",
+    "James Linn",
+    "Kurt Cagle",
+    "Kurt Cagle",
+    "Kurt Cagle",
+    "Vaidyanathan Nagarajan"
+  ],
+  "year":"2000"
+}
+---
+{
+    "book" : {
+      "title" : record.title,
+      "year" : record.year,
+      "authors" : record.author distinctBy $
+    }
+}
+
+
+
+OUTPUT:
+{
+  "book": {
+    "title": "XQuery Kick Start",
+    "year": "2000",
+    "authors": [
+      "James McGovern",
+      "Per Bothner",
+      "Kurt Cagle",
+      "James Linn",
+      "Vaidyanathan Nagarajan"
+    ]
+  }
+}
+
+
+______________________________________________________
+
+distinctBy<K, V>(object: { (K)?: V }, criteria: (value: V, key: K) -> Any): Object
+Removes duplicate key-value pairs from an object.
+
+
+
+
+
+
+
+Source:
+%dw 2.0
+output application/json
+---
+{a : "b", a : "b", A : "b", a : "B"} distinctBy (value) -> { "unique" : value }
+DataWeave
+Output:
+{ "a": "b", "a": "B" }
+
+
+
+
+
+
+
+
+
+
+
+
+JSON
+Example:
+This example removes duplicates (<author>James McGovern</author>) from <book/>.
+
+Source:
+%dw 2.0
+output application/xml
+---
+{
+   book : {
+     title : payload.book.title,
+     authors: payload.book.&author distinctBy $
+   }
+}
+
+
+Input:
+<book>
+  <title> "XQuery Kick Start"</title>
+  <author>James Linn</author>
+  <author>Per Bothner</author>
+  <author>James McGovern</author>
+  <author>James McGovern</author>
+  <author>James McGovern</author>
+</book>
+XML
+
+
+
+
+
+Output:
+<book>
+  <title> "XQuery Kick Start"</title>
+  <authors>
+      <author>James Linn</author>
+      <author>Per Bothner</author>
+      <author>James McGovern</author>
+  </authors>
+</book>
+
+
+
+
+
+_______________________________________________________________________-
+
+distinctBy(@StreamCapable items: Null, criteria: (item: Nothing, index: Nothing) -> Any): Null
+
+Helper function that enables distinctBy to work with a null value.

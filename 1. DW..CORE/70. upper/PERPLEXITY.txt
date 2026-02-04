@@ -1,0 +1,25 @@
+upper:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class UpperCaseController {
+
+    @GetMapping("/uppercase")
+    public Map<String, String> toUpperCase() {
+        String input = "mulesoft";
+        String upper = input.toUpperCase();
+        return Map.of("name", upper);
+    }
+}
+
+output:
+
+
+{ "name": "MULESOFT" }

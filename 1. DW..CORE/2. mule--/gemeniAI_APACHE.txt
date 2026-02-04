@@ -1,0 +1,77 @@
+--:
+
+example 1:
+
+input:
+
+<route id="DataWeaveArraySubtraction">
+    <from uri="direct:arrayInput"/>
+    <transform>
+        <groovy>
+            // Define the source array and the elements to remove
+            def sourceArray = [0, 1, 1, 2]
+            def toRemove = [1, 2]
+            
+            // Groovy's 'minus' operator performs the subtraction
+            def resultArray = sourceArray.minus(toRemove)
+            
+            // Reconstruct the expected JSON structure {"a": [...]}. 
+            // Groovy map conversion often handles this structure well.
+            return [a: resultArray]
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+    <to uri="mock:output"/>
+</route>
+
+
+
+output:
+{
+  "a": [0]
+}
+
+
+
+----------------------------------------------------------------
+
+example 2:
+
+input:
+
+<route id="DataWeaveObjectKeyRemoval">
+    <from uri="direct:objectInput"/>
+    <transform>
+        <groovy>
+            // Groovy is smart enough to treat the 'body' as a Map 
+            // if it was unmarshalled from JSON.
+            def payloadMap = request.body
+            
+            // Define the keys to remove
+            def keysToRemove = ["yes", "old"]
+            
+            // Remove the keys from the map.
+            keysToRemove.each { key ->
+                payloadMap.remove(key)
+            }
+            
+            // The modified map is returned as the new body
+            return payloadMap
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+    <to uri="mock:output"/>
+</route>
+
+
+
+output:
+
+
+{
+  "good": "bad"
+}

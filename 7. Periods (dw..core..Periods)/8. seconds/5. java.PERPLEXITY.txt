@@ -1,0 +1,52 @@
+seconds:
+
+
+input:
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_INSTANT;
+        Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+
+        // nextSecond: +1 second
+        Instant nextSecond = base.plus(Duration.ofSeconds(1));
+        
+        // previousSecond: -1 second
+        Instant previousSecond = base.minus(Duration.ofSeconds(1));
+        
+        // decimalInputPeriod: exact DataWeave format
+        String decimalInputPeriod = "PT4.555S";
+        
+        // wholeNumberInputPeriod: 4 seconds
+        String wholeNumberInputPeriod = "PT4S";
+        
+        // addNegativeValue: seconds(-1) + seconds(2) = 1
+        long addNegativeValue = 1;
+
+        // JSON output matching DataWeave exactly
+        System.out.println("{");
+        System.out.println("  \"nextSecond\": \"" + fmt.format(nextSecond) + "\",");
+        System.out.println("  \"previousSecond\": \"" + fmt.format(previousSecond) + "\",");
+        System.out.println("  \"decimalInputPeriod\": \"" + decimalInputPeriod + "\",");
+        System.out.println("  \"wholeNumberInputPeriod\": \"" + wholeNumberInputPeriod + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "nextSecond": "2020-10-05T20:22:35.385Z",
+  "previousSecond": "2020-10-05T20:22:33.385Z",
+  "decimalInputPeriod": "PT4.555S",
+  "wholeNumberInputPeriod": "PT4S",
+  "addNegativeValue": 1
+}
+

@@ -1,0 +1,33 @@
+remove:
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class RemoveConverter {
+    public static String remove(String text, String pattern) {
+        if (text == null || pattern == null || pattern.isEmpty()) {
+            return text;
+        }
+        // Remove all non-overlapping occurrences of pattern
+        return text.replaceAll("(?i)\\b" + Pattern.quote(pattern) + "\\b", "");
+    }
+    
+    public static void main(String[] args) {
+        String input = "lazyness purity state higher-order stateful";
+        String result = remove(input, "state");
+        
+        Map<String, String> output = new LinkedHashMap<>();
+        output.put("remove", result);
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+"lazyness purity  higher-order ful"
+
+
+

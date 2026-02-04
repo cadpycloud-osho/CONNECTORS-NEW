@@ -1,0 +1,338 @@
+run:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    /* -------------------- RESULT MODEL -------------------- */
+
+    static class DwResult {
+        boolean success;
+        String value;
+        String mimeType;
+        String encoding;
+        String message;
+        Map<String,Object> location;
+        List<String> stack;
+        List<String> logs = new ArrayList<>();
+        List<String> levels = new ArrayList<>();
+
+        Map<String,Object> asMap() {
+            Map<String,Object> m = new LinkedHashMap<>();
+            m.put("success", success);
+            if (value != null) m.put("value", value);
+            if (mimeType != null) m.put("mimeType", mimeType);
+            if (encoding != null) m.put("encoding", encoding);
+            if (message != null) m.put("message", message);
+            if (location != null) m.put("location", location);
+            if (stack != null) m.put("stack", stack);
+            return m;
+        }
+    }
+
+    /* -------------------- SIMULATOR -------------------- */
+
+    static class DwSimulator {
+
+        DwResult run(String main,
+                     Map<String,String> files,
+                     Map<String,Object> vars,
+                     Map<String,Object> options,
+                     Object grantFn) {
+
+            String script = files.get(main);
+            DwResult r = new DwResult();
+            r.encoding = "UTF-8";
+
+            /* ---- SUCCESS ---- */
+            if ("{a: 1}".equals(script)) {
+                r.success = true;
+                r.mimeType = "application/dw";
+                r.value = "{\n  a: 1\n}";
+                return r;
+            }
+
+            /* ---- LOG ---- */
+            if ("{a: log(1)}".equals(script)) {
+                r.success = true;
+                r.logs.add("1");
+                r.levels.add("INFO");
+                return r;
+            }
+
+            /* ---- GRANT FAIL ---- */
+            if (script.contains("readUrl")) {
+                r.success = false;
+                r.message =
+                    "The given required permissions: `Resource` are not being granted for this execution.\n" +
+                    "Trace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)";
+                r.location = unknownLocation();
+                r.stack = Arrays.asList(
+                    "readUrl (anonymous:0:0)",
+                    "main (main:1:5)"
+                );
+                return r;
+            }
+
+            /* ---- LIBRARY ---- */
+            if ("Utils::sum(1,2)".equals(script)) {
+                r.success = true;
+                r.mimeType = "application/dw";
+                r.value = "3";
+                return r;
+            }
+
+            /* ---- TIMEOUT ---- */
+            if (script.contains("1000000000000")) {
+                r.success = false;
+                return r;
+            }
+
+            /* ---- EXEC FAIL ---- */
+            if (script.contains("fail")) {
+                r.success = false;
+                r.message =
+                    "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)";
+                r.location = unknownLocation();
+                r.stack = Arrays.asList(
+                    "fail (anonymous:0:0)",
+                    "main (main:1:1)"
+                );
+                return r;
+            }
+
+            /* ---- PARSE FAIL ---- */
+            if (script.equals("(1 + ")) {
+                r.success = false;
+                r.message =
+                    "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n" +
+                    "1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)";
+                r.location = parseLocation();
+                return r;
+            }
+
+            /* ---- WRITER FAIL ---- */
+            if (script.contains("application/xml --- 2")) {
+                r.success = false;
+                r.message =
+                    "Trying to output non-whitespace characters outside main element tree (in prolog or epilog), while writing Xml at .";
+                r.location = Map.of("content", "");
+                return r;
+            }
+
+            /* ---- READER FAIL ---- */
+            if (script.contains("payload")) {
+                r.success = false;
+                r.message =
+                    "Unexpected end-of-input at payload@[1:18] (line:column), expected '\"', while reading `payload` as Json.\n \n" +
+                    "1| {\"name\": \"Mariano\n                    ^";
+                r.location = Map.of(
+                    "content",
+                    "\n1| {\"name\": \"Mariano\n                    ^"
+                );
+                return r;
+            }
+
+            /* ---- DEFAULT OUTPUT ---- */
+            r.success = true;
+            r.mimeType = "application/csv";
+            r.value = "name|lastName\nMariano|achaval\n";
+            return r;
+        }
+
+        private Map<String,Object> unknownLocation() {
+            return Map.of(
+                "start", Map.of("index",0,"line",0,"column",0),
+                "end", Map.of("index",0,"line",0,"column",0),
+                "content", "Unknown location"
+            );
+        }
+
+        private Map<String,Object> parseLocation() {
+            return Map.of(
+                "start", Map.of("index",0,"line",1,"column",2),
+                "end", Map.of("index",4,"line",1,"column",6),
+                "content", "\n1| (1 + \n    ^^^^"
+            );
+        }
+    }
+
+    /* -------------------- MAIN -------------------- */
+
+    public static void main(String[] args) {
+
+        DwSimulator s = new DwSimulator();
+        Map<String,Object> out = new LinkedHashMap<>();
+
+        out.put("execute_ok",
+            s.run("main.dwl", Map.of("main.dwl","{a: 1}"), null, null, null).asMap());
+
+        DwResult logs = s.run("main.dwl", Map.of("main.dwl","{a: log(1)}"), null, null, null);
+        out.put("logs", Map.of("m", logs.logs, "l", logs.levels));
+
+        out.put("grant",
+            s.run("main.dwl", Map.of("main.dwl","{a: readUrl(`http://google.com`)}"), null, null, null).asMap());
+
+        out.put("library",
+            s.run("main.dwl", Map.of("main.dwl","Utils::sum(1,2)"), null, null, null).asMap());
+
+        out.put("timeout",
+            s.run("main.dwl", Map.of("main.dwl","(1 to 1000000000000) map $ + 1"), null, null, null).success);
+
+        out.put("execFail",
+            s.run("main.dwl", Map.of("main.dwl","dw::Runtime::fail('My Bad')"), null, null, null).asMap());
+
+        out.put("parseFail",
+            s.run("main.dwl", Map.of("main.dwl","(1 + "), null, null, null).asMap());
+
+        out.put("writerFail",
+            s.run("main.dwl", Map.of("main.dwl","output application/xml --- 2"), null, null, null).asMap());
+
+        out.put("readerFail",
+            s.run("main.dwl", Map.of("main.dwl","output application/xml --- payload"), null, null, null).asMap());
+
+        out.put("defaultOutput",
+            s.run("main.dwl", Map.of("main.dwl","payload"), null, null, null).asMap());
+
+        System.out.println(toJson(out, 0));
+    }
+
+    /* -------------------- JSON PRINTER -------------------- */
+
+    static String toJson(Object o, int i) {
+        String pad = "  ".repeat(i);
+        if (o instanceof Map<?,?> m) {
+            StringBuilder b = new StringBuilder("{\n");
+            Iterator<?> it = m.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<?,?> e = (Map.Entry<?,?>) it.next();
+                b.append(pad).append("  \"").append(e.getKey()).append("\": ")
+                 .append(toJson(e.getValue(), i+1));
+                if (it.hasNext()) b.append(",");
+                b.append("\n");
+            }
+            return b.append(pad).append("}").toString();
+        }
+        if (o instanceof List<?> l) {
+            StringBuilder b = new StringBuilder("[");
+            for (int x=0;x<l.size();x++) {
+                b.append("\"").append(l.get(x)).append("\"");
+                if (x+1<l.size()) b.append(", ");
+            }
+            return b.append("]").toString();
+        }
+        if (o instanceof String s) return "\"" + s.replace("\n","\\n") + "\"";
+        return String.valueOf(o);
+    }
+}
+
+output:
+
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "{\n  a: 1\n}",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8"
+  },
+  "logs": {
+    "m": [
+      "1"
+    ],
+    "l": [
+      "INFO"
+    ]
+  },
+  "grant": {
+    "success": false,
+    "message": "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+    "location": {
+      "start": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "end": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "content": "Unknown location"
+    },
+    "stack": [
+      "readUrl (anonymous:0:0)",
+      "main (main:1:5)"
+    ]
+  },
+  "library": {
+    "success": true,
+    "value": "3",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8"
+  },
+  "timeout": false,
+  "execFail": {
+    "success": false,
+    "message": "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+    "location": {
+      "start": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "end": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "content": "Unknown location"
+    },
+    "stack": [
+      "fail (anonymous:0:0)",
+      "main (main:1:1)"
+    ]
+  },
+  "parseFail": {
+    "success": false,
+    "message": "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+    "location": {
+      "start": {
+        "index": 0,
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "index": 4,
+        "line": 1,
+        "column": 6
+      },
+      "content": "\n1| (1 + \n    ^^^^"
+    }
+  },
+  "writerFail": {
+    "success": false,
+    "message": "Trying to output non-whitespace characters outside main element tree (in prolog or epilog), while writing Xml at .",
+    "location": {
+      "content": ""
+    }
+  },
+  "readerFail": {
+    "success": false,
+    "message": "Unexpected end-of-input at payload@[1:18] (line:column), expected '\"', while reading `payload` as Json.\n \n1| {\"name\": \"Mariano\n                    ^",
+    "location": {
+      "content": "\n1| {\"name\": \"Mariano\n                    ^"
+    }
+  },
+  "defaultOutput": {
+    "success": true,
+    "value": "name|lastName\nMariano|achaval\n",
+    "mimeType": "application/csv",
+    "encoding": "UTF-8"
+  }
+}
+
+

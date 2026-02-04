@@ -1,0 +1,79 @@
+entriesOf:
+
+
+
+
+input:
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+        Document doc = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+        
+        Node root = doc.getDocumentElement();
+        List<Map<String, Object>> entries = new ArrayList<>();
+        
+        // Create entry for root element "xml"
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("key", root.getNodeName());  // "xml"
+        
+        // Value: child elements as object
+        Map<String, String> value = new LinkedHashMap<>();
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                value.put(child.getNodeName(), child.getTextContent());
+            }
+        }
+        entry.put("value", value);
+        
+        // Attributes
+        Map<String, String> attributes = new LinkedHashMap<>();
+        NamedNodeMap attrs = root.getAttributes();
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            attributes.put(attr.getNodeName(), attr.getNodeValue());
+        }
+        entry.put("attributes", attributes);
+        
+        entries.add(entry);
+        
+        Map<String, Object> result = Map.of("entriesOf", entries);
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+
+
+
+
+
+
+

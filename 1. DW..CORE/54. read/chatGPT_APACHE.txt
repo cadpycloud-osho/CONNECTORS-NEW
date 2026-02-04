@@ -1,0 +1,65 @@
+read:
+
+example 1:
+
+
+input:
+
+from("direct:start")
+    .setBody(constant("{\"hello\":\"world\"}"))
+    .unmarshal().json()          // read JSON
+    .marshal().jacksonxml()      // convert to XML
+    .log("Output: ${body}");
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<hello>world</hello>
+
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:start")
+    .setBody(constant("Some, Body"))
+    .unmarshal().csv()      // read CSV without header
+    .setBody(simple("${body[0]}"))
+    .log("Output: ${body}");
+
+
+
+output:
+
+{ "column_0": "Some", "column_1": " Body" }
+
+
+
+----------------------------------------------------------
+example 3:
+
+
+input:
+
+from("direct:start")
+    .setBody(constant("<prices><basic>9.99</basic></prices>"))
+    .unmarshal().jacksonxml()
+    .setBody(simple("{\"XML\": ${body[prices]}}"))
+    .marshal().jacksonxml()
+    .log("Output: ${body}");
+
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<XML>
+  <basic>9.99</basic>
+</XML>
+
+
+----------------------------------------------------------

@@ -1,0 +1,238 @@
+field:
+
+
+example 1:
+
+
+input:
+
+
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String boundary = "----=_Part_320_1528378161";
+        String firstPart = "content for my first part";
+        String secondPart = "content for my second part";
+
+        StringBuilder multipart = new StringBuilder();
+
+        // Part 1
+        multipart.append(boundary).append("\n");
+        multipart.append("Content-Disposition: form-data; name=\"myFirstPart\"\n\n");
+        multipart.append(firstPart).append("\n");
+
+        // Part 2
+        multipart.append(boundary).append("\n");
+        multipart.append("Content-Disposition: form-data; name=\"mySecondPart\"\n\n");
+        multipart.append(secondPart).append("\n");
+
+        // Closing boundary
+        multipart.append(boundary).append("--");
+
+        System.out.println(multipart.toString());
+    }
+}
+
+
+
+output:
+------=_Part_320_1528378161
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161--
+
+---------------------------------------------------------------
+example 2:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String boundary = "------=_Part_8032_681891620.1542560124825";
+
+        // ===== JSON Part (manually built) =====
+        String orderJson =
+                "[\n" +
+                "  {\n" +
+                "    \"order\": 1,\n" +
+                "    \"amount\": 2\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"order\": 32,\n" +
+                "    \"amount\": 1\n" +
+                "  }\n" +
+                "]";
+
+        // ===== XML Part =====
+        String clientsXml =
+                "<clients>\n" +
+                "  <client>\n" +
+                "    <id>1</id>\n" +
+                "    <name>Mariano</name>\n" +
+                "  </client>\n" +
+                "  <client>\n" +
+                "    <id>2</id>\n" +
+                "    <name>Shoki</name>\n" +
+                "  </client>\n" +
+                "</clients>";
+
+        StringBuilder multipart = new StringBuilder();
+
+        // JSON Part
+        multipart.append(boundary).append("\n");
+        multipart.append("Content-Type: application/json\n");
+        multipart.append("Content-Disposition: form-data; name=\"order\"; filename=\"order.json\"\n\n");
+        multipart.append(orderJson).append("\n");
+
+        // XML Part
+        multipart.append(boundary).append("\n");
+        multipart.append("Content-Type: application/xml\n");
+        multipart.append("Content-Disposition: form-data; name=\"clients\"\n\n");
+        multipart.append(clientsXml).append("\n");
+
+        // Closing boundary
+        multipart.append(boundary).append("--");
+
+        System.out.println(multipart.toString());
+    }
+}
+
+
+
+output:
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_8032_681891620.1542560124825--
+
+
+---------------------------------------------------------------
+example 3:
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String boundary = "------=_Part_4846_2022598837.1542560230901";
+
+        // -------- JSON part (manually formatted) --------
+        String orderJson =
+                "[\n" +
+                "  {\n" +
+                "    \"order\": 1,\n" +
+                "    \"amount\": 2\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"order\": 32,\n" +
+                "    \"amount\": 1\n" +
+                "  }\n" +
+                "]";
+
+        // -------- XML part --------
+        String xml =
+                "<clients>\n" +
+                "  <client>\n" +
+                "    <id>1</id>\n" +
+                "    <name>Mariano</name>\n" +
+                "  </client>\n" +
+                "  <client>\n" +
+                "    <id>2</id>\n" +
+                "    <name>Shoki</name>\n" +
+                "  </client>\n" +
+                "</clients>";
+
+        StringBuilder sb = new StringBuilder();
+
+        // JSON Part
+        sb.append(boundary).append("\n");
+        sb.append("Content-Type: application/json\n");
+        sb.append("Content-Disposition: form-data; name=\"order\"; filename=\"order.json\"\n\n");
+        sb.append(orderJson).append("\n");
+
+        // XML Part
+        sb.append(boundary).append("\n");
+        sb.append("Content-Type: application/xml\n");
+        sb.append("Content-Disposition: form-data; name=\"clients\"\n\n");
+        sb.append(xml).append("\n");
+
+        // End boundary
+        sb.append(boundary).append("--");
+
+        System.out.println(sb.toString());
+    }
+}
+
+
+
+output:
+
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_4846_2022598837.1542560230901--
+

@@ -1,0 +1,51 @@
+attr:
+
+
+input:
+
+public class Main {
+
+    static class AttributeRepresentation {
+        private final String kind;
+        private final String namespace;
+        private final String selector;
+
+        public AttributeRepresentation(String namespace, String selector) {
+            this.kind = "Attribute";
+            this.namespace = namespace;
+            this.selector = selector;
+        }
+
+        // Convert object to JSON (pure Java)
+        public String toJson() {
+            return "{\n" +
+                   "   \"kind\": \"" + kind + "\",\n" +
+                   "   \"namespace\": \"" + namespace + "\",\n" +
+                   "   \"selector\": \"" + selector + "\"\n" +
+                   "}";
+        }
+    }
+
+    private static final String NAMESPACE_URI = "http://acme.com/foo";
+    private static final String ATTRIBUTE_NAME = "myAttr";
+
+    public static void main(String[] args) {
+
+        // Create the object
+        AttributeRepresentation attribute =
+                new AttributeRepresentation(NAMESPACE_URI, ATTRIBUTE_NAME);
+
+        // Print JSON output
+        System.out.println(attribute.toJson());
+    }
+}
+
+
+output:
+
+{
+  "kind": "Attribute",
+  "namespace": "http://acme.com/foo",
+  "selector": "myAttr"
+}
+

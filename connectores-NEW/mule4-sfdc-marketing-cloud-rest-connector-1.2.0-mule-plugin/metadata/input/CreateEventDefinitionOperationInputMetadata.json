@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "type",
+        "name",
+        "eventDefinitionKey",
+        "dataExtensionId",
+        "schema"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "eventDefinitionKey": {
+          "type": "string"
+        },
+        "sourceApplicationExtensionId": {
+          "type": "string"
+        },
+        "iconUrl": {
+          "type": "string"
+        },
+        "isVisibleInPicker": {
+          "type": "boolean"
+        },
+        "category": {
+          "type": "string"
+        },
+        "arguments": {
+          "$ref": "#/definitions/eventArguments"
+        },
+        "configuration": {
+          "type": "object"
+        },
+        "metaData": {
+          "type": "object"
+        },
+        "dataExtensionId": {
+          "type": "string"
+        },
+        "dataExtensionName": {
+          "type": "string"
+        },
+        "filterDefinitionTemplate": {
+          "type": "string"
+        },
+        "schema": {
+          "$ref": "#/definitions/eventSchema"
+        },
+        "schedule": {
+          "$ref": "#/definitions/eventSchedule"
+        }
+      }
+    },
+    "eventSchema": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "sendableCustomObjectField": {
+          "type": "string"
+        },
+        "sendableSubscriberField": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventSchemaField"
+          }
+        }
+      }
+    },
+    "eventSchemaField": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "dataType": {
+          "type": "string"
+        },
+        "maxLength": {
+          "type": "string"
+        },
+        "isNullable": {
+          "type": "boolean"
+        },
+        "defaultValue": {
+          "type": "string"
+        }
+      }
+    },
+    "eventArguments": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "type": "string"
+        }
+      }
+    },
+    "eventSchedule": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "startDateTime",
+        "endType",
+        "frequency",
+        "recurrencePattern"
+      ],
+      "properties": {
+        "startDateTime": {
+          "type": "string"
+        },
+        "endDateTime": {
+          "type": "string"
+        },
+        "occurrences": {
+          "type": "number"
+        },
+        "endType": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string"
+        },
+        "recurrencePattern": {
+          "type": "string"
+        },
+        "interval": {
+          "type": "number"
+        },
+        "sunday": {
+          "type": "boolean"
+        },
+        "monday": {
+          "type": "boolean"
+        },
+        "tuesday": {
+          "type": "boolean"
+        },
+        "wednesday": {
+          "type": "boolean"
+        },
+        "thursday": {
+          "type": "boolean"
+        },
+        "friday": {
+          "type": "boolean"
+        },
+        "saturday": {
+          "type": "boolean"
+        },
+        "scheduledDay": {
+          "type": "number"
+        },
+        "scheduledDayOfWeek": {
+          "type": "string"
+        },
+        "scheduledWeek": {
+          "type": "string"
+        },
+        "scheduledMonth": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

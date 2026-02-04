@@ -1,0 +1,46 @@
+--:
+
+example 1:
+
+input:
+
+from("direct:dwMinus")
+.setBody(constant(Map.of("a", List.of(0, 1, 1, 2))))
+.setProperty("remove", constant(List.of(1, 2)))
+
+.split(simple("${body[a]}"))
+    .filter(simple("${exchangeProperty.remove} not contains ${body}"))
+        .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end()
+
+.setBody(simple("{\"a\": ${body}}"));
+
+
+
+output:
+{ "a": [0] }
+
+
+
+----------------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:keyMinus")
+.setBody(constant(Map.of(
+    "hello", "world",
+    "name", "DW"
+)))
+.removeHeader("hello");
+
+
+
+
+output:
+
+{ "name": "DW" }
+
+

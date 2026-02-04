@@ -1,0 +1,17 @@
+tomorrow:
+
+input:
+
+from("direct:tomorrow")
+    .process(exchange -> {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        
+        exchange.getIn().setBody(tomorrow.format(DateTimeFormatter.ISO_LOCAL_DATE));
+    });
+
+
+output:
+
+
+"2026-01-22"
+

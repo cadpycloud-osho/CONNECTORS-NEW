@@ -1,0 +1,55 @@
+takeWhile:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+public class TakeWhileExample {
+
+    /**
+     * Replicates the DataWeave 'takeWhile' function using Java 9+ Stream.takeWhile().
+     * Returns elements from the start of the list as long as the predicate is true.
+     *
+     * @param sourceList The list to process.
+     * @param predicate The condition to test against elements.
+     * @return A list containing the leading elements that satisfy the condition.
+     */
+    public static <T> List<T> takeWhile(List<T> sourceList, Predicate<T> predicate) {
+        if (sourceList == null || sourceList.isEmpty()) {
+            return List.of();
+        }
+
+        // Use Stream.takeWhile() (Java 9+) for direct functional equivalence
+        return sourceList.stream()
+                .takeWhile(predicate)
+                .collect(Collectors.toList());
+    }
+
+    public static void main(String[] args) {
+        
+        // Input array/List
+        List<Integer> arr = Arrays.asList(0, 1, 2, 1);
+        
+        // DataWeave Logic: arr takeWhile $ <= 1
+        // Predicate: n -> n <= 1
+        List<Integer> result = takeWhile(arr, n -> n <= 1);
+        
+        System.out.println("--- Input List ---");
+        System.out.println(arr);
+        
+        System.out.println("\n--- DataWeave takeWhile Equivalent Output ---");
+        // Print the result to replicate the DataWeave JSON output format [ 0, 1 ]
+        System.out.println(result.toString());
+    }
+}
+
+output:
+
+[
+  0,
+  1
+]

@@ -1,0 +1,68 @@
+seconds:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SecondsArithmeticRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateSeconds")
+            .routeId("Seconds-Arithmetic-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+                Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+
+                // 1. Logic: + seconds(1)
+                results.put("nextSecond", base.plus(Duration.ofSeconds(1)).toString());
+
+                // 2. Logic: - seconds(1)
+                results.put("previousSecond", base.minus(Duration.ofSeconds(1)).toString());
+
+                // 3. Decimal Input: seconds(4.555)
+                // We use ofMillis to handle the 3-decimal precision accurately
+                results.put("decimalInputPeriod", toDurationFromSeconds(4.555).toString());
+
+                // 4. Whole Number: seconds(4)
+                results.put("wholeNumberInputPeriod", Duration.ofSeconds(4).toString());
+
+                // 5. Negative Arithmetic: (-1s) + (2s) = 1s
+                Duration combined = Duration.ofSeconds(-1).plus(Duration.ofSeconds(2));
+                results.put("addNegativeValue", combined.getSeconds());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Seconds Result: ${body}");
+    }
+
+    /**
+     * Replicates DW seconds() for decimal inputs
+     * Formula: seconds * 1000 to get milliseconds
+     */
+    private Duration toDurationFromSeconds(double seconds) {
+        long millis = Math.round(seconds * 1000);
+        return Duration.ofMillis(millis);
+    }
+}
+
+
+
+output:
+
+{
+  "nextSecond": "2020-10-05T20:22:35.385Z",
+  "previousSecond": "2020-10-05T20:22:33.385Z",
+  "decimalInputPeriod": "PT4.555S",
+  "wholeNumberInputPeriod": "PT4S",
+  "addNegativeValue": 1
+}
+
+
+

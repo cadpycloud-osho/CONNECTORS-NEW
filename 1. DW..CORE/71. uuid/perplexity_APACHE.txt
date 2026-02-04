@@ -1,0 +1,26 @@
+uuid:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.UUID;
+
+public class UuidRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:uuid")
+            .process(exchange -> {
+                // Generate UUID v4 matching DataWeave uuid()
+                String uuid = UUID.randomUUID().toString();
+                
+                exchange.getIn().setBody(uuid);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+"7cc64d24-f2ad-4d43-8893-fa24a0789a99"
+

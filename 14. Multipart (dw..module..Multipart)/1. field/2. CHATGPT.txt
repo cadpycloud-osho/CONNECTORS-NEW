@@ -1,0 +1,243 @@
+field:
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class MultipartController {
+
+    @GetMapping(value = "/multipart", produces = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> generateMultipart() {
+
+        String firstPart = "content for my first part";
+        String secondPart = "content for my second part";
+
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+
+        // part 1
+        parts.add("myFirstPart", firstPart);
+
+        // part 2
+        parts.add("mySecondPart", secondPart);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        return new ResponseEntity<>(parts, headers, HttpStatus.OK);
+    }
+}
+
+
+output:
+------=_Part_320_1528378161
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161--
+
+---------------------------------------------------------------
+example 2:
+
+
+input:
+
+@RestController
+public class MultipartController {
+
+    @GetMapping(value = "/multipart", produces = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> generateMultipart() throws Exception {
+
+        // ===== JSON Part =====
+        List<Map<String, Object>> myOrder = List.of(
+                Map.of("order", 1, "amount", 2),
+                Map.of("order", 32, "amount", 1)
+        );
+
+        ObjectMapper mapper = new ObjectMapper();
+        String orderJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(myOrder);
+
+        ByteArrayResource jsonResource = new ByteArrayResource(orderJson.getBytes()) {
+            @Override
+            public String getFilename() {
+                return "order.json";
+            }
+        };
+
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<ByteArrayResource> jsonPart =
+                new HttpEntity<>(jsonResource, jsonHeaders);
+
+
+        // ===== XML Part =====
+        String clientsXml =
+                "<clients>\n" +
+                "  <client>\n" +
+                "    <id>1</id>\n" +
+                "    <name>Mariano</name>\n" +
+                "  </client>\n" +
+                "  <client>\n" +
+                "    <id>2</id>\n" +
+                "    <name>Shoki</name>\n" +
+                "  </client>\n" +
+                "</clients>";
+
+        ByteArrayResource xmlResource = new ByteArrayResource(clientsXml.getBytes());
+
+        HttpHeaders xmlHeaders = new HttpHeaders();
+        xmlHeaders.setContentType(MediaType.APPLICATION_XML);
+
+        HttpEntity<ByteArrayResource> xmlPart =
+                new HttpEntity<>(xmlResource, xmlHeaders);
+
+
+        // ==== Build Multipart ====
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("order", jsonPart);
+        parts.add("clients", xmlPart);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        return new ResponseEntity<>(parts, headers, HttpStatus.OK);
+    }
+}
+
+
+output:
+
+------=_Part_8032_681891620
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_8032_681891620
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_8032_681891620--
+
+---------------------------------------------------------------
+example 3:
+
+
+input:
+
+@RestController
+public class MultipartController {
+
+    @GetMapping(value = "/orders-multipart", produces = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> generateMultipart() throws Exception {
+
+        // -------- JSON PART (order.json) --------
+        List<Map<String, Object>> myOrder = List.of(
+            Map.of("order", 1, "amount", 2),
+            Map.of("order", 32, "amount", 1)
+        );
+
+        ObjectMapper mapper = new ObjectMapper();
+        String orderJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(myOrder);
+
+        ByteArrayResource jsonResource = new ByteArrayResource(orderJson.getBytes()) {
+            @Override
+            public String getFilename() {
+                return "order.json";
+            }
+        };
+
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<ByteArrayResource> orderPart =
+                new HttpEntity<>(jsonResource, jsonHeaders);
+
+        // -------- XML PART (clients) --------
+        String xml =
+                "<clients>\n" +
+                "  <client>\n" +
+                "    <id>1</id>\n" +
+                "    <name>Mariano</name>\n" +
+                "  </client>\n" +
+                "  <client>\n" +
+                "    <id>2</id>\n" +
+                "    <name>Shoki</name>\n" +
+                "  </client>\n" +
+                "</clients>";
+
+        ByteArrayResource xmlResource = new ByteArrayResource(xml.getBytes());
+
+        HttpHeaders xmlHeaders = new HttpHeaders();
+        xmlHeaders.setContentType(MediaType.APPLICATION_XML);
+
+        HttpEntity<ByteArrayResource> clientsPart =
+                new HttpEntity<>(xmlResource, xmlHeaders);
+
+        // -------- Combine Parts --------
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("order", orderPart);
+        body.add("clients", clientsPart);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body);
+    }
+}
+
+
+output:
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_4846_2022598837.1542560230901--

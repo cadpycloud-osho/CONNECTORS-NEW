@@ -1,0 +1,99 @@
+toTime:
+
+
+example 1:
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "13:44:12.283-08:00";
+
+        // Define the two possible patterns
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("HH:mm:ss.nXXX");
+
+        // a: try both formatters
+        OffsetTime a;
+        try {
+            a = OffsetTime.parse(input, formatter1);
+        } catch (DateTimeParseException e1) {
+            try {
+                a = OffsetTime.parse(input, formatter2);
+            } catch (DateTimeParseException e2) {
+                a = null;
+            }
+        }
+
+        // b: try only the first formatter and capture error message
+        String b;
+        try {
+            OffsetTime.parse(input, formatter1);
+            b = "success"; // parsing succeeded
+        } catch (DateTimeParseException e) {
+            b = "Could not find a valid formatter for '" + input + "'";
+        }
+
+        // Print result JSON-like
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + (a != null ? a.toString() : null) + "\",");
+        System.out.println("  \"b\": \"" + b + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": "13:44:12.283-08:00",
+  "b": "Could not find a valid formatter for '13:44:12.283-08:00'"
+}
+
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // a: parse ISO time string
+        OffsetTime a = OffsetTime.parse("23:57:59Z"); // Z = UTC
+
+        // b: parse custom format "HH:mm:ss.nxxx"
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("HH:mm:ss.nXXX");
+        OffsetTime b = OffsetTime.parse("13:44:12.283-08:00", formatterB);
+
+        // Print results
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a.toString() + "\",");
+        System.out.println("  \"b\": \"" + b.toString() + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "a": "23:57:59Z",
+  "b": "13:44:12.000000283-08:00"
+}
+
+
+---------------------------------------------------------
+

@@ -1,0 +1,75 @@
+time:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+public class TimeProfileRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:profileExecution")
+            .routeId("Execution-Profiler")
+            .process(exchange -> {
+                // 1. Define the functions (replicating myFunction and myFunction2)
+                Supplier<Object> func1 = () -> {
+                    try { Thread.sleep(100); } catch (Exception e) {}
+                    return "My result";
+                };
+
+                Supplier<Object> func2 = () -> List.of(1, 2, 3, 4).stream().mapToInt(Integer::intValue).sum();
+
+                // 2. Profile both functions
+                List<Map<String, Object>> testingResults = new ArrayList<>();
+                testingResults.add(profile(func1));
+                testingResults.add(profile(func2));
+
+                // 3. Set output parity
+                exchange.getIn().setBody(Map.of("testing", testingResults));
+            })
+            .marshal().json()
+            .log("Profile Output: ${body}");
+    }
+
+    /**
+     * Helper method to replicate dw::util::Timer::time()
+     */
+    private Map<String, Object> profile(Supplier<Object> function) {
+        Instant start = Instant.now();
+        Object result = function.get();
+        Instant end = Instant.now();
+
+        return Map.of(
+            "start", start.toString(), // ISO-8601 format
+            "result", result,
+            "end", end.toString()      // ISO-8601 format
+        );
+    }
+}
+
+
+output:
+
+{
+  "testing": [
+    {
+      "start": "2026-01-21T15:23:01.490Z",
+      "result": "My result",
+      "end": "2026-01-21T15:23:01.591Z"
+    },
+    {
+      "start": "2026-01-21T15:23:01.591Z",
+      "result": 10,
+      "end": "2026-01-21T15:23:01.591Z"
+    }
+  ]
+}
+
+

@@ -1,0 +1,35 @@
+repeat:
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class RepeatController {
+    
+    @GetMapping("/repeat")
+    public Map<String, String> repeatExamples() {
+        return Map.of(
+            "a", repeat("e", 0),
+            "b", repeat("e", 3),
+            "c", repeat("e", -2)
+        );
+    }
+    
+    private String repeat(String str, int times) {
+        if (times <= 0) return "";
+        return str.repeat(times);
+    }
+}
+
+
+output:
+
+{
+  "a": "",
+  "b": "eee",
+  "c": ""
+}
+
+
+

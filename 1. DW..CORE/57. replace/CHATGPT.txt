@@ -1,0 +1,68 @@
+replace:
+
+
+example 1:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.regex.*;
+
+@RestController
+public class ReplaceController {
+
+    @GetMapping("/regexReplace")
+    public List<String> regexReplace() {
+
+        String input1 = "123-456-7890";
+        String result1 = input1.replaceAll(".*-", ""); // Output → 7890
+
+        String input2 = "abc123def";
+        String result2 = input2.replaceAll("[b13e]", "-"); // Output → a-c-2-d-f
+
+        return Arrays.asList(result1, result2);
+    }
+}
+
+
+
+output:
+
+[
+  "7890",
+  "a-c-2-d-f"
+]
+
+
+
+---------------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+@GetMapping("/simpleReplace")
+public Map<String, String> simpleReplace() {
+    String value = "admin123".replace("123", "ID");
+    Map<String, String> response = new HashMap<>();
+    response.put("replace", value);
+    return response;
+}
+
+
+
+output:
+
+{
+  "replace": "adminID"
+}
+

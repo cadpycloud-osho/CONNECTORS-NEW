@@ -1,0 +1,63 @@
+runUrl:
+
+runUrl(url: String, readerInputs: Dictionary<ReaderInput> = {}, inputValues: Dictionary<Any> = {}, configuration: RuntimeExecutionConfiguration = {}): RunResult
+
+runUrl(url: String, readerInputs: Dictionary<ReaderInput> = {}, inputValues: Dictionary<Any> = {}, configuration: RuntimeExecutionConfiguration = {}): RunResult
+Runs the script at the specified URL.
+
+Experimental: This function is an experimental feature that is subject to change or removal from future versions of DataWeave.
+
+
+
+
+
+Source
+import * from dw::Runtime
+var jsonValue = {
+  value: '{"name": "Mariano"}' as Binary {encoding: "UTF-8"},
+  encoding: "UTF-8",
+  properties: {},
+  mimeType: "application/json"
+}
+
+var Utils = "fun sum(a,b) = a +b"
+---
+{
+  "execute_ok" : runUrl("classpath://org/mule/weave/v2/engine/runtime_runUrl/example.dwl", {"payload": jsonValue })
+}
+
+
+DataWeave
+Output
+{
+   "execute_ok": {
+     "success": true,
+     "value": "\"Mariano\"",
+     "mimeType": "application/dw",
+     "encoding": "UTF-8",
+     "logs": [
+
+     ]
+   }
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+fromHex:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.codec.binary.Hex;
+import java.util.HashMap;
+import java.util.Map;
+
+public class HexToBinaryRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startHexConversion")
+            .routeId("Hex-to-Binary-Route")
+            .process(exchange -> {
+                // 1. The Hex input string
+                String hexInput = "4D756C65";
+
+                // 2. Decode Hex string to a byte array (Binary)
+                // Requires org.apache.commons.codec.binary.Hex
+                byte[] binaryData = Hex.decodeHex(hexInput);
+
+                // 3. Construct the Map structure to match the Source
+                Map<String, Object> response = new HashMap<>();
+                response.put("hexToBinary", binaryData);
+
+                // Set the map as the message body
+                exchange.getIn().setBody(response);
+            })
+            // 4. Marshal to JSON
+            // Jackson automatically converts byte[] into Base64 strings in JSON
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "hexToBinary": "TXVsZQ=="
+}
+
+
+

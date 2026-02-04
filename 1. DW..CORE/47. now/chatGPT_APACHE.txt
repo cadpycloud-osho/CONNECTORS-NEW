@@ -1,0 +1,78 @@
+now:
+
+example 1:
+
+
+input:
+
+from("direct:nowExample")
+.setBody(simple(
+    "{ " +
+    "\"nowCalled\": \"${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}\"," +
+    "\"nowCalledSpecificTimeZone\": \"${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX:America/New_York}\"" +
+    " }"
+));
+
+
+output:
+
+{
+  "nowCalled": "2026-01-19T21:45:30.123+05:30",
+  "nowCalledSpecificTimeZone": "2026-01-19T11:15:30.123-04:00"
+}
+
+
+-------------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:nowDetails")
+.setBody(simple(
+    "{ " +
+      "\"now\": \"${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}\"," +
+      "\"epochTime\": ${date:now:UNIX}, " +
+      "\"nanoseconds\": ${date:now:SSS000000}, " +
+      "\"milliseconds\": ${date:now:SSS}, " +
+      "\"seconds\": ${date:now:ss}, " +
+      "\"minutes\": ${date:now:mm}, " +
+      "\"hour\": ${date:now:HH}, " +
+      "\"day\": ${date:now:dd}, " +
+      "\"month\": ${date:now:MM}, " +
+      "\"year\": ${date:now:yyyy}, " +
+      "\"quarter\": ${date:now:MM / 3 + 1}, " +
+      "\"dayOfWeek\": ${date:now:e}, " +
+      "\"dayOfYear\": ${date:now:D}, " +
+      "\"offsetSeconds\": ${date:now:XXX}, " +
+      "\"formattedDate\": \"${date:now:yyyy-MM-dd}\"," +
+      "\"formattedTime\": \"${date:now:HH:mm:ss}\"" +
+    " }"
+));
+
+
+output:
+
+{
+  "now": "2026-01-19T21:50:12.345+05:30",
+  "epochTime": 1674127812,
+  "nanoseconds": 345000000,
+  "milliseconds": 345,
+  "seconds": 12,
+  "minutes": 50,
+  "hour": 21,
+  "day": 19,
+  "month": 1,
+  "year": 2026,
+  "quarter": 1,
+  "dayOfWeek": 1,
+  "dayOfYear": 19,
+  "offsetSeconds": "+05:30",
+  "formattedDate": "2026-01-19",
+  "formattedTime": "21:50:12"
+}
+
+
+
+

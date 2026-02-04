@@ -1,0 +1,43 @@
+isRegexType:
+
+isRegexType(t: Type): Boolean
+
+isRegexType(t: Type): Boolean
+Returns true if the input is the Regex type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ARegex = Regex
+output application/json
+---
+{
+   a: isRegexType(ARegex),
+   b: isRegexType(Regex),
+   c: isRegexType(Boolean),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

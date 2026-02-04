@@ -1,0 +1,41 @@
+isAlphanumeric:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isAlphanumeric(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return false;
+        }
+        return input.matches("^[A-Za-z0-9]+$");
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        result.put("a", isAlphanumeric(null));
+        result.put("b", isAlphanumeric(""));
+        result.put("c", isAlphanumeric("  "));
+        result.put("d", isAlphanumeric("abc"));
+        result.put("e", isAlphanumeric("ab c"));
+        result.put("f", isAlphanumeric("ab2c"));
+        result.put("g", isAlphanumeric("ab-c"));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=false, b=false, c=false, d=true, e=false, f=true, g=false}
+

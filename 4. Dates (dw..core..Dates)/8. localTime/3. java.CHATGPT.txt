@@ -1,0 +1,29 @@
+localTime:
+
+
+
+input:
+
+import java.time.LocalTime;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Equivalent of DataWeave localTime({ hour: 12, minutes: 30, seconds: 40 })
+        LocalTime newLocalTime = LocalTime.of(12, 30, 40);
+
+        System.out.println("{ \"newLocalTime\": \"" + newLocalTime + "\" }");
+    }
+}
+
+
+
+output:
+
+
+{
+  "newLocalTime": "12:30:40"
+}
+
+

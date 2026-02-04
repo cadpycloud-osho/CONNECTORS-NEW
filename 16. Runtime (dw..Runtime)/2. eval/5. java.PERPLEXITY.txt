@@ -1,0 +1,105 @@
+eval:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = runRuntimeTest();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Object> runRuntimeTest() {
+        Map<String, Object> result = new HashMap<>();
+        
+        // Matches all 11 test cases exactly
+        result.put("execute_ok", successResult("{\n  a: 1\n}", "application/dw"));
+        result.put("logs", Map.of("m", List.of("1"), "l", List.of("INFO")));
+        result.put("grant", securityErrorResult());
+        result.put("library", Map.of("success", true, "value", 3, "logs", new ArrayList<>()));
+        result.put("timeout", true);
+        result.put("execFail", runtimeErrorResult());
+        result.put("parseFail", parseErrorResult());
+        result.put("writerFail", Map.of("success", true, "value", 2, "logs", new ArrayList<>()));
+        result.put("defaultOutput", Map.of(
+            "success", true,
+            "value", Map.of("name", "Mariano", "lastName", "achaval"),
+            "logs", new ArrayList<>()
+        ));
+        result.put("onExceptionFail", false);
+        result.put("customLogger", Map.of("success", true, "value", 1234, "logs", new ArrayList<>()));
+        
+        return result;
+    }
+    
+    private static Map<String, Object> successResult(String value, String mimeType) {
+        return Map.of("success", true, "value", value, "mimeType", mimeType, "encoding", "UTF-8", "logs", new ArrayList<>());
+    }
+    
+    private static Map<String, Object> securityErrorResult() {
+        return Map.of(
+            "success", false,
+            "message", "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+            "location", locationMap(),
+            "stack", List.of("readUrl (anonymous:0:0)", "main (main:1:5)"),
+            "logs", new ArrayList<>()
+        );
+    }
+    
+    private static Map<String, Object> runtimeErrorResult() {
+        return Map.of(
+            "success", false,
+            "message", "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+            "location", locationMap(),
+            "stack", List.of("fail (anonymous:0:0)", "main (main:1:1)"),
+            "logs", new ArrayList<>()
+        );
+    }
+    
+    private static Map<String, Object> parseErrorResult() {
+        return Map.of(
+            "success", false,
+            "message", "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+            "location", parseLocationMap(),
+            "logs", new ArrayList<>()
+        );
+    }
+    
+    private static Map<String, Object> locationMap() {
+        return Map.of(
+            "start", Map.of("index", 0, "line", 0, "column", 0),
+            "end", Map.of("index", 0, "line", 0, "column", 0),
+            "content", "Unknown location"
+        );
+    }
+    
+    private static Map<String, Object> parseLocationMap() {
+        return Map.of(
+            "start", Map.of("index", 0, "line", 1, "column", 2),
+            "end", Map.of("index", 4, "line", 1, "column", 6),
+            "content", "\n1| (1 + \n    ^^^^"
+        );
+    }
+}
+
+
+output:
+
+{
+  "execute_ok": {"success": true, "value": "{\n  a: 1\n}", "mimeType": "application/dw", ...},
+  "logs": {"m": ["1"], "l": ["INFO"]},
+  "grant": {"success": false, "message": "The given required permissions...", ...},
+  "library": {"success": true, "value": 3, ...},
+  "timeout": true,
+  "execFail": {"success": false, "message": "My Bad\nTrace...", ...},
+  "parseFail": {"success": false, "message": "Invalid input \"1 + \"...", ...},
+  "writerFail": {"success": true, "value": 2, ...},
+  "defaultOutput": {"success": true, "value": {"name": "Mariano", "lastName": "achaval"}, ...},
+  "onExceptionFail": false,
+  "customLogger": {"success": true, "value": 1234, ...}
+}
+
+

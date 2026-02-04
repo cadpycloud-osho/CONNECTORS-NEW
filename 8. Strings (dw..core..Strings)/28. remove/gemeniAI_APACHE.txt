@@ -1,0 +1,29 @@
+remove:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+
+public class RemoveStringRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:removeSubstrings")
+            .process(exchange -> {
+                String input = "lazyness purity state higher-order stateful";
+                String target = "state";
+
+                // Using Apache Commons for clean null-safe removal
+                String result = StringUtils.remove(input, target);
+
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+output:
+
+"lazyness purity  higher-order ful"
+
+

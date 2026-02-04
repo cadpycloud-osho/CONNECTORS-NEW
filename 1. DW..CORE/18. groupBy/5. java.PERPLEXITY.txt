@@ -1,0 +1,223 @@
+groupBy:
+
+example 1:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> array = Arrays.asList("a", "b", "c");
+        
+        Map<String, List<String>> result = IntStream.range(0, array.size())
+            .boxed()
+            .collect(Collectors.groupingBy(
+                i -> String.valueOf(i),
+                Collectors.mapping(array::get, Collectors.toList())
+            ));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{0=[a], 1=[b], 2=[c]}
+
+-------------------------------------------------------------
+
+example 2:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+class Person {
+    String name;
+    String language;
+    
+    Person(String name, String language) {
+        this.name = name;
+        this.language = language;
+    }
+    
+    @Override
+    public String toString() {
+        return "{\"name\":\"" + name + "\",\"language\":\"" + language + "\"}";
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        List<Person> myArray = Arrays.asList(
+            new Person("Foo", "Java"),
+            new Person("Bar", "Scala"),
+            new Person("FooBar", "Java")
+        );
+        
+        Map<String, List<Person>> result = myArray.stream()
+            .collect(Collectors.groupingBy(p -> p.language));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{Scala=[{"name":"Bar","language":"Scala"}], Java=[{"name":"Foo","language":"Java"}, {"name":"FooBar","language":"Java"}]}
+
+-------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> labels = Arrays.asList(
+            null, "Move Left", "Move Right", "Move Up", "Move Down"
+        );
+        
+        Map<String, List<String>> result = labels.stream()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList())
+            .stream()
+            .collect(Collectors.groupingBy(label -> "myLabels"));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+{myLabels=[Move Left, Move Right, Move Up, Move Down]}
+
+
+-------------------------------------------------------------
+
+
+example 4:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "hello world!";
+        
+        Map<Boolean, String> result = IntStream.range(0, input.length())
+            .boxed()
+            .collect(Collectors.groupingBy(
+                i -> input.charAt(i) != ' ' && "aeiou".indexOf(Character.toLowerCase(input.charAt(i))) >= 0,
+                Collectors.mapping(i -> String.valueOf(input.charAt(i)), Collectors.joining())
+            ));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{false=hll wrld!, true=eoo}
+
+-------------------------------------------------------------
+
+
+example 5:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> input = new HashMap<>();
+        input.put("a", "b");
+        input.put("c", "d");
+        
+        Map<String, Map<String, String>> result = input.entrySet().stream()
+            .collect(Collectors.groupingBy(
+                entry -> entry.getKey().toUpperCase(),
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+            ));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{B={a=b}, D={c=d}}
+
+-------------------------------------------------------------
+
+
+example 6:
+
+input:
+
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<prices><price>9.99</price><price>10.99</price></prices>";
+        
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+        
+        NodeList priceNodes = doc.getElementsByTagName("price");
+        Map<String, String> prices = new LinkedHashMap<>();
+        
+        for (int i = 0; i < priceNodes.getLength(); i++) {
+            prices.put("price", priceNodes.item(i).getTextContent());
+        }
+        
+        Map<String, Map<String, String>> result = Collections.singletonMap("costs", prices);
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{costs={price=10.99}}
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+

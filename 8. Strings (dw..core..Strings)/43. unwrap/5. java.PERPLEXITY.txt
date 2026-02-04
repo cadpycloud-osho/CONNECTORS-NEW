@@ -1,0 +1,49 @@
+unwrap:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + unwrap(null, "") + ",");
+        System.out.println("  \"b\": " + unwrap(null, '\0') + ",");
+        System.out.println("  \"c\": \"" + unwrap("'abc'", '\'') + "\",");
+        System.out.println("  \"d\": \"" + unwrap("AABabcBAA", 'A') + "\",");
+        System.out.println("  \"e\": \"" + unwrap("A", '#') + "\",");
+        System.out.println("  \"f\": \"" + unwrap("#A", '#') + "\",");
+        System.out.println("  \"g\": \"" + unwrap("A#", '#') + "\"");
+        System.out.println("}");
+    }
+    
+    private static String unwrap(String input, char wrapper) {
+        if (input == null) return null;
+        if (input.isEmpty()) return input;
+        
+        int start = 0;
+        int end = input.length();
+        
+        while (start < end && input.charAt(start) == wrapper) {
+            start++;
+        }
+        while (end > start && input.charAt(end - 1) == wrapper) {
+            end--;
+        }
+        
+        return input.substring(start, end);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": null,
+  "c": "abc",
+  "d": "ABabcBA",
+  "e": "A",
+  "f": "#A",
+  "g": "A#"
+}
+

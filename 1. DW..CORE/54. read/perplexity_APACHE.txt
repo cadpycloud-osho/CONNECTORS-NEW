@@ -1,0 +1,136 @@
+read:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class JsonToXmlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:jsonToXml")
+            .setBody(simple("{ \"hello\" : \"world\" }"))
+            .unmarshal().json(JsonLibrary.Jackson)
+            .marshal().xml()  // Converts to XML using first key as root
+            .setHeader("Content-Type", constant("application/xml"))
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<hello>world</hello>
+
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class CsvStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:csvString")
+            .setBody(simple("Some, Body"))
+            .process(exchange -> {
+                String csvLine = exchange.getIn().getBody(String.class);
+                String[] columns = csvLine.split(",");
+                
+                Map<String, String> row = new LinkedHashMap<>();
+                for (int i = 0; i < columns.length; i++) {
+                    row.put("column_" + i, columns[i].trim());
+                }
+                
+                // Return first (only) row [0]
+                List<Map<String, String>> result = new ArrayList<>();
+                result.add(row);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[
+  {
+    "column_0": "Some",
+    "column_1": " Body"
+  }
+]
+
+
+----------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+
+public class XmlReadRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:xmlRead")
+            .setBody(simple("<prices><basic>9.99</basic></prices>"))
+            .process(exchange -> {
+                // Parse input XML
+                Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new ByteArrayInputStream(exchange.getIn().getBody(String.class).getBytes()));
+                
+                // Create wrapper <XML> element
+                Document outputDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                Element xmlRoot = outputDoc.createElement("XML");
+                outputDoc.appendChild(xmlRoot);
+                
+                // Import prices content (indexedReader: false behavior)
+                Node pricesNode = doc.getDocumentElement();
+                Node importedPrices = outputDoc.importNode(pricesNode, true);
+                xmlRoot.appendChild(importedPrices);
+                
+                // Convert back to XML string
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                TransformerFactory.newInstance().newTransformer()
+                    .transform(new DOMSource(outputDoc), new StreamResult(baos));
+                
+                exchange.getIn().setBody(baos.toString("UTF-8"));
+            })
+            .setHeader("Content-Type", constant("application/xml"))
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<XML>
+  <basic>9.99</basic>
+</XML>
+
+
+
+----------------------------------------------------------

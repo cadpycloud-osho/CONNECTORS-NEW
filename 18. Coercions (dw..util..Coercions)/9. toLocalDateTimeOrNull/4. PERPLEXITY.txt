@@ -1,0 +1,59 @@
+toLocalDateTimeOrNull:
+
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+
+
+input:
+
+
+@SpringBootApplication
+@RestController
+public class DateParsingApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DateParsingApplication.class, args);
+    }
+
+    @GetMapping("/parse-dates")
+    public Map<String, LocalDateTime> parseDates() {
+        String input = "2003-10-01 23:57:59";
+        
+        // Equivalent to DataWeave 'a' - tries multiple formats
+        DateTimeFormatter multiFormat = new DateTimeFormatterBuilder()
+            .appendPattern("uuuu-MM-dd HH:mm:ss")
+            .parseCaseInsensitive()
+            .toFormatter();
+        
+        LocalDateTime resultA = LocalDateTime.parse(input, multiFormat);
+        
+        // Equivalent to DataWeave 'b' - single format only
+        DateTimeFormatter singleFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
+        LocalDateTime resultB = null;
+        try {
+            resultB = LocalDateTime.parse(input, singleFormat);
+        } catch (DateTimeParseException e) {
+            // Silently return null like DataWeave toLocalDateTimeOrNull
+        }
+        
+        return Map.of(
+            "a", resultA,
+            "b", resultB
+        );
+    }
+}
+
+
+output:
+
+{
+  "a": "2003-10-01T23:57:59",
+  "b": null
+}
+
+
+

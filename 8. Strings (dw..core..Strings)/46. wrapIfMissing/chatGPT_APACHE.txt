@@ -1,0 +1,63 @@
+wrapIfMissing:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class WrapIfMissingExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", wrapIfMissing(null, "'"));
+        result.put("b", wrapIfMissing("", "'"));
+        result.put("c", wrapIfMissing("ab", "x"));
+        result.put("d", wrapIfMissing("'ab'", "'"));
+        result.put("e", wrapIfMissing("/", "/"));
+        result.put("f", wrapIfMissing("a/b/c", "/"));
+        result.put("g", wrapIfMissing("/a/b/c", "/"));
+        result.put("h", wrapIfMissing("a/b/c/", "/"));
+
+        System.out.println(result);
+    }
+
+    public static String wrapIfMissing(String value, String wrapper) {
+        if (value == null) {
+            return null;
+        }
+        if (wrapper == null || wrapper.isEmpty()) {
+            return value;
+        }
+        boolean startsWith = value.startsWith(wrapper);
+        boolean endsWith = value.endsWith(wrapper);
+        StringBuilder sb = new StringBuilder();
+        if (!startsWith) {
+            sb.append(wrapper);
+        }
+        sb.append(value);
+        if (!endsWith) {
+            sb.append(wrapper);
+        }
+        return sb.toString();
+    }
+}
+
+
+
+
+output:
+
+{
+   "a": null,
+   "b": "'",
+   "c": "xabx",
+   "d": "'ab'",
+   "e": "/",
+   "f": "/a/b/c/",
+   "g": "/a/b/c/",
+   "h": "/a/b/c/"
+}
+
+
+

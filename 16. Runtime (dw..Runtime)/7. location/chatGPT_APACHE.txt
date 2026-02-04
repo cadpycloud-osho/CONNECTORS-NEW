@@ -1,0 +1,46 @@
+location:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    static Map<String, Object> locationOfSqrt() {
+
+        Map<String, Object> location = new LinkedHashMap<>();
+
+        location.put("uri", "java.lang.Math");
+        location.put("nameIdentifier", "Math.sqrt");
+        location.put("startLine", -1);
+        location.put("startColumn", -1);
+        location.put("endLine", -1);
+        location.put("endColumn", -1);
+
+        return location;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> output = locationOfSqrt();
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{
+  "uri": "java.lang.Math",
+  "nameIdentifier": "Math.sqrt",
+  "startLine": -1,
+  "startColumn": -1,
+  "endLine": -1,
+  "endColumn": -1
+}
+
+
+
+

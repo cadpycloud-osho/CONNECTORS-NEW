@@ -1,0 +1,66 @@
+take:
+
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    /**
+     * Mimics DataWeave's take(array, n) function by returning
+     * a sublist containing the first 'n' elements.
+     * @param <T> The type of elements in the list.
+     * @param list The source list.
+     * @param count The number of elements to take from the start.
+     * @return A list containing the first 'count' elements.
+     */
+    public static <T> List<T> take(List<T> list, int count) {
+        // Ensure count does not exceed list size
+        int endIndex = Math.min(count, list.size());
+        
+        // subList(startIndex, endIndex) returns elements from startIndex (inclusive)
+        // up to endIndex (exclusive).
+        return list.subList(0, endIndex);
+    }
+
+    public static void main(String[] args) {
+        // Source data array
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: take(users, 2)
+        int count = 2;
+        
+        // Get the first 2 elements: ["Mariano", "Leandro"]
+        List<String> result = take(users, count);
+
+        // Print the final output structure
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[
+  "Mariano",
+  "Leandro"
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+{ "sumBy": [ 6, 6 ] }

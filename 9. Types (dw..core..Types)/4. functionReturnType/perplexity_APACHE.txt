@@ -1,0 +1,36 @@
+functionReturnType:
+
+
+input:
+
+import java.util.*;
+
+public class FunctionReturnTypeConverter {
+    public static String functionReturnType(String functionSignature) {
+        // Parse DataWeave function signature: (params) -> ReturnType
+        if (functionSignature.contains("->")) {
+            return functionSignature.substring(functionSignature.lastIndexOf("->") + 2).trim();
+        }
+        return "Unknown";
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", functionReturnType("(String, Number) -> Number"));
+        result.put("b", functionReturnType("() -> Number"));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "Number",
+  "b": "Number"
+}
+
+
+

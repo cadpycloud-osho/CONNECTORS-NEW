@@ -1,0 +1,92 @@
+time:
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveTimerTimeApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTimerTimeApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/timer")
+@RequiredArgsConstructor
+class TimerController {
+    
+    private final TimerService timerService;
+    
+    @GetMapping("/time")
+    public Map<String, List<TimerResult>> testTimer() {
+        return timerService.executeTimerTests();
+    }
+}
+
+@Service
+class TimerService {
+    
+    /**
+     * DataWeave Timer.time() equivalent:
+     * Measures execution time of a function with start/end timestamps and result
+     */
+    public Map<String, List<TimerResult>> executeTimerTests() {
+        List<TimerResult> results = new ArrayList<>();
+        
+        // Test 1: Simulates dw::Runtime::wait("My result", 100) - 100ms delay
+        results.add(time(() -> {
+            Thread.sleep(100);
+            return "My result";
+        }));
+        
+        // Test 2: Simulates sum([1,2,3,4]) - instant calculation
+        results.add(time(() -> sum(Arrays.asList(1, 2, 3, 4))));
+        
+        return Map.of("testing", results);
+    }
+    
+    private int sum(List<Integer> numbers) {
+        return numbers.stream().mapToInt(Integer::intValue).sum();
+    }
+    
+    /**
+     * Core Timer.time() implementation matching DataWeave behavior
+     */
+    public <T> TimerResult time(Supplier<T> function) {
+        String start = Instant.now().toString();
+        T result = function.get();
+        String end = Instant.now().toString();
+        
+        return new TimerResult(start, result, end);
+    }
+    
+    public record TimerResult(String start, Object result, String end) {}
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+{
+  "testing": [
+    {
+      "start": "2025-12-13T09:12:34.123456789Z",
+      "result": "My result",
+      "end": "2025-12-13T09:12:34.223456789Z"
+    },
+    {
+      "start": "2025-12-13T09:12:34.223789012Z",
+      "result": 10,
+      "end": "2025-12-13T09:12:34.223890123Z"
+    }
+  ]
+}
+
+
+
+

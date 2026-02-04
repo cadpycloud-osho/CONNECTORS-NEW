@@ -1,0 +1,50 @@
+last:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String last(String input, int n) {
+        if (input == null || n <= 0) return "";
+        if (n >= input.length()) return input;
+        return input.substring(input.length() - n);
+    }
+}
+
+Spring Boot Controller
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class LastController {
+
+    @GetMapping("/last")
+    public Map<String, String> getLastCharacters() {
+        Map<String, String> response = new HashMap<>();
+
+        String input = "hello world!";
+        response.put("result", StringUtils.last(input, 6));
+
+        return response;
+    }
+}
+
+output:
+
+
+{
+  "result": "world!"
+}
+
+
+

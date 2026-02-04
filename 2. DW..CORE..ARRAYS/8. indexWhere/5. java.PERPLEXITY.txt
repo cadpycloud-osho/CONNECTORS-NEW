@@ -1,0 +1,84 @@
+indexWhere:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String[] users = {"Mariano", "Leandro", "Julian"};
+        String prefix = "Jul";
+        int index = -1;
+        
+        for (int i = 0; i < users.length; i++) {
+            if (users[i].startsWith(prefix)) {
+                index = i;
+                break;
+            }
+        }
+        
+        System.out.println(index);
+    }
+}
+
+
+
+
+output:
+
+2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional approach using Streams to find the first matching index with startsWith predicate.
+
+java
+import java.util.Arrays;
+import java.util.List;
+
+public class IndexWhereStream {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        int index = IntStream.range(0, users.size())
+                            .filter(i -> users.get(i).startsWith("Jul"))
+                            .findFirst()
+                            .orElse(-1);
+        System.out.println(index);
+    }
+}
+Output: 2
+
+Java List Version
+Using List with custom index finding logic matching DataWeave behavior.
+
+java
+import java.util.Arrays;
+import java.util.List;
+import java.util.OptionalInt;
+
+public class IndexWhereList {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        OptionalInt index = users.stream()
+                                .map(users::indexOf)
+                                .filter(i -> i >= 0 && users.get(i).startsWith("Jul"))
+                                .findFirst();
+        
+        int result = index.orElse(-1);
+        System.out.println(result);
+    }
+}
+Output: 2

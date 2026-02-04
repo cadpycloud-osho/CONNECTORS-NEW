@@ -1,0 +1,166 @@
+--:
+
+
+example 1:
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+// Renamed the class from DataWeaveSetDifference to Main 
+// to match the expected file name (Main.java) and resolve the error.
+public class Main { 
+
+    public static void main(String[] args) {
+        // DataWeave Source: { "a" : [0, 1, 1, 2] -- [1, 2] }
+
+        // 1. Define the source list (Left-hand operand: [0, 1, 1, 2])
+        List<Integer> listA = new ArrayList<>(Arrays.asList(0, 1, 1, 2));
+
+        // 2. Define the list of elements to remove (Right-hand operand: [1, 2])
+        List<Integer> listB = Arrays.asList(1, 2);
+
+        // 3. Perform the set difference (equivalent to DW's --)
+        // This removes ALL occurrences of '1' and the single '2'.
+        listA.removeAll(listB); // listA is now [0]
+
+        // 4. Construct the final output structure
+        Map<String, List<Integer>> output = Map.of("a", listA);
+
+        // Print the result to match the expected JSON output format
+        System.out.println("Output:");
+        String listString = output.get("a").toString().replaceAll("[\\[\\]]", "");
+        System.out.println("{ \"a\": [" + listString + "] }");
+    }
+}
+
+output:
+
+{ "a": [0] }
+
+
+
+
+-----------------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+// Renamed to Main to match the assumed file name (Main.java)
+public class Main { 
+
+    public static void main(String[] args) {
+        // DataWeave Source: { "yes" : "no", "good" : "bad", "old" : "new" } -- ["yes", "old"]
+
+        // 1. Define the source Map (equivalent to the DataWeave Object)
+        // We use HashMap because we need to remove keys, making it mutable.
+        Map<String, String> sourceObject = new HashMap<>();
+        sourceObject.put("yes", "no");
+        sourceObject.put("good", "bad");
+        sourceObject.put("old", "new");
+
+        // 2. Define the list of keys to remove (equivalent to the Array of Strings)
+        List<String> keysToRemove = Arrays.asList("yes", "old");
+
+        // 3. Perform the object set difference (equivalent to DW's --)
+        // Iterate over the keys to remove and delete them from the source Map.
+        for (String key : keysToRemove) {
+            sourceObject.remove(key);
+        }
+
+        // 4. The resulting Map is the output structure
+        Map<String, String> output = sourceObject; // 'output' now contains only {"good": "bad"}
+
+        // Print the result to match the expected JSON output format
+        System.out.println("Output:");
+        System.out.println("{");
+        // Iterate and print the remaining entry
+        output.forEach((key, value) -> System.out.println("  \"" + key + "\": \"" + value + "\""));
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "good": "bad"
+}
+
+-----------------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+// Renamed to Main to match the file name (Main.java) and resolve the compilation error.
+public class Main { 
+
+    public static void main(String[] args) {
+        // DataWeave Source: { "hello" : "world", "name" : "DW" } -- ["hello" as Key]
+
+        // 1. Define the source Map (equivalent to the DataWeave Object)
+        Map<String, String> sourceObject = new HashMap<>();
+        sourceObject.put("hello", "world");
+        sourceObject.put("name", "DW");
+
+        // 2. Define the list of keys to remove (equivalent to the Array of Keys)
+        List<String> keysToRemove = Arrays.asList("hello");
+
+        // 3. Perform the object set difference (equivalent to DW's --)
+        // The Map.remove(key) operation efficiently handles the removal.
+        for (String key : keysToRemove) {
+            sourceObject.remove(key);
+        }
+
+        // 4. The resulting Map is the output structure
+        Map<String, String> output = sourceObject;
+
+        // Print the result to match the expected JSON output format
+        System.out.println("Output:");
+        System.out.println("{");
+        // Print the remaining entry
+        output.forEach((key, value) -> System.out.println("  \"" + key + "\": \"" + value + "\""));
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "name": "DW"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

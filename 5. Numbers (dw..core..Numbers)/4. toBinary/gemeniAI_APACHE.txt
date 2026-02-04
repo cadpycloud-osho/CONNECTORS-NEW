@@ -1,0 +1,64 @@
+toBinary:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToBinaryRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertToBinary")
+            .routeId("To-Binary-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // 1. Logic: toBinary(value)
+                results.put("a", formatBinary("-2"));
+                results.put("b", formatBinary("100000000000000000000000000000000000000000000000000000000000000"));
+                results.put("c", formatBinary("0"));
+                results.put("d", formatBinary(null));
+                results.put("e", formatBinary("2"));
+
+                exchange.getIn().setBody(results);
+            })
+            // 2. Logic: output application/json
+            .marshal().json()
+            .log("Binary Result: ${body}");
+    }
+
+    /**
+     * Replicates dw::core::Numbers::toBinary
+     */
+    private String formatBinary(Object input) {
+        if (input == null) return null;
+        
+        try {
+            // Convert input to BigInteger first to handle large values and signs
+            BigInteger val = new BigInteger(String.valueOf(input));
+            // toString(2) converts the value to a binary string
+            return val.toString(2);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a": "-10",
+  "b": "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "10"
+}
+
+

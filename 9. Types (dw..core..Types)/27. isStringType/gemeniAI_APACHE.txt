@@ -1,0 +1,52 @@
+isStringType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class StringTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkString")
+            .process(exchange -> {
+                // Mapping the DataWeave source logic:
+                // a: The type definition AString
+                // b: The String keyword
+                // c: A different type (Boolean)
+                Object refA = String.class;
+                Object refB = "Hello World"; // A String instance
+                Object refC = Boolean.TRUE;
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if it is the String class or an instance of a String
+                result.put("a", isStringType(refA));
+                result.put("b", isStringType(refB));
+                result.put("c", isStringType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isStringType(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the class reference (String.class) or an actual String instance
+        return obj instanceof String || obj.equals(String.class);
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

@@ -1,0 +1,169 @@
+read:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.component.jacksonxml.JacksonXMLDataFormat;
+
+public class CamelJsonToXml {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // The JSON input string
+                String jsonInput = "{ \"hello\" : \"world\" }";
+
+                from("direct:start")
+                    // 1. Convert JSON string to Java Map (Equivalent to read(..., 'application/json'))
+                    .unmarshal().json(JsonLibrary.Jackson)
+                    
+                    // 2. Convert Java Map to XML (Equivalent to output application/xml)
+                    .marshal(new JacksonXMLDataFormat())
+                    
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<hello>world</hello>
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class CamelCsvRead {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                String myVar = "Some, Body";
+
+                from("direct:start")
+                    // 1. Unmarshal CSV (Equivalent to read as application/csv)
+                    // This returns a List<List<String>> representing rows and columns
+                    .unmarshal().csv()
+                    
+                    .process(exchange -> {
+                        // 2. Logic: [0] (Get first row)
+                        List<List<String>> data = exchange.getIn().getBody(List.class);
+                        List<String> firstRow = data.get(0);
+
+                        // 3. Map to DataWeave's default "column_n" format
+                        Map<String, String> result = new LinkedHashMap<>();
+                        for (int i = 0; i < firstRow.size(); i++) {
+                            result.put("column_" + i, firstRow.get(i));
+                        }
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // 4. Output application/json
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{
+  "column_0": "Some",
+  "column_1": " Body"
+}
+
+----------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.component.jacksonxml.JacksonXMLDataFormat;
+import java.util.Map;
+
+public class CamelXmlReadAndWrap {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // Setup the output format with the new root name "XML"
+                JacksonXMLDataFormat format = new JacksonXMLDataFormat();
+                format.setRootName("XML");
+
+                from("direct:start")
+                    // 1. Unmarshal XML to Map (Equivalent to read(..., "application/xml"))
+                    .unmarshal().jacksonXml(Map.class)
+                    
+                    .process(exchange -> {
+                        // 2. Extract the "prices" node
+                        Map<String, Object> body = exchange.getIn().getBody(Map.class);
+                        Object pricesContent = body.get("prices");
+                        
+                        // Set the content of <prices> as the new body
+                        exchange.getIn().setBody(pricesContent);
+                    })
+                    
+                    // 3. Marshal back to XML with root <XML> (Equivalent to output application/xml)
+                    .marshal(format)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        String xmlInput = "<prices><basic>9.99</basic></prices>";
+        context.createProducerTemplate().sendBody("direct:start", xmlInput);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<XML>
+  <basic>9.99</basic>
+</XML>
+
+
+----------------------------------------------------------

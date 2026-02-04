@@ -1,0 +1,37 @@
+isDateTimeType:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsDateTimeTypeExample {
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isDateTimeType("DateTime"));
+        result.put("b", isDateTimeType("DateTime"));
+        result.put("c", isDateTimeType("String"));
+
+        System.out.println(result);
+    }
+
+    public static boolean isDateTimeType(String type) {
+        if (type == null) return false;
+        return type.equals("DateTime");
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

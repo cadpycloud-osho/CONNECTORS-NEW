@@ -1,0 +1,53 @@
+indexOf:
+
+example 1:
+
+input:
+
+import java.util.*;
+
+List<String> presentArray = Arrays.asList("a", "b", "c", "d");
+List<String> notPresentArray = Arrays.asList("x", "w", "x");
+List<String> multipleArray = Arrays.asList("a", "b", "c", "c");
+
+Map<String, Integer> output = Map.of(
+    "present", presentArray.indexOf("c"),
+    "notPresent", notPresentArray.indexOf("c"),
+    "presentMoreThanOnce", multipleArray.indexOf("c")
+);
+
+System.out.println(output);
+
+
+
+output:
+
+{present=2, notPresent=-1, presentMoreThanOnce=2}
+
+
+--------------------------------------------------------------
+
+example 2:
+
+input:
+
+String presentStr = "abcd";
+String notPresentStr = "xyz";
+String multipleStr = "abcdc";
+
+Map<String, Integer> output = Map.of(
+    "present", presentStr.indexOf("c"),
+    "notPresent", notPresentStr.indexOf("c"),
+    "presentMoreThanOnce", multipleStr.indexOf("c")
+);
+
+System.out.println(output);
+
+
+
+output:
+
+{present=2, notPresent=-1, presentMoreThanOnce=2}
+
+
+--------------------------------------------------------------

@@ -1,0 +1,59 @@
+period:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+public class PeriodRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:period")
+            .process(exchange -> {
+                ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                LocalDate baseDate = LocalDate.parse("2020-10-05");
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // dayBeforeDateTime: - period({days:1})
+                result.put("dayBeforeDateTime", baseDateTime.minusDays(1).toString());
+                
+                // dayAfterDate: + period({days:1})
+                result.put("dayAfterDate", baseDate.plusDays(1).toString());
+                
+                // yearMonthDayAfterDate: + period({years:1, months:1, days:1})
+                result.put("yearMonthDayAfterDate", baseDate.plusYears(1).plusMonths(1).plusDays(1).toString());
+                
+                // emptyPeriod: period({})
+                result.put("emptyPeriod", "P0D");
+                
+                // constructPeriod: period({years:4, months:11, days:28})
+                result.put("constructPeriod", "P4Y11M28D");
+                
+                // selectMonthsFromPeriod: .months → 11
+                result.put("selectMonthsFromPeriod", 11);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+
+output:
+
+{
+  "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+  "dayAfterDate": "2020-10-06",
+  "yearMonthDayAfterDate": "2021-11-06",
+  "emptyPeriod": "P0D",
+  "constructPeriod": "P4Y11M28D",
+  "selectMonthsFromPeriod": 11
+}
+
+

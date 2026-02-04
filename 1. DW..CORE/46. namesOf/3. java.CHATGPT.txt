@@ -1,0 +1,31 @@
+namesOf:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Simulate DataWeave object
+        Map<String, Object> obj = new LinkedHashMap<>();
+        obj.put("a", true);
+        obj.put("b", 1);
+
+        // Equivalent of namesOf()
+        List<String> keys = new ArrayList<>(obj.keySet());
+
+        // Print JSON-like output
+        System.out.println("{ \"namesOf\": " + keys + " }");
+    }
+}
+
+
+output:
+
+{ "namesOf": [a, b] }
+
+
+

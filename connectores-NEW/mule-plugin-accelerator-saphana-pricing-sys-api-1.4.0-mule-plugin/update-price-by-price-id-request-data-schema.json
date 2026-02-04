@@ -1,0 +1,179 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/PriceBookEntry",
+  "definitions": {
+    "PriceBookEntry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_2"
+        },
+        "minRequiredQuantity": {
+          "$ref": "#/definitions/default_5"
+        },
+        "unitListPrice": {
+          "$ref": "#/definitions/default_6"
+        },
+        "product": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "minRequiredOrderValue": {
+          "$ref": "#/definitions/default_7"
+        },
+        "isActive": {
+          "$ref": "#/definitions/default_4"
+        },
+        "maxRequiredOrderValue": {
+          "$ref": "#/definitions/default_1"
+        },
+        "useStandardPrice": {
+          "$ref": "#/definitions/default"
+        },
+        "servicePeriodCount": {
+          "$ref": "#/definitions/default_3"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "AuditInfo": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "isDeleted",
+        "createdBy",
+        "updatedBy",
+        "updatedDate",
+        "createdDate"
+      ],
+      "properties": {
+        "createdDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "isDeleted": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "default": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_1": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_2": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_3": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_4": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_5": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_6": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_7": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

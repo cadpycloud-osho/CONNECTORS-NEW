@@ -1,0 +1,145 @@
+map:
+
+example 1:
+
+
+input:
+
+// MapIndexObjectApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.*;
+
+@SpringBootApplication
+public class MapIndexObjectApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MapIndexObjectApp.class, args);
+
+        List<String> names = Arrays.asList("jose", "pedro", "mateo");
+        List<Map<String, String>> result = IntStream.range(0, names.size())
+            .mapToObj(i -> Map.of(String.valueOf(i), names.get(i)))
+            .collect(Collectors.toList());
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+[{0=jose}, {1=pedro}, {2=mateo}]
+____________________________________________________________________________
+
+
+example 2:
+
+
+input:
+
+// MapIndexStringApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.*;
+import java.util.stream.IntStream;
+
+@SpringBootApplication
+public class MapIndexStringApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MapIndexStringApp.class, args);
+
+        List<String> chars = Arrays.asList("a", "b", "c");
+        List<String> result = IntStream.range(0, chars.size())
+            .mapToObj(i -> (i + 1) + "_" + chars.get(i))
+            .collect(Collectors.toList());
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+[1_a, 2_b, 3_c]
+____________________________________________________________________________
+
+
+
+example 3:
+
+
+input:
+
+// MapDoubleDollarApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.*;
+import java.util.stream.IntStream;
+
+@SpringBootApplication
+public class MapDoubleDollarApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MapDoubleDollarApp.class, args);
+
+        List<String> names = Arrays.asList("joe", "pete", "matt");
+        List<Map<String, String>> result = IntStream.range(0, names.size())
+            .mapToObj(i -> Map.of(String.valueOf(i), names.get(i)))
+            .collect(Collectors.toList());
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+[{0=joe}, {1=pete}, {2=matt}]
+____________________________________________________________________________
+
+
+
+example 4:
+
+
+input:
+
+// MapCsvApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.*;
+
+@SpringBootApplication
+public class MapCsvApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MapCsvApp.class, args);
+
+        List<Map<String, Object>> people = Arrays.asList(
+            Map.of("age", 14, "name", "Claire"),
+            Map.of("age", 56, "name", "Max"),
+            Map.of("age", 89, "name", "John")
+        );
+
+        // CSV Header
+        System.out.println("age,name");
+        
+        // CSV Rows
+        people.forEach(person -> 
+            System.out.println(person.get("age") + "," + person.get("name"))
+        );
+    }
+}
+
+Output (CSV):
+
+age,name
+14,Claire
+56,Max
+89,John
+
+
+
+

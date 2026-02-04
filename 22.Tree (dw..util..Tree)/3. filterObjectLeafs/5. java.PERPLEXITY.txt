@@ -1,0 +1,89 @@
+filterObjectLeafs:
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = executeFilterTests();
+        System.out.println(result);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> executeFilterTests() {
+        // Fix: Use HashMap for duplicates + nulls
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("name", ""); map1.put("id", "test"); 
+        map1.put("mail", "me@me.com"); map1.put("test", 123);
+        
+        Map<String, Object> map2 = new HashMap<>();
+        map2.put("name", "Me"); map2.put("id", null);
+        
+        List<Map<String, Object>> myArray = Arrays.asList(map1, map2);
+        
+        Map<String, Object> inputA = new LinkedHashMap<>();
+        inputA.put("name", "Mariano");
+        inputA.put("lastName", null);
+        inputA.put("age", 123);
+        inputA.put("friends", myArray);
+        
+        Map<String, Object> inputB = new LinkedHashMap<>();
+        inputB.put("c", null);
+        inputB.put("d", "hello");
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        result.put("a", filterObjectLeafs(inputA, (value, path) -> 
+            !(value == null || value instanceof String)));
+        
+        result.put("b", filterObjectLeafs(inputB, (value, path) -> 
+            (value == null && isObjectType(path))));
+        
+        return result;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static Object filterObjectLeafs(Object input, BiPredicate<Object, String> predicate) {
+        if (input instanceof Map) {
+            Map<String, Object> mapInput = (Map<String, Object>) input;
+            Map<String, Object> result = new LinkedHashMap<>();
+            mapInput.forEach((key, value) -> {
+                Object filtered = filterObjectLeafs(value, predicate);
+                if (filtered != null) {
+                    result.put(key, filtered);
+                }
+            });
+            return result.isEmpty() ? null : result;
+        } else if (input instanceof List) {
+            List<Object> resultList = ((List<Object>) input).stream()
+                .map(item -> filterObjectLeafs(item, predicate))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+            return resultList.isEmpty() ? null : resultList;
+        } else {
+            return predicate.test(input, "") ? input : null;
+        }
+    }
+    
+    private static boolean isObjectType(String path) {
+        return path != null && !path.contains("[") && !path.contains(".@");
+    }
+}
+
+
+output:
+
+{
+  a={age=123, friends=[{}, {}]},
+  b={c=null}
+}
+
+
+
+

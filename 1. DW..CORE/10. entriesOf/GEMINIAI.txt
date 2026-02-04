@@ -1,0 +1,151 @@
+entriesOf:
+
+INPUT:
+
+1. Java Object Model (`XmlData.java`)
+
+java
+package com.example.xmldemo;
+
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+// Represents the root <xml> element and its content
+@JacksonXmlRootElement(localName = "xml")
+public class XmlData {
+
+    // Content of the <xml> element
+    public Content content;
+    
+    // Attribute 'attr' of the <xml> element
+    public Attributes attributes;
+
+    public XmlData() {}
+
+    public XmlData(Content content, Attributes attributes) {
+        this.content = content;
+        this.attributes = attributes;
+    }
+
+    // Inner class to hold the content: <a> and <b>
+    public static class Content {
+        public String a;
+        public String b;
+        
+        public Content() {}
+        public Content(String a, String b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+
+    // Inner class to hold the attributes of the root element
+    public static class Attributes {
+        // Designates 'attr' as an XML attribute
+        @JacksonXmlProperty(isAttribute = true)
+        public String attr;
+
+        public Attributes() {}
+        public Attributes(String attr) {
+            this.attr = attr;
+        }
+    }
+}
+```
+
+2. Spring Boot Controller (`XmlController.java`)
+
+
+
+package com.example.xmldemo;
+
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class XmlController {
+
+    private final XmlMapper xmlMapper = new XmlMapper();
+    
+    // The source XML string from DataWeave
+    private static final String XML_SOURCE = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+    /**
+     * Replicates the DataWeave transformation: { "entriesOf" : entriesOf(myVar) }
+     */
+    @GetMapping("/entriesOfXml")
+    public Map<String, Object> getEntriesOfXml() throws Exception {
+        
+        // 1. Replicate 'read(..., 'application/xml')'
+        // Read the XML string into the XmlData object.
+        XmlData parsedXml = xmlMapper.readValue(XML_SOURCE, XmlData.class);
+
+        // --- 2. Replicate 'entriesOf(myVar)' ---
+        
+        // DataWeave 'entriesOf' output structure:
+        // [ { "key": "xml", "value": { ... }, "attributes": { ... } } ]
+        
+        Map<String, String> attributesMap = Map.of("attr", parsedXml.attributes.attr);
+        
+        Map<String, String> valueMap = Map.of(
+            "a", parsedXml.content.a,
+            "b", parsedXml.content.b
+        );
+
+        // Create the single entry object
+        Map<String, Object> entry = Map.of(
+            "key", "xml", // The root element name
+            "value", valueMap,
+            "attributes", attributesMap
+        );
+
+        // Create the final output map: { "entriesOf": [ ... ] }
+        List<Map<String, Object>> entriesList = Collections.singletonList(entry);
+
+        return Collections.singletonMap("entriesOf", entriesList);
+    }
+}
+
+
+Required Maven Dependency 
+
+You need to include the Jackson XML library for this code to run:
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+```
+
+
+Output (JSON)
+
+json
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+
+
+
+_____________________________________________________________________
+
+
+entriesOf(obj: Null): Null
+Helper function that enables entriesOf to work with a null value.

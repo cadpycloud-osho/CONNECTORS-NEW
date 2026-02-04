@@ -1,0 +1,108 @@
+pluck:
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("a", "b");
+        map.put("c", "d");
+
+        List<Map<Integer, Map<String, String>>> result = new ArrayList<>();
+
+        int index = 0;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            Map<String, String> inner = new HashMap<>();
+            inner.put(entry.getValue(), entry.getKey());
+
+            Map<Integer, Map<String, String>> outer = new HashMap<>();
+            outer.put(index, inner);
+
+            result.add(outer);
+            index++;
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[ {0={b=a}}, {1={d=c}} ]
+
+
+
+-----------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<prices>" +
+                     "<basic>9.99</basic>" +
+                     "<premium>53.00</premium>" +
+                     "<vip>398.99</vip>" +
+                     "</prices>";
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+        NodeList children = doc.getDocumentElement().getChildNodes();
+
+        List<String> keys = new ArrayList<>();
+        List<Double> values = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                keys.add(node.getNodeName());
+                values.add(Double.parseDouble(node.getTextContent()));
+                indices.add(i);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("keys", keys);
+        result.put("values", values);
+        result.put("indices", indices);
+
+        Map<String, Object> finalOutput = new HashMap<>();
+        finalOutput.put("result", result);
+
+        System.out.println(finalOutput);
+    }
+}
+
+
+
+output:
+
+
+{
+  "result": {
+    "keys": ["basic", "premium", "vip"],
+    "values": [9.99, 53.0, 398.99],
+    "indices": [0, 1, 2]
+  }
+}
+
+
+-----------------------------------------------------

@@ -1,0 +1,280 @@
+toString:
+
+
+example 1:
+
+
+
+input:
+
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a
+        result.put("a", Double.toString(1.0));
+
+        // b
+        result.put("b", new DecimalFormat(".00").format(0.005));
+
+        // c
+        DecimalFormatSymbols esSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
+        result.put("c", new DecimalFormat("#.##", esSymbols).format(0.035));
+
+        // d
+        DecimalFormat dfD = new DecimalFormat("#.##", esSymbols);
+        dfD.setRoundingMode(RoundingMode.HALF_EVEN);
+        result.put("d", dfD.format(0.005));
+
+        // e
+        DecimalFormat dfE = new DecimalFormat("#.00");
+        dfE.setRoundingMode(RoundingMode.HALF_EVEN);
+        result.put("e", dfE.format(0.035));
+
+        // f
+        DecimalFormat dfF = new DecimalFormat("$#.## 'in my account'");
+        dfF.setRoundingMode(RoundingMode.HALF_EVEN);
+        result.put("f", dfF.format(1.1234));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=1, b=.01, c=0,04, d=0, e=.04, f=$1.12 in my account}
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // aDate
+        LocalDate aDate = LocalDate.parse("2003-10-01");
+        result.put("aDate", aDate.format(DateTimeFormatter.ofPattern("uuuu/MM/dd")));
+
+        // aDateTime
+        OffsetDateTime aDateTime = OffsetDateTime.parse("2018-09-17T22:13:00-03:00");
+        result.put("aDateTime", aDateTime.toString());
+
+        // aLocalTime
+        LocalTime aLocalTime = LocalTime.parse("23:57:59");
+        result.put("aLocalTime", aLocalTime.format(DateTimeFormatter.ofPattern("HH-mm-ss")));
+
+        // aLocalDateTime
+        LocalDateTime aLocalDateTime = LocalDateTime.parse("2015-10-01T23:57:59");
+        result.put("aLocalDateTime", aLocalDateTime.toString());
+
+        // aLocalDateTimeFormatted
+        LocalDateTime aLocalDateTime2 = LocalDateTime.parse("2003-10-01T23:57:59");
+        result.put("aLocalDateTimeFormatted",
+                aLocalDateTime2.format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss a")));
+
+        // aLocalDateTimeFormattedAndLocalizedSpain
+        LocalDateTime aLocalDateTimeSpain = LocalDateTime.parse("2003-01-01T23:57:59");
+        DateTimeFormatter formatterSpain = DateTimeFormatter.ofPattern("eeee, dd MMMM, uuuu HH:mm:ss a", new Locale("es"));
+        result.put("aLocalDateTimeFormattedAndLocalizedSpain", aLocalDateTimeSpain.format(formatterSpain));
+
+        // aTime
+        OffsetTime aTime = OffsetTime.parse("22:10:18Z");
+        result.put("aTime", "Time");
+
+        // aTimeZone
+        ZoneOffset offset = ZoneOffset.of("-03:00");
+        result.put("aTimeZone", offset.toString());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{aDate=2003/10/01, aDateTime=2018-09-17T22:13:00-03:00, aLocalTime=23-57-59, aLocalDateTime=2015-10-01T23:57:59, aLocalDateTimeFormatted=2003-10-01 23:57:59 PM, aLocalDateTimeFormattedAndLocalizedSpain=miércoles, 01 enero, 2003 23:57:59 p. m., aTime=Time, aTimeZone=-03:00}
+
+
+---
+
+
+example 3:
+
+
+
+input:
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Simulate DataWeave: "DW Test" as Binary {encoding: "UTF-32"}
+        byte[] binaryData = "DW Test".getBytes(Charset.forName("UTF-32"));
+
+        Map<String, String> result = new HashMap<>();
+        result.put("a", toString(binaryData, "UTF-32"));
+
+        System.out.println(result);
+    }
+
+    private static String toString(byte[] binaryData, String charsetName) {
+        return new String(binaryData, Charset.forName(charsetName));
+    }
+}
+
+
+
+output:
+
+{a=DW Test}
+
+
+---
+
+
+
+example 4:
+
+
+
+input:
+
+import java.net.URI;
+import java.time.Duration;
+import java.time.Period;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // TimeZone
+        result.put("transformTimeZone", "Z");
+
+        // Boolean
+        result.put("transformBoolean", Boolean.toString(true));
+
+        // Period P1D
+        result.put("transformPeriod", Period.ofDays(1).toString());
+
+        // Regex /a-Z/
+        result.put("transformRegex", Pattern.compile("a-Z").pattern());
+
+        // Period PT8M10S (Duration)
+        result.put("transformPeriod", Duration.ofMinutes(8).plusSeconds(10).toString());
+
+        // URI
+        result.put("transformUri", URI.create("https://docs.mulesoft.com/").toString());
+
+        // Key of Map
+        Map<String, String> map = new HashMap<>();
+        map.put("aKeyToString", "aValue");
+        String key = map.keySet().iterator().next();
+        result.put("transformKey", key);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{transformTimeZone=Z, transformBoolean=true, transformPeriod=PT8M10S, transformRegex=a-Z, transformUri=https://docs.mulesoft.com/, transformKey=aKeyToString}
+
+---
+
+
+
+
+example 5:
+
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> emptyList = Arrays.asList();
+        List<String> holaList = Arrays.asList("h", "o", "l", "a");
+
+        String a = toString(emptyList);
+        String b = toString(holaList);
+
+        System.out.println("{\"a\":\"" + a + "\", \"b\":\"" + b + "\"}");
+    }
+
+    private static String toString(List<String> list) {
+        return list.stream().collect(Collectors.joining());
+    }
+}
+
+
+output:
+
+{"a":"", "b":"hola"}
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

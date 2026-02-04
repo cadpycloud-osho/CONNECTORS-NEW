@@ -1,0 +1,103 @@
+takeWhile:
+
+
+input:
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 1};
+        List<Integer> result = new ArrayList<>();
+        
+        for (int num : arr) {
+            if (num <= 1) {
+                result.add(num);
+            } else {
+                break; // Stop at first failure
+            }
+        }
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+ [0, 1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional approach using manual index iteration to mimic takeWhile behavior.
+
+java
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 1};
+        
+        int endIndex = IntStream.range(0, arr.length)
+                               .takeWhile(i -> arr[i] <= 1)
+                               .count();
+        
+        List<Integer> result = Arrays.stream(arr, 0, (int) endIndex)
+                                    .boxed()
+                                    .toList();
+        
+        System.out.println(result);
+    }
+}
+Output: [0, 1]
+
+
+
+Manual Array Version (No Collections)
+Pure array manipulation without Java 8+ features.
+
+java
+
+
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 1};
+        int count = 0;
+        
+        // Count elements while condition holds
+        while (count < arr.length && arr[count] <= 1) {
+            count++;
+        }
+        
+        // Print first 'count' elements
+        System.out.print("[");
+        for (int i = 0; i < count; i++) {
+            System.out.print(arr[i]);
+            if (i < count - 1) System.out.print(", ");
+        }
+        System.out.println("]");
+    }
+}
+
+
+Output: [0, 1]

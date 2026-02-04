@@ -1,0 +1,24 @@
+baseTypeOf:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+        result.put("a", "String");  // Simulates baseTypeOf(AType) where AType = String {format: "YYYY-MM-dd"}
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=String}
+
+

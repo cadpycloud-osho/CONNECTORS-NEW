@@ -1,0 +1,62 @@
+countBy:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array
+        List<Integer> list = Arrays.asList(1, 2, 3, 4);
+
+        // DataWeave Logic: countBy (($ mod 2) == 0)
+        // Implemented using the Stream API: filter for numbers where (n % 2) == 0 (i.e., even), and then count them.
+        long countOfEvenNumbers = list.stream()
+            .filter(n -> (n % 2) == 0)
+            .count();
+
+        // The final result structure: {"countBy": 2}
+        // Outputting the required JSON-like map structure
+        System.out.println("{\"countBy\":" + countOfEvenNumbers + "}");
+    }
+}
+
+
+
+Alternate Correct Java Code (Using Imperative Loop)
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array
+        List<Integer> list = Arrays.asList(1, 2, 3, 4);
+        
+        int countOfEvenNumbers = 0;
+
+        // DataWeave Logic: countBy (($ mod 2) == 0)
+        // Loop through each number and check if it's even
+        for (int number : list) {
+            if ((number % 2) == 0) {
+                countOfEvenNumbers++; 
+            }
+        }
+        
+        // The final result structure: {"countBy": 2}
+        // Outputting the required JSON-like map structure
+        System.out.println("{\"countBy\":" + countOfEvenNumbers + "}");
+    }
+}
+
+
+output:
+
+{ "countBy": 2 }
+

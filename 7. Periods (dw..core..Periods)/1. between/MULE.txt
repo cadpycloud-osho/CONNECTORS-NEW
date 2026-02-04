@@ -1,0 +1,35 @@
+between:
+
+between(endDateExclusive: Date, startDateInclusive: Date): Period
+
+between(endDateExclusive: Date, startDateInclusive: Date): Period
+Returns a Period (P) value consisting of the number of years, months, and days between two Date values.
+
+The start date is included, but the end date is not. The result of this method can be a negative period if the end date (endDateExclusive) is before the start date (startDateInclusive).
+
+Note that the first parameter of the function is the endDateExclusive and the second one is the startDateInclusive.
+
+
+
+
+
+
+
+Source
+import * from dw::core::Periods
+output application/json
+---
+{
+   a: between(|2010-12-12|,|2010-12-10|),
+   b: between(|2011-12-11|,|2010-11-10|),
+   c: between(|2020-02-29|,|2020-03-30|)
+}
+
+
+DataWeave
+Output
+{
+   "a": "P2D",
+   "b": "P1Y1M1D",
+   "c": "P-1M-1D"
+ }

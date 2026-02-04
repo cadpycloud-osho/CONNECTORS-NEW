@@ -1,0 +1,66 @@
+toRegex:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.regex.Pattern;
+
+public class DataWeaveToRegexConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Mimics DataWeave's toRegex() by compiling a Java Pattern and returning its string representation.
+     * @param regexString The string to convert into a pattern.
+     * @return The pattern string itself.
+     */
+    private String toRegex(String regexString) {
+        // In Java, we compile the string into a Pattern object to validate it.
+        // We then return the source pattern string, which corresponds to the DW output.
+        Pattern pattern = Pattern.compile(regexString);
+        return pattern.pattern();
+    }
+
+    public String getRegexConversionJson() throws IOException {
+        
+        // --- Logic for Key 'toRegexEx1' ---
+        String regexString1 = "a-Z";
+        String parsedRegex1 = toRegex(regexString1); 
+
+        // --- Logic for Key 'toRegexEx2' ---
+        String regexString2 = "0-9+";
+        String parsedRegex2 = toRegex(regexString2);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // The output is the string representation of the regex pattern.
+        root.put("toRegexEx1", parsedRegex1);
+        root.put("toRegexEx2", parsedRegex2);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToRegexConverter converter = new DataWeaveToRegexConverter();
+        try {
+            String jsonOutput = converter.getRegexConversionJson();
+            System.out.println(jsonOutput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "toRegexEx1" : "a-Z",
+  "toRegexEx2" : "0-9+"
+}
+

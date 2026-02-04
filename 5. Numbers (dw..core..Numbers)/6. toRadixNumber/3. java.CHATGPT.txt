@@ -1,0 +1,33 @@
+toRadixNumber:
+
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        int numA = 2;
+        int numB = 255;
+
+        Map<String, String> result = new HashMap<>();
+        result.put("a", Integer.toString(numA, 2));   // base 2
+        result.put("b", Integer.toString(numB, 16));  // base 16
+
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+
+{a=10, b=ff}
+

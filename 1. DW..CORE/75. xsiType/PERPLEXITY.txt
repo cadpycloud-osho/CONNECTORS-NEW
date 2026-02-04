@@ -1,0 +1,54 @@
+xsiType:
+
+
+input:
+
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+@RestController
+public class XmlNamespaceController {
+
+    @GetMapping(value = "/xmlNamespace", produces = MediaType.APPLICATION_XML_VALUE)
+    public UserResponse xmlNamespace() throws Exception {
+        User user = new User("Peter", "Parker");
+        return new UserResponse(user);
+    }
+
+    @JacksonXmlRootElement(localName = "user")
+    public static class UserResponse {
+        @JacksonXmlProperty(localName = "user", namespace = "http://acme.com")
+        public User user;
+
+        public UserResponse(User user) {
+            this.user = user;
+        }
+    }
+
+    public static class User {
+        @JacksonXmlProperty(localName = "name")
+        public String name;
+
+        @JacksonXmlProperty(localName = "lastName")
+        public String lastName;
+
+        public User(String name, String lastName) {
+            this.name = name;
+            this.lastName = lastName;
+        }
+    }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<user xmlns:acme="http://acme.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="acme:user">
+    <name>Peter</name>
+    <lastName>Parker</lastName>
+</user>

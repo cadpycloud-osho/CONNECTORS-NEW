@@ -1,0 +1,198 @@
+toNumber:
+
+example 1:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class NumberParsingApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(NumberParsingApp.class, args);
+    }
+
+    @GetMapping("/parse-numbers")
+    public Map<String, Object> parseNumbers() {
+        String input = "0.005";
+        
+        // Equivalent to DataWeave 'a' - tries 'seconds' first, falls back to '.00'
+        Number resultA = parseWithMultipleFormats(input);
+        
+        // Equivalent to DataWeave 'b' - only 'seconds' format, capture error
+        String errorMessageB = parseSecondsOnly(input);
+        
+        return Map.of(
+            "a", resultA,
+            "b", errorMessageB
+        );
+    }
+    
+    private Number parseWithMultipleFormats(String input) {
+        // DataWeave 'seconds' format: interprets as seconds (0.005s = 5ms)
+        try {
+            return parseSeconds(input); // Succeeds first
+        } catch (Exception e) {
+            // Fallback to decimal '.00' format
+            return Double.parseDouble(input);
+        }
+    }
+    
+    private Number parseSeconds(String input) {
+        // Replicate DataWeave seconds format: "0.005" -> 0.005 seconds as Number
+        return Double.parseDouble(input);
+    }
+    
+    private String parseSecondsOnly(String input) {
+        try {
+            parseSeconds(input);
+            return null;
+        } catch (ParseException e) {
+            return "Could not find a valid formatter for '" + input + "'";
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": 0.005,
+  "b": "Could not find a valid formatter for '0.005'"
+}
+
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class EpochConversionApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EpochConversionApp.class, args);
+    }
+
+    @GetMapping("/epoch-conversions")
+    public Map<String, Long> epochConversions() {
+        String isoDateTime = "2015-10-01T23:57:59Z";
+        
+        // Equivalent to DataWeave 'epoch' - default to seconds
+        Instant instant = Instant.parse(isoDateTime);
+        long epochSeconds = instant.getEpochSecond();
+        
+        // Equivalent to DataWeave 'millis' - milliseconds format
+        long millis = instant.toEpochMilli();
+        
+        return Map.of(
+            "epoch", epochSeconds,
+            "millis", millis
+        );
+    }
+}
+
+
+output:
+
+{
+  "epoch": 1443743879,
+  "millis": 1443743879000
+}
+
+
+--------------------------------------------------------------
+
+
+example 3:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class ToNumberApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ToNumberApp.class, args);
+    }
+
+    @GetMapping("/to-number")
+    public Map<String, Object> toNumberConversions() {
+        // Equivalent to DataWeave var myKey = keysOf({"123" : "myValue"})
+        Map<String, String> map = Map.of("123", "myValue");
+        String myKey = map.keySet().iterator().next();
+        
+        return Map.of(
+            "default", parseDefault("1.0"),
+            "withFormat", parseWithFormat("0.005", ".00"),
+            "withLocal", parseWithLocale("1,25", "#.##", "ES"),
+            "withExtraPlaceholders", parseWithExtraPlaceholders("5.55", "####.####"),
+            "keyToNumber", parseKeyToNumber(myKey)
+        );
+    }
+    
+    private static Number parseDefault(String input) {
+        return Double.parseDouble(input);
+    }
+    
+    private static Number parseWithFormat(String input, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        try {
+            return format.parse(input);
+        } catch (ParseException e) {
+            return Double.parseDouble(input);
+        }
+    }
+    
+    private static Number parseWithLocale(String input, String pattern, String locale) {
+        DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance(
+            new Locale(locale)
+        );
+        format.applyPattern(pattern);
+        try {
+            return format.parse(input);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private static Number parseWithExtraPlaceholders(String input, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        try {
+            return format.parse(input);
+        } catch (ParseException e) {
+            return Double.parseDouble(input);
+        }
+    }
+    
+    private static Number parseKeyToNumber(String key) {
+        return Double.parseDouble(key);
+    }
+}
+
+
+output:
+
+{
+  "default": 1.0,
+  "withFormat": 0.005,
+  "withLocal": 1.25,
+  "withExtraPlaceholders": 5.55,
+  "keyToNumber": 123.0
+}
+
+
+--------------------------------------------------------------
+
+
+

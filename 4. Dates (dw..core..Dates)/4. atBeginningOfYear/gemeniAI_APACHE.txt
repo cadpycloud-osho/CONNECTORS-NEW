@@ -1,0 +1,180 @@
+atBeginningOfYear:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class BeginningOfYearRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startBeginningOfYear")
+            .routeId("Beginning-Of-Year-Route")
+            .process(exchange -> {
+                // 1. Input string (ISO-8601 with offset)
+                String inputDT = "2020-10-06T18:23:20.351-03:00";
+
+                // 2. Parse into OffsetDateTime
+                OffsetDateTime dateTime = OffsetDateTime.parse(inputDT);
+
+                // 3. Logic: atBeginningOfYear 
+                // Adjust to the first day of the year and midnight
+                OffsetDateTime beginningOfYear = dateTime
+                    .with(TemporalAdjusters.firstDayOfYear()) // Sets to January 1st
+                    .with(LocalTime.MIN);                     // Sets to 00:00:00
+
+                // 4. Format to match DW output style (including milliseconds)
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                String result = beginningOfYear.format(formatter);
+
+                // 5. Structure the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfYearDateTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .to("log:result?showBody=true");
+    }
+}
+
+output:
+
+{
+  "atBeginningOfYearDateTime": "2020-01-01T00:00:00.000-03:00"
+}
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class BeginningOfLocalYearRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startLocalYear")
+            .routeId("Beginning-Of-Local-Year-Route")
+            .process(exchange -> {
+                // 1. Input string as LocalDateTime (no offset)
+                String inputDT = "2020-10-06T18:23:20.351";
+
+                // 2. Parse into LocalDateTime
+                LocalDateTime dateTime = LocalDateTime.parse(inputDT);
+
+                // 3. Logic: atBeginningOfYear 
+                // Move to January 1st and reset the time to midnight
+                LocalDateTime beginningOfLocalYear = dateTime
+                    .with(TemporalAdjusters.firstDayOfYear())
+                    .with(LocalTime.MIN);
+
+                // 4. Format to match DW output (YYYY-MM-DDTHH:mm:ss)
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                String result = beginningOfLocalYear.format(formatter);
+
+                // 5. Structure the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfYearLocalDateTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+  "atBeginningOfYearLocalDateTime": "2020-01-01T00:00:00"
+}
+
+
+---------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class BeginningOfYearDateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startDateYear")
+            .routeId("Beginning-Of-Year-Date-Route")
+            .process(exchange -> {
+                // 1. Input string as a plain Date (YYYY-MM-DD)
+                String inputDateStr = "2020-10-06";
+
+                // 2. Parse into LocalDate
+                LocalDate date = LocalDate.parse(inputDateStr);
+
+                // 3. Logic: atBeginningOfYear
+                // Sets the month to January and the day to 1st
+                LocalDate beginningOfYear = date.with(TemporalAdjusters.firstDayOfYear());
+
+                // 4. Format the output back to string (ISO-8601 Date format)
+                String result = beginningOfYear.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                // 5. Structure the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfYearDate", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+  "atBeginningOfYearDate": "2020-01-01"
+}
+
+
+---------------------------------------------------------
+
+
+
+
+
+
+
+

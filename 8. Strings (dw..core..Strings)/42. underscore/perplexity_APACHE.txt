@@ -1,0 +1,43 @@
+underscore:
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class UnderscoreConverter {
+    public static String underscore(String input) {
+        if (input == null) return null;
+        
+        // Replace camelCase with spaces (before underscore conversion)
+        String result = input.replaceAll("([a-z])([A-Z])", "$1 $2");
+        
+        // Replace spaces and hyphens with underscores
+        result = result.replaceAll("[ -]", "_");
+        
+        // Convert to lowercase
+        return result.toLowerCase();
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", underscore("customer"));
+        result.put("b", underscore("customer-first-name"));
+        result.put("c", underscore("customer NAME"));
+        result.put("d", underscore("customerName"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+{
+   "a": "customer",
+   "b": "customer_first_name",
+   "c": "customer_name",
+   "d": "customer_name"
+}
+
+
+

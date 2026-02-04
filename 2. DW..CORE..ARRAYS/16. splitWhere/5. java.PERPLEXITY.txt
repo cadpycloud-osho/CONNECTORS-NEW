@@ -1,0 +1,151 @@
+splitWhere:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String[] users = {"Mariano", "Leandro", "Julian", "Tomo"};
+        String prefix = "Jul";
+        int splitIndex = -1;
+        
+        // Find first match
+        for (int i = 0; i < users.length; i++) {
+            if (users[i].startsWith(prefix)) {
+                splitIndex = i;
+                break;
+            }
+        }
+        
+        StringBuilder left = new StringBuilder("[");
+        StringBuilder right = new StringBuilder("[");
+        
+        for (int i = 0; i < splitIndex; i++) {
+            if (i > 0) left.append(",");
+            left.append("\"").append(users[i]).append("\"");
+        }
+        left.append("]");
+        
+        for (int i = splitIndex; i < users.length; i++) {
+            if (i > splitIndex) right.append(",");
+            right.append("\"").append(users[i]).append("\"");
+        }
+        right.append("]");
+        
+        String result = String.format(
+            "{\n  \"l\":\n    %s,\n  \"r\":\n    %s\n}",
+            left.toString(),
+            right.toString()
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+  "l": [
+    "Mariano",
+    "Leandro"
+  ],
+  "r": [
+    "Julian",
+    "Tomo"
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional approach finding split index then using subList.
+
+java
+
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+        
+        int splitIndex = (int) IntStream.range(0, users.size())
+                                       .filter(i -> users.get(i).startsWith("Jul"))
+                                       .findFirst()
+                                       .orElse(users.size());
+        
+        List<String> left = users.subList(0, splitIndex);
+        List<String> right = users.subList(splitIndex, users.size());
+        
+        String result = String.format(
+            "{\n  \"l\":\n    %s,\n  \"r\":\n    %s\n}",
+            left.toString().replace(" ", ""),
+            right.toString().replace(" ", "")
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+
+
+
+Output: Identical to loop version above.
+
+
+
+
+
+
+Simple List Version (No JSON)
+Pure lists without external dependencies.
+
+java
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+        int splitIndex = 0;
+        
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).startsWith("Jul")) {
+                splitIndex = i;
+                break;
+            }
+        }
+        
+        List<String> left = users.subList(0, splitIndex);
+        List<String> right = users.subList(splitIndex, users.size());
+        
+        System.out.println("{\"l\": " + left + ", \"r\": " + right + "}");
+    }
+}
+
+
+
+
+Output: {"l": [Mariano, Leandro], "r": [Julian, Tomo]}

@@ -1,0 +1,57 @@
+asin:
+
+
+
+input:
+
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the asin function.
+     * @return A map containing the results of the arc sine calculations.
+     */
+    @GetMapping("/calculateAsin")
+    public Map<String, Object> calculateAsin() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // Helper function to replicate DataWeave's asin behavior 
+        // (returning null for out-of-range input)
+        Object asin(double x) {
+            // DataWeave's asin returns null if x is outside the range [-1, 1].
+            if (x < -1.0 || x > 1.0) {
+                return null;
+            }
+            // Math.asin returns the arc sine of a value; the returned angle is 
+            // in the range [-pi/2] through [pi/2] radians.
+            return Math.asin(x);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("asin0", asin(0));
+        output.put("asin13", asin(0.13));
+        output.put("asin-1", asin(-1));
+        output.put("asin1.1", asin(1.1));
+
+        return output;
+    }
+}
+
+output:
+
+{
+  "asin0": 0.0,
+  "asin13": 0.1303689797031455,
+  "asin-1": -1.5707963267948966,
+  "asin1.1": null
+}
+

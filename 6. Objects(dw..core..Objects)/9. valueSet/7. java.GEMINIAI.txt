@@ -1,0 +1,77 @@
+valueSet:
+
+
+
+
+input:
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * Simulates the DataWeave valueSet() function on a standard object.
+     * @param inputMap The map (DW object) to extract values from.
+     * @return A Collection of values.
+     */
+    public static Collection<Object> valueSet(Map<String, Object> inputMap) {
+        // Map.values() directly gives the collection of values.
+        return inputMap.values();
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // 1. Define the input object/Map, must use LinkedHashMap to guarantee order
+        Map<String, Object> inputObject = new LinkedHashMap<>();
+        inputObject.put("a", true);
+        inputObject.put("b", 1);
+        
+        // 2. Apply the valueSet() function
+        Collection<Object> values = valueSet(inputObject);
+        
+        // 3. Format the final JSON output
+        String valuesArrayString = values.stream()
+            // Map values to their appropriate JSON string representation
+            .map(v -> (v instanceof String) ? "\"" + v + "\"" : v.toString())
+            // Join them with a comma
+            .collect(Collectors.joining(","));
+
+        String jsonOutput = String.format(
+            "{\n  \"valueSet\": [%s]\n}",
+            valuesArrayString
+        );
+
+        System.out.println("--- DataWeave valueSet() Simulation ---");
+        System.out.println("Input Object: " + inputObject);
+        System.out.println("Extracted Values: " + values);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+--- DataWeave valueSet() Simulation ---
+Input Object: {a=true, b=1}
+Extracted Values: [true, 1]
+---------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "valueSet": [true,1]
+}
+
+

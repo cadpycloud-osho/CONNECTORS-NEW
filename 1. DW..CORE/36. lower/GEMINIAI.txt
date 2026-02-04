@@ -1,0 +1,36 @@
+lower:
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.Collections;
+
+@RestController
+public class LowerCaseController {
+
+    /**
+     * Endpoint to demonstrate the equivalent of DataWeave's lower("MULESOFT").
+     * Accessible at http://localhost:8080/lowercase-example
+     */
+    @GetMapping("/lowercase-example")
+    public Map<String, String> toLowerCaseExample() {
+        // 1. Define the input string (equivalent to "MULESOFT" in DW)
+        String inputString = "MULESOFT";
+
+        // 2. Perform the conversion to lowercase
+        // This is the Java equivalent of DataWeave: lower("MULESOFT")
+        String lowerCaseString = inputString.toLowerCase();
+
+        // 3. Construct the JSON output map
+        return Collections.singletonMap("name", lowerCaseString);
+    }
+}
+
+output:
+
+{
+  "name": "mulesoft"
+}

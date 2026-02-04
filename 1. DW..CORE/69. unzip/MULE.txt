@@ -1,0 +1,67 @@
+unzip:
+
+unzip<T>(items: Array<Array<T>>): Array<Array<T>>
+
+unzip<T>(items: Array<Array<T>>): Array<Array<T>>
+Performs the opposite of zip. It takes an array of arrays as input.
+
+The function groups the values of the input sub-arrays by matching indices, and it outputs new sub-arrays with the values of those matching indices. No sub-arrays are produced for unmatching indices. For example, if one input sub-array contains four elements (indices 0-3) and another only contains three (indices 0-2), the function will not produce a sub-array for the value at index 3.
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+unzip([ [0,"a"], [1,"b"], [2,"c"],[ 3,"d"] ])
+DataWeave
+Output
+[ [ 0, 1, 2, 3 ], [ "a", "b", "c", "d" ] ]
+
+
+------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+unzip([ [0,"a"], [1,"a","foo"], [2], [3,"a"] ])
+DataWeave
+Output
+[0,1,2,3]
+
+
+------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+unzip([ [0,"a","W"], [1,"b","X"], [2,"c","Y"], [3,"d","Z"] ])
+DataWeave
+Output
+[
+ [0,1,2,3],
+ ["a","b","c","d"],
+ ["W","X","Y","Z"]
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

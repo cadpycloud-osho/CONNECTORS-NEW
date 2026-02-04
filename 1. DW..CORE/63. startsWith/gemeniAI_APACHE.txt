@@ -1,0 +1,44 @@
+startsWith:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+
+public class CamelStartsWith {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String name = "Mari";
+                        
+                        // Java native String.startsWith(String prefix)
+                        boolean check1 = name.startsWith("Mar");
+                        boolean check2 = name.startsWith("Em");
+
+                        exchange.getIn().setBody(List.of(check1, check2));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[ true, false ]
+

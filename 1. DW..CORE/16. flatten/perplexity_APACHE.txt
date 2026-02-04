@@ -1,0 +1,84 @@
+flatten:
+
+example 1:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.*;
+
+List<List<Integer>> array1 = Arrays.asList(1, 2, 3);
+List<List<Integer>> array2 = Arrays.asList(4, 5, 6);
+List<List<Integer>> array3 = Arrays.asList(7, 8, 9);
+List<List<List<Integer>>> arrayOfArrays = Arrays.asList(array1, array2, array3);
+
+List<Integer> output = arrayOfArrays.stream()
+    .flatMap(List::stream)
+    .collect(Collectors.toList());
+
+System.out.println(output);  // [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+output:
+
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+
+---------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+List<Map<String, Object>> output = new ArrayList<>();
+
+// Simulate the nested structure
+Map<String, Object> user1 = new HashMap<>();
+user1.put("group", "dev");
+List<Map<String, Object>> myarray1 = Arrays.asList(
+    Map.of("name", "Shoki", "id", 5678),
+    Map.of("name", "Mariano", "id", 9123)
+);
+user1.put("myarray", myarray1);
+
+Map<String, Object> user2 = new HashMap<>();
+user2.put("group", "test");
+List<Map<String, Object>> myarray2 = Arrays.asList(
+    Map.of("name", "Sai", "id", 2001),
+    Map.of("name", "Peter", "id", 2002)
+);
+user2.put("myarray", myarray2);
+
+List<Map<String, Object>> user = Arrays.asList(user1, user2);
+Map<String, Object> myData = new HashMap<>();
+myData.put("user", user);
+
+// Flatten myData.user.myarray equivalent
+((List<?>) ((List<?>) myData.get("user")).get(0).get("myarray"))
+    .forEach(output::add);
+((List<?>) ((List<?>) myData.get("user")).get(1).get("myarray"))
+    .forEach(output::add);
+
+System.out.println(output);
+
+
+output:
+
+[
+  {name=Shoki, id=5678}, 
+  {name=Mariano, id=9123}, 
+  {name=Sai, id=2001}, 
+  {name=Peter, id=2002}
+]
+
+
+
+---------------------------------------------------
+

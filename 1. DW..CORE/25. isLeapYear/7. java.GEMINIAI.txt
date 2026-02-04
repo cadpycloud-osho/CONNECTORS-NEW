@@ -1,0 +1,146 @@
+isLeapYear:
+
+
+
+example 1:
+
+input:
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // DataWeave Input: |2016-10-01T23:57:59| (LocalDateTime)
+        LocalDateTime datetime1 = LocalDateTime.of(2016, 10, 1, 23, 57, 59);
+        // DataWeave Input: |2017-10-01T23:57:59|
+        LocalDateTime datetime2 = LocalDateTime.of(2017, 10, 1, 23, 57, 59);
+
+        // Logic: Extract the year from the LocalDateTime object and check if it's a leap year.
+        // We use toLocalDate() because isLeapYear() is a method of LocalDate.
+        
+        // isLeapYear(|2016-10-01T23:57:59|)
+        boolean result1 = datetime1.toLocalDate().isLeapYear(); // 2016 is a leap year (True)
+        
+        // isLeapYear(|2017-10-01T23:57:59|)
+        boolean result2 = datetime2.toLocalDate().isLeapYear(); // 2017 is not a leap year (False)
+
+        List<Boolean> outputList = Arrays.asList(result1, result2);
+
+        System.out.println("--- DataWeave isLeapYear (LocalDateTime) Conversion ---");
+        System.out.println("Output: " + outputList);
+    }
+}
+
+output:
+[true, false]
+
+-----------------------------------------------------------
+
+
+example 2:
+
+input:
+
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // DataWeave Input: |2016-10-01| (LocalDate)
+        LocalDate date1 = LocalDate.of(2016, 10, 1);
+        // DataWeave Input: |2017-10-01|
+        LocalDate date2 = LocalDate.of(2017, 10, 1);
+
+        // Logic: LocalDate has the isLeapYear() method directly.
+        
+        // isLeapYear(|2016-10-01|)
+        boolean result1 = date1.isLeapYear(); // 2016 is a leap year (True)
+        
+        // isLeapYear(|2017-10-01|)
+        boolean result2 = date2.isLeapYear(); // 2017 is not a leap year (False)
+
+        List<Boolean> outputList = Arrays.asList(result1, result2);
+
+        System.out.println("--- DataWeave isLeapYear (LocalDate) Conversion ---");
+        System.out.println("Output: " + outputList);
+    }
+}
+
+
+output:
+[true, false]
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.LocalDate; // <-- **Corrected: Added missing import for LocalDate**
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // DataWeave Input 1: |2016-10-01T23:57:59-03:00| (OffsetDateTime)
+        OffsetDateTime odt1 = OffsetDateTime.of(2016, 10, 1, 23, 57, 59, 0, ZoneOffset.ofHours(-3));
+        
+        // DataWeave Input 2: |2016-10-01T23:57:59Z| (OffsetDateTime with Z/UTC offset)
+        OffsetDateTime odt2 = OffsetDateTime.of(2016, 10, 1, 23, 57, 59, 0, ZoneOffset.UTC);
+
+        // Combine inputs into a list
+        List<OffsetDateTime> dateTimes = Arrays.asList(odt1, odt2);
+
+        // Logic: Use a Stream to map over the list and apply the isLeapYear check.
+        // The isLeapYear check is based only on the year (2016 is a leap year).
+        List<Boolean> outputList = dateTimes.stream()
+            .map(OffsetDateTime::toLocalDate) // Convert to LocalDate
+            .map(LocalDate::isLeapYear)      // Apply the check (now resolved by import)
+            .collect(Collectors.toList());
+
+        System.out.println("--- DataWeave isLeapYear (OffsetDateTime/Map) Conversion ---");
+        System.out.println("Output: " + outputList);
+    }
+}
+
+
+
+output:
+
+[true, true]
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

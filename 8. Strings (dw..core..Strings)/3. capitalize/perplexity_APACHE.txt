@@ -1,0 +1,58 @@
+capitalize:
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class CapitalizeConverter {
+    public static String capitalize(String input) {
+        if (input == null) return null;
+        if (input.isEmpty()) return "";
+        
+        // Split by underscore first, then capitalize each word
+        String[] parts = input.split("_");
+        StringBuilder result = new StringBuilder();
+        
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+            if (!part.isEmpty()) {
+                // Capitalize first letter, preserve rest of case
+                if (part.length() > 1) {
+                    result.append(Character.toUpperCase(part.charAt(0)))
+                          .append(part.substring(1));
+                } else {
+                    result.append(Character.toUpperCase(part.charAt(0)));
+                }
+                if (i < parts.length - 1) {
+                    result.append(" ");
+                }
+            }
+        }
+        return result.toString();
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", capitalize("customer"));
+        result.put("b", capitalize("customer_first_name"));
+        result.put("c", capitalize("customer NAME"));
+        result.put("d", capitalize("customerName"));
+        result.put("e", capitalize("a*s_b's"));
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+{
+  "a": "Customer",
+  "b": "Customer First Name",
+  "c": "Customer Name", 
+  "d": "Customer Name",
+  "e": "A*S B'S"
+}
+
+

@@ -1,0 +1,66 @@
+divideBy:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class DivideByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:divideBy")
+            .process(exchange -> {
+                // Input object with duplicate keys (last value wins for same key)
+                LinkedHashMap<String, Object> input = new LinkedHashMap<>();
+                input.put("a", 1);
+                input.put("b", true);
+                input.put("a", 2);      // Overwrites previous "a":1
+                input.put("b", false);  // Overwrites previous "b":true  
+                input.put("c", 3);
+                
+                // Convert entries to list, preserving insertion order
+                List<Map.Entry<String, Object>> entries = new ArrayList<>(input.entrySet());
+                
+                // Group into chunks of 2
+                List<Map<String, Object>> result = IntStream.range(0, 
+                    (int) Math.ceil(entries.size() / 2.0))
+                    .mapToObj(i -> {
+                        int start = i * 2;
+                        int end = Math.min(start + 2, entries.size());
+                        return entries.subList(start, end).stream()
+                            .collect(Collectors.toMap(
+                                Map.Entry::getKey, 
+                                Map.Entry::getValue,
+                                (v1, v2) -> v2,  // Last value wins for duplicate keys
+                                LinkedHashMap::new
+                            ));
+                    })
+                    .collect(Collectors.toList());
+                
+                Map<String, Object> output = new LinkedHashMap<>();
+                output.put("divideBy", result);
+                
+                exchange.getIn().setBody(output);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+
+public static <T> List<T> divideBy(List<T> items, int n) {
+    return IntStream.range(0, (int) Math.ceil(items.size() / (double) n))
+        .mapToObj(i -> items.subList(i * n, Math.min((i + 1) * n, items.size())))
+        .collect(Collectors.toList());
+}
+
+// For Objects: convert entries → divideBy → reconstruct objects
+
+

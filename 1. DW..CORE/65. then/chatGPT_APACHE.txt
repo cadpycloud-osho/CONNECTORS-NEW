@@ -1,0 +1,52 @@
+then:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        // chainResult: reduce then sizeOf
+        java.util.List<String> chainList = java.util.Arrays.asList("mariano", "de Achaval");
+        String chainConcat = String.join("", chainList); // equivalent to reduce with concatenation
+        int chainResult = chainConcat.length();
+        
+        // referenceResult: map upper then build object
+        java.util.List<String> refList = java.util.Arrays.asList("mariano", "de Achaval");
+        java.util.List<String> upperList = new java.util.ArrayList<>();
+        for(String s : refList) {
+            upperList.add(s.toUpperCase());
+        }
+        java.util.Map<String, Object> referenceResult = new java.util.LinkedHashMap<>();
+        referenceResult.put("name", upperList.get(0));
+        referenceResult.put("lastName", upperList.get(1));
+        referenceResult.put("length", upperList.size());
+        
+        // onNullReturnNull: reduce empty list then sizeOf → null
+        java.util.List<String> emptyList = new java.util.ArrayList<>();
+        Integer onNullReturnNull = emptyList.isEmpty() ? null : String.join("", emptyList).length();
+        
+        // combine results
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("chainResult", chainResult);
+        result.put("referenceResult", referenceResult);
+        result.put("onNullReturnNull", onNullReturnNull);
+        
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+
+
+output:
+
+{
+  "chainResult": 17,
+  "referenceResult": {
+    "name": "MARIANO",
+    "lastName": "DE ACHAVAL",
+    "length": 2
+  },
+  "onNullReturnNull": null
+}
+
+

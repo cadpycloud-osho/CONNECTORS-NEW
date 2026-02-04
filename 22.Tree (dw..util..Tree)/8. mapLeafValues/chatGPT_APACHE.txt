@@ -1,0 +1,161 @@
+mapLeafValues:
+
+example 1:
+
+input:
+
+import java.util.*;
+
+public class MapLeafValuesExample {
+
+    public static void main(String[] args) {
+
+        // Input structure
+        Map<String, Object> input = new LinkedHashMap<>();
+
+        Map<String, Object> user1 = new LinkedHashMap<>();
+        user1.put("name", "mariano");
+        user1.put("lastName", "achaval");
+
+        input.put("user", Arrays.asList(user1));
+        input.put("group", "data-weave");
+
+        // Apply mapLeafValues logic
+        Map<String, Object> output = mapLeafValues(input, value -> {
+            if (value instanceof String) {
+                return ((String) value).toUpperCase();
+            }
+            return value;
+        });
+
+        System.out.println(output);
+    }
+
+    // Recursive mapLeafValues for maps
+    private static Map<String, Object> mapLeafValues(Map<String, Object> map, java.util.function.Function<Object, Object> mapper) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                result.put(entry.getKey(), mapLeafValues((Map<String, Object>) value, mapper));
+            } else if (value instanceof List) {
+                result.put(entry.getKey(), mapLeafValues((List<?>) value, mapper, mapper));
+            } else {
+                result.put(entry.getKey(), mapper.apply(value));
+            }
+        }
+        return result;
+    }
+
+    private static List<Object> mapLeafValues(List<?> list, java.util.function.Function<Object, Object> mapper, java.util.function.Function<Object, Object> dummy) {
+        List<Object> result = new ArrayList<>();
+        for (Object item : list) {
+            if (item instanceof Map) {
+                result.add(mapLeafValues((Map<String, Object>) item, mapper));
+            } else if (item instanceof List) {
+                result.add(mapLeafValues((List<?>) item, mapper, mapper));
+            } else {
+                result.add(mapper.apply(item));
+            }
+        }
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "user": [
+    {
+      "name": "MARIANO",
+      "lastName": "ACHAVAL"
+    }
+  ],
+  "group": "DATA-WEAVE"
+}
+
+--------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.*;
+
+public class MapLeafValuesWithTypeExample {
+
+    public static void main(String[] args) {
+
+        // Input structure
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("name", "Mariano");
+        input.put("test", Arrays.asList(1, 2, 3));
+
+        // Apply mapLeafValues logic
+        Map<String, Object> output = mapLeafValues(input);
+
+        System.out.println(output);
+    }
+
+    private static Map<String, Object> mapLeafValues(Map<String, Object> map) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                // Object type → replace with "***"
+                result.put(entry.getKey(), "***");
+            } else if (value instanceof List) {
+                // Array type → replace each element with "In an array"
+                List<Object> list = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    list.add("In an array");
+                }
+                result.put(entry.getKey(), list);
+            } else {
+                // Attribute → replace with "Is an attribute"
+                result.put(entry.getKey(), "Is an attribute");
+            }
+        }
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "name": "***",
+  "test": [
+    "In an array",
+    "In an array",
+    "In an array"
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

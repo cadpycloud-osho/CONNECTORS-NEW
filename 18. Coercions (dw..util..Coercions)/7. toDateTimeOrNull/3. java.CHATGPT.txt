@@ -1,0 +1,54 @@
+toDateTimeOrNull:
+
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("a", toDateTimeOrNull(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz",
+                        "uuuu-MM-dd HH:mm:ssz"
+                }
+        ));
+
+        result.put("b", toDateTimeOrNull(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz"
+                }
+        ));
+
+        System.out.println(result);
+    }
+
+    private static ZonedDateTime toDateTimeOrNull(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                return ZonedDateTime.parse(value, formatter);
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+{a=2003-10-01T23:57:59Z, b=null}
+
+

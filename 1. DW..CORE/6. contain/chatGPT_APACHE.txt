@@ -1,0 +1,97 @@
+contains:
+
+
+example 1:
+
+
+input:
+
+<root>
+    <order><items>155</items></order>
+    <order><items>30</items></order>
+    <order><items>15</items></order>
+    <order><items>5</items></order>
+    <order>
+        <items>4</items>
+        <items>7</items>
+    </order>
+    <order>
+        <items>1</items>
+        <items>3</items>
+    </order>
+    <order>
+        null
+    </order>
+</root>
+
+
+from("direct:containsCheck")
+.setHeader("ContainsRequestedItem",
+    xpath("boolean(//items[text()='3'])"))
+.setBody(simple("{\"ContainsRequestedItem\": ${header.ContainsRequestedItem}}"));
+
+
+output:
+
+{
+  "ContainsRequestedItem": true
+}
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+from("direct:containsCheck")
+.setBody(simple("${'mulesoft'.contains('mule')}"));
+
+
+
+XML DSL (Optional)
+<route>
+    <from uri="direct:containsCheck"/>
+    <setBody>
+        <simple>${'mulesoft'.contains('mule')}</simple>
+    </setBody>
+</route>
+
+YAML DSL (Optional)
+- from:
+    uri: direct:containsCheck
+    steps:
+      - setBody:
+          simple: "${'mulesoft'.contains('mule')}"
+
+
+output:
+true
+
+
+-----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+from("direct:containsCheck")
+    .setHeader("containsResult",
+        xpath("contains(/root/mystring/text(), 'me')", Boolean.class))
+    .setBody(simple("{\"ContainsString\": ${header.containsResult}}"));
+
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <mystring>some string</mystring>
+</root>
+
+
+
+output:
+{ "ContainsString": true }
+
+
+-----------------------------------------------------------------

@@ -1,0 +1,26 @@
+date:
+
+
+input:
+
+from("direct:createDate")
+.process(exchange -> {
+
+    // Create a LocalDate from year, month, day
+    java.time.LocalDate newDate = java.time.LocalDate.of(2012, 10, 11);
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("newDate", newDate.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+
+{
+  "newDate": "2012-10-11"
+}
+

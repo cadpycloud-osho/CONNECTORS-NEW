@@ -1,0 +1,26 @@
+today:
+
+
+input:
+
+from("direct:getToday")
+.process(exchange -> {
+
+    // Get current date
+    java.time.LocalDate today = java.time.LocalDate.now();
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("today", today.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+
+output:
+
+{
+  "today": "2021-05-15"
+}

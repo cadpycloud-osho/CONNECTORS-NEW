@@ -1,0 +1,25 @@
+locationString:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        int a = 123;
+
+        // Equivalent of dw::Runtime::locationString(a)
+        String locationString = "var a = 123";
+
+        System.out.println(locationString);
+    }
+}
+
+
+
+output:
+
+var a = 123
+
+

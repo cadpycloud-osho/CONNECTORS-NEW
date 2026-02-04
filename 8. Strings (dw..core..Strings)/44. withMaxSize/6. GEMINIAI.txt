@@ -1,0 +1,75 @@
+withMaxSize:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class TruncateController {
+
+    @GetMapping("/with-max-size-conversion")
+    public Map<String, String> convertDataWeaveWithMaxSize() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = StringUtil.withMaxSize("123", 10);
+        String b = StringUtil.withMaxSize("123", 3);
+        String c = StringUtil.withMaxSize("123", 2);
+        String d = StringUtil.withMaxSize("123", 0);
+        String e = StringUtil.withMaxSize(null, 23);
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'e' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e
+        );
+    }
+}
+
+
+public class StringUtil {
+
+    /**
+     * Replicates the dw::core::Strings::withMaxSize function.
+     * Truncates the string if its length exceeds maxSize. Returns original string 
+     * if maxSize <= 0 or if maxSize >= string length.
+     *
+     * @param str The input string (can be null).
+     * @param maxSize The maximum allowed length.
+     * @return The truncated string, or null if the input string was null.
+     */
+    public static String withMaxSize(String str, int maxSize) {
+        // 1. DataWeave Rule 'e': If input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+        
+        // 2. DataWeave Rule 'd': If maxSize is less than or equal to 0, return the original string.
+        // 3. DataWeave Rule 'a', 'b': If string length is less than or equal to maxSize, return original string.
+        if (maxSize <= 0 || str.length() <= maxSize) {
+            return str;
+        }
+
+        // 4. DataWeave Rule 'c': Truncate the string.
+        // The truncation happens at the beginning of the string (i.e., we keep the leftmost characters).
+        return str.substring(0, maxSize);
+    }
+}
+output:
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}
+

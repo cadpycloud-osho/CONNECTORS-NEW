@@ -1,0 +1,51 @@
+log10:
+
+
+input:
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the log10 function.
+     * @return A map containing the results of the base-10 logarithm calculations.
+     */
+    @GetMapping("/calculateLog10")
+    public Map<String, Object> calculateLog10() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // Helper function to replicate DataWeave's log10 behavior (null for non-positive input)
+        Object log10(double x) {
+            // Logarithm domain requires x > 0.
+            if (x <= 0) {
+                return null;
+            }
+            // Use change of base formula: log10(x) = ln(x) / ln(10)
+            return Math.log(x) / Math.log(10);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("log1010", log10(10));
+        output.put("log1013", log10(0.13));
+        output.put("log10-20", log10(-20));
+
+        return output;
+    }
+}
+
+
+output:
+
+{
+  "log1010": 1.0,
+  "log1013": -0.8860566476931632,
+  "log10-20": null
+}
+

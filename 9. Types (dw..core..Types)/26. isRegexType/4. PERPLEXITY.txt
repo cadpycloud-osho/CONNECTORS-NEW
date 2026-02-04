@@ -1,0 +1,42 @@
+isRegexType:
+
+
+input:
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+@RestController
+public class RegexTypeController {
+
+    private boolean isRegexType(Object value) {
+        return value instanceof Pattern;
+    }
+
+    @GetMapping("/regex-type-check")
+    public Map<String, Boolean> checkRegexTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Pattern aRegex = Pattern.compile(".*");   // ARegex alias
+        Pattern regexType = Pattern.compile("\\d+"); // Regex
+        Boolean boolValue = true;                // Boolean
+        
+        result.put("a", isRegexType(aRegex));
+        result.put("b", isRegexType(regexType));
+        result.put("c", isRegexType(boolValue));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

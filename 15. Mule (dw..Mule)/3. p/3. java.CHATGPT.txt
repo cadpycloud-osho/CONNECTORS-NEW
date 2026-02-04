@@ -1,0 +1,35 @@
+p:
+
+config.properties
+http.port=8081
+
+input:
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        try {
+            Properties props = new Properties();
+            props.load(new FileInputStream("config.properties"));
+
+            String httpPort = props.getProperty("http.port");
+
+            System.out.println("Logged: " + httpPort);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+Logged: 8081
+
+

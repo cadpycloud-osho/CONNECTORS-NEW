@@ -1,0 +1,210 @@
+splitBy:
+
+
+example 1:
+
+
+input:
+
+import java.util.regex.Pattern;
+
+public class Main {
+    public static void main(String[] args) {
+        String[] result = "192.88.99.0/24".split("[./]");
+        System.out.println(java.util.Arrays.toString(result));
+    }
+}
+
+
+output:
+
+[192, 88, 99, 0, 24]
+
+
+------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String[]> splitters = new HashMap<>();
+        splitters.put("split1", "a-b-c".split("-"));
+        splitters.put("split2", "hello world".split("\\s"));
+        splitters.put("split3", "no match".split("^s"));
+        splitters.put("split4", "no match".split("^n.."));
+        splitters.put("split5", "a1b2c3d4A1B2C3D".split("[0-9A-Z]"));
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("splitters", splitters);
+        
+        // Manual JSON output
+        System.out.println("{");
+        System.out.print("  \"splitters\" : {\n");
+        
+        Object[] keys = splitters.keySet().toArray();
+        for (int i = 0; i < keys.length; i++) {
+            String key = (String) keys[i];
+            String[] values = splitters.get(key);
+            System.out.print("    \"" + key + "\" : [ ");
+            for (int j = 0; j < values.length; j++) {
+                System.out.print("\"" + values[j] + "\"");
+                if (j < values.length - 1) System.out.print(", ");
+            }
+            System.out.print(" ]");
+            System.out.println(i < keys.length - 1 ? "," : "");
+        }
+        System.out.println("  }");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{"splitters":{"split1":["a","c"],"split2":["hello","world"],"split3":["no match"],"split4":["","match"],"split5":["a","b","c","d"]}}
+
+
+------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String[] result = "192.88.99.0".split("\\.");
+        System.out.println("\"" + result[0] + "\"");
+    }
+}
+
+
+
+output:
+
+"192"
+
+
+------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String[] result = "'root.sources.data.`test.branch.BranchSource`.source.traits'".split("\\.(?=(?:[^`]*`[^`]*`)*[^`]*$)");
+        System.out.println(java.util.Arrays.toString(result));
+    }
+}
+
+
+output:
+
+[root, sources, data, `test.branch.BranchSource`, source, traits]
+
+
+------------------------------------------------------
+
+
+
+example 5:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String[] result = "192.88.99.0".split("\\.");
+        System.out.println(java.util.Arrays.toString(result));
+    }
+}
+
+
+output:
+
+[192, 88, 99, 0]
+
+
+------------------------------------------------------
+
+
+
+
+example 6:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String[]> splitters = new HashMap<>();
+        splitters.put("split1", "a-b-c".split("-"));
+        splitters.put("split2", "hello world".split(""));
+        splitters.put("split3", "first,middle,last".split(","));
+        splitters.put("split4", "no split".split("NO"));
+        
+        // Manual JSON output (compact format)
+        System.out.print("{\"splitters\":{");
+        Object[] keys = splitters.keySet().toArray();
+        for (int i = 0; i < keys.length; i++) {
+            String key = (String) keys[i];
+            String[] values = splitters.get(key);
+            System.out.print("\"" + key + "\":[");
+            for (int j = 0; j < values.length; j++) {
+                System.out.print("\"" + values[j] + "\"");
+                if (j < values.length - 1) System.out.print(",");
+            }
+            System.out.print("]");
+            if (i < keys.length - 1) System.out.print(",");
+        }
+        System.out.println("}}");
+    }
+}
+
+
+
+output:
+
+{"splitters":{"split1":["a","b","c"],"split2":["h","e","l","l","o","","w","o","r","l","d"],"split3":["first","middle","last"],"split4":["no split"]}}
+
+
+------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+namesOf:
+
+namesOf(obj: Object): Array<String>
+
+namesOf(obj: Object): Array<String>
+Returns an array of strings with the names of all the keys within the given object.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "namesOf" : namesOf({ "a" : true, "b" : 1}) }
+DataWeave
+Output
+{ "namesOf" : ["a","b"] }
+
+
+JSON
+namesOf(obj: Null): Null
+Helper function that enables namesOf to work with a null value.

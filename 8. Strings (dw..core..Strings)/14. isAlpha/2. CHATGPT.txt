@@ -1,0 +1,62 @@
+isAlpha:
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static boolean isAlpha(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return false;
+        }
+        return input.matches("^[A-Za-z]+$");
+    }
+}
+
+Spring Boot Controller:
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.HashMap;
+
+@RestController
+public class AlphaController {
+
+    @GetMapping("/isAlpha")
+    public Map<String, Boolean> isAlphaCheck() {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        result.put("a", StringUtils.isAlpha(null));
+        result.put("b", StringUtils.isAlpha(""));
+        result.put("c", StringUtils.isAlpha("  "));
+        result.put("d", StringUtils.isAlpha("abc"));
+        result.put("e", StringUtils.isAlpha("ab2c"));
+        result.put("f", StringUtils.isAlpha("ab-c"));
+
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+
+
+

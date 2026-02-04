@@ -1,0 +1,50 @@
+wrapIfMissing:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class WrapIfMissingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:ensureWrapping")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides 1:1 parity with DW behavior
+                results.put("a", StringUtils.wrapIfMissing(null, "'"));
+                results.put("b", StringUtils.wrapIfMissing("", "'"));
+                results.put("c", StringUtils.wrapIfMissing("ab", "x"));
+                results.put("d", StringUtils.wrapIfMissing("'ab'", "'"));
+                results.put("e", StringUtils.wrapIfMissing("/", "/"));
+                results.put("f", StringUtils.wrapIfMissing("a/b/c", "/"));
+                results.put("g", StringUtils.wrapIfMissing("/a/b/c", "/"));
+                results.put("h", StringUtils.wrapIfMissing("a/b/c/", "/"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+{
+   "a": null,
+   "b": "'",
+   "c": "xabx",
+   "d": "'ab'",
+   "e": "/",
+   "f": "/a/b/c/",
+   "g": "/a/b/c/",
+   "h": "/a/b/c/"
+}
+

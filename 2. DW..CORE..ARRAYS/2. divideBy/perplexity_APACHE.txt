@@ -1,0 +1,57 @@
+divideBy:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.*;
+
+public class DivideByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:divideBy")
+            .process(exchange -> {
+                List<Integer> list1 = Arrays.asList(1, 2, 3, 4, 5);
+                List<Integer> list2 = Arrays.asList(1, 2, 3, 4, 5, 6);
+                List<Integer> list3 = Arrays.asList(1, 2, 3, 4, 5);
+                
+                List<Map<String, List<List<Integer>>>> result = Arrays.asList(
+                    Map.of("divideBy2", divideIntoChunks(list1, 2)),
+                    Map.of("divideBy2", divideIntoChunks(list2, 2)),
+                    Map.of("divideBy3", divideIntoChunks(list3, 3))
+                );
+                
+                exchange.getIn().setBody(Map.of("divideBy", result));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private List<List<Integer>> divideIntoChunks(List<Integer> list, int chunkSize) {
+        return IntStream.range(0, (list.size() + chunkSize - 1) / chunkSize)
+            .mapToObj(i -> list.subList(
+                i * chunkSize,
+                Math.min((i + 1) * chunkSize, list.size())
+            ))
+            .collect(Collectors.toList());
+    }
+}
+
+
+output:
+
+{
+  "divideBy": [
+    {
+      "divideBy2": [ [1,2], [3,4], [5] ]
+    },
+    {
+      "divideBy2": [ [1,2], [3,4], [5,6] ]
+    },
+    {
+      "divideBy3": [ [1,2,3], [4,5] ]
+    }
+  ]
+}
+

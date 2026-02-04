@@ -1,0 +1,46 @@
+remove:
+
+remove(text: String, toRemove: String): String
+
+Copy link to clipboardremove(text: String, toRemove: String): String
+Removes all occurrences of a specified pattern from a string.
+
+
+
+
+Source
+%dw 2.0
+import remove from dw::core::Strings
+output application/json
+---
+"lazyness purity state higher-order stateful" remove "state"
+
+
+DataWeave
+Output
+"lazyness purity  higher-order ful"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

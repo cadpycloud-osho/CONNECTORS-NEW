@@ -1,0 +1,23 @@
+everyCharacter:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "12 34  56";
+        boolean result = input.chars()
+                             .mapToObj(c -> (char) c)
+                             .allMatch(c -> c == ' ' || Character.isDigit(c));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+true

@@ -1,0 +1,411 @@
+orderBy:
+
+
+example 1:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        Map<String, String> obj1 = new HashMap<>();
+        obj1.put("letter", "e");
+
+        Map<String, String> obj2 = new HashMap<>();
+        obj2.put("letter", "d");
+
+        list.add(obj1);
+        list.add(obj2);
+
+        // sort by "letter"
+        list.sort(Comparator.comparing(m -> m.get("letter")));
+
+        // print JSON-style output
+        System.out.println("[");
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, String> obj = list.get(i);
+            System.out.println("  {");
+            System.out.println("    \"letter\": \"" + obj.get("letter") + "\"");
+            System.out.print("  }");
+            if (i < list.size() - 1) {
+                System.out.println(",");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("]");
+    }
+}
+
+
+
+output:
+
+
+[
+  {
+    "letter": "d"
+  },
+  {
+    "letter": "e"
+  }
+]
+
+
+
+------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> list = new ArrayList<>(Arrays.asList(3, 8, 1));
+
+        // sort in descending order
+        list.sort(Comparator.reverseOrder());
+
+        // print JSON-style output
+        System.out.println("{");
+        System.out.print("  \"orderDescending\": [");
+
+        for (int i = 0; i < list.size(); i++) {
+            System.out.print(list.get(i));
+            if (i < list.size() - 1) {
+                System.out.print(", ");
+            }
+        }
+
+        System.out.println("]");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "orderDescending": [8, 3, 1]
+}
+
+
+
+
+------------------------------------------------------------
+
+example 3:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> list = new ArrayList<>(Arrays.asList(3, 2, 3));
+
+        // sort in ascending order
+        list.sort(Comparator.naturalOrder());
+
+        // print JSON-style array
+        System.out.print("[");
+        for (int i = 0; i < list.size(); i++) {
+            System.out.print(list.get(i));
+            if (i < list.size() - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println("]");
+    }
+}
+
+
+output:
+
+
+[2, 3, 3]
+
+
+------------------------------------------------------------
+
+
+example 4:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    static class Person {
+        String name;
+        int age;
+
+        Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        List<Person> people = Arrays.asList(
+                new Person("Santiago", 42),
+                new Person("Leandro", 29),
+                new Person("Mariano", 35)
+        );
+
+        // sort by age ascending
+        people.sort(Comparator.comparingInt(p -> p.age));
+
+        // print JSON-style output
+        System.out.println("[");
+        for (int i = 0; i < people.size(); i++) {
+            Person p = people.get(i);
+            System.out.println("  {");
+            System.out.println("    \"name\" : \"" + p.name + "\",");
+            System.out.println("    \"age\" : " + p.age);
+            System.out.print("  }");
+            if (i < people.size() - 1) {
+                System.out.println(",");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("]");
+    }
+}
+
+
+output:
+
+
+[
+  {
+    "name": "Leandro",
+    "age": 29
+  },
+  {
+    "name": "Mariano",
+    "age": 35
+  },
+  {
+    "name": "Santiago",
+    "age": 42
+  }
+]
+
+
+
+------------------------------------------------------------
+
+
+
+example 5:
+
+
+
+input:
+
+import java.time.Instant;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<String> dates = new ArrayList<>(Arrays.asList(
+                "2020-10-01T23:57:59.017Z",
+                "2022-12-22T12:12:12.011Z",
+                "2020-10-01T12:40:10.012Z",
+                "2020-10-01T23:57:59.021Z"
+        ));
+
+        // sort by Instant descending
+        dates.sort((d1, d2) -> Instant.parse(d2).compareTo(Instant.parse(d1)));
+
+        // print JSON-style array
+        System.out.println("[");
+        for (int i = 0; i < dates.size(); i++) {
+            System.out.print("  \"" + dates.get(i) + "\"");
+            if (i < dates.size() - 1) {
+                System.out.println(",");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("]");
+    }
+}
+
+
+
+output:
+
+
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+
+
+------------------------------------------------------------
+
+
+
+example 6:
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+
+    static class Account {
+        String accountNumber;
+        String nameOnAccount;
+        String type;
+        Map<String, String> cDetail;
+
+        Account(String accountNumber, String nameOnAccount, String type, Map<String, String> cDetail) {
+            this.accountNumber = accountNumber;
+            this.nameOnAccount = nameOnAccount;
+            this.type = type;
+            this.cDetail = cDetail;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        List<Account> myInput = Arrays.asList(
+                new Account(
+                        "987999321",
+                        "QA",
+                        "AAAA",
+                        new HashMap<String, String>() {{
+                            put("Status", "Open");
+                        }}
+                ),
+                new Account(
+                        "12399978",
+                        "QA",
+                        "BBBB",
+                        new HashMap<>()
+                ),
+                new Account(
+                        "32199974",
+                        "QA",
+                        "CCCC",
+                        new HashMap<>()
+                )
+        );
+
+        // sort by Type descending
+        myInput.sort((a, b) -> b.type.compareTo(a.type));
+
+        // print JSON-style output
+        System.out.println("[");
+        for (int i = 0; i < myInput.size(); i++) {
+            Account a = myInput.get(i);
+
+            System.out.println("  {");
+            System.out.println("    \"AccountNumber\" : \"" + a.accountNumber + "\",");
+            System.out.println("    \"NameOnAccount\" : \"" + a.nameOnAccount + "\",");
+            System.out.println("    \"Type\" : \"" + a.type + "\",");
+            System.out.print("    \"CDetail\" : ");
+
+            if (a.cDetail.isEmpty()) {
+                System.out.println("{ }");
+            } else {
+                System.out.println("{");
+                int j = 0;
+                for (Map.Entry<String, String> entry : a.cDetail.entrySet()) {
+                    System.out.print("      \"" + entry.getKey() + "\" : \"" + entry.getValue() + "\"");
+                    if (++j < a.cDetail.size()) System.out.println(",");
+                    else System.out.println();
+                }
+                System.out.println("    }");
+            }
+
+            System.out.print("  }");
+            if (i < myInput.size() - 1) System.out.println(",");
+            else System.out.println();
+        }
+        System.out.println("]");
+    }
+}
+
+
+output:
+
+
+[
+  {
+    "AccountNumber": "32199974",
+    "NameOnAccount": "QA",
+    "Type": "CCCC",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "12399978",
+    "NameOnAccount": "QA",
+    "Type": "BBBB",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "987999321",
+    "NameOnAccount": "QA",
+    "Type": "AAAA",
+    "CDetail": {
+      "Status": "Open"
+    }
+  }
+]
+
+
+
+------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

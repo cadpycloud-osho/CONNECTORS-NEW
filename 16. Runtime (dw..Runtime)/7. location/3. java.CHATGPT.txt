@@ -1,0 +1,60 @@
+location:
+
+
+
+input:
+
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> location = new HashMap<>();
+
+        try {
+            Method sqrtMethod = Math.class.getMethod("sqrt", double.class);
+            Class<?> declaringClass = sqrtMethod.getDeclaringClass();
+
+            // Handle JDK modules (CodeSource is null)
+            URL codeSource = null;
+            if (declaringClass.getProtectionDomain() != null &&
+                declaringClass.getProtectionDomain().getCodeSource() != null) {
+                codeSource = declaringClass
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation();
+            }
+
+            // Fallback for Java modules
+            String uri = (codeSource != null)
+                    ? codeSource.getPath()
+                    : "/usr/lib/jvm/java-17-openjdk/lib/modules";
+
+            location.put("uri", uri);
+            location.put("nameIdentifier", declaringClass.getName());
+
+            // Line/column info not available in compiled Java classes
+            location.put("startLine", -1);
+            location.put("startColumn", -1);
+            location.put("endLine", -1);
+            location.put("endColumn", -1);
+
+        } catch (NoSuchMethodException e) {
+            location.put("error", "Method not found");
+        }
+
+        System.out.println(location);
+    }
+}
+
+
+
+output:
+
+{uri=/usr/lib/jvm/java-17-openjdk/lib/modules, nameIdentifier=java.lang.Math, startLine=-1, startColumn=-1, endLine=-1, endColumn=-1}
+
+

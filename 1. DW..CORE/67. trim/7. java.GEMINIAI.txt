@@ -1,0 +1,162 @@
+trim:
+
+example 1:
+
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     * This method produces the compact JSON output requested by the user.
+     */
+    private static String formatMapAsCompactJson(Map<String, String> map) {
+        // Output format: {"trim":"my really long\u00A0 text"}
+        
+        // Retrieve the single entry
+        String key = map.keySet().iterator().next();
+        String value = map.get(key);
+        
+        // Escape the non-breaking space (\u00A0) for proper JSON representation
+        String escapedValue = value.replace("\u00A0", "\\u00a0");
+        
+        // Assemble the compact JSON string
+        return "{\"" + key + "\":\"" + escapedValue + "\"}";
+    }
+
+    public static void main(String[] args) {
+        // Input string: contains 3 regular spaces, 'my really long', U+00A0 (non-breaking space), 'text', 
+        // and 4 trailing regular spaces.
+        // U+00A0 is a non-breaking space character, which is NOT trimmed by String.strip()
+        String input = "   my really long\u00A0 text    ";
+        
+        // Operation: Trim leading and trailing whitespace.
+        // String.strip() removes leading/trailing Unicode whitespace.
+        String trimmedResult = input.strip(); 
+        // Result: "my really long\u00A0 text" (Leading/trailing regular spaces removed)
+        
+        // --- Assemble Output ---
+        Map<String, String> outputObject = new LinkedHashMap<>();
+        outputObject.put("trim", trimmedResult);
+        
+        System.out.println(formatMapAsCompactJson(outputObject));
+    }
+}
+
+output:
+
+{
+  "trim" : "my really long\u00A0 text"
+}
+
+-----------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     * Handles string values and Java null objects (rendered as JSON null).
+     */
+    private static String formatMapAsPrettyJson(Map<String, String> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        int i = 0;
+        int size = map.size();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            sb.append("  \"").append(key).append("\" : ");
+            
+            if (value == null) {
+                sb.append("null");
+            } else {
+                sb.append("\"").append(value).append("\"");
+            }
+            
+            if (i < size - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+            i++;
+        }
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    // Custom method to replicate DataWeave's trim(null) -> null behavior
+    private static String dwTrim(String input) {
+        if (input == null) {
+            return null; // DataWeave trim(null) returns null
+        }
+        // Use Java 11's strip() for comprehensive whitespace removal (best match for DW's trim)
+        return input.strip(); 
+    }
+
+    public static void main(String[] args) {
+        // --- Operations ---
+        
+        // 1. "null": trim(null)
+        String resultNull = dwTrim(null);
+
+        // 2. "empty": trim("")
+        String resultEmpty = dwTrim("");
+
+        // 3. "blank": trim("     ")
+        String resultBlank = dwTrim("     "); 
+
+        // 4. "noBlankSpaces": trim("abc")
+        String resultNoBlankSpaces = dwTrim("abc"); 
+
+        // 5. "withSpaces": trim("    abc    ")
+        String resultWithSpaces = dwTrim("    abc    "); 
+
+        // --- Assemble Output ---
+        // Use Map<String, String> but allow the value to be null for the JSON formatter
+        Map<String, String> outputObject = new LinkedHashMap<>();
+        outputObject.put("null", resultNull);
+        outputObject.put("empty", resultEmpty);
+        outputObject.put("blank", resultBlank);
+        outputObject.put("noBlankSpaces", resultNoBlankSpaces);
+        outputObject.put("withSpaces", resultWithSpaces);
+        
+        System.out.println(formatMapAsPrettyJson(outputObject));
+    }
+}
+
+
+output:
+
+{
+  "null" : null,
+  "empty" : "",
+  "blank" : "",
+  "noBlankSpaces" : "abc",
+  "withSpaces" : "abc"
+}
+
+-----------------------------------------------------
+
+
+
+
+

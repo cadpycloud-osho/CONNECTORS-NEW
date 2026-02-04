@@ -1,0 +1,44 @@
+orElse:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> user = new HashMap<>(); // {}
+        Map<String, Object> otherUser = new HashMap<>();
+        otherUser.put("name", "DW");
+
+        Map<String, String> result = new HashMap<>();
+
+        // Equivalent of DW try() orElse
+        try {
+            result.put("a", (String) user.get("name"));
+            if (result.get("a") == null) throw new NullPointerException();
+        } catch (Exception e) {
+            result.put("a", "No User Name");
+        }
+
+        try {
+            result.put("b", (String) otherUser.get("name"));
+            if (result.get("b") == null) throw new NullPointerException();
+        } catch (Exception e) {
+            result.put("b", "No User Name");
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=No User Name, b=DW}
+
+

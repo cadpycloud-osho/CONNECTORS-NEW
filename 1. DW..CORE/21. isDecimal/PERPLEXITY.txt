@@ -1,0 +1,50 @@
+isDecimal:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class IsDecimalApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IsDecimalApp.class, args);
+
+        Object val1 = 1.1;      // Double
+        Object val2 = 1;        // Integer
+        Object val3 = "1.1";    // String representing decimal
+
+        List<Boolean> results = Arrays.asList(
+                isDecimal(val1),
+                isDecimal(val2),
+                isDecimal(val3)
+        );
+
+        System.out.println(results);  // Output: [true, false, true]
+    }
+
+    private static boolean isDecimal(Object val) {
+        if (val instanceof Double || val instanceof Float) {
+            return true;
+        }
+        if (val instanceof String) {
+            try {
+                Double.parseDouble((String) val);
+                return ((String) val).contains(".");
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false; // For other types (e.g., Integer), return false
+    }
+}
+
+
+OUTPUT:
+
+
+[true, false, true]

@@ -1,0 +1,42 @@
+underscore:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UnderscoreExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", underscore("customer"));
+        result.put("b", underscore("customer-first-name"));
+        result.put("c", underscore("customer NAME"));
+        result.put("d", underscore("customerName"));
+
+        System.out.println(result);
+    }
+
+    public static String underscore(String value) {
+        if (value == null) {
+            return null;
+        }
+        // Replace spaces and dashes with underscores
+        String s = value.replaceAll("[\\s\\-]+", "_");
+        // Convert camelCase to snake_case
+        s = s.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
+        return s;
+    }
+}
+
+
+output:
+
+{
+   "a": "customer",
+   "b": "customer_first_name",
+   "c": "customer_name",
+   "d": "customer_name"
+}
+
+

@@ -1,0 +1,115 @@
+atBeginningOfWeek:
+
+example 1:
+
+
+input:
+
+@GetMapping("/beginningOfWeek1")
+public Map<String, String> atBeginningOfWeek1() {
+    OffsetDateTime dateTime = OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+    // Adjust back to Sunday (start of the week)
+    OffsetDateTime startOfWeek = dateTime
+            .minusDays(dateTime.getDayOfWeek().getValue() % 7)
+            .toLocalDate()
+            .atStartOfDay()
+            .atOffset(dateTime.getOffset());
+
+    return Map.of("atBeginningOfWeekDateTime", startOfWeek.toString());
+}
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDateTime": "2020-10-04T00:00:00-03:00"
+}
+
+
+------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+@GetMapping("/beginningOfWeek2")
+public Map<String, String> atBeginningOfWeek2() {
+    LocalDateTime dateTime = LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+    LocalDateTime startOfWeek = dateTime
+            .minusDays(dateTime.getDayOfWeek().getValue() % 7)
+            .toLocalDate()
+            .atStartOfDay();
+
+    return Map.of("atBeginningOfWeekLocalDateTime", startOfWeek.toString());
+}
+
+
+
+output:
+
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00:00"
+}
+
+
+------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+@GetMapping("/beginningOfWeek3")
+public Map<String, String> atBeginningOfWeek3() {
+    LocalDate date = LocalDate.parse("2020-10-06");
+
+    LocalDate startOfWeek = date.minusDays(date.getDayOfWeek().getValue() % 7);
+
+    return Map.of("atBeginningOfWeekDate", startOfWeek.toString());
+}
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDate": "2020-10-04"
+}
+
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

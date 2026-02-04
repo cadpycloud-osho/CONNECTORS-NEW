@@ -1,0 +1,80 @@
+try:
+
+
+input:
+
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+public class Main {
+    
+    private static final Random random = new Random();
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = tryRandomNumber();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Object> tryRandomNumber() {
+        try {
+            // Matches: try(() -> randomNumber())
+            Object result = randomNumber();
+            return Map.of("success", true, "result", result);
+        } catch (RuntimeException e) {
+            // Exact DataWeave error structure
+            return Map.of(
+                "success", false,
+                "error", Map.of(
+                    "kind", "UserException",
+                    "message", e.getMessage(),
+                    "location", "Unknown location",
+                    "stack", List.of(
+                        "fail (anonymous:0:0)",
+                        "myFunction (anonymous:1:114)",
+                        "main (anonymous:1:179)"
+                    )
+                )
+            );
+        }
+    }
+    
+    // Matches DataWeave randomNumber function exactly
+    private static Object randomNumber() {
+        if (random.nextDouble() > 0.5) {
+            throw new RuntimeException("This function is failing");
+        }
+        return "OK";
+    }
+}
+
+
+output:
+
+
+SUCCESS (50% chance - random() <= 0.5):
+Spring Boot (GET /try-random) and Pure Java:
+
+json
+{
+  "success": true,
+  "result": "OK"
+}
+FAILURE (50% chance - random() > 0.5):
+Spring Boot (GET /try-random) and Pure Java:
+
+json
+{
+  "success": false,
+  "error": {
+    "kind": "UserException",
+    "message": "This function is failing",
+    "location": "Unknown location",
+    "stack": [
+      "fail (anonymous:0:0)",
+      "myFunction (anonymous:1:114)",
+      "main (anonymous:1:179)"
+    ]
+  }
+}
+

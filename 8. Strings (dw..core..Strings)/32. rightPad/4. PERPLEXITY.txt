@@ -1,0 +1,43 @@
+rightPad:
+
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class RightPadController {
+    
+    @GetMapping("/rightpad")
+    public Map<String, Object> rightPadExamples() {
+        return Map.of(
+            "a", rightPad(null, 3),
+            "b", rightPad("", 3),
+            "c", rightPad("bat", 5),
+            "d", rightPad("bat", 3),
+            "e", rightPad("bat", -1)
+        );
+    }
+    
+    private String rightPad(String input, int length) {
+        if (input == null) return null;
+        if (length <= input.length()) return input;
+        StringBuilder sb = new StringBuilder(input);
+        while (sb.length() < length) {
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}
+
+

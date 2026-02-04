@@ -1,0 +1,25 @@
+pluralize:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String result = pluralize("box");
+        System.out.println("{ \"pluralize\" : \"" + result + "\" }");
+    }
+    
+    private static String pluralize(String word) {
+        if (word.endsWith("x")) {
+            return word + "es";
+        }
+        return word + "s";
+    }
+}
+
+
+output:
+
+
+
+{ "pluralize" : "boxes" }

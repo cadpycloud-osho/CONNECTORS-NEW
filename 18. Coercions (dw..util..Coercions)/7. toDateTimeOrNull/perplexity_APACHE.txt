@@ -1,0 +1,90 @@
+toDateTimeOrNull:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class DwToDateTimeOrNullTest {
+
+    // Simulate dw::util::Coercions::toDateTimeOrNull() - returns null on parse failure
+    static ZonedDateTime toDateTimeOrNull(String dateTimeStr, List<Map<String, Object>> formatters) {
+        for (Map<String, Object> formatter : formatters) {
+            try {
+                String format = (String) formatter.get("format");
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+                return ZonedDateTime.parse(dateTimeStr, dtf);
+            } catch (DateTimeParseException e) {
+                // Try next formatter or return null if none succeed
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToDateTimeOrNullRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToDateTimeOrNullRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // a: toDateTimeOrNull("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}, {format: "uuuu-MM-dd HH:mm:ssz"}])
+                        List<Map<String, Object>> formattersA = Arrays.asList(
+                            Map.of("format", "uuuu/MM/dd HH:mm:ssz"),
+                            Map.of("format", "uuuu-MM-dd HH:mm:ssz")
+                        );
+                        ZonedDateTime dateTimeA = toDateTimeOrNull("2003-10-01 23:57:59Z", formattersA);
+
+                        // b: toDateTimeOrNull("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}])
+                        List<Map<String, Object>> formattersB = Arrays.asList(
+                            Map.of("format", "uuuu/MM/dd HH:mm:ssz")
+                        );
+                        ZonedDateTime dateTimeB = toDateTimeOrNull("2003-10-01 23:57:59Z", formattersB);
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", dateTimeA != null ? dateTimeA.toString() : null);
+                        result.put("b", dateTimeB);
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a" : "2003-10-01T23:57:59Z",
+  "b" : null
+}
+
+
+

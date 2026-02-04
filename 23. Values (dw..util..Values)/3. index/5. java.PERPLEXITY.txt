@@ -1,0 +1,35 @@
+index:
+
+
+index:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        int index = 0;
+        
+        Map<String, Object> result = createIndex(index);
+        System.out.println(result);
+    }
+    
+    public static Map<String, Object> createIndex(int index) {
+        Map<String, Object> indexSelector = new HashMap<>();
+        indexSelector.put("kind", "Array");
+        indexSelector.put("namespace", null);
+        indexSelector.put("selector", index);
+        return indexSelector;
+    }
+}
+
+
+output:
+
+
+{
+   "kind": "Array",
+   "namespace": null,
+   "selector": 0
+}
+

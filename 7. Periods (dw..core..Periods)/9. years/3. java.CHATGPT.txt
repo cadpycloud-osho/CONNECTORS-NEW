@@ -1,0 +1,38 @@
+years:
+
+
+
+
+input:
+
+
+import java.time.Instant;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Instant inputTime = Instant.parse("2020-10-05T20:22:34.385Z");
+
+        Instant nextYear = inputTime.plus(1, ChronoUnit.YEARS);
+        Period fourYearPeriod = Period.ofYears(4);
+        int addNegativeValue = Period.ofYears(-1).plusYears(2).getYears();
+
+        System.out.println("nextYear: " + nextYear);
+        System.out.println("fourYearPeriod: " + fourYearPeriod);
+        System.out.println("addNegativeValue: " + addNegativeValue);
+    }
+}
+
+
+output:
+
+
+nextYear: 2021-10-05T20:22:34.385Z
+fourYearPeriod: P4Y
+addNegativeValue: 12
+
+
+
+

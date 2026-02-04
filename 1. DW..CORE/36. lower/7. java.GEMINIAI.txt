@@ -1,0 +1,47 @@
+lower:
+
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.17.0</version>
+</dependency>
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input string (which is "MULESOFT" in the DataWeave example)
+        String originalString = "MULESOFT";
+
+        // 2. Apply the 'lower' function (Java equivalent: toLowerCase())
+        String lowerCaseString = originalString.toLowerCase();
+
+        // 3. Create the structure (Using standard Java Map)
+        Map<String, String> outputData = new HashMap<>();
+        outputData.put("name", lowerCaseString);
+
+        // 4. Manually construct the JSON output string to match the required format
+        // This avoids the need for external libraries like Jackson.
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("{\n");
+        jsonBuilder.append("  \"name\" : \"").append(outputData.get("name")).append("\"\n");
+        jsonBuilder.append("}");
+        
+        String outputJson = jsonBuilder.toString();
+
+        // Print the output
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+
+{
+  "name" : "mulesoft"
+}
+

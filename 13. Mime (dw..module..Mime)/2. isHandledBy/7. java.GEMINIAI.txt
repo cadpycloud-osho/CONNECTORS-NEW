@@ -1,0 +1,102 @@
+isHandledBy:
+
+
+input:
+
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+
+public class Main {
+
+    // --- MimeResult Definition (Simplified to use only standard Java) ---
+    record MimeResult(
+        String type, 
+        String subtype, 
+        Map<String, String> parameters
+    ) {
+        // Simple composition is enough for matching, we don't need toContentType()
+        // The fields are accessed directly below.
+    }
+
+    /**
+     * Conceptually mimics DataWeave's isHandledBy(sourceType, targetType).
+     * Checks if a 'target' type pattern (which can include wildcards) matches a concrete 'source' type.
+     * Parameters are ignored for matching as per standard MIME type matching rules.
+     */
+    public static boolean isHandledBy(MimeResult source, MimeResult target) {
+        
+        String sourceType = source.type().toLowerCase();
+        String targetType = target.type().toLowerCase();
+        String sourceSubtype = source.subtype().toLowerCase();
+        String targetSubtype = target.subtype().toLowerCase();
+
+        // 1. Primary Type Check (Target must be '*' or match Source)
+        if (!targetType.equals("*") && !targetType.equals(sourceType)) {
+            return false;
+        }
+
+        // 2. Subtype Check (Target must be '*' or match Source)
+        if (!targetSubtype.equals("*") && !targetSubtype.equals(sourceSubtype)) {
+            
+            // Handle Structured Suffix matching (e.g., target: */*+xml, source: application/soap+xml)
+            if (targetSubtype.startsWith("*+")) {
+                String targetSuffix = targetSubtype.substring(2);
+                if (sourceSubtype.endsWith("+" + targetSuffix)) {
+                    // Wildcard suffix matches if the source subtype ends with the same suffix
+                    return true;
+                }
+            }
+            // If no match by strict equality or wildcard suffix, the match fails
+            return false;
+        }
+        
+        // 3. Success if Type and Subtype checks pass
+        return true;
+    }
+
+    public static void main(String[] args) {
+        // Define MimeResults matching the DataWeave vars
+        MimeResult JSON = new MimeResult("application", "json", Map.of());
+        MimeResult MULTIPART = new MimeResult("multipart", "form-data", Map.of("boundary", "my-boundary"));
+        MimeResult ALL = new MimeResult("*", "*", Map.of());
+        
+        MimeResult APP_WILDCARD_JSON = new MimeResult("*", "json", Map.of());
+        MimeResult APPLICATION_WILDCARD = new MimeResult("application", "*", Map.of());
+        MimeResult WILDCARD_XML = new MimeResult("application", "*+xml", Map.of());
+        MimeResult SOAP_XML = new MimeResult("application", "soap+xml", Map.of());
+
+        // Execute tests
+        Map<String, Boolean> results = new HashMap<>();
+        results.put("a", isHandledBy(JSON, JSON));                 // T: application/json -> application/json
+        results.put("b", isHandledBy(JSON, APP_WILDCARD_JSON));    // T: application/json -> */json (False due to type mismatch: * != application) 
+                                                                   // Note: DW's isHandledBy logic is usually Target vs Source. 
+                                                                   // If target type is '*', it matches any. 
+                                                                   // I'll assume the DW context means APP_WILDCARD_JSON is actually */json, which should match.
+                                                                   // (Target: *, Source: application -> Match. Target: json, Source: json -> Match) -> TRUE
+        results.put("c", isHandledBy(JSON, APPLICATION_WILDCARD)); // T: application/json -> application/*
+        results.put("d", isHandledBy(MULTIPART, ALL));             // T: multipart/form-data -> */*
+        results.put("e", isHandledBy(ALL, MULTIPART));             // F: */* -> multipart/form-data (Target must be specific, Source is too general)
+        results.put("f", isHandledBy(JSON, MULTIPART));            // F: application/json -> multipart/form-data
+        results.put("g", isHandledBy(SOAP_XML, WILDCARD_XML));     // T: application/soap+xml -> application/*+xml
+
+        // Print final JSON output
+        // The default Map.of() provides the requested output format.
+        System.out.println(String.format("{\n \"a\": %s,\n \"b\": %s,\n \"c\": %s,\n \"d\": %s,\n \"e\": %s,\n \"f\": %s,\n \"g\": %s\n}",
+            results.get("a"), results.get("b"), results.get("c"), results.get("d"), results.get("e"), results.get("f"), results.get("g")
+        ).replace("false", "false").replace("true", "true"));
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": true
+}

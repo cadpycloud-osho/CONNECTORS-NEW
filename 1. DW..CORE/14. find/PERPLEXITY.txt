@@ -1,0 +1,114 @@
+find:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@SpringBootApplication
+public class FindInListApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FindInListApp.class, args);
+
+        List<String> list = List.of("Bond", "James", "Bond");
+        String toFind = "Bond";
+
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if (toFind.equals(list.get(i))) {
+                indices.add(i);
+            }
+        }
+
+        System.out.println(indices);  // Output: [0, 2]
+    }
+}
+
+
+OUTPUT:
+
+[0, 2]
+____________________________________________________________
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@SpringBootApplication
+public class RegexFindApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RegexFindApp.class, args);
+
+        String input = "I heart DataWeave";
+        Pattern pattern = Pattern.compile("\\w*ea\\w*\\b"); // \b word boundary
+
+        Matcher matcher = pattern.matcher(input);
+        List<int[]> matches = new ArrayList<>();
+
+        while (matcher.find()) {
+            matches.add(new int[]{matcher.start(), matcher.end()});
+        }
+
+        // Print as list of arrays like DataWeave output
+        System.out.print("[");
+        for (int i = 0; i < matches.size(); i++) {
+            int[] range = matches.get(i);
+            System.out.print("[" + range[0] + "," + range[1] + "]");
+            if (i < matches.size() - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println("]"); // Output: [[2,7], [8,17]]
+    }
+}
+
+
+OUTPUT:
+
+[[2,7], [8,17]]
+____________________________________________________________
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@SpringBootApplication
+public class FindCharInStringApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FindCharInStringApp.class, args);
+
+        String input = "aabccdbce";
+        char toFind = 'a';
+
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == toFind) {
+                indices.add(i);
+            }
+        }
+
+        System.out.println(indices);  // Output: [0, 1]
+    }
+}
+
+
+OUTPUT:
+
+[0, 1]
+

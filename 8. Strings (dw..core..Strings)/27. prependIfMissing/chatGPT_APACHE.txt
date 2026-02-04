@@ -1,0 +1,44 @@
+prependIfMissing:
+
+
+input:
+
+public class PrependIfMissingExample {
+
+    public static void main(String[] args) {
+
+        System.out.println(prependIfMissing(null, ""));
+        System.out.println(prependIfMissing("abc", ""));
+        System.out.println(prependIfMissing("", "xyz"));
+        System.out.println(prependIfMissing("abc", "xyz"));
+        System.out.println(prependIfMissing("xyzabc", "xyz"));
+    }
+
+    public static String prependIfMissing(String value, String prefix) {
+
+        if (value == null) {
+            return null;
+        }
+
+        if (prefix == null || prefix.isEmpty()) {
+            return value;
+        }
+
+        if (value.startsWith(prefix)) {
+            return value;
+        }
+
+        return prefix + value;
+    }
+}
+
+
+output:
+
+null
+abc
+xyz
+xyzabc
+xyzabc
+
+

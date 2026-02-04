@@ -1,0 +1,37 @@
+upper:
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class UpperCaseExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(UpperCaseExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        String input = "mulesoft";
+        
+        // Java equivalent of DWL upper(): String.toUpperCase()
+        String upperCaseString = input.toUpperCase();
+        
+        // Map to mimic the final JSON object structure
+        Map<String, String> outputMap = new LinkedHashMap<>();
+        outputMap.put("name", upperCaseString);
+        
+        System.out.println("--- DWL upper Equivalent Output ---");
+        System.out.println(outputMap); 
+    }
+}
+output:
+
+
+{name=MULESOFT}

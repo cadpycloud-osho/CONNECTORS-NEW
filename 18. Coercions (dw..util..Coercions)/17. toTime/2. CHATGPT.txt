@@ -1,0 +1,116 @@
+toTime:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TimeCoercionController {
+
+    @GetMapping("/time")
+    public Map<String, String> getTimeValues() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: successful parsing using second formatter
+        result.put("a", toTime(
+                "13:44:12.283-08:00",
+                new String[]{"HH:mm:ss.SSS", "HH:mm:ss.nnnXXXXX"} // DW "xxx" -> Java SSS, "nxxx" -> nnnXXXXX
+        ));
+
+        // b: error message when parsing fails
+        result.put("b", tryToTime(
+                "13:44:12.283-08:00",
+                new String[]{"HH:mm:ss.SSS"}
+        ));
+
+        return result;
+    }
+
+    private String toTime(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                OffsetTime ot = OffsetTime.parse(value, formatter);
+                return ot.toString(); // ISO 8601 offset time
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    private String tryToTime(String value, String[] formats) {
+        try {
+            return toTime(value, formats);
+        } catch (RuntimeException e) {
+            return e.getMessage();
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": "13:44:12.283-08:00",
+  "b": "Could not find a valid formatter for '13:44:12.283-08:00'"
+}
+
+--------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TimeCoercionController {
+
+    @GetMapping("/time")
+    public Map<String, String> getTimes() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: ISO default
+        OffsetTime timeA = OffsetTime.parse("23:57:59Z"); // "Z" for UTC
+        result.put("a", timeA.toString()); // returns "23:57:59Z"
+
+        // b: custom format "HH:mm:ss.nxxx"
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("HH:mm:ss.nxxx");
+        OffsetTime timeB = OffsetTime.parse("13:44:12.283-08:00", formatterB);
+        result.put("b", formatterB.format(timeB)); // preserves nanoseconds & offset
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "23:57:59Z",
+  "b": "13:44:12.000000283-08:00"
+}
+

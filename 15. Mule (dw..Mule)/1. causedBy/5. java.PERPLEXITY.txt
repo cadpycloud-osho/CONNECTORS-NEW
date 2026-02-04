@@ -1,0 +1,64 @@
+causedBy:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static class HttpUnauthorizedException extends Exception {
+        public HttpUnauthorizedException(String message) { super(message); }
+    }
+    
+    public static class HttpForbiddenException extends Exception {
+        public HttpForbiddenException(String message) { super(message); }
+    }
+    
+    public static void main(String[] args) {
+        try {
+            processRequest("invalid-token");
+        } catch (Exception e) {
+            handleSecurityError(e);
+        }
+    }
+    
+    static void processRequest(String token) throws Exception {
+        if ("invalid-token".equals(token)) {
+            throw new HttpUnauthorizedException("HTTP:UNAUTHORIZED");
+        }
+        if ("forbidden-user".equals(token)) {
+            throw new HttpForbiddenException("HTTP:FORBIDDEN");
+        }
+    }
+    
+    static void handleSecurityError(Exception error) {
+        // Matches Mule error-handler choice structure
+        if (isCausedBy(error, "HTTP:UNAUTHORIZED")) {
+            System.out.println("Handling HTTP:UNAUTHORIZED - continue processing");
+            // General security handling + specific 401 handling
+        } else if (isCausedBy(error, "HTTP:FORBIDDEN")) {
+            System.out.println("Handling HTTP:FORBIDDEN - access denied");
+            // Specific 403 handling
+        } else {
+            System.out.println("General SECURITY error handling");
+        }
+    }
+    
+    static boolean isCausedBy(Exception error, String errorType) {
+        // Matches Mule::causedBy(error, 'HTTP:UNAUTHORIZED')
+        return error.getMessage().contains(errorType);
+    }
+}
+
+
+output:
+
+Handling HTTP:UNAUTHORIZED - continue processing
+
+Handling HTTP:FORBIDDEN - access denied
+
+

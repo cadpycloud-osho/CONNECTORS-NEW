@@ -1,0 +1,64 @@
+--:
+
+<S>(source: Array<S>, toRemove: Array<Any>): Array<S>
+This example removes specified items from an array. Specifically, it removes all instances of the items listed in the array on the right side of -- from the array on the left side of the function, leaving [0] as the result.
+INPUT:
+
+%dw 2.0
+output application/json
+---
+{ "a" : [0, 1, 1, 2] -- [1,2] }
+
+OUT PUT:
+
+{ "a": [0] }
+
+-------------------------------------------------------------------------
+--(source: Object, keys: Array<String>)
+Removes all key-value pairs from the source object that match the specified search key.
+
+INPUT:
+%dw 2.0
+output application/json
+---
+{ "yes" : "no", "good" : "bad", "old" : "new" } -- ["yes", "old"]
+
+
+
+OUTPUT:
+
+{
+  "good": "bad"
+}
+
+
+-------------------------------------------------------------
+--(source: Object, keys: Array<Key>)
+Removes specified key-value pairs from an object.
+INPUT:
+
+%dw 2.0
+output application/json
+---
+{ "hello" : "world", "name" : "DW" } -- ["hello" as Key]
+
+OUTPUT:
+
+{ "name": "DW" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

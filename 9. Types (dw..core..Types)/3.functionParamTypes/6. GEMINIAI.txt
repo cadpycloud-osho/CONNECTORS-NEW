@@ -1,0 +1,118 @@
+functionParamTypes:
+
+
+
+
+input:
+
+package com.example.functiontypes.model;
+
+public class FunctionParam {
+    private String paramType;
+    private boolean optional;
+
+    public FunctionParam(String paramType, boolean optional) {
+        this.paramType = paramType;
+        this.optional = optional;
+    }
+
+    // Getters and Setters (omitted for brevity, but needed by Spring/Jackson)
+    public String getParamType() { return paramType; }
+    public void setParamType(String paramType) { this.paramType = paramType; }
+    public boolean isOptional() { return optional; }
+    public void setOptional(boolean optional) { this.optional = optional; }
+}
+
+// Class to hold the final output structure
+public class FunctionIntrospectionResult {
+    private List<FunctionParam> a;
+    private List<FunctionParam> b;
+
+    // Getters and Setters (omitted for brevity)
+    public List<FunctionParam> getA() { return a; }
+    public void setA(List<FunctionParam> a) { this.a = a; }
+    public List<FunctionParam> getB() { return b; }
+    public void setB(List<FunctionParam> b) { this.b = b; }
+}
+
+package com.example.functiontypes.service;
+
+import com.example.functiontypes.model.FunctionParam;
+import com.example.functiontypes.model.FunctionIntrospectionResult;
+import org.springframework.stereotype.Service;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+@Service
+public class IntrospectionService {
+
+    /**
+     * Mimics the DataWeave functionParamTypes(AFunction) behavior.
+     */
+    public List<FunctionParam> functionParamTypes(String functionTypeName) {
+        
+        // This switch statement explicitly maps the DW type definitions to their parameters.
+        return switch (functionTypeName) {
+            case "AFunction" -> Arrays.asList(
+                new FunctionParam("String", false), // (String, Number) -> Number
+                new FunctionParam("Number", false)
+            );
+            case "AFunction2" -> Collections.emptyList(); // () -> Number
+            default -> Collections.emptyList();
+        };
+    }
+
+    public FunctionIntrospectionResult getFunctionParameters() {
+        FunctionIntrospectionResult result = new FunctionIntrospectionResult();
+        
+        // Map AFunction's parameters
+        result.setA(functionParamTypes("AFunction")); 
+        
+        // Map AFunction2's parameters
+        result.setB(functionParamTypes("AFunction2"));
+        
+        return result;
+    }
+}
+
+
+package com.example.functiontypes.controller;
+
+import com.example.functiontypes.model.FunctionIntrospectionResult;
+import com.example.functiontypes.service.IntrospectionService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveController {
+
+    private final IntrospectionService introspectionService;
+
+    public DataWeaveController(IntrospectionService introspectionService) {
+        this.introspectionService = introspectionService;
+    }
+
+    // Maps to http://localhost:8080/function-params
+    @GetMapping("/function-params")
+    public FunctionIntrospectionResult getParams() {
+        return introspectionService.getFunctionParameters();
+    }
+}
+
+output:
+
+
+{
+  "a": [
+    {
+      "paramType": "String",
+      "optional": false
+    },
+    {
+      "paramType": "Number",
+      "optional": false
+    }
+  ],
+  "b": []
+}

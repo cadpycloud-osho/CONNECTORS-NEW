@@ -1,0 +1,87 @@
+lastIndexOf:
+
+example 1:
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class LastIndexArrayController {
+
+    @GetMapping("/lastindex-array")
+    public Map<String, Integer> lastIndexForArray() {
+
+        List<String> arr1 = List.of("a", "b", "c", "d");
+        List<String> arr2 = List.of("x", "w", "x");
+        List<String> arr3 = List.of("a", "b", "c", "c");
+
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("present", arr1.lastIndexOf("c"));
+        result.put("notPresent", arr2.lastIndexOf("c"));
+        result.put("presentMoreThanOnce", arr3.lastIndexOf("c"));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+
+
+____________________________________________________________________
+
+
+example 2:
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class LastIndexStringController {
+
+    @GetMapping("/lastindex-string")
+    public Map<String, Integer> lastIndexForString() {
+
+        String str1 = "abcd";
+        String str2 = "xyz";
+        String str3 = "abcdc";
+
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("present", str1.lastIndexOf("c"));
+        result.put("notPresent", str2.lastIndexOf("c"));
+        result.put("presentMoreThanOnce", str3.lastIndexOf("c"));
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}
+
+

@@ -1,0 +1,49 @@
+takeWhile:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class TakeWhileController {
+
+    @GetMapping("/takeWhile")
+    public Map<String, Integer> takeWhileExample() {
+
+        Map<String, Integer> obj = new LinkedHashMap<>();
+        obj.put("a", 1);
+        obj.put("b", 2);
+        obj.put("c", 5);
+        obj.put("d", 1);
+
+        Map<String, Integer> result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Integer> entry : obj.entrySet()) {
+            if (entry.getValue() < 3) {
+                result.put(entry.getKey(), entry.getValue());
+            } else {
+                break; // stop when condition fails
+            }
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": 1,
+  "b": 2
+}
+

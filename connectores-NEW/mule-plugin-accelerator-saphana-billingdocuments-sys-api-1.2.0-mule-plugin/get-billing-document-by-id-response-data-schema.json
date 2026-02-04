@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/BillingDocument",
+  "definitions": {
+    "BillingDocument": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "billingId": {
+          "type": "string"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "netValue": {
+          "type": "number",
+          "minimum": 0.0,
+          "multipleOf": 0.01
+        },
+        "taxValue": {
+          "type": "number",
+          "multipleOf": 0.01,
+          "minimum": 0.0
+        },
+        "grossValue": {
+          "type": "number",
+          "minimum": 0.0,
+          "multipleOf": 0.01
+        },
+        "billingDocumentItems": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+hammingDistance:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.text.similarity.HammingDistance;
+
+public class HammingDistanceRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:calculateHamming")
+            .process(exchange -> {
+                String left = "holu";
+                String right = "chau";
+
+                // Using Apache Commons Text
+                HammingDistance distanceMetric = new HammingDistance();
+                Integer result = distanceMetric.apply(left, right);
+
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+
+output:
+
+3
+

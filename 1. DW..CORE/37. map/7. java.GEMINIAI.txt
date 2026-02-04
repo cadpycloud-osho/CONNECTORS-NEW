@@ -1,0 +1,218 @@
+map:
+
+
+example 1:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Arrays;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input array (List in Java)
+        List<String> inputList = Arrays.asList("jose", "pedro", "mateo");
+
+        ObjectMapper mapper = new ObjectMapper();
+        // The final result will be a JSON array
+        ArrayNode outputArray = mapper.createArrayNode();
+
+        // 2. Iterate (map) over the input list
+        for (int index = 0; index < inputList.size(); index++) {
+            String value = inputList.get(index);
+
+            // 3. Create the output object: { (index) : value}
+            ObjectNode itemObject = mapper.createObjectNode();
+            
+            // Note: DataWeave converts the index (number) to a string key in JSON.
+            // In Java, we convert the int index to a String for the key name.
+            itemObject.put(String.valueOf(index), value); 
+
+            outputArray.add(itemObject);
+        }
+
+        // 4. Convert the JSON array to a formatted string
+        String outputJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputArray);
+        
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+[
+  {
+    "0" : "jose"
+  },
+  {
+    "1" : "pedro"
+  },
+  {
+    "2" : "mateo"
+  }
+]
+-------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.util.List;
+import java.util.Arrays;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input array
+        List<String> inputList = Arrays.asList("a", "b", "c");
+
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode outputArray = mapper.createArrayNode();
+
+        // 2. Iterate (map) over the input list
+        for (int index = 0; index < inputList.size(); index++) {
+            String value = inputList.get(index);
+            
+            // 3. Perform the concatenation: (index + 1) + "_" + value
+            // We use 'index + 1' for the 1-based numbering.
+            String resultString = (index + 1) + "_" + value; 
+
+            // 4. Add the resulting string to the output JSON array
+            outputArray.add(resultString);
+        }
+
+        // 5. Convert the JSON array to a formatted string
+        String outputJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputArray);
+        
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+[ "1_a", "2_b", "3_c" ]
+-------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Arrays;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input array
+        List<String> inputList = Arrays.asList("joe", "pete", "matt");
+
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode outputArray = mapper.createArrayNode();
+
+        // 2. Iterate (map) over the input list
+        for (int index = 0; index < inputList.size(); index++) {
+            String value = inputList.get(index);
+
+            // 3. Create the output object: { index : value }
+            ObjectNode itemObject = mapper.createObjectNode();
+            
+            // Index (as String key) : Value
+            itemObject.put(String.valueOf(index), value); 
+
+            outputArray.add(itemObject);
+        }
+
+        // 4. Convert the JSON array to a formatted string
+        String outputJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputArray);
+        
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+[
+  {
+    "0" : "joe"
+  },
+  {
+    "1" : "pete"
+  },
+  {
+    "2" : "matt"
+  }
+]
+
+-------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+import java.util.List;
+import java.util.Arrays;
+
+// Simple internal class to represent the input structure
+class Person {
+    int age;
+    String name;
+
+    public Person(int age, String name) {
+        this.age = age;
+        this.name = name;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+        // 1. Define the input array of objects
+        List<Person> inputList = Arrays.asList(
+            new Person(14, "Claire"),
+            new Person(56, "Max"),
+            new Person(89, "John")
+        );
+
+        // 2. Use a StringBuilder to construct the CSV output
+        StringBuilder csvOutput = new StringBuilder();
+
+        // 3. Add the Header Row (CSV keys)
+        csvOutput.append("age,name").append("\n"); // Append newline
+
+        // 4. Iterate (map) over the input list and build the data rows
+        for (Person person : inputList) {
+            // DataWeave's map effectively selects age and name and outputs them
+            // In Java, we access the fields and concatenate them with a comma.
+            String csvRow = person.age + "," + person.name;
+            csvOutput.append(csvRow).append("\n");
+        }
+
+        // 5. Print the final CSV string
+        System.out.println(csvOutput.toString().trim()); // .trim() removes the trailing newline
+    }
+}
+
+output:
+age,name
+14,Claire
+56,Max
+89,John
+
+-------------------------------------------------------------

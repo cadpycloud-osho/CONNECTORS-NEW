@@ -1,0 +1,141 @@
+toDate:
+
+example 1:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+@RestController
+public class DateCoercionController {
+
+    @GetMapping("/date")
+    public Map<String, Object> getDates() {
+
+        Map<String, Object> result = new HashMap<>();
+
+        // a: successful parsing using second formatter
+        result.put("a", parseDate(
+                "2023-28-03",
+                Arrays.asList(
+                        new Formatter("yyyy/MM/dd", null),
+                        new Formatter("yyyy-dd-MM", Locale.US)
+                )
+        ));
+
+        // b: error message when no formatter matches
+        result.put("b", tryParseWithError(
+                "2023-28-03",
+                Collections.singletonList(
+                        new Formatter("yyyy/MM/dd", null)
+                )
+        ));
+
+        return result;
+    }
+
+    private String parseDate(String value, List<Formatter> formatters) {
+        for (Formatter f : formatters) {
+            try {
+                DateTimeFormatter dtf = f.locale == null
+                        ? DateTimeFormatter.ofPattern(f.pattern)
+                        : DateTimeFormatter.ofPattern(f.pattern, f.locale);
+
+                LocalDate date = LocalDate.parse(value, dtf);
+                return date.toString(); // ISO format (2023-03-28)
+            } catch (Exception ignored) {}
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    private String tryParseWithError(String value, List<Formatter> formatters) {
+        try {
+            parseDate(value, formatters);
+            return null;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    static class Formatter {
+        String pattern;
+        Locale locale;
+
+        Formatter(String pattern, Locale locale) {
+            this.pattern = pattern;
+            this.locale = locale;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2023-03-28",
+  "b": "Could not find a valid formatter for '2023-28-03'"
+}
+
+----------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DateCoercionController {
+
+    @GetMapping("/dates")
+    public Map<String, String> getDates() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // Equivalent of toDate("2015-10-01")
+        LocalDate a = LocalDate.parse("2015-10-01");
+
+        // Equivalent of toDate("2003/10/01", "uuuu/MM/dd")
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+        LocalDate b = LocalDate.parse("2003/10/01", formatter);
+
+        result.put("a", a.toString());
+        result.put("b", b.toString());
+
+        return result;
+    }
+}
+
+
+output:
+
+
+
+{
+  "a": "2015-10-01",
+  "b": "2003-10-01"
+}
+
+
+
+
+
+
+

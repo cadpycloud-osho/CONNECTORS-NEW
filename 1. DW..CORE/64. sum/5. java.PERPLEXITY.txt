@@ -1,0 +1,42 @@
+sum:
+
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        int result = Arrays.asList(1, 2, 3).stream()
+            .mapToInt(Integer::intValue)
+            .sum();
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+6
+
+
+Alternative using Collections:
+
+java
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3);
+        int sum = 0;
+        for (int num : numbers) {
+            sum += num;
+        }
+        System.out.println(sum);
+    }
+}

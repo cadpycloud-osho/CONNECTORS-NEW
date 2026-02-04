@@ -1,0 +1,47 @@
+mergeWith:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // LinkedHashMap preserves insertion order
+        Map<String, Object> map1 = new LinkedHashMap<>();
+        map1.put("a", true);
+        map1.put("b", 1);
+
+        Map<String, Object> map2 = new LinkedHashMap<>();
+        map2.put("a", false);
+        map2.put("c", "Test");
+
+        // Merge map2 into map1 (map2 overwrites duplicates)
+        Map<String, Object> merged = new LinkedHashMap<>(map1);
+        merged.putAll(map2);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("mergeWith", merged);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+  "mergeWith": {
+    "b": 1,
+    "a": false,
+    "c": "Test"
+  }
+}
+
+
+

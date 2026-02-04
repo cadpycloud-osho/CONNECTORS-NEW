@@ -1,0 +1,381 @@
+filter:
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class FilterController {
+
+    @GetMapping("/filter")
+    public List<Integer> filterList() {
+
+        List<Integer> input = Arrays.asList(9, 2, 3, 4, 5);
+
+        // Filter values > 2
+        List<Integer> result = input.stream()
+                .filter(value -> value > 2)
+                .collect(Collectors.toList());
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+[9,3,4,5]
+
+
+_____________________________________________________________________
+
+
+INPUT:
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class FilterController {
+
+    static class Person {
+        public String name;
+        public int age;
+
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+    }
+
+    @GetMapping("/filter-age")
+    public List<Map<String, Object>> filterPeople() {
+
+        List<Person> people = Arrays.asList(
+                new Person("Mariano", 37),
+                new Person("Shoki", 30),
+                new Person("Tomo", 25),
+                new Person("Ana", 29)
+        );
+
+        List<Person> filtered = people.stream()
+                .filter(p -> p.age >= 30)
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (Person p : filtered) {
+            Map<String, Object> obj = new HashMap<>();
+            obj.put("name", p.name);
+            obj.put("age", p.age);
+            response.add(obj);
+        }
+
+        return response;
+    }
+}
+
+
+
+OUTPUT:
+
+[
+  {
+    "name": "Mariano",
+    "age": 37
+  },
+  {
+    "name": "Shoki",
+    "age": 30
+  }
+]
+
+____________________________________________________________
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.IntStream;
+
+@RestController
+public class FilterController {
+
+    @GetMapping("/filter-numbers")
+    public List<Integer> filterNumbers() {
+
+        List<Integer> list = Arrays.asList(9, 2, 3, 4, 5);
+        List<Integer> filteredList = new ArrayList<>();
+
+        IntStream.range(0, list.size())
+            .filter(i -> i > 1 && list.get(i) < 5)
+            .forEach(i -> filteredList.add(list.get(i)));
+
+        return filteredList;
+    }
+}
+
+
+
+
+OUTPUT:
+
+[3,4]
+
+
+
+______________________________________________________________________
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class UserFilterController {
+
+    @GetMapping("/filter-users")
+    public List<Map<String, Object>> filterUsers() {
+
+        List<Map<String, Object>> users = new ArrayList<>();
+
+        // User 1
+        Map<String, Object> user1 = new HashMap<>();
+        Map<String, Object> user1Info = new HashMap<>();
+        user1Info.put("name", "123");
+        user1Info.put("lastName", "Smith");
+        user1.put("user", user1Info);
+        user1.put("error", "That name doesn't exists");
+
+        // User 2
+        Map<String, Object> user2 = new HashMap<>();
+        Map<String, Object> user2Info = new HashMap<>();
+        user2Info.put("name", "John");
+        user2Info.put("lastName", "Johnson");
+        user2.put("user", user2Info);
+        user2.put("error", null);
+
+        users.add(user1);
+        users.add(user2);
+
+        // Filter like DataWeave: item.error == null
+        return users.stream()
+                .filter(item -> item.get("error") == null)
+                .collect(Collectors.toList());
+    }
+}
+
+
+
+OUTPUT:
+
+[
+  {
+    "user": {
+      "name": "John",
+      "lastName": "Johnson"
+    },
+    "error": null
+  }
+]
+
+
+
+_______________________________________________________________
+
+
+INPUT:
+
+package com.example.demo.model;
+
+public class Phone {
+    private String activeInd;
+    private String type;
+    private String primaryInd;
+    private String number;
+
+    public String getActiveInd() { return activeInd; }
+    public void setActiveInd(String activeInd) { this.activeInd = activeInd; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+    public String getPrimaryInd() { return primaryInd; }
+    public void setPrimaryInd(String primaryInd) { this.primaryInd = primaryInd; }
+    public String getNumber() { return number; }
+    public void setNumber(String number) { this.number = number; }
+}
+
+
+BaseProfile.java
+
+
+package com.example.demo.model;
+
+import java.util.List;
+
+public class BaseProfile {
+    private String username;
+    private String activeInd;
+    private List<Phone> phone;
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getActiveInd() { return activeInd; }
+    public void setActiveInd(String activeInd) { this.activeInd = activeInd; }
+    public List<Phone> getPhone() { return phone; }
+    public void setPhone(List<Phone> phone) { this.phone = phone; }
+}
+
+
+Profile.java
+package com.example.demo.model;
+
+public class Profile {
+    private BaseProfile base;
+
+    public BaseProfile getBase() { return base; }
+    public void setBase(BaseProfile base) { this.base = base; }
+}
+
+Payload.java
+package com.example.demo.model;
+
+public class Payload {
+    private String Id;
+    private String marketCode;
+    private String languageCode;
+    private Profile profile;
+
+    public String getId() { return Id; }
+    public void setId(String id) { Id = id; }
+
+    public String getMarketCode() { return marketCode; }
+    public void setMarketCode(String marketCode) { this.marketCode = marketCode; }
+
+    public String getLanguageCode() { return languageCode; }
+    public void setLanguageCode(String languageCode) { this.languageCode = languageCode; }
+
+    public Profile getProfile() { return profile; }
+    public void setProfile(Profile profile) { this.profile = profile; }
+}
+
+✔ Controller Code
+package com.example.demo;
+
+import com.example.demo.model.Payload;
+import com.example.demo.model.Phone;
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class TransformController {
+
+    @PostMapping("/transform")
+    public Map<String, Object> transform(@RequestBody Payload payload) {
+
+        List<String> phoneNumbers = Optional.ofNullable(payload.getProfile())
+                .map(p -> p.getBase().getPhone())
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(p -> "Y".equals(p.getActiveInd()) && "Y".equals(p.getPrimaryInd()))
+                .map(Phone::getNumber)
+                .collect(Collectors.toList());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", payload.getId());
+        result.put("markCode", payload.getMarketCode());
+        result.put("languageCode", payload.getLanguageCode());
+        result.put("username", payload.getProfile().getBase().getUsername());
+        result.put("phoneNumber", phoneNumbers);
+
+        return result;
+    }
+}
+
+OUTPUT:
+
+{
+  "id": "1184001100000000517",
+  "markCode": "US",
+  "languageCode": "en-US",
+  "username": "TheMule",
+  "phoneNumber": [
+    "230678123",
+    "154896523"
+  ]
+}
+
+
+
+
+
+__________________________________________________________________________________
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class FilterStringController {
+
+    @GetMapping("/filter-string")
+    public Map<String, String> filterString() {
+        String input = "hello world";
+        StringBuilder filtered = new StringBuilder();
+
+        for (int i = 0; i < input.length(); i++) {
+            if (i % 2 == 0) { // $$ mod 2 == 0 in DataWeave
+                filtered.append(input.charAt(i));
+            }
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("output", filtered.toString());
+        return response;
+    }
+}
+
+
+
+OUTPUT:
+
+{
+  "output": "hlowrd"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

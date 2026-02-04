@@ -1,0 +1,23 @@
+
+
+sum:
+
+
+input:
+
+@RestController
+class SumExampleController {
+
+    @GetMapping("/sum")
+    public int sum() {
+        List<Integer> numbers = List.of(1, 2, 3);
+        return numbers.stream().mapToInt(Integer::intValue).sum();
+    }
+}
+
+
+output:
+
+6
+
+

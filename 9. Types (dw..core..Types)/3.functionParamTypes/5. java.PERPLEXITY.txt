@@ -1,0 +1,47 @@
+functionParamTypes:
+
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static class ParamInfo {
+        String paramType;
+        boolean optional;
+        
+        ParamInfo(String paramType, boolean optional) {
+            this.paramType = paramType;
+            this.optional = optional;
+        }
+        
+        @Override
+        public String toString() {
+            return "ParamInfo{paramType='" + paramType + "', optional=" + optional + "}";
+        }
+    }
+    
+    public static void main(String[] args) {
+        Map<String, List<ParamInfo>> result = new HashMap<>();
+        
+        // Simulates functionParamTypes((String, Number) -> Number)
+        result.put("a", Arrays.asList(
+            new ParamInfo("String", false),
+            new ParamInfo("Number", false)
+        ));
+        
+        // Simulates functionParamTypes(() -> Number)
+        result.put("b", new ArrayList<>());
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=[ParamInfo{paramType='String', optional=false}, ParamInfo{paramType='Number', optional=false}], b=[]}
+
+

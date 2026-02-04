@@ -1,0 +1,37 @@
+functionReturnType:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class FunctionReturnTypeExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", functionReturnType("String, Number -> Number"));
+        result.put("b", functionReturnType("-> Number"));
+
+        System.out.println(result);
+    }
+
+    public static String functionReturnType(String functionSignature) {
+        if (functionSignature == null || !functionSignature.contains("->")) {
+            return "Any";
+        }
+        return functionSignature.substring(functionSignature.indexOf("->") + 2).trim();
+    }
+}
+
+
+
+output:
+{
+  "a": "Number",
+  "b": "Number"
+}
+
+
+
+

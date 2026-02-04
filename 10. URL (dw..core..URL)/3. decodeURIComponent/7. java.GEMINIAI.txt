@@ -1,0 +1,74 @@
+decodeURIComponent:
+
+
+input:
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mimics DataWeave's URL::decodeURIComponent.
+     * Performs URL percent-decoding on the input string using UTF-8.
+     * @param encodedComponent The URI component string containing percent-encoded characters.
+     * @return The decoded string.
+     */
+    public static String decodeUriComponent(String encodedComponent) {
+        try {
+            // URLDecoder.decode decodes ALL percent-encoded octets, matching the behavior 
+            // of DataWeave's decodeURIComponent for the test cases provided.
+            return URLDecoder.decode(encodedComponent, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            // Handle exceptions like IllegalArgumentException if the encoding is malformed
+            return "Decoding Error: " + e.getMessage();
+        }
+    }
+
+    public static void main(String[] args) {
+        
+        // DataWeave input strings
+        String input1 = "%20PATH/%20TO%20/DECODE%20";
+        String input2 = "%3B%2C%2F%3F%3A%40%26%3D";
+        String input3 = "%2D%5F%2E%21%7E%2A%27%28%29%24";
+        
+        // --- Execution ---
+        
+        String decoded1 = decodeUriComponent(input1); 
+        String decoded2 = decodeUriComponent(input2); 
+        String decoded3 = decodeUriComponent(input3); 
+
+        // Output the result in JSON format
+        // Use a map to build the nested JSON structure
+        Map<String, String> innerMap = new LinkedHashMap<>();
+        innerMap.put("decodeURIComponent1", decoded1);
+        innerMap.put("decodeURIComponent2", decoded2);
+        innerMap.put("decodeURIComponent3", decoded3);
+        
+        System.out.println("{");
+        System.out.println("  \"decodeURIComponent\": {");
+        // Manually format inner elements to match the requested output structure
+        System.out.println("    \"decodeURIComponent\": \"" + decoded1 + "\",");
+        System.out.println("    \"decodeURIComponent\": \"" + decoded2 + "\",");
+        System.out.println("    \"decodeURIComponent\": \"" + decoded3.replace("$", "\\$") + "\"");
+        System.out.println("  }");
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+
+{
+  "decodeURIComponent": {
+    "decodeURIComponent": " PATH/ TO /DECODE ",
+    "decodeURIComponent": ";,/?:@&=",
+    "decodeURIComponent": "-_.!~*'()$"
+  }
+}
+
+

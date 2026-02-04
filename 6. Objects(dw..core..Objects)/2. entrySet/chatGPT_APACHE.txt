@@ -1,0 +1,75 @@
+entrySet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.Document;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+from("direct:entrySetXml")
+.process(exchange -> {
+    String xml = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+    // Parse XML
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    factory.setNamespaceAware(true);
+    Document doc = factory.newDocumentBuilder()
+                          .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+    Element root = doc.getDocumentElement();
+
+    // Get attributes
+    Map<String, String> attributes = new LinkedHashMap<>();
+    for (int i = 0; i < root.getAttributes().getLength(); i++) {
+        attributes.put(root.getAttributes().item(i).getNodeName(),
+                       root.getAttributes().item(i).getNodeValue());
+    }
+
+    // Get child elements
+    Map<String, String> childElements = new LinkedHashMap<>();
+    NodeList children = root.getChildNodes();
+    for (int i = 0; i < children.getLength(); i++) {
+        if (children.item(i) instanceof Element) {
+            Element child = (Element) children.item(i);
+            childElements.put(child.getNodeName(), child.getTextContent());
+        }
+    }
+
+    // Build the output structure like DW entrySet
+    Map<String, Object> entry = new LinkedHashMap<>();
+    entry.put("key", root.getNodeName());
+    entry.put("value", childElements);
+    entry.put("attributes", attributes);
+
+    Map<String, Object> output = new HashMap<>();
+    output.put("entrySet", Collections.singletonList(entry));
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+
+output:
+
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+
+

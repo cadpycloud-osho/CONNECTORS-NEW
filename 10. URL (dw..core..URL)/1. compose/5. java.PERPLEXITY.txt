@@ -1,0 +1,33 @@
+compose:
+
+
+input:
+
+
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        String urlPath = "content folder";
+        
+        // Simulate DataWeave compose URL encoding
+        String encodedPath = URLEncoder.encode(urlPath, "UTF-8");
+        String encodedURL = "http://examplewebsite.com/" + encodedPath + "/page.html";
+        
+        result.put("encodedURL", encodedURL);
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{encodedURL=http://examplewebsite.com/content%20folder/page.html}
+
+

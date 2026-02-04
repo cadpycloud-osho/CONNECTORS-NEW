@@ -1,0 +1,81 @@
+time:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+public class TimerTimeProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<Map<String, Object>> testing = new ArrayList<>();
+        
+        // Test 1: myFunction() - dw::Runtime::wait("My result", 100)
+        Map<String, Object> test1 = measureTime(() -> {
+            Thread.sleep(100);
+            return "My result";
+        });
+        testing.add(test1);
+        
+        // Test 2: myFunction2() - sum([1,2,3,4])
+        Map<String, Object> test2 = measureTime(() -> {
+            return 1 + 2 + 3 + 4; // sum = 10
+        });
+        testing.add(test2);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("testing", testing);
+        exchange.getIn().setBody(result);
+    }
+    
+    private Map<String, Object> measureTime(SupplierWithResult supplier) throws Exception {
+        String start = Instant.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        
+        Object result = supplier.execute();
+        
+        String end = Instant.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        
+        Map<String, Object> timing = new HashMap<>();
+        timing.put("start", start);
+        timing.put("result", result);
+        timing.put("end", end);
+        
+        return timing;
+    }
+    
+    // Functional interface for functions that return results
+    @FunctionalInterface
+    interface SupplierWithResult {
+        Object execute() throws Exception;
+    }
+}
+
+from("direct:timerTime")
+    .process(new TimerTimeProcessor())
+    .log("${body}");
+
+
+output:
+
+{
+  "testing": [
+    {
+      "start": "2026-01-21T09:54:32.123Z",
+      "result": "My result",
+      "end": "2026-01-21T09:54:32.224Z"
+    },
+    {
+      "start": "2026-01-21T09:54:32.224Z", 
+      "result": 10,
+      "end": "2026-01-21T09:54:32.224Z"
+    }
+  ]
+}
+
+
+

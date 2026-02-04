@@ -1,0 +1,151 @@
+zip:
+
+
+example 1:
+
+
+input:
+
+@GetMapping("/zip1")
+public List<List<Object>> zipExample1() {
+    List<Integer> list1 = Arrays.asList(0, 1);
+    List<String> list2 = Arrays.asList("a", "b");
+
+    List<List<Object>> result = new ArrayList<>();
+    for (int i = 0; i < Math.min(list1.size(), list2.size()); i++) {
+        result.add(Arrays.asList(list1.get(i), list2.get(i)));
+    }
+    return result;
+}
+
+
+
+output:
+
+[
+  [0, "a"],
+  [1, "b"]
+]
+
+------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+
+@GetMapping("/zip2")
+public Map<String, List<List<Object>>> zipExample2() {
+
+    Map<String, List<List<Object>>> response = new HashMap<>();
+
+    response.put("a", zip(Arrays.asList(0,1,2,3), Arrays.asList("a","b","c","d")));
+    response.put("b", zip(Arrays.asList(0,1,2,3), Arrays.asList("a")));
+    response.put("c", zip(Arrays.asList(0,1,2,3), Arrays.asList("a","b")));
+    response.put("d", zip(Arrays.asList(0,1,2), Arrays.asList("a","b","c","d")));
+
+    return response;
+}
+
+private List<List<Object>> zip(List<?> list1, List<?> list2) {
+    List<List<Object>> zipped = new ArrayList<>();
+    for (int i = 0; i < Math.min(list1.size(), list2.size()); i++) {
+        zipped.add(Arrays.asList(list1.get(i), list2.get(i)));
+    }
+    return zipped;
+}
+
+
+output:
+
+{
+  "a": [
+    [0,"a"], [1,"b"], [2,"c"], [3,"d"]
+  ],
+  "b": [
+    [0,"a"]
+  ],
+  "c": [
+    [0,"a"], [1,"b"]
+  ],
+  "d": [
+    [0,"a"], [1,"b"], [2,"c"]
+  ]
+}
+
+------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+@GetMapping("/zip3")
+public List<List<Object>> zipExample3() {
+
+    List<String> list1 = Arrays.asList("a", "b");
+    List<Integer> list2 = Arrays.asList(1, 2, 3);
+    List<String> list3 = Arrays.asList("aa", "bb");
+    List<List<?>> list4 = Arrays.asList(
+            Arrays.asList("A", "B", "C"),
+            Arrays.asList(11, 12),
+            Arrays.asList("aA", "bB")
+    );
+
+    List<List<Object>> step1 = zip(list1, list2);
+    List<List<Object>> step2 = zip(step1, list3);
+    List<List<Object>> finalZip = zip(step2, list4);
+
+    return finalZip;
+}
+
+private List<List<Object>> zip(List<?> list1, List<?> list2) {
+    List<List<Object>> result = new ArrayList<>();
+    for (int i = 0; i < Math.min(list1.size(), list2.size()); i++) {
+        result.add(Arrays.asList(list1.get(i), list2.get(i)));
+    }
+    return result;
+}
+
+
+output:
+
+[
+  [
+    [["a", 1], "aa"], ["A", "B", "C"]
+  ],
+  [
+    [["b", 2], "bb"], [11, 12]
+  ]
+]
+
+------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

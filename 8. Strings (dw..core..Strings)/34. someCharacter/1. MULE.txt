@@ -1,0 +1,42 @@
+someCharacter:
+
+someCharacter(text: String, condition: (character: String) -> Boolean): Boolean
+
+someCharacter(text: String, condition: (character: String) -> Boolean): Boolean
+Checks whether a condition is valid for at least one of the characters or blank spaces in a string.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+"someCharacter" someCharacter isUpperCase($)
+
+DataWeave
+Output
+true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

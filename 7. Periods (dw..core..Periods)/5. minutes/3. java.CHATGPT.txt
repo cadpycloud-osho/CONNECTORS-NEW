@@ -1,0 +1,50 @@
+minutes:
+
+input:
+
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.Duration;
+
+public class Main {
+    public static void main(String[] args) {
+        ZonedDateTime inputDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        ZonedDateTime nextMinute = inputDateTime.plusMinutes(1);
+        ZonedDateTime previousMinute = inputDateTime.minusMinutes(1);
+
+        // Decimal Minutes: 4.555 minutes → Duration.ofMillis()
+        double decimalMinutes = 4.555;
+        Duration decimalDuration = Duration.ofMillis((long) (decimalMinutes * 60 * 1000));
+
+        // Whole number minutes
+        Duration wholeDuration = Duration.ofMinutes(4);
+
+        // Add negative value: -1 + 2 mins → 1 min
+        Duration addNegativeDuration = Duration.ofMinutes(-1).plusMinutes(2);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+
+        System.out.println("{");
+        System.out.println("  \"nextMinute\": \"" + formatter.format(nextMinute) + "\",");
+        System.out.println("  \"previousMinute\": \"" + formatter.format(previousMinute) + "\",");
+        System.out.println("  \"decimalInputPeriod\": \"" + decimalDuration + "\",");
+        System.out.println("  \"wholeNumberInputPeriod\": \"" + wholeDuration + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeDuration.toMinutes());
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "nextMinute": "2020-10-05T20:23:34.385Z",
+  "previousMinute": "2020-10-05T20:21:34.385Z",
+  "decimalInputPeriod": "PT4M33.3S",
+  "wholeNumberInputPeriod": "PT4M",
+  "addNegativeValue": 1
+}
+

@@ -1,0 +1,76 @@
+toTimeZone:
+
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
+public class DataWeaveToTimeZoneConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Mimics DataWeave's toTimeZone() behavior by using Java's ZoneId and ZoneOffset.
+     * Since ZoneId.of() can handle both IDs and offsets, we can use it uniformly,
+     * although we keep ZoneOffset explicit for the first two to match DW's coercion intent.
+     * @param zoneString The string representing the time zone/offset.
+     * @return The canonical string representation of the ZoneId/ZoneOffset.
+     */
+    private String toTimeZone(String zoneString) {
+        // ZoneId.of() handles both fixed offsets (like "+01:00", "Z") and zone IDs (like "Europe/London").
+        // This method reliably gets the canonical string representation.
+        return ZoneId.of(zoneString).toString();
+    }
+
+    public String getTimeZoneConversionJson() throws IOException {
+        
+        // --- Logic for Keys ---
+        
+        // 1. toTimeZoneOffset: Converts offset string "-03:00"
+        String offsetResult = toTimeZone("-03:00"); 
+
+        // 2. toTimeZoneAbbreviation: Converts "Z" (UTC)
+        String abbreviationResult = toTimeZone("Z"); 
+
+        // 3. toTimeZoneName: Converts full zone name
+        String nameResult = toTimeZone("America/Argentina/Buenos_Aires");
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Java's toString() method on ZoneId/ZoneOffset provides the canonical string.
+        root.put("toTimeZoneOffset", offsetResult);
+        root.put("toTimeZoneAbbreviation", abbreviationResult);
+        root.put("toTimeZoneName", nameResult);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToTimeZoneConverter converter = new DataWeaveToTimeZoneConverter();
+        try {
+            String jsonOutput = converter.getTimeZoneConversionJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+{
+  "toTimeZoneOffset" : "-03:00",
+  "toTimeZoneAbbreviation" : "Z",
+  "toTimeZoneName" : "America/Argentina/Buenos_Aires"
+}
+

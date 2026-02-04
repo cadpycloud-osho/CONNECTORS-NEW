@@ -1,0 +1,37 @@
+fromRadixNumber:
+
+
+input:
+
+import java.math.BigInteger;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: fromRadixNumber("10", 2) and fromRadixNumber("FF", 16)
+        Number a = fromRadixNumber("10", 2);
+        Number b = fromRadixNumber("FF", 16);
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b);
+        System.out.println("}");
+    }
+    
+    // DataWeave "fromRadixNumber(numberStr, radix)" equivalent
+    public static Number fromRadixNumber(String numberStr, int radix) {
+        return new BigInteger(numberStr, radix);
+    }
+}
+
+
+output:
+
+{
+  "a": 2,
+  "b": 255
+}
+
+
+
+

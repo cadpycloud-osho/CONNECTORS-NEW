@@ -1,0 +1,90 @@
+time:
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Constructs an OffsetTime from explicit time and offset components.
+     * This mimics the DataWeave 'time({...})' function with a timeZone.
+     * @param hour The hour component (0-23).
+     * @param minute The minute component (0-59).
+     * @param second The second component (0-59).
+     * @param offsetHours The offset in hours from UTC.
+     * @param offsetMinutes The offset in minutes from UTC.
+     * @return The resulting time string in ISO 8601 format (HH:MM:SS+HH:MM).
+     */
+    public static String createNewTimeWithOffset(
+            int hour, int minute, int second, 
+            int offsetHours, int offsetMinutes) {
+        
+        // 1. Define the ZoneOffset object using the offset components
+        // The DataWeave input |-03:00| corresponds to an offset of -3 hours
+        ZoneOffset zoneOffset = ZoneOffset.ofHoursMinutes(offsetHours, offsetMinutes);
+        
+        // 2. Construct the time object (DW: time({...}))
+        // OffsetTime.of() is the direct Java equivalent
+        OffsetTime newTime = OffsetTime.of(
+            hour, minute, second, 0, // Nano-seconds set to 0 as not provided
+            zoneOffset
+        );
+        
+        // 3. Format the time to the standard ISO output (DW output format)
+        // DateTimeFormatter.ISO_OFFSET_TIME produces the "HH:MM:SS+HH:MM" format
+        return newTime.format(DateTimeFormatter.ISO_OFFSET_TIME);
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // Input values from the DW source
+        int hour = 12;
+        int minutes = 30;
+        int seconds = 40;
+        
+        // Offset: |-03:00|
+        int offsetHours = -3;
+        int offsetMinutes = 0;
+        
+        // Calculate the new time string
+        String newTimeString = createNewTimeWithOffset(
+            hour, minutes, seconds, offsetHours, offsetMinutes
+        );
+        
+        // 4. Format the final JSON output
+        String jsonOutput = String.format("{\n  \"newTime\": \"%s\"\n}", newTimeString);
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Input Components: 12:30:40 with offset -03:00");
+        System.out.println("ISO Time String: " + newTimeString);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+--- Intermediate Data (For Context) ---
+Input Components: 12:30:40 with offset -03:00
+ISO Time String: 12:30:40-03:00
+---------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "newTime": "12:30:40-03:00"
+}

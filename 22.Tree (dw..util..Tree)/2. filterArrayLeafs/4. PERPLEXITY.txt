@@ -1,0 +1,133 @@
+filterArrayLeafs:
+
+
+
+
+input:
+
+
+@SpringBootApplication
+public class DataWeaveTreeFilterArrayLeafsApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTreeFilterArrayLeafsApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/tree")
+@RequiredArgsConstructor
+class TreeController {
+    
+    private final TreeService treeService;
+    
+    @GetMapping("/filterArrayLeafs")
+    public Map<String, Object> filterArrayLeafs() {
+        return treeService.executeFilterTests();
+    }
+}
+
+@Service
+class TreeService {
+    
+    public Map<String, Object> executeFilterTests() {
+        Object myArray = Arrays.asList(1, 
+            Map.of("name", Arrays.asList("", true), "test", 213), 
+            "123", null);
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        // a: filter !(value is Null or value is String)
+        result.put("a", filterArrayLeafs(myArray, (value, path) -> 
+            !(value == null || value instanceof String)));
+        
+        // b: filter (value is Null or value == 1)
+        result.put("b", filterArrayLeafs(myArray, (value, path) -> 
+            (value == null || (value instanceof Number && ((Number)value).intValue() == 1))));
+        
+        // c: filter (value is Null or value == 1) on object
+        result.put("c", filterArrayLeafs(Map.of("a", Arrays.asList(1, 2)), 
+            (value, path) -> (value == null || (value instanceof Number && ((Number)value).intValue() == 1))));
+        
+        // d: filter !isArrayType(path)
+        result.put("d", filterArrayLeafs(myArray, (value, path) -> !isArrayType(path)));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave Tree.filterArrayLeafs() equivalent:
+     * Recursively filters leaf nodes based on predicate, preserving structure
+     */
+    @SuppressWarnings("unchecked")
+    public Object filterArrayLeafs(Object input, BiPredicate<Object, String> predicate) {
+        if (input instanceof Map) {
+            Map<String, Object> result = new HashMap<>();
+            ((Map<String, Object>) input).forEach((key, value) -> {
+                Object filtered = filterArrayLeafs(value, predicate);
+                if (filtered != null) {
+                    result.put(key, filtered);
+                }
+            });
+            return result.isEmpty() ? null : result;
+        } else if (input instanceof List) {
+            List<Object> result = new ArrayList<>();
+            for (int i = 0; i < ((List<?>) input).size(); i++) {
+                Object value = ((List<?>) input).get(i);
+                Object filtered = filterArrayLeafs(value, predicate);
+                if (filtered != null) {
+                    result.add(filtered);
+                }
+            }
+            return result.isEmpty() ? null : result;
+        } else {
+            // Leaf node - apply predicate
+            return predicate.test(input, "") ? input : null;
+        }
+    }
+    
+    private boolean isArrayType(String path) {
+        return path != null && path.contains("[");
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+{
+  "a": [
+    1,
+    {
+      "name": [
+        true
+      ],
+      "test": 213
+    }
+  ],
+  "b": [
+    1,
+    {
+      "name": [],
+      "test": 213
+    },
+    null
+  ],
+  "c": {
+    "a": [
+      1
+    ]
+  },
+  "d": [
+    {
+      "name": [],
+      "test": 213
+    }
+  ]
+}
+
+

@@ -1,0 +1,58 @@
+ordinalize:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class OrdinalizeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:ordinalizeNumbers")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                results.put("a", ordinalize(1));
+                results.put("b", ordinalize(2));
+                results.put("c", ordinalize(5));
+                results.put("d", ordinalize(103));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic to replicate DW ordinalize:
+     * 1. Check for 11, 12, 13 (the "teen" exceptions).
+     * 2. Use modulo 10 to determine the last digit suffix.
+     */
+    private String ordinalize(int n) {
+        int mod100 = n % 100;
+        int mod10 = n % 10;
+        
+        if (mod100 >= 11 && mod100 <= 13) {
+            return n + "th";
+        }
+        
+        return switch (mod10) {
+            case 1 -> n + "st";
+            case 2 -> n + "nd";
+            case 3 -> n + "rd";
+            default -> n + "th";
+        };
+    }
+}
+
+
+output:
+
+{
+   "a": "1st",
+   "b": "2nd",
+   "c": "5th",
+   "d": "103rd"
+}

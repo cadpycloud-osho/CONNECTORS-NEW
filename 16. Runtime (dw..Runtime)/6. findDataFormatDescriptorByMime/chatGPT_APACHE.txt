@@ -1,0 +1,79 @@
+
+findDataFormatDescriptorByMime:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    /* -------- DataFormat Descriptor -------- */
+
+    static class DataFormatDescriptor {
+        String name;
+        String defaultMimeType;
+
+        DataFormatDescriptor(String name, String defaultMimeType) {
+            this.name = name;
+            this.defaultMimeType = defaultMimeType;
+        }
+    }
+
+    /* -------- Lookup Simulation -------- */
+
+    static DataFormatDescriptor findByMime(String subtype) {
+        if ("json".equals(subtype)) {
+            return new DataFormatDescriptor("json", "application/json");
+        }
+        return null;
+    }
+
+    /* -------- Simplify -------- */
+
+    static Map<String, Object> simplify(DataFormatDescriptor df) {
+        if (df != null) {
+            return Map.of(
+                    "name", df.name,
+                    "defaultMimeType", df.defaultMimeType
+            );
+        }
+        return Map.of(
+                "name", "unknown",
+                "defaultMimeType", "unknown"
+        );
+    }
+
+    /* -------- MAIN -------- */
+
+    public static void main(String[] args) {
+
+        DataFormatDescriptor jsonDF = findByMime("json");
+        DataFormatDescriptor unknownDF = findByMime("*");
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("json", simplify(jsonDF));
+        output.put("unknown", simplify(unknownDF));
+
+        System.out.println(output);
+    }
+}
+
+output:
+
+{
+  "json": {
+    "name": "json",
+    "defaultMimeType": "application/json"
+  },
+  "unknown": {
+    "name": "unknown",
+    "defaultMimeType": "unknown"
+  }
+}
+
+
+
+
+
+

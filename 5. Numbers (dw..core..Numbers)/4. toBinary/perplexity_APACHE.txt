@@ -1,0 +1,89 @@
+toBinary:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.HashMap;
+import java.util.Map;
+import java.math.BigInteger;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ToBinaryProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        Map<String, Object> input = exchange.getIn().getBody(Map.class);
+        Map<String, Object> result = new HashMap<>();
+        
+        for (Map.Entry<String, Object> entry : input.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            
+            if (value == null) {
+                result.put(key, null);
+            } else if (value instanceof Number) {
+                BigInteger num = new BigInteger(value.toString());
+                String binary = num.toString(2);
+                if (num.signum() < 0) {
+                    binary = "-" + binary;
+                }
+                result.put(key, binary);
+            }
+        }
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ToBinaryRoute extends RouteBuilder {
+    @Produce("direct:start")
+    private ProducerTemplate template;
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .unmarshal().json(JsonLibrary.Jackson, Map.class)
+            .process(new ToBinaryProcessor())
+            .marshal().json()
+            .to("mock:output");
+    }
+    
+    // Test method with input included
+    public void test() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> input = new HashMap<>();
+        input.put("a", -2L);
+        input.put("b", 100000000000000000000000000000000000000000000000000000000000000L);
+        input.put("c", 0L);
+        input.put("d", null);
+        input.put("e", 2L);
+        
+        String jsonInput = mapper.writeValueAsString(input);
+        String result = template.requestBody(jsonInput, String.class);
+        System.out.println("Output: " + result);
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": -2,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 2
+}
+
+

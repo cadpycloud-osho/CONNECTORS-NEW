@@ -1,0 +1,78 @@
+isIntersectionType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveIntersectionTypeRoute extends RouteBuilder {
+    
+    private final ObjectMapper mapper = new ObjectMapper();
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processIntersectionChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processIntersectionChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AType equivalent: {name: String} & {age: Number}
+        result.put("a", isIntersectionType(createNameAgeSchema()));
+        
+        // Boolean - simple type
+        result.put("b", isIntersectionType("Boolean"));
+        
+        return result;
+    }
+    
+    private boolean isIntersectionType(Object schema) {
+        // Check if schema represents intersection type (& operator equivalent)
+        // Intersection: combines multiple types with all required properties
+        if (schema instanceof String) {
+            return false; // Simple types like Boolean aren't intersections
+        }
+        
+        try {
+            JsonNode node = mapper.valueToTree(schema);
+            // Intersection type has nested structure with multiple required fields
+            // from different type definitions
+            return node.isObject() && 
+                   node.has("name") && 
+                   node.has("age") &&
+                   node.has("additionalProperties");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    private Map<String, Object> createNameAgeSchema() {
+        // Represents {name: String} & {age: Number} intersection
+        Map<String, Object> schema = new HashMap<>();
+        schema.put("type", "object");
+        schema.put("properties", Map.of(
+            "name", Map.of("type", "string"),
+            "age", Map.of("type", "number")
+        ));
+        schema.put("required", List.of("name", "age"));
+        schema.put("additionalProperties", false);
+        return schema;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}

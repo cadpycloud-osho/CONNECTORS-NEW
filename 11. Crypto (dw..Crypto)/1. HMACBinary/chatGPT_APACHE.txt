@@ -1,0 +1,44 @@
+HMACBinary:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
+public class HmacBinaryRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                byte[] message = "confidential".getBytes(StandardCharsets.UTF_8);
+                byte[] key = "xxxxx".getBytes(StandardCharsets.UTF_8);
+
+                Mac mac = Mac.getInstance("HmacSHA512");
+                mac.init(new SecretKeySpec(key, "HmacSHA512"));
+
+                byte[] hmacBytes = mac.doFinal(message);
+
+                // Convert raw binary to ISO-8859-1 string (closest to DataWeave Binary display)
+                String binaryString = new String(hmacBytes, StandardCharsets.ISO_8859_1);
+
+                exchange.getMessage().setBody(
+                    "{ \"HMACBinary\" : \"" + binaryString + "\" }"
+                );
+            });
+    }
+}
+
+
+output:
+
+
+{
+  "HMACBinary": "    ^h !3\u0005 ֎\u00017   ` 8? jn7 bs;\t ƅ   x&g ~  % 7>1 K\u000e@ C\u0011 T }W"
+}
+

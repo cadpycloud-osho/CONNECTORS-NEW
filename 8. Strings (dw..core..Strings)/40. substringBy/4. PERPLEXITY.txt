@@ -1,0 +1,22 @@
+substringBy:
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class SubstringByController {
+    
+    @GetMapping("/substring-by")
+    public List<String> substringByDelimiters() {
+        String input = "hello~world=here_data-weave";
+        return Arrays.asList(input.split("[~=._]"));
+    }
+}
+
+
+output:
+
+
+["hello", "world", "here", "data-weave"]
+

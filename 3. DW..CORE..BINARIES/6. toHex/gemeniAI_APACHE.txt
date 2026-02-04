@@ -1,0 +1,47 @@
+toHex:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.HexFormat;
+import java.nio.charset.StandardCharsets;
+
+public class BinaryToHexRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertBinaryToHex")
+            .routeId("Binary-to-Hex-Route")
+            .process(exchange -> {
+                // 1. Logic: "Mule" as Binary
+                String input = "Mule";
+                byte[] myBinary = input.getBytes(StandardCharsets.UTF_8);
+
+                // 2. Logic: toHex(myBinary)
+                // HexFormat is the modern Java way to handle hex conversions
+                String hexResult = HexFormat.of().withUpperCase().formatHex(myBinary);
+
+                // 3. Construct the Map structure to match the DataWeave output
+                Map<String, String> response = new HashMap<>();
+                response.put("binaryToHex", hexResult);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            // Marshal the Map into a JSON string
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+  "binaryToHex": "4D756C65"
+}
+
+

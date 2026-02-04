@@ -1,0 +1,78 @@
+isLiteralType:
+
+
+
+INPUT:
+
+
+package com.example.typecheck.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class LiteralTypeCheckService {
+
+    // Define indicators for literal and non-literal types
+    private static final String LITERAL_TYPE_INDICATOR = "\""; // String literals start and end with quotes
+    private static final String PRIMITIVE_BOOLEAN = "Boolean";
+
+    /**
+     * Helper method to simulate DataWeave's isLiteralType() function.
+     * Checks if the given type representation indicates a literal value.
+     */
+    private boolean isLiteralType(String typeRepresentation) {
+        // In DW, ALiteralType is defined as "Mariano". We check for leading/trailing quotes.
+        return typeRepresentation.startsWith(LITERAL_TYPE_INDICATOR) && 
+               typeRepresentation.endsWith(LITERAL_TYPE_INDICATOR);
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, Boolean> checkTypes() {
+        
+        // Emulating the type definitions and uses from the DW script:
+        // ALiteralType is represented by its definition string.
+        final String ALiteralType_Representation = "\"Mariano\""; 
+        final String Builtin_Boolean = PRIMITIVE_BOOLEAN;
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: isLiteralType(ALiteralType), b: isLiteralType(Boolean) }
+        return Map.of(
+            "a", isLiteralType(ALiteralType_Representation),
+            "b", isLiteralType(Builtin_Boolean)
+        );
+    }
+}
+
+package com.example.typecheck.controller;
+
+import com.example.typecheck.service.LiteralTypeCheckService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final LiteralTypeCheckService literalTypeCheckService;
+
+    public DataWeaveController(LiteralTypeCheckService literalTypeCheckService) {
+        this.literalTypeCheckService = literalTypeCheckService;
+    }
+
+    // Maps to http://localhost:8080/check-literal-type
+    @GetMapping("/check-literal-type")
+    public Map<String, Boolean> checkLiteralType() {
+        // Calls the service method that holds the transformation logic
+        return literalTypeCheckService.checkTypes();
+    }
+}
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+

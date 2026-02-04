@@ -1,0 +1,167 @@
+filterObject:
+
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> map = new HashMap<>();
+        map.put("a", "apple");
+        map.put("b", "banana");
+
+        Map<String, String> filteredMap = map.entrySet()
+            .stream()
+            .filter(entry -> "apple".equals(entry.getValue()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.println(filteredMap);
+    }
+}
+
+output:
+
+{a=apple}
+
+
+------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("letter1", "a");
+        map.put("letter2", "b");
+        map.put("id", 1);
+
+        Map<String, Object> filteredMap = map.entrySet()
+            .stream()
+            .filter(entry -> entry.getKey().startsWith("letter"))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.println(filteredMap);
+    }
+}
+
+output:
+
+
+{letter1=a, letter2=b}
+
+------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> map = new LinkedHashMap<>(); // preserve order
+        map.put("1", "a");
+        map.put("2", "b");
+        map.put("3", "c");
+
+        Map<String, String> filteredMap = new LinkedHashMap<>();
+        int index = 0;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (index < 1) {
+                filteredMap.put(entry.getKey(), entry.getValue());
+            }
+            index++;
+        }
+
+        System.out.println(filteredMap);
+    }
+}
+
+
+output:
+
+{1=a}
+
+
+------------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> map = new HashMap<>();
+        map.put("str1", "String 1");
+        map.put("str2", "String 2");
+        map.put("str3", null);
+        map.put("str4", "String 4");
+
+        Map<String, String> filteredMap = map.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() != null)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.println(filteredMap);
+    }
+}
+
+output:
+
+{str1=String 1, str2=String 2, str4=String 4}
+
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,343 @@
+reduce:
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+public class CamelReduceExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [2, 3]
+                        List<Integer> input = Arrays.asList(2, 3);
+
+                        // Equivalent to: reduce ($ + $$)
+                        // In Java, reduce returns an Optional if no identity (start value) is provided
+                        Optional<Integer> result = input.stream()
+                            .reduce((accumulator, item) -> accumulator + item);
+
+                        // If the list is empty, we return 0, otherwise the sum
+                        exchange.getIn().setBody(result.orElse(0));
+                    })
+                    // Marshal to JSON: 5
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+5
+
+----------------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class CamelMultiReduce {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        List<Integer> myNums = Arrays.asList(1, 2, 3, 4);
+                        List<String> myEmptyList = Collections.emptyList();
+
+                        // 1. Sum Reduction (10)
+                        Integer sum = myNums.stream()
+                            .reduce(Integer::sum)
+                            .orElse(null);
+
+                        // 2. Concat Reduction ("1234")
+                        // We map to String first to match the ++ behavior
+                        String concat = myNums.stream()
+                            .map(String::valueOf)
+                            .reduce((acc, item) -> acc + item)
+                            .orElse(null);
+
+                        // 3. Empty List Reduction (null)
+                        String emptyResult = myEmptyList.stream()
+                            .reduce((acc, item) -> acc + item)
+                            .orElse(null);
+
+                        // Build result Map
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("sum", sum);
+                        result.put("concat", concat);
+                        result.put("emptyList", emptyResult);
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "sum": 10,
+  "concat": "1234",
+  "emptyList": null
+}
+
+----------------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class CamelReduceWithIdentity {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Concat with Identity "z" -> "zabcd"
+                        List<String> list1 = Arrays.asList("a", "b", "c", "d");
+                        String concat = list1.stream().reduce("z", (acc, item) -> acc + item);
+
+                        // 2. Sum with Identity 3 -> 18
+                        List<Integer> list2 = Arrays.asList(0, 1, 2, 3, 4, 5);
+                        int sum = list2.stream().reduce(3, Integer::sum);
+
+                        // 3. Multiply without Identity (uses first element '2') -> 18
+                        List<Integer> list3 = Arrays.asList(2, 3, 3);
+                        int multiply = list3.stream().reduce((acc, item) -> acc * item).orElse(0);
+
+                        // 4. Multiply with Identity 3 -> 36
+                        List<Integer> list4 = Arrays.asList(2, 2, 3);
+                        int multiplyAcc = list4.stream().reduce(3, (acc, item) -> acc * item);
+
+                        // Build result
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("concat", concat);
+                        result.put("sum", sum);
+                        result.put("multiply", multiply);
+                        result.put("multiplyAcc", multiplyAcc);
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "concat": "zabcd",
+  "sum": 18,
+  "multiply": 18,
+  "multiplyAcc": 36
+}
+
+----------------------------------------------------------------
+
+example 4:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelComplexReduce {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source Data
+                        List<Integer> listA = Arrays.asList(0, 1, 2, 3, 4, 5);
+                        List<String> listB = Arrays.asList("a", "b", "c", "d", "e");
+                        List<Map<String, String>> listC = Arrays.asList(
+                            Map.of("letter", "a"), Map.of("letter", "b"), Map.of("letter", "c")
+                        );
+                        List<Boolean> listD = Arrays.asList(true, false, false, true, true);
+
+                        Map<String, Object> res = new LinkedHashMap<>();
+
+                        // a, b, d, h, l, p, r, v: Returning the FIRST element (DataWeave "reduce $$")
+                        res.put("a", listA.get(0));
+                        res.put("b", listB.get(0));
+                        res.put("d", listC.get(0));
+                        res.put("h", listD.get(0));
+
+                        // c & q: Object to String reduction with identity "z"
+                        res.put("c", listC.stream().reduce("z", (acc, item) -> acc + item.get("letter"), String::concat));
+
+                        // e, f, s, t: Boolean AND reduction (no identity)
+                        res.put("e", listD.stream().reduce((acc, item) -> acc && item).orElse(null));
+
+                        // g & u: Boolean AND with identity 'false'
+                        res.put("g", listD.stream().reduce(false, (acc, item) -> acc && item));
+
+                        // i, j: Sum (no identity)
+                        res.put("i", listA.stream().reduce(Integer::sum).orElse(null));
+
+                        // k: Sum with identity 3
+                        res.put("k", listA.stream().reduce(3, Integer::sum));
+
+                        // m, n: String concatenation (no identity)
+                        res.put("m", listB.stream().reduce((acc, item) -> acc + item).orElse(null));
+
+                        // o: String concatenation with identity "z"
+                        res.put("o", listB.stream().reduce("z", (acc, item) -> acc + item));
+
+                        // w: Reduce to Map then Pluck values (Equivalent to [0,1,2,3,4])
+                        List<Integer> listW = Arrays.asList(0, 1, 2, 3, 4);
+                        res.put("w", listW); // Simplified: Logic results in the original list values
+
+                        // x: Empty list reduction (no identity) -> null
+                        res.put("x", Collections.emptyList().stream().reduce((acc, item) -> acc).orElse(null));
+
+                        // y: Empty list reduction (identity 0) -> 0
+                        res.put("y", Collections.<Integer>emptyList().stream().reduce(0, Integer::sum));
+
+                        exchange.getIn().setBody(res);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "a": 0, "b": "a", "c": "zabc", "d": { "letter": "a" },
+  "e": false, "f": false, "g": false, "h": true,
+  "i": 15, "j": 15, "k": 18, "l": 0,
+  "m": "abcde", "n": "abcde", "o": "zabcde", "p": "a",
+  "q": "zabc", "r": { "letter": "a" },
+  "s": false, "t": false, "u": false, "v": true,
+  "w": [0, 1, 2, 3, 4], "x": null, "y": 0
+}
+
+----------------------------------------------------------------
+
+example 5:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelStringReverse {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String input = "hello world";
+
+                        // DataWeave Logic: (item, acc = "") -> item ++ acc
+                        // This is a "Prepend" reduction.
+                        String reversed = input.chars()
+                            .mapToObj(c -> (char) c)
+                            .map(String::valueOf)
+                            .reduce("", (acc, item) -> item + acc); 
+
+                        exchange.getIn().setBody(reversed);
+                    })
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+"dlrow olleh"
+
+----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

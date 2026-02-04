@@ -1,0 +1,42 @@
+FLOOR:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class FloorController {
+
+    @GetMapping("/floor-values")
+    public List<Integer> getFlooredValues() {
+
+        List<Double> input = Arrays.asList(1.5, 2.2, 3.0);
+
+        List<Integer> output = new ArrayList<>();
+        for (Double d : input) {
+            output.add((int) Math.floor(d)); // Same as DW: floor()
+        }
+
+        return output;
+    }
+}
+
+
+OUTPUT:
+
+[1, 2, 3]
+
+
+
+
+
+
+
+
+
+

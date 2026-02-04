@@ -1,0 +1,158 @@
+filterObject:
+
+
+INPUT:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class FilterExample1 {
+    public static Map<String, String> filterByValue(Map<String, String> inputMap) {
+        // DataWeave: {"a" : "apple", "b" : "banana"} filterObject ((value) -> value == "apple")
+        return inputMap.entrySet().stream()
+                .filter(entry -> "apple".equals(entry.getValue()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
+                ));
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> input = Map.of("a", "apple", "b", "banana");
+        Map<String, String> output = filterByValue(input);
+        System.out.println("Input: " + input);
+        System.out.println("Output: " + output);
+    }
+}
+
+
+OUTPUT:
+
+ {a=apple}
+
+___________________________________________________________________
+
+INPUT:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class FilterExample2 {
+    public static Map<String, Object> filterByKeyPrefix(Map<String, Object> inputMap) {
+        // DataWeave: {"letter1": "a", "letter2": "b", "id": 1} filterObject ((value, key) -> key startsWith "letter")
+        return inputMap.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith("letter"))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
+                ));
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> input = Map.of("letter1", "a", "letter2", "b", "id", 1);
+        Map<String, Object> output = filterByKeyPrefix(input);
+        System.out.println("Input: " + input);
+        System.out.println("Output: " + output);
+    }
+}
+
+OUTPUT:
+
+{letter1=a, letter2=b}
+
+
+___________________________________________________________________
+
+INPUT:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class FilterExample3 {
+    public static Map<String, String> filterByIndex(Map<String, String> inputMap) {
+        // DataWeave: { "1": "a", "2": "b", "3": "c"} filterObject ((value, key, index) -> index < 1)
+        
+        // Maps do not natively support index; we use an array as a mutable counter.
+        int[] index = {0}; 
+        
+        return inputMap.entrySet().stream()
+                .filter(entry -> index[0]++ < 1) // Only keep the entry where index is 0
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
+                ));
+    }
+
+    public static void main(String[] args) {
+        // Use LinkedHashMap to ensure insertion order for index-based filtering
+        Map<String, String> input = new LinkedHashMap<>();
+        input.put("1", "a");
+        input.put("2", "b");
+        input.put("3", "c");
+        
+        Map<String, String> output = filterByIndex(input);
+        System.out.println("Input: " + input);
+        System.out.println("Output: " + output);
+    }
+}
+
+OUTPUT:
+
+ {1=a}
+
+
+
+___________________________________________________________________
+
+INPUT:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class FilterExample4 {
+    public static Map<String, Object> filterOutNullValues(Map<String, Object> inputMap) {
+        // DataWeave: myObject filterObject $ != null
+        return inputMap.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
+                ));
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("str1", "String 1");
+        input.put("str2", "String 2");
+        input.put("str3", null);
+        input.put("str4", "String 4");
+
+        Map<String, Object> output = filterOutNullValues(input);
+        System.out.println("Input: " + input);
+        System.out.println("Output: " + output);
+    }
+}
+
+OUTPUT:
+
+{str1=String 1, str2=String 2, str4=String 4}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+lines:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+public class LinesController {
+    
+    @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<String> lines() {
+        String input = "hello world\n\nhere   data-weave";
+        return Arrays.asList(input.split("\n"));
+    }
+}
+
+
+
+OUTPUT:
+
+
+ ["hello world", "", "here data-weave"]

@@ -1,0 +1,53 @@
+indexOf:
+
+example 1:
+
+input:
+
+from("direct:indexOfArray")
+.setBody(simple(
+    "{"
+  + " \"present\": ${list:['a','b','c','d'].indexOf('c')},"
+  + " \"notPresent\": ${list:['x','w','x'].indexOf('c')},"
+  + " \"presentMoreThanOnce\": ${list:['a','b','c','c'].indexOf('c')}"
+  + "}"
+));
+
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+
+--------------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:indexOfString")
+.setBody(simple(
+    "{"
+  + " \"present\": ${'abcd'.indexOf('c')},"
+  + " \"notPresent\": ${'xyz'.indexOf('c')},"
+  + " \"presentMoreThanOnce\": ${'abcdc'.indexOf('c')}"
+  + "}"
+));
+
+
+
+output:
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+
+
+--------------------------------------------------------------

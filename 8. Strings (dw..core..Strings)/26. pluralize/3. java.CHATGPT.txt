@@ -1,0 +1,42 @@
+pluralize:
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+
+    public static String pluralize(String word) {
+        if (word == null || word.isEmpty()) return word;
+
+        String lower = word.toLowerCase();
+
+        if (lower.endsWith("s") || lower.endsWith("sh") ||
+            lower.endsWith("ch") || lower.endsWith("x") ||
+            lower.endsWith("z")) {
+            return word + "es";
+        }
+
+        if (lower.matches(".*[^aeiou]y$")) {
+            return word.substring(0, word.length() - 1) + "ies";
+        }
+
+        return word + "s";
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = Map.of(
+            "pluralize", pluralize("box")
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{pluralize=boxes}
+
+

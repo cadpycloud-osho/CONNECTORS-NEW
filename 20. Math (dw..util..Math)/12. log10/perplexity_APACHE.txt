@@ -1,0 +1,39 @@
+log10:
+
+
+input:
+
+
+import java.util.*;
+import static java.lang.Math.*;
+import static java.lang.Double.*;
+
+public class Log10Converter {
+    public static Double safeLog10(double value) {
+        if (value <= 0) {
+            return null;
+        }
+        return log10(value);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        result.put("log1010", safeLog10(10));
+        result.put("log1013", safeLog10(0.13));
+        result.put("log10-20", safeLog10(-20));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+   "log1010": 1.0,
+   "log1013": -0.8860566476931632,
+   "log10-20": null
+}
+

@@ -1,0 +1,32 @@
+date:
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: date({year: 2012, month: 10, day: 11})
+        LocalDate newDate = LocalDate.of(2012, 10, 11);
+        
+        // Output as JSON structure matching DataWeave
+        String output = newDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        System.out.println("{");
+        System.out.println("  \"newDate\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "newDate": "2012-10-11"
+}
+

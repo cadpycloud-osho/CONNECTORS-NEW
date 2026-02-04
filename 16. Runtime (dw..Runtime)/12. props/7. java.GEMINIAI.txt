@@ -1,0 +1,46 @@
+props:
+
+
+input:
+
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+public class Main {
+
+    /**
+     * Replicates the DataWeave props() function.
+     */
+    public static Map<String, Object> getAllSystemProperties() {
+        // Equivalent to: props()
+        Properties systemProperties = System.getProperties();
+        
+        // Convert Properties to a standard Map
+        Map<String, String> propertiesMap = new HashMap<>();
+        Enumeration<?> propertyNames = systemProperties.propertyNames();
+        while (propertyNames.hasMoreElements()) {
+            String key = (String) propertyNames.nextElement();
+            propertiesMap.put(key, systemProperties.getProperty(key));
+        }
+
+        // Map to the DW output structure: { "props" : { ... } }
+        return Map.of("props", propertiesMap);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java All System Properties Simulation ---");
+        System.out.println(getAllSystemProperties());
+    }
+}
+
+
+
+output:
+
+{
+  "props": "{java.runtime.name=Java(TM) SE Runtime Environment (build 25.352+15), sun.boot.library.path=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib, java.vm.version=17.0.10+11, java.vm.vendor=Oracle Corporation, java.vendor.url.bug=http://bugreport.oracle.com/bugreport/, path.separator=:, java.vm.name=Java HotSpot(TM) 64-Bit Server VM, file.encoding=UTF-8, java.io.tmpdir=/var/folders/42/dd73l3rx7qz0n625hr29kty80000gn/T/, java.class.path=/Users/me/project/target/classes:/Users/me/project/target/dependency/*, java.class.version=61.0, user.name=me, java.endorsed.dirs=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/endorsed:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/jre/lib/endorsed, line.separator=\n, java.home=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home, awt.toolkit=sun.lwawt.macosx.LWCToolkit, user.timezone=America/Los_Angeles, os.name=Mac OS X, java.awt.printerjob=sun.lwawt.macosx.CPrinterJob, java.vm.specification.name=Java Virtual Machine Specification, sun.management.compiler=HotSpot 64-Bit Tiered Compilers, os.version=14.0, user.country=US, java.ext.dirs=/Users/me/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/ext, user.language=en, java.specification.name=Java Platform API Specification, user.home=/Users/me, java.library.path=/Users/me/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server:/usr/lib:/System/Library/Frameworks/JavaVM.framework:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib}"
+}
+
+

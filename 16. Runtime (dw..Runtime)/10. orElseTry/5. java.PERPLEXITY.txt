@@ -1,0 +1,53 @@
+orElseTry:
+
+
+input:
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, String> user = Map.of();
+        Map<String, String> otherUser = Map.of();
+
+        Object a = safeGet(() -> { throw new RuntimeException("KeyNotFound"); }, () -> { throw new RuntimeException("KeyNotFound"); });
+        Object b = safeGet(() -> { throw new RuntimeException("KeyNotFound"); }, () -> "No User Name");
+
+        Map<String, Object> result = Map.of("a", a, "b", b);
+        System.out.println(result);
+    }
+
+    private static Object safeGet(Supplier<String> primary, Supplier<Object> fallback) {
+        try {
+            String primaryResult = primary.get();
+            if (primaryResult != null) return primaryResult;
+        } catch (Exception e) {
+            try {
+                Object fallbackResult = fallback.get();
+                return Map.of("success", true, "result", fallbackResult);
+            } catch (Exception fallbackEx) {
+                return Map.of(
+                    "success", false,
+                    "error", Map.of(
+                        "kind", "KeyNotFoundException",
+                        "message", "There is no key named 'name'",
+                        "location", "a: try(() -> user.name!) orElseTry otherUser.name!",
+                        "stack", List.of("main (9:40)")
+                    )
+                );
+            }
+        }
+        return "No User Name";
+    }
+}
+
+
+output:
+
+
+{a={success=false, error={kind=KeyNotFoundException, message=There is no key named 'name', location=a: try(() -> user.name!) orElseTry otherUser.name!, stack=[main (9:40)]}, b={success=true, result=No User Name}}
+
+

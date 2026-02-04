@@ -1,0 +1,62 @@
+runUrl:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class RunUrlSimulationController {
+
+    @GetMapping("/simulateRunUrl")
+    public Map<String, Object> simulateRunUrl() throws Exception {
+
+        // DW input (Binary → String)
+        String jsonBinary = "{\"name\": \"Mariano\"}";
+        String encoding = "UTF-8";
+
+        // Parse JSON
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(jsonBinary.getBytes(StandardCharsets.UTF_8));
+
+        // Simulated DW script result: extract name
+        String extractedName = "\"" + node.get("name").asText() + "\"";
+
+        // Build response mimicking DW runUrl output
+        Map<String, Object> executeOk = new HashMap<>();
+        executeOk.put("success", true);
+        executeOk.put("value", extractedName);
+        executeOk.put("mimeType", "application/dw");
+        executeOk.put("encoding", encoding);
+        executeOk.put("logs", new String[]{});
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("execute_ok", executeOk);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "\"Mariano\"",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8",
+    "logs": []
+  }
+}
+

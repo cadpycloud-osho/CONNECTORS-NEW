@@ -1,0 +1,85 @@
+firstWith:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class FirstWithExample {
+
+    // 1. Data Class for the User object
+    static class User {
+        private String name;
+        private String lastName;
+
+        public User(String name, String lastName) {
+            this.name = name;
+            this.lastName = lastName;
+        }
+
+        // Getters for Jackson/JSON serialization
+        public String getName() { return name; }
+        public String getLastName() { return lastName; }
+
+        @Override
+        public String toString() {
+            // Simple toString for console output
+            return String.format("{name: %s, lastName: %s}", name, lastName);
+        }
+    }
+
+    // 2. Main Logic to replicate DataWeave 'firstWith'
+    public static void main(String[] args) throws JsonProcessingException {
+        // Input List of User objects
+        List<User> users = Arrays.asList(
+            new User("Mariano", "Achaval"), 
+            new User("Ana", "Felisatti"), 
+            new User("Mariano", "de Sousa")
+        );
+
+        // --- Scenario A: Match found ---
+        // users firstWith ((user, index) -> user.name == "Mariano")
+        Optional<User> resultA = users.stream()
+            .filter(user -> "Mariano".equals(user.getName())) // Filter by condition
+            .findFirst();                                     // Get the first match (short-circuiting)
+        
+        // --- Scenario B: No match found ---
+        // users firstWith ((user, index) -> user.name == "Peter")
+        Optional<User> resultB = users.stream()
+            .filter(user -> "Peter".equals(user.getName()))
+            .findFirst();
+
+        // 3. Constructing the Output
+        
+        // Use Jackson ObjectMapper to generate clean JSON output
+        ObjectMapper mapper = new ObjectMapper();
+        
+        String outputA = resultA.isPresent() ? 
+            mapper.writeValueAsString(resultA.get()) : "null";
+            
+        // If not present, Optional.orElse(null) and then writing to JSON yields "null"
+        String outputB = mapper.writeValueAsString(resultB.orElse(null)); 
+
+        System.out.println("--- DataWeave firstWith Equivalent Output ---");
+        System.out.println("{");
+        System.out.println("  \"a\": " + outputA + ",");
+        System.out.println("  \"b\": " + outputB);
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}

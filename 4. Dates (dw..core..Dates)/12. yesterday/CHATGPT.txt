@@ -1,0 +1,35 @@
+yesterday
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDate;
+import java.util.Map;
+
+@RestController
+public class DateController {
+
+    @GetMapping("/yesterday")
+    public Map<String, String> getYesterdayDate() {
+
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        return Map.of("yesterday", yesterday.toString());
+    }
+}
+
+
+output:
+
+
+{
+  "yesterday": "2021-05-14"
+}
+
+

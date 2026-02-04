@@ -1,0 +1,86 @@
+typeOf:
+
+
+example 1:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class TypeOfMultipleController {
+
+    @GetMapping("/typeOfMultiple")
+    public List<String> typeOfMultiple() {
+        Object str = "A b";
+        Object arr = List.of(1, 2);
+        Object num = 34;
+        Object bool = true;
+        Object obj = java.util.Map.of("a", 5);
+
+        return List.of(
+                typeOf(str),
+                typeOf(arr),
+                typeOf(num),
+                typeOf(bool),
+                typeOf(obj)
+        );
+    }
+
+    private String typeOf(Object input) {
+        if (input == null) return "Null";
+        if (input instanceof String) return "String";
+        if (input instanceof List) return "Array";
+        if (input instanceof Number) return "Number";
+        if (input instanceof Boolean) return "Boolean";
+        if (input instanceof java.util.Map) return "Object";
+        return "Unknown";
+    }
+}
+
+
+output:
+
+["String", "Array", "Number", "Boolean", "Object"]
+
+
+----------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class TypeOfVarController {
+
+    @GetMapping("/typeOfVars")
+    public List<String> typeOfVars() {
+        // Variable x could be String or Number - here assigned String
+        Object x = "clearly a string";
+        // Variable y with value "because", treated as String literal
+        Object y = "because";
+
+        return List.of(typeOf(x), typeOf(y));
+    }
+
+    private String typeOf(Object input) {
+        if (input == null) return "Null";
+        if (input instanceof String) return "String";
+        if (input instanceof Number) return "Number";
+        return "Unknown";
+    }
+}
+
+
+output:
+
+["String", "String"]
+

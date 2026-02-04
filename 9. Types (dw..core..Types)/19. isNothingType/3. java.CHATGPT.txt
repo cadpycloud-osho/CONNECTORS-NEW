@@ -1,0 +1,35 @@
+isNothingType:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isNothingType(Class<?> type) {
+        return type.equals(Void.class);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ANothing = Void.class;
+
+        result.put("a", isNothingType(ANothing));
+        result.put("b", isNothingType(Void.class));
+        result.put("c", isNothingType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=true, b=true, c=false}
+
+

@@ -1,0 +1,41 @@
+prependIfMissing:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class PrependRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:normalizePrefix")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides perfect parity
+                results.put("a", StringUtils.prependIfMissing(null, ""));
+                results.put("b", StringUtils.prependIfMissing("abc", ""));
+                results.put("c", StringUtils.prependIfMissing("", "xyz"));
+                results.put("d", StringUtils.prependIfMissing("abc", "xyz"));
+                results.put("e", StringUtils.prependIfMissing("xyzabc", "xyz"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+

@@ -1,0 +1,49 @@
+mapString:
+
+
+input:
+
+
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        String input = "$234";
+        String transformedBalance = transform(input);
+
+        // Print the JSON-like structure
+        System.out.println("{ \"balance\": \"" + transformedBalance + "\" }");
+    }
+    
+    /**
+     * Implements the DataWeave mapString logic using Java Streams.
+     * Iterates over each character, checks if it's a digit, and transforms it.
+     * * @param input The string to transform (e.g., "$234").
+     * @return The transformed string (e.g., "$~~~").
+     */
+    public static String transform(String input) {
+        // Uses a stream to process each character individually (like mapString)
+        return input.chars() // Get an IntStream of character codes
+            .mapToObj(c -> (char) c) // Convert IntStream back to Stream<Character>
+            .map(c -> {
+                // c is the character ($), 2, 3, or 4
+                if (Character.isDigit(c)) { // isNumeric($)
+                    return "~"; // if true, replace with "~"
+                } else {
+                    return String.valueOf(c); // else, keep the original character
+                }
+            })
+            .collect(Collectors.joining()); // Join the characters back into a String
+    }
+}
+
+output:
+
+
+{
+  "balance": "$~~~"
+}
+
+

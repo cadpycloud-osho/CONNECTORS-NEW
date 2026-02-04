@@ -1,0 +1,129 @@
+nodeExists:
+
+
+input:
+
+import java.util.*;
+
+public class NodeExistsConverter {
+    public static boolean nodeExists(Object input, BiPredicate<Object, List<Object>> predicate) {
+        NodeVisitor visitor = new NodeVisitor(predicate);
+        visitor.visit(input, new ArrayList<>());
+        return visitor.foundMatch;
+    }
+    
+    static class NodeVisitor {
+        private final BiPredicate<Object, List<Object>> predicate;
+        boolean foundMatch = false;
+        
+        NodeVisitor(BiPredicate<Object, List<Object>> predicate) {
+            this.predicate = predicate;
+        }
+        
+        void visit(Object node, List<Object> path) {
+            if (foundMatch) return;
+            
+            if (isLeaf(node)) {
+                // Check predicate at leaf: path[-1].selector + value
+                if (!path.isEmpty()) {
+                    Object lastSelector = path.get(path.size() - 1);
+                    List<Object> predicatePath = new ArrayList<>(path);
+                    predicatePath.add(node); // append value as last element
+                    foundMatch = predicate.test(lastSelector, predicatePath);
+                }
+            } else {
+                // Recurse into containers
+                if (node instanceof Map) {
+                    visitObject((Map<?, ?>) node, path);
+                } else if (node instanceof List) {
+                    visitArray((List<?>) node, path);
+                }
+            }
+        }
+        
+        private void visitObject(Map<?, ?> obj, List<Object> path) {
+            obj.forEach((key, value) -> {
+                if (!foundMatch) {
+                    List<Object> newPath = new ArrayList<>(path);
+                    newPath.add(key); // selector = key
+                    visit(value, newPath);
+                }
+            });
+        }
+        
+        private void visitArray(List<?> array, List<Object> path) {
+            for (int i = 0; i < array.size() && !foundMatch; i++) {
+                List<Object> newPath = new ArrayList<>(path);
+                newPath.add(String.valueOf(i));
+                visit(array.get(i), newPath);
+            }
+        }
+    }
+    
+    // Test
+    public static void main(String[] args) {
+        Map<String, Object> myObject = createTestData();
+        
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("mariano", nodeExists(myObject, 
+            (selector, path) -> "name".equals(selector) && "mariano".equals(path.get(path.size() - 1))));
+        result.put("julian", nodeExists(myObject, 
+            (selector, path) -> "name".equals(selector) && "julian".equals(path.get(path.size() - 1))));
+        result.put("tom", nodeExists(myObject, 
+            (selector, path) -> "name".equals(selector) && "tom".equals(path.get(path.size() - 1))));
+        result.put("leandro", nodeExists(myObject, 
+            (selector, path) -> "name".equals(selector) && "leandro".equals(path.get(path.size() - 1))));
+        result.put("peter", nodeExists(myObject, 
+            (selector, path) -> "name".equals(selector) && "peter".equals(path.get(path.size() - 1))));
+        result.put("wrongField", nodeExists(myObject, 
+            (selector, path) -> "wrongField".equals(selector)));
+        result.put("teo", nodeExists(myObject, 
+            (selector, path) -> "name".equals(selector) && "teo".equals(path.get(path.size() - 1))));
+        
+        System.out.println(result);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> createTestData() {
+        Map<String, Object> user1 = new LinkedHashMap<>();
+        user1.put("name", "mariano");
+        user1.put("lastName", "achaval");
+        user1.put("friends", Arrays.asList(
+            createFriend("julian"),
+            createFriend("tom")
+        ));
+        
+        Map<String, Object> user2 = new LinkedHashMap<>();
+        user2.put("name", "leandro");
+        user2.put("lastName", "shokida");
+        user2.put("friends", Arrays.asList(
+            createFriend("peter"),
+            createFriend("robert")
+        ));
+        
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("user", Arrays.asList(user1, user2));
+        return result;
+    }
+    
+    private static Map<String, String> createFriend(String name) {
+        Map<String, String> friend = new LinkedHashMap<>();
+        friend.put("name", name);
+        return friend;
+    }
+}
+
+
+output:
+
+{
+  "mariano": true,
+  "julian": true,
+  "tom": true,
+  "leandro": true,
+  "peter": true,
+  "wrongField": false,
+  "teo": false
+}
+
+

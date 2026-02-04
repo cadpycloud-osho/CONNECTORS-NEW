@@ -1,0 +1,52 @@
+between:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Map;
+
+@RestController
+public class PeriodController {
+
+    @GetMapping("/periods")
+    public Map<String, String> getPeriods() {
+
+        // DW: between(|2010-12-12|,|2010-12-10|)
+        Period a = Period.between(
+                LocalDate.parse("2010-12-12"),
+                LocalDate.parse("2010-12-10"));
+
+        // DW: between(|2011-12-11|,|2010-11-10|)
+        Period b = Period.between(
+                LocalDate.parse("2011-12-11"),
+                LocalDate.parse("2010-11-10"));
+
+        // DW: between(|2020-02-29|,|2020-03-30|)
+        Period c = Period.between(
+                LocalDate.parse("2020-02-29"),
+                LocalDate.parse("2020-03-30"));
+
+        return Map.of(
+                "a", a.toString(),
+                "b", b.toString(),
+                "c", c.toString()
+        );
+    }
+}
+
+
+output:
+
+{
+  "a": "P2D",
+  "b": "P1Y1M1D",
+  "c": "P-1M-1D"
+}
+

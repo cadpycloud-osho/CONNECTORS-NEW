@@ -1,0 +1,44 @@
+substringAfterLast:
+
+
+INPUT:
+
+
+@RestController
+@RequestMapping("/api")
+public class SubstringAfterLastController {
+    
+    @GetMapping("/substring-after-last")
+    public Map<String, Object> substringAfterLastExamples() {
+        return Map.of(
+            "a", substringAfterLast(null, "'"),
+            "b", substringAfterLast("", "-"),
+            "c", substringAfterLast("abc", "b"),
+            "d", substringAfterLast("abcba", "b"),
+            "e", substringAfterLast("abc", "d"),
+            "f", substringAfterLast("abc", "")
+        );
+    }
+    
+    private String substringAfterLast(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null || delimiter.isEmpty()) return null;
+        
+        int index = input.lastIndexOf(delimiter);
+        return index == -1 ? "" : input.substring(index + delimiter.length());
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "a",
+  "e": "",
+  "f": null
+}
+
+

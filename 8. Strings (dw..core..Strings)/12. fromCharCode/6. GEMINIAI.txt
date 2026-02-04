@@ -1,0 +1,48 @@
+fromCharCode:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class CharCodeConverterController {
+
+    /**
+     * Custom method to emulate DataWeave's fromCharCode(code) function.
+     * Converts a Unicode/ASCII code to its corresponding character.
+     */
+    private String getCharacterFromCode(int code) {
+        // Casting the integer directly to char performs the Unicode conversion.
+        char resultChar = (char) code;
+        
+        // Return the character as a String
+        return String.valueOf(resultChar);
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression: { "fromCharCode" : fromCharCode(117) }
+     */
+    @GetMapping("/get-char-from-code")
+    public Map<String, String> getCharFromCode() {
+        int charCode = 117; // The hardcoded input code from the DataWeave example
+        
+        String result = getCharacterFromCode(charCode);
+        
+        // Return the result in the desired JSON format: { "fromCharCode": "u" }
+        return Collections.singletonMap("fromCharCode", result);
+    }
+}
+
+
+output:
+
+{
+  "fromCharCode": "u"
+}
+
+

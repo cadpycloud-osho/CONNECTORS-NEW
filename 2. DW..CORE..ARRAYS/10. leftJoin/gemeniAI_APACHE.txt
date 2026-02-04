@@ -1,0 +1,77 @@
+leftJoin:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelLeftJoinExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        List<Map<String, String>> users = List.of(
+                            Map.of("id", "1", "name", "Mariano"),
+                            Map.of("id", "2", "name", "Leandro"),
+                            Map.of("id", "3", "name", "Julian"),
+                            Map.of("id", "5", "name", "Julian")
+                        );
+
+                        List<Map<String, String>> products = List.of(
+                            Map.of("ownerId", "1", "name", "DataWeave"),
+                            Map.of("ownerId", "1", "name", "BAT"),
+                            Map.of("ownerId", "3", "name", "DataSense"),
+                            Map.of("ownerId", "4", "name", "SmartConnectors")
+                        );
+
+                        // Java Left Join Logic
+                        List<Map<String, Object>> leftJoinResult = users.stream()
+                            .flatMap(user -> {
+                                // Find all matches in products
+                                List<Map<String, String>> matches = products.stream()
+                                    .filter(p -> user.get("id").equals(p.get("ownerId")))
+                                    .collect(Collectors.toList());
+
+                                // If no matches, return the left side only (DataWeave behavior)
+                                if (matches.isEmpty()) {
+                                    return Stream.of(Map.of("l", user));
+                                }
+
+                                // If matches exist, create the {l, r} pairs
+                                return matches.stream().map(product -> Map.of("l", user, "r", product));
+                            })
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(leftJoinResult);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  {"l": {"id": "1", "name": "Mariano"}, "r": {"ownerId": "1", "name": "DataWeave"}},
+  {"l": {"id": "1", "name": "Mariano"}, "r": {"ownerId": "1", "name": "BAT"}},
+  {"l": {"id": "2", "name": "Leandro"}},
+  {"l": {"id": "3", "name": "Julian"}, "r": {"ownerId": "3", "name": "DataSense"}},
+  {"l": {"id": "5", "name": "Julian"}}
+]
+

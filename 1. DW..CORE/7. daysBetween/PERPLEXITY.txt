@@ -1,0 +1,32 @@
+daysBetween
+
+Copy link to clipboarddaysBetween(from: Date, to: Date): Number
+Returns the number of days between two dates.
+
+
+Source:
+
+// DaysBetweenController.java
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
+@RestController
+public class DaysBetweenController {
+
+    @GetMapping("/days-between")
+    public Object calculateDays() {
+        ZonedDateTime start = ZonedDateTime.parse("2016-10-01T23:57:59-03:00");
+        ZonedDateTime end = ZonedDateTime.parse("2017-10-01T23:57:59-03:00");
+        long days = ChronoUnit.DAYS.between(start, end);
+        return new Object() {
+            public final long days = days;
+        };
+    }
+}
+
+Output:
+{ "days" : 365 }

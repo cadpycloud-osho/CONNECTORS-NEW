@@ -1,0 +1,53 @@
+slice:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class SliceSublistExample {
+
+    /**
+     * Replicates the DataWeave 'slice(array, start, end)' function
+     * using Java's List.subList(fromIndex, toIndex).
+     *
+     * @param sourceList The list to slice.
+     * @param startIndex The inclusive starting index.
+     * @param endIndex The exclusive ending index.
+     * @return A list containing the elements from start (inclusive) to end (exclusive).
+     */
+    public static <T> List<T> slice(List<T> sourceList, int startIndex, int endIndex) {
+        // subList(fromIndex, toIndex) matches the behavior of DataWeave's slice
+        // fromIndex is inclusive, toIndex is exclusive.
+        return sourceList.subList(startIndex, endIndex);
+    }
+
+    public static void main(String[] args) {
+        
+        // Input List
+        List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+        
+        // DataWeave Logic: slice(arr, 1, 4)
+        int startIndex = 1;
+        int endIndex = 4;
+        
+        List<Integer> slicedList = slice(arr, startIndex, endIndex);
+        
+        System.out.println("--- DataWeave slice Equivalent Output ---");
+        System.out.println("Input List: " + arr);
+        System.out.println("Slice Indices (1 to 4): " + startIndex + " (inclusive) to " + endIndex + " (exclusive)");
+        
+        // Print the result to match the DataWeave output format [ 1, 2, 3 ]
+        System.out.println("Result: " + slicedList.toString());
+    }
+}
+
+output:
+
+[
+  1,
+  2,
+  3
+]
+

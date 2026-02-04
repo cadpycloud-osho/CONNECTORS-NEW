@@ -1,0 +1,53 @@
+lookup:
+
+
+input:
+
+@Service
+public class Flow2Service {
+
+    public String flow2Lookup(Map<String, String> payload) {
+        String result = payload.get("test") + "world";
+        System.out.println("Logger: " + result);
+        return result;
+    }
+}
+
+@RestController
+@RequestMapping("/source")
+public class Flow1Controller {
+
+    @Autowired
+    private Flow2Service flow2Service;
+
+    @GetMapping
+    public Map<String, String> source() {
+
+        // Equivalent of: Mule::lookup("flow2", { test: "hello " })
+        Map<String, String> input = Map.of("test", "hello ");
+        String output = flow2Service.flow2Lookup(input);
+
+        return Map.of("result", output);
+    }
+}
+
+output:
+
+SPRING BOOT OUTPUT
+
+If you send GET:
+
+http://localhost:8080/source
+
+
+Response:
+
+{
+  "result": "hello world"
+}
+
+
+Console log (equivalent to Mule logger):
+
+Logger: hello world
+

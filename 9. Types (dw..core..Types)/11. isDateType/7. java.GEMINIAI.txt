@@ -1,0 +1,53 @@
+isDateType:
+
+
+
+
+INPUT:
+
+
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    // Define the constant for the DataWeave 'Date' type representation
+    private static final String DW_DATE_TYPE = "Date";
+
+    /**
+     * Pure Java method to mimic the DataWeave isDateType() function.
+     */
+    public static boolean checkIsDateType(String typeName) {
+        // Compares the type name against the expected 'Date' type string
+        return typeName.equals(DW_DATE_TYPE);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Define the input types (mimicking the DW type aliases and built-in types)
+        final String ADate_Type = "Date"; 
+        final String Builtin_Date = "Date";
+        final String Builtin_String = "String";
+
+        // 2. Perform the transformation
+        boolean resultA = checkIsDateType(ADate_Type);
+        boolean resultB = checkIsDateType(Builtin_Date);
+        boolean resultC = checkIsDateType(Builtin_String);
+
+        // 3. Structure the final output map: { "a": resultA, "b": resultB, "c": resultC }
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", resultA);
+        output.put("b", resultB);
+        output.put("c", resultC);
+
+        // 4. Print the result to the console
+        System.out.println("DataWeave Output Emulation:");
+        // Simple print of the Map structure (looks like JSON key-value pairs)
+        System.out.println(output.toString().replace("=", ": "));
+    }
+}
+
+OUTPUT:
+
+{a: true, b: true, c: false}

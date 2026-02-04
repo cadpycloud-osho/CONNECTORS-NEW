@@ -1,0 +1,62 @@
+toTimeOrNull:
+
+
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String input = "13:44:12.283-08:00";
+        
+        OffsetTime resultA = parseWithMultipleFormats(input);
+        OffsetTime resultB = parseWithSingleFormat(input);
+        
+        System.out.println("Result: " + Map.of("a", resultA, "b", resultB));
+    }
+    
+    private static OffsetTime parseWithMultipleFormats(String input) {
+        // First: HH:mm:ss.xxx (strict 3 millisecond digits)
+        DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+        try {
+            return OffsetTime.parse(input, fmt1);
+        } catch (DateTimeParseException e) {
+            // Fallback: HH:mm:ss.nxxx (flexible nanoseconds)
+            DateTimeFormatter fmt2 = new DateTimeFormatterBuilder()
+                .appendPattern("HH:mm:ss.")
+                .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+                .appendOffset("+HH:mm", "Z")
+                .toFormatter();
+            try {
+                return OffsetTime.parse(input, fmt2);
+            } catch (DateTimeParseException ex) {
+                return null;
+            }
+        }
+    }
+    
+    private static OffsetTime parseWithSingleFormat(String input) {
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+            return OffsetTime.parse(input, fmt);
+        } catch (DateTimeParseException e) {
+            return null; // Matches DataWeave toTimeOrNull
+        }
+    }
+}
+
+
+output:
+
+Result: {a=13:44:12.000000283-08:00, b=null}
+
+
+

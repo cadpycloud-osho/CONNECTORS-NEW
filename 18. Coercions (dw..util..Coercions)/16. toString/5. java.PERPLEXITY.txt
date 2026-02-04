@@ -1,0 +1,327 @@
+toString:
+
+
+example 1:
+
+
+
+input:
+
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, String> result = Map.of(
+            "a", formatDefault(1.0),
+            "b", formatWithPattern(0.005, ".00"),
+            "c", formatWithLocale(0.035, "#.##", "ES"),
+            "d", formatWithRounding(0.005, "#.##", "ES", RoundingMode.HALF_EVEN),
+            "e", formatWithNullLocale(0.035, "#.00", RoundingMode.HALF_EVEN),
+            "f", formatWithCustomText(1.1234, "\\$.## 'in my account'")
+        );
+        
+        System.out.println("Result: " + result);
+    }
+    
+    private static String formatDefault(double value) {
+        return String.valueOf((long) value); // Matches DataWeave "1"
+    }
+    
+    private static String formatWithPattern(double value, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        return format.format(value);
+    }
+    
+    private static String formatWithLocale(double value, String pattern, String locale) {
+        DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance(new Locale(locale));
+        format.applyPattern(pattern);
+        return format.format(value);
+    }
+    
+    private static String formatWithRounding(double value, String pattern, String locale, RoundingMode mode) {
+        DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance(new Locale(locale));
+        format.applyPattern(pattern);
+        format.setRoundingMode(mode);
+        return format.format(value);
+    }
+    
+    private static String formatWithNullLocale(double value, String pattern, RoundingMode mode) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        format.setRoundingMode(mode);
+        return format.format(value);
+    }
+    
+    private static String formatWithCustomText(double value, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        return format.format(value);
+    }
+}
+
+
+output:
+
+Result: {a=1, b=.01, c=0,04, d=0, e=.04, f=$1.12 in my account}
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+
+
+input:
+
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = Map.of(
+            "aDate", formatDate(),
+            "aDateTime", formatDateTime(),
+            "aLocalTime", formatLocalTime(),
+            "aLocalDateTime", formatLocalDateTime(),
+            "aLocalDateTimeFormatted", formatLocalDateTimeFormatted(),
+            "aLocalDateTimeFormattedAndLocalizedSpain", formatLocalizedSpain(),
+            "aTime", getTypeOfTime(),
+            "aTimeZone", formatTimeZone()
+        );
+        
+        System.out.println("Result: " + result);
+    }
+    
+    private static String formatDate() {
+        LocalDate date = LocalDate.parse("2003-10-01");
+        return date.format(DateTimeFormatter.ofPattern("uuuu/MM/dd"));
+    }
+    
+    private static String formatDateTime() {
+        OffsetDateTime dateTime = OffsetDateTime.parse("2018-09-17T22:13:00-03:00");
+        return dateTime.toString();
+    }
+    
+    private static String formatLocalTime() {
+        LocalTime time = LocalTime.parse("23:57:59");
+        return time.format(DateTimeFormatter.ofPattern("HH-mm-ss"));
+    }
+    
+    private static String formatLocalDateTime() {
+        LocalDateTime dateTime = LocalDateTime.parse("2015-10-01T23:57:59");
+        return dateTime.toString();
+    }
+    
+    private static String formatLocalDateTimeFormatted() {
+        LocalDateTime dateTime = LocalDateTime.parse("2003-10-01T23:57:59");
+        return dateTime.format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss a"));
+    }
+    
+    private static String formatLocalizedSpain() {
+        LocalDateTime dateTime = LocalDateTime.parse("2003-01-01T23:57:59");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+            "eeee, dd MMMM, uuuu HH:mm:ss a", Locale.forLanguageTag("ES")
+        );
+        return dateTime.format(formatter);
+    }
+    
+    private static String getTypeOfTime() {
+        OffsetTime time = OffsetTime.parse("22:10:18Z");
+        return "Time"; // Matches DataWeave typeOf(|22:10:18Z|)
+    }
+    
+    private static String formatTimeZone() {
+        ZoneOffset zone = ZoneOffset.of("-03:00");
+        return zone.toString();
+    }
+}
+
+
+output:
+
+Result: {aDate=2003/10/01, aDateTime=2018-09-17T22:13:00-03:00, aLocalTime=23-57-59, aLocalDateTime=2015-10-01T23:57:59, aLocalDateTimeFormatted=2003-10-01 23:57:59 PM, aLocalDateTimeFormattedAndLocalizedSpain=miércoles, 01 enero, 2003 23:57:59 p. m., aTime=Time, aTimeZone=-03:00}
+
+
+---
+
+
+example 3:
+
+DataWeave:
+1. "DW Test" as Binary {encoding: "UTF-32"} → UTF-32 encoded bytes
+2. toString(binaryData, "UTF-32") → decodes UTF-32 bytes back to "DW Test"
+
+Java:
+1. "DW Test".getBytes("UTF-32") → UTF-32 encoded bytes
+2. new String(bytes, "UTF-32") → decodes back to "DW Test"
+
+
+input:
+
+import java.nio.charset.Charset;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        // Equivalent to DataWeave: "DW Test" as Binary {encoding: "UTF-32"}
+        String original = "DW Test";
+        Charset utf32Charset = Charset.forName("UTF-32");
+        byte[] binaryData = original.getBytes(utf32Charset);
+        
+        // Equivalent to DataWeave: toString(binaryData, "UTF-32")
+        String result = new String(binaryData, utf32Charset);
+        
+        System.out.println("Result: " + Map.of("a", result));
+    }
+}
+
+
+
+output:
+
+Result: {a=DW Test}
+
+
+---
+
+
+
+example 4:
+
+
+
+input:
+
+import java.net.URI;
+import java.time.Duration;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class Main {
+    
+    public static void main(String[] args) throws Exception {
+        // Equivalent to DataWeave keysOf() ++ merge
+        Map<String, String> map = Map.of("aKeyToString", "aValue");
+        String transformKey = map.keySet().iterator().next();
+        
+        Map<String, String> result = Map.of(
+            "transformTimeZone", toStringZoneOffset(),
+            "transformBoolean", toStringBoolean(),
+            "transformPeriod", toStringPeriod(),
+            "transformRegex", toStringRegex(),
+            "transformPeriod2", toStringDuration(),
+            "transformUri", toStringUri(),
+            "transformKey", transformKey
+        );
+        
+        System.out.println("Result: " + result);
+    }
+    
+    private static String toStringZoneOffset() {
+        return ZoneOffset.UTC.toString(); // |Z| → "Z"
+    }
+    
+    private static String toStringBoolean() {
+        return Boolean.TRUE.toString(); // true → "true"
+    }
+    
+    private static String toStringPeriod() {
+        return Period.parse("P1D").toString(); // |P1D| → "P1D"
+    }
+    
+    private static String toStringRegex() {
+        return Pattern.compile("a-Z").pattern(); // /a-Z/ → "a-Z"
+    }
+    
+    private static String toStringDuration() {
+        return Duration.parse("PT8M10S").toString(); // |PT8M10S| → "PT8M10S"
+    }
+    
+    private static String toStringUri() throws Exception {
+        return new URI("https://docs.mulesoft.com/").toString();
+    }
+}
+
+
+
+output:
+
+Result: {transformTimeZone=Z, transformBoolean=true, transformPeriod=P1D, transformRegex=a-Z, transformPeriod2=PT8M10S, transformUri=https://docs.mulesoft.com/, transformKey=aKeyToString}
+
+
+---
+
+
+
+
+example 5:
+
+
+
+input:
+
+
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, String> result = Map.of(
+            "a", toStringEmptyArray(),
+            "b", toStringArray()
+        );
+        
+        System.out.println("Result: " + result);
+    }
+    
+    private static String toStringEmptyArray() {
+        // Equivalent to DataWeave toString([])
+        List<String> emptyArray = List.of();
+        return String.join("", emptyArray);
+    }
+    
+    private static String toStringArray() {
+        // Equivalent to DataWeave toString(["h", "o", "l", "a"])
+        List<String> array = List.of("h", "o", "l", "a");
+        return String.join("", array);
+    }
+}
+
+
+output:
+
+Result: {a=, b=hola}
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

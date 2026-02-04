@@ -1,0 +1,151 @@
+someEntry:
+
+
+
+input:
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiPredicate;
+
+public class Main {
+
+    /**
+     * Functional Interface to represent the DW lambda (value, key) -> condition
+     */
+    @FunctionalInterface
+    public interface EntryPredicate extends BiPredicate<Object, String> {
+        // BiPredicate<T, U> represents a predicate (boolean-valued function) of two arguments.
+        // Here, T=Value (Object), U=Key (String).
+        @Override
+        boolean test(Object value, String key);
+    }
+
+    /**
+     * Simulates the DataWeave someEntry function.
+     * Checks if the predicate is true for at least one entry in the map.
+     * Returns false for null or empty maps.
+     * @param inputMap The map (DW object) to iterate over.
+     * @param predicate The condition to test.
+     * @return true if at least one entry satisfies the condition, false otherwise.
+     */
+    public static boolean someEntry(Map<String, Object> inputMap, EntryPredicate predicate) {
+        // DataWeave behavior: null or empty input returns false.
+        if (inputMap == null || inputMap.isEmpty()) {
+            return false;
+        }
+
+        // Iterate over the entries
+        for (Map.Entry<String, Object> entry : inputMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // If the predicate succeeds for any entry, return true immediately (short-circuiting)
+            if (predicate.test(value, key)) {
+                return true;
+            }
+        }
+
+        // If the loop completes without finding a match, return false.
+        return false;
+    }
+
+    /**
+     * Helper to create maps easily for the test cases.
+     */
+    private static Map<String, Object> createMap(Object... entries) {
+        if (entries.length % 2 != 0) {
+            throw new IllegalArgumentException("Map entries must be key-value pairs.");
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (int i = 0; i < entries.length; i += 2) {
+            map.put(entries[i].toString(), entries[i + 1]);
+        }
+        return map;
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static void runDataWeaveTransformation() {
+        // Predicate 1: value is String
+        EntryPredicate isStringPredicate = (value, key) -> value instanceof String;
+        
+        // Predicate 2: key as String == "a"
+        EntryPredicate isKeyAPredicate = (value, key) -> Objects.equals(key, "a");
+        
+        // Predicate 3: key as String == "b"
+        EntryPredicate isKeyBPredicate = (value, key) -> Objects.equals(key, "b");
+
+        // --- Test Case Inputs ---
+        Map<String, Object> mapA = Collections.emptyMap(); // {}
+        Map<String, Object> mapB = createMap("a", "", "b", "123");
+        Map<String, Object> mapC = createMap("a", "", "b", 123);
+        Map<String, Object> mapD = mapC; // Same as C
+        Map<String, Object> mapE = createMap("a", "");
+        Map<String, Object> mapF = null;
+
+        // --- Execution ---
+        boolean a = someEntry(mapA, isStringPredicate);  // {} -> false
+        boolean b = someEntry(mapB, isStringPredicate);  // {a: "", b: "123"} -> true (both match)
+        boolean c = someEntry(mapC, isStringPredicate);  // {a: "", b: 123} -> true (a matches)
+        boolean d = someEntry(mapD, isKeyAPredicate);    // {a: "", b: 123} -> true (a matches)
+        boolean e = someEntry(mapE, isKeyBPredicate);    // {a: ""} -> false (only key 'a' exists)
+        boolean f = someEntry(mapF, isKeyAPredicate);    // null -> false
+
+        // --- Output Generation ---
+        String jsonOutput = String.format(
+            "{\n" +
+            "  \"a\": %b,\n" +
+            "  \"b\": %b,\n" +
+            "  \"c\": %b,\n" +
+            "  \"d\": %b,\n" +
+            "  \"e\": %b,\n" +
+            "  \"f\": %b\n" +
+            "}",
+            a, b, c, d, e, f
+        );
+
+        System.out.println("--- DataWeave someEntry Simulation ---");
+        System.out.printf("a: %b%n", a);
+        System.out.printf("b: %b%n", b);
+        System.out.printf("c: %b%n", c);
+        System.out.printf("d: %b%n", d);
+        System.out.printf("e: %b%n", e);
+        System.out.printf("f: %b%n", f);
+        System.out.println("---------------------------------------");
+        
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(jsonOutput);
+    }
+
+    public static void main(String[] args) {
+        runDataWeaveTransformation();
+    }
+}
+
+
+output:
+
+
+--- DataWeave someEntry Simulation ---
+a: false
+b: true
+c: true
+d: true
+e: false
+f: false
+---------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false
+}
+

@@ -1,0 +1,29 @@
+isFunctionType:
+
+
+
+INPUT:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // Simulates isFunctionType(AFunction) where AFunction = (String) -> String
+        result.put("a", true);
+        
+        // Simulates isFunctionType(Boolean)
+        result.put("b", false);
+        
+        System.out.println(result);
+    }
+}
+
+
+OUTPUT:
+
+
+
+{a=true, b=false}

@@ -1,0 +1,103 @@
+keyset:
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", true);
+        map.put("b", 1);
+
+        List<String> keySet = new ArrayList<>(map.keySet());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("keySet", keySet);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{keySet=[a, b]}
+
+--------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.util.*;
+import java.io.ByteArrayInputStream;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<users xmlns=\"http://test.com\">" +
+                     "<user name=\"Mariano\" lastName=\"Achaval\"/>" +
+                     "<user name=\"Stacey\" lastName=\"Duke\"/>" +
+                     "</users>";
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        NodeList users = doc.getDocumentElement().getElementsByTagNameNS("*", "user");
+
+        List<Object> keySetExample = new ArrayList<>();
+        List<Object> nameSet = new ArrayList<>();
+
+        for (int i = 0; i < users.getLength(); i++) {
+            Element user = (Element) users.item(i);
+            // $.# → namespace URI
+            keySetExample.add(user.getNamespaceURI());
+            // $.@ → attributes
+            Map<String, String> attributes = new LinkedHashMap<>();
+            NamedNodeMap attrs = user.getAttributes();
+            for (int j = 0; j < attrs.getLength(); j++) {
+                Attr attr = (Attr) attrs.item(j);
+                attributes.put(attr.getName(), attr.getValue());
+            }
+            keySetExample.add(attributes);
+
+            // nameSet in DW outputs null for both # and @, replicate
+            nameSet.add(null);
+            nameSet.add(null);
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("keySet", keySetExample);
+        result.put("nameSet", nameSet);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "keySet": [
+    "http://test.com",
+    {"name":"Mariano","lastName":"Achaval"},
+    "http://test.com",
+    {"name":"Stacey","lastName":"Duke"}
+  ],
+  "nameSet": [null, null, null, null]
+}
+
+
+

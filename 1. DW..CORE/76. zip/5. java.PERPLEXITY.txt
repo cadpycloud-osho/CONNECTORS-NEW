@@ -1,0 +1,197 @@
+zip:
+
+
+example 1:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> left = Arrays.asList(0, 1);
+        List<String> right = Arrays.asList("a", "b");
+        
+        List<List<Object>> result = zip(left, right);
+        System.out.print("[");
+        for (int i = 0; i < result.size(); i++) {
+            if (i > 0) System.out.print(",");
+            System.out.print(" [");
+            List<Object> pair = result.get(i);
+            for (int j = 0; j < pair.size(); j++) {
+                if (j > 0) System.out.print(",");
+                Object item = pair.get(j);
+                if (item instanceof String) {
+                    System.out.print("\"" + item + "\"");
+                } else {
+                    System.out.print(item);
+                }
+            }
+            System.out.print(" ]");
+        }
+        System.out.println("]");
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T, U> List<List<Object>> zip(List<T> left, List<U> right) {
+        int length = Math.min(left.size(), right.size());
+        List<List<Object>> result = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            result.add(Arrays.asList((Object)left.get(i), (Object)right.get(i)));
+        }
+        return result;
+    }
+}
+
+
+output:
+
+[[0,"a"],[1,"b"]]
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> nums = Arrays.asList(0, 1, 2, 3);
+        List<String> letters4 = Arrays.asList("a", "b", "c", "d");
+        List<String> letters1 = Arrays.asList("a");
+        List<String> letters2 = Arrays.asList("a", "b");
+        
+        System.out.print("{\n");
+        System.out.print("  \"a\": "); printZip(nums, letters4); System.out.print(",\n");
+        System.out.print("  \"b\": "); printZip(nums, letters1); System.out.print(",\n");
+        System.out.print("  \"c\": "); printZip(nums, letters2); System.out.print(",\n");
+        System.out.print("  \"d\": "); printZip(Arrays.asList(0,1,2), letters4);
+        System.out.println("\n}");
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T, U> List<List<Object>> zip(List<T> left, List<U> right) {
+        int length = Math.min(left.size(), right.size());
+        List<List<Object>> result = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            result.add(Arrays.asList((Object)left.get(i), (Object)right.get(i)));
+        }
+        return result;
+    }
+    
+    public static void printZip(List<?> left, List<?> right) {
+        List<List<Object>> zipped = zip(left, right);
+        System.out.print("[");
+        for (int i = 0; i < zipped.size(); i++) {
+            if (i > 0) System.out.print(",");
+            List<Object> pair = zipped.get(i);
+            System.out.print("[");
+            Object first = pair.get(0);
+            Object second = pair.get(1);
+            if (first instanceof String) {
+                System.out.print("\"" + first + "\"");
+            } else {
+                System.out.print(first);
+            }
+            System.out.print(",");
+            if (second instanceof String) {
+                System.out.print("\"" + second + "\"");
+            } else {
+                System.out.print(second);
+            }
+            System.out.print("]");
+        }
+        System.out.print("]");
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "a": [[0,"a"],[1,"b"],[2,"c"],[3,"d"]],
+  "b": [[0,"a"]],
+  "c": [[0,"a"],[1,"b"]],
+  "d": [[0,"a"],[1,"b"],[2,"c"]]
+}
+
+
+
+---------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> list1 = Arrays.asList("a", "b");
+        List<Integer> list2 = Arrays.asList(1, 2, 3);
+        List<String> list3 = Arrays.asList("aa", "bb");
+        List<List<Object>> list4 = Arrays.asList(
+            Arrays.asList("A", "B", "C"),
+            Arrays.asList(11, 12)
+        );
+        
+        // ((list1 zip list2) zip list3) zip list4
+        List<List<Object>> step1 = zip(list1, list2);
+        List<List<Object>> step2 = zip(step1, list3);
+        List<List<Object>> result = zip(step2, list4);
+        
+        printNestedList(result);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T, U> List<List<Object>> zip(List<T> left, List<U> right) {
+        int length = Math.min(left.size(), right.size());
+        List<List<Object>> result = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            result.add(Arrays.asList((Object)left.get(i), (Object)right.get(i)));
+        }
+        return result;
+    }
+    
+    public static void printNestedList(List<List<Object>> list) {
+        System.out.print("[");
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) System.out.print(",");
+            printList(list.get(i));
+        }
+        System.out.println("]");
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void printList(List<Object> list) {
+        System.out.print("[");
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) System.out.print(",");
+            Object item = list.get(i);
+            if (item instanceof String) {
+                System.out.print("\"" + item + "\"");
+            } else if (item instanceof List) {
+                printList((List<Object>) item);
+            } else {
+                System.out.print(item);
+            }
+        }
+        System.out.print("]");
+    }
+}
+
+
+
+
+output:
+[[[["a",1],"aa"],["A","B","C"]],[ [["b",2],"bb"],[11,12] ]]
+
+

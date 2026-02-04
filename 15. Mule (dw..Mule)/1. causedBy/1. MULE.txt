@@ -1,0 +1,50 @@
+causedBy:
+
+causedBy(@DesignOnlyType error: Error, errorType: String): Boolean
+
+causedBy(@DesignOnlyType error: Error, errorType: String): Boolean
+This function matches an error by its type, like an error handler does.
+
+causedBy is useful when you need to match by a super type, but the specific sub-type logic is also needed. It can also useful when handling a COMPOSITE_ROUTING error that contains child errors of different types.
+
+
+
+
+Source
+<error-handler name="securityHandler">
+  <on-error-continue type="SECURITY">
+    <!-- general error handling for all SECURITY errors -->
+    <choice>
+      <when expression="#[Mule::causedBy(error, 'HTTP:UNAUTHORIZED')]">
+        <!-- specific error handling only for HTTP:UNAUTHORIZED errors -->
+      </when>
+      <when expression="#[Mule::causedBy('HTTP:FORBIDDEN')]">
+        <!-- specific error handling only for HTTP:FORBIDDEN errors -->
+      </when>
+    </choice>
+  </on-error-continue>
+</error-handler>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

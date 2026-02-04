@@ -1,0 +1,80 @@
+lookup:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    static class FlowRegistry {
+        private static final Map<String, Flow> flows = new HashMap<>();
+        
+        static {
+            flows.put("flow2", new Flow2());
+        }
+        
+        static Flow lookup(String flowName, Map<String, String> params) {
+            Flow flow = flows.get(flowName);
+            if (flow != null) {
+                flow.setPayload(params);
+            }
+            return flow;
+        }
+    }
+    
+    interface Flow {
+        void setPayload(Map<String, String> payload);
+        String process();
+    }
+    
+    static class Flow1 {
+        public String process(String test) {
+            // Matches Mule::lookup('flow2', {test:'hello '})
+            Map<String, String> params = new HashMap<>();
+            params.put("test", test + " ");
+            
+            Flow flow2 = FlowRegistry.lookup("flow2", params);
+            String result = flow2.process();
+            
+            System.out.println("Flow1 result: " + result);
+            return result;
+        }
+    }
+    
+    static class Flow2 implements Flow {
+        private Map<String, String> payload;
+        
+        @Override
+        public void setPayload(Map<String, String> payload) {
+            this.payload = payload;
+        }
+        
+        @Override
+        public String process() {
+            // Matches: #[payload.test ++ "world"]
+            String test = payload.get("test");
+            String result = test + "world";
+            
+            // Matches logger
+            System.out.println("Flow2: " + result);
+            return result;
+        }
+    }
+    
+    public static void main(String[] args) {
+        Flow1 flow1 = new Flow1();
+        String result = flow1.process("hello");
+        System.out.println("Final result: " + result);
+    }
+}
+
+
+output:
+
+Flow2: hello world
+Flow1 result: hello world
+Final result: hello world
+
+

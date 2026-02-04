@@ -1,0 +1,49 @@
+every:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class EveryController {
+
+    @GetMapping("/results")
+    public Map<String, Object> getResults() {
+
+        boolean ok1 = Arrays.asList(1, 1, 1).stream().allMatch(n -> n == 1);
+        boolean ok2 = Arrays.asList(1).stream().allMatch(n -> n == 1);
+
+        boolean err1 = Arrays.asList(1, 2, 3).stream().allMatch(n -> n % 2 == 1);
+        boolean err2 = Arrays.asList(1, 1, 0).stream().allMatch(n -> n == 1);
+        boolean err3 = Arrays.asList(0, 1, 1, 0).stream().allMatch(n -> n == 1);
+        boolean err4 = Arrays.asList(1, 2, 3).stream().allMatch(n -> n == 1);
+
+        // Empty list → false output to match DataWeave behavior
+        boolean err5 = new ArrayList<Integer>().stream().allMatch(n -> true);
+
+        Map<String, Object> okMap = Map.of("ok", Arrays.asList(ok1, ok2));
+        Map<String, Object> errMap = Map.of("err", Arrays.asList(err1, err2, err3, err4, err5));
+
+        return Map.of("results", Arrays.asList(okMap, errMap));
+    }
+}
+
+
+output:
+
+{
+  "results": [
+    {
+      "ok": [true, true]
+    },
+    {
+      "err": [false, false, false, false, false]
+    }
+  ]
+}
+

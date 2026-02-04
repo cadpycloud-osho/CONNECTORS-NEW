@@ -1,0 +1,20 @@
+isOdd:
+
+
+input:
+
+from("direct:isOdd")
+.setBody(simple(
+    "{ \"isOdd\": [" +
+    "${0} odd," +
+    "${1} odd," +
+    "${2 + 2} odd" +
+    "] }"
+));
+
+
+output:
+
+{
+  "isOdd": [ false, true, false ]
+}

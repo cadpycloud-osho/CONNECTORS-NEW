@@ -1,0 +1,98 @@
+takeWhile:
+
+
+
+input:
+
+package com.example.dataweaveconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class DataweaveTakeWhileApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveTakeWhileApplication.class, args);
+    }
+
+    // =========================================================================
+    // 1. DTO (Data Transfer Object)
+    // =========================================================================
+    public record DataWeaveOutput(
+        Map<String, Integer> result
+    ) {}
+
+    // =========================================================================
+    // 2. REST CONTROLLER
+    // =========================================================================
+    @RestController
+    @RequestMapping("/convert")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+
+        @Autowired
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/takeWhile")
+        public DataWeaveOutput runDataWeaveLogic() {
+            // Source object. Using LinkedHashMap to preserve the iteration order of keys.
+            Map<String, Integer> sourceObject = new LinkedHashMap<>();
+            sourceObject.put("a", 1);
+            sourceObject.put("b", 2);
+            sourceObject.put("c", 5); // Fails the condition (5 < 3 is false)
+            sourceObject.put("d", 1); // This entry is skipped because the condition failed at 'c'
+            
+            // The condition: (value, key) -> value < 3
+            Map<String, Integer> result = dataWeaveService.takeWhile(
+                sourceObject, 
+                entry -> entry.getValue() < 3
+            );
+
+            return new DataWeaveOutput(result);
+        }
+    }
+
+    // =========================================================================
+    // 3. SERVICE LAYER (LOGIC IMPLEMENTATION)
+    // =========================================================================
+    @Service
+    public static class DataWeaveService {
+
+        /**
+         * Mimics the DataWeave dw::core::Objects::takeWhile function.
+         * Collects entries as long as the predicate remains true, stopping at the first failure.
+         *
+         * @param inputMap The ordered map to process.
+         * @param condition The predicate to test for each entry.
+         * @return A new LinkedHashMap containing the subset of entries collected.
+         */
+        public Map<String, Integer> takeWhile(
+            Map<String, Integer> inputMap, 
+            Predicate<Map.Entry<String, Integer>> condition
+        ) {
+            // Use Java Stream API's takeWhile (Requires Java 9 or
+
+
+output:
+
+{
+  "result": {
+    "a": 1,
+    "b": 2
+  }
+}
+

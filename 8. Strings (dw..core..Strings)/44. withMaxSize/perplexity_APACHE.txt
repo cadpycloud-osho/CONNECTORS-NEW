@@ -1,0 +1,42 @@
+withMaxSize:
+
+input:
+
+import java.util.*;
+
+public class WithMaxSizeConverter {
+    public static String withMaxSize(String text, int maxLength) {
+        if (text == null) return null;
+        // Special case: maxLength = 0 returns original (per DataWeave spec)
+        if (maxLength == 0) return text;
+        // Truncate if longer than maxLength
+        return text.length() > maxLength ? text.substring(0, maxLength) : text;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", withMaxSize("123", 10));
+        result.put("b", withMaxSize("123", 3));
+        result.put("c", withMaxSize("123", 2));
+        result.put("d", withMaxSize("123", 0));
+        result.put("e", withMaxSize(null, 23));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}
+
+
+

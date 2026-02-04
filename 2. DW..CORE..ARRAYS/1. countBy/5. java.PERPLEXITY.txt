@@ -1,0 +1,58 @@
+countBy:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        int[] numbers = {1, 2, 3, 4};
+        int count = 0;
+        
+        for (int num : numbers) {
+            if (num % 2 == 0) {
+                count++;
+            }
+        }
+        
+        String result = "{\"countBy\":" + count + "}";
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{"countBy":2}
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+This functional-style pure Java equivalent uses Stream API's filter and count to mimic DataWeave's higher-order countBy behavior.
+
+java
+
+import java.util.Arrays;
+
+public class DataWeaveCountByStream {
+    public static void main(String[] args) {
+        int[] numbers = {1, 2, 3, 4};
+        long count = Arrays.stream(numbers)
+                           .filter(num -> num % 2 == 0)
+                           .count();
+        
+        String result = "{\"countBy\":" + count + "}";
+        System.out.println(result);
+    }
+}
+
+
+{"countBy":2}

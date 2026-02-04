@@ -1,0 +1,64 @@
+isPeriodType:
+
+
+
+
+input:
+
+import java.time.Period;
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isPeriodType(Type).
+     * Checks if the provided type is java.time.Period or a subclass/implementation.
+     */
+    public static boolean isPeriodType(Class<?> type) {
+        return Period.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'APeriod' (which is Period)
+        Class<?> aPeriodClass = Period.class;
+
+        // 2. Mimics the type 'Period'
+        Class<?> periodClass = Period.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isPeriodType(APeriod)
+        boolean a = isPeriodType(aPeriodClass); 
+
+        // b: isPeriodType(Period)
+        boolean b = isPeriodType(periodClass); 
+        
+        // c: isPeriodType(String)
+        boolean c = isPeriodType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

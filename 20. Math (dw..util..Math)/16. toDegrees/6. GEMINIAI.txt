@@ -1,0 +1,49 @@
+toDegrees:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the toDegrees function.
+     * @return A map containing the results of the radian-to-degree conversions.
+     */
+    @GetMapping("/convertToDegrees")
+    public Map<String, Double> convertToDegrees() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        // Helper function for toDegrees (direct map to Java's Math.toDegrees)
+        double toDegrees(double radians) {
+            // Math.toDegrees converts radians to degrees.
+            return Math.toDegrees(radians);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("toDegrees0.17", toDegrees(0.174));
+        output.put("toDegrees0", toDegrees(0));
+        output.put("toDegrees-20", toDegrees(-0.20));
+
+        return output;
+    }
+}
+
+
+output:
+
+{
+  "toDegrees0.17": 9.969465635276324,
+  "toDegrees0": 0.0,
+  "toDegrees-20": -11.459155902616464
+}
+

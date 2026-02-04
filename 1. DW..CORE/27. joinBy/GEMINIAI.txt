@@ -1,0 +1,40 @@
+joinBy:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+
+@RestController
+public class StringJoinController {
+
+    /**
+     * Endpoint to demonstrate the equivalent of DataWeave's joinBy.
+     * Accessible at http://localhost:8080/hyphenate-example
+     */
+    @GetMapping("/hyphenate-example")
+    public Map<String, String> hyphenateArray() {
+        // 1. Define the array (List in Java)
+        List<String> arrayToJoin = Arrays.asList("a", "b", "c");
+
+        // 2. Perform the join operation with the "-" separator
+        // This is the Java equivalent of DataWeave: ["a", "b", "c"] joinBy "-"
+        String joinedString = String.join("-", arrayToJoin);
+
+        // 3. Construct the JSON output map
+        return Collections.singletonMap("hyphenate", joinedString);
+    }
+}
+
+output:
+
+
+{
+  "hyphenate": "a-b-c"
+}
+

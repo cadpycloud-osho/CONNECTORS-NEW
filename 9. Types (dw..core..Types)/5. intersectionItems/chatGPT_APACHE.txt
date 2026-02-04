@@ -1,0 +1,41 @@
+intersectionItems:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
+
+public class IntersectionItemsExample {
+
+    public static void main(String[] args) {
+        Map<String, List<String>> result = new LinkedHashMap<>();
+        result.put("a", intersectionItems("{name: String} & {age: Number}"));
+
+        System.out.println(result);
+    }
+
+    public static List<String> intersectionItems(String type) {
+        if (type == null || !type.contains("&")) {
+            return Arrays.asList("Any");
+        }
+        // Split by '&' and treat each as Object
+        String[] items = type.split("&");
+        String[] mapped = new String[items.length];
+        for (int i = 0; i < items.length; i++) {
+            mapped[i] = "Object"; // Each part of intersection is Object
+        }
+        re
+
+
+
+output:
+
+{
+  "a": ["Object","Object"]
+}
+
+
+

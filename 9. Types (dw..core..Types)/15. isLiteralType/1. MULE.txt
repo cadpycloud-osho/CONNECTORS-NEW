@@ -1,0 +1,28 @@
+isLiteralType:
+
+isLiteralType(t: Type): Boolean
+
+isLiteralType(t: Type): Boolean
+Returns true if the input is the Literal type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ALiteralType = "Mariano"
+output application/json
+---
+{
+   a: isLiteralType(ALiteralType),
+   b: isLiteralType(Boolean)
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": false
+}
+

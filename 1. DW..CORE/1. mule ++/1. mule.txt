@@ -1,0 +1,36 @@
+The example concatenates an Array<Number> with an Array<String>. 
+
+%dw 2.0
+output application/json
+---
+{ "a" : [0, 1, true, "my string"] ++ [2, [3,4,5], {"a": 6}] }
+
+
+-------------------------------------------------------
+++(date: Date, time: LocalTime): LocalDateTime
+%dw 2.0
+output application/json
+---
+{ "LocalDateTime" : (|2017-10-01| ++ |23:57:59|) }
+
+
+------------------------------------------------------------
+This example concatenates Time and Date objects to return DateTime objects. Note that the first LocalTime object is coerced to a `Time. Notice that the order of the date and time inputs does not change the order of the output DateTime.
+
+
+%dw 2.0
+output application/json
+---
+{
+  "DateTime1" : (|23:57:59| as Time) ++ |2017-10-01|,
+  "DateTime2" : |23:57:59Z| ++ |2017-10-01|,
+  "DateTime3" : |2017-10-01| ++ |23:57:59+02:00|
+}
+
+--------------------------------------------------
+++(dateTime: LocalDateTime, timezone: TimeZone): DateTime
+
+
+
+
+

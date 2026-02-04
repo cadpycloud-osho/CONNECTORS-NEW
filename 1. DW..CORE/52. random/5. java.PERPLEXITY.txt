@@ -1,0 +1,25 @@
+random:
+
+
+input:
+
+import java.util.Random;
+
+public class Main {
+    public static void main(String[] args) {
+        Random random = new Random();
+        
+        // random() * 1000 equivalent: generates [0.0, 1.0) * 1000 = [0.0, 1000.0)
+        double price = random.nextDouble() * 1000;
+        
+        // Output JSON format
+        System.out.println("{\"price\":" + price + "}");
+    }
+}
+
+
+output:
+
+
+
+{"price":847.3928473928474}

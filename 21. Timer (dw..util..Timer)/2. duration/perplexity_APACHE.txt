@@ -1,0 +1,46 @@
+duration:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.Map;
+import java.util.HashMap;
+
+public class TimerDurationProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        long startTime = System.currentTimeMillis();
+        
+        // dw::Runtime::wait("My result", 100) equivalent - sleep 100ms
+        Thread.sleep(100);
+        String result = "My result";
+        
+        long durationMs = System.currentTimeMillis() - startTime;
+        
+        // dw::util::Timer::duration() output structure
+        Map<String, Object> output = new HashMap<>();
+        output.put("time", durationMs);
+        output.put("result", result);
+        
+        exchange.getIn().setBody(output);
+    }
+}
+
+from("direct:timerDuration")
+    .process(new TimerDurationProcessor())
+    .log("${body}");
+
+
+output:
+
+{
+  "time": 101,
+  "result": "My result"
+}
+
+
+

@@ -1,0 +1,38 @@
+isPeriodType:
+
+
+
+
+input:
+
+
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isPeriodType(Class<?> type) {
+        return type == Period.class;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> APeriod = Period.class;
+
+        result.put("a", isPeriodType(APeriod));
+        result.put("b", isPeriodType(Period.class));
+        result.put("c", isPeriodType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+

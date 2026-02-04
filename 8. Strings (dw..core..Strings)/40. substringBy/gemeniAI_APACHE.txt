@@ -1,0 +1,28 @@
+substringBy:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SubstringByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:splitByCondition")
+            .process(exchange -> {
+                String input = "hello~world=here_data-weave";
+                
+                // [~=_] acts as the predicate: split on any of these chars
+                String[] result = input.split("[~=_]");
+                
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+
+output:
+
+["hello", "world", "here", "data-weave"]
+
+

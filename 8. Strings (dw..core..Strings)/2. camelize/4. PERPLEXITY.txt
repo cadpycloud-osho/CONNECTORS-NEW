@@ -1,0 +1,54 @@
+camelize:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class CamelizeController {
+
+    @GetMapping("/camelize")
+    public Map<String, String> getCamelized() {
+        Map<String, String> result = new LinkedHashMap<>();
+        
+        result.put("a", camelize("customer_first_name"));
+        result.put("b", camelize("_name_starts_with_underscore"));
+        
+        return result;
+    }
+    
+    private static String camelize(String input) {
+        if (input == null || input.isEmpty()) return input;
+        
+        StringBuilder result = new StringBuilder();
+        boolean nextIsUpper = false;
+        
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '_') {
+                nextIsUpper = true;
+            } else if (nextIsUpper) {
+                result.append(Character.toUpperCase(c));
+                nextIsUpper = false;
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": "customerFirstName",
+  "b": "nameStartsWithUnderscore"
+}
+
+

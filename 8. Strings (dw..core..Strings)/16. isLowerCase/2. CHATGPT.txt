@@ -1,0 +1,71 @@
+isLowerCase:
+
+
+
+input:
+
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static boolean isLowerCaseDW(String input) {
+        if (input == null || input.isEmpty()) return false;
+
+        // DW behavior: reject whitespace, numbers, symbols
+        if (!input.matches("^[\\p{Ll}]+$")) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+Spring Boot Controller:
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class LowerCaseController {
+
+    @GetMapping("/islowercase")
+    public Map<String, Boolean> checkLowercase() {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.isLowerCaseDW(null));
+        result.put("b", StringUtils.isLowerCaseDW(""));
+        result.put("c", StringUtils.isLowerCaseDW(" "));
+        result.put("d", StringUtils.isLowerCaseDW("abc"));
+        result.put("e", StringUtils.isLowerCaseDW("aBC"));
+        result.put("f", StringUtils.isLowerCaseDW("a c"));
+        result.put("g", StringUtils.isLowerCaseDW("a1c"));
+        result.put("h", StringUtils.isLowerCaseDW("a/c"));
+        result.put("i", StringUtils.isLowerCaseDW("mulesöft"));
+        result.put("j", StringUtils.isLowerCaseDW("mulesÖft"));
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": true,
+  "j": false
+}
+
+

@@ -1,0 +1,53 @@
+metadataOf:
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MetadataController {
+
+    // Define the metadata map attached to the conceptual AType
+    private static final Map<String, String> ATYPE_METADATA = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("format", "YYYY-MM-dd");
+        }});
+
+    /**
+     * Helper method to conceptually mimic metadataOf(AType).
+     */
+    private Map<String, String> metadataOf() {
+        // Returns the constant metadata map for the type
+        return ATYPE_METADATA;
+    }
+
+    @GetMapping("/metadata-value")
+    public Map<String, Map<String, String>> getMetadataValue() {
+        
+        // Perform the metadata extraction
+        Map<String, String> metadata = metadataOf();
+
+        // Map the results to match the desired JSON structure: { "a": {metadata_map} }
+        Map<String, Map<String, String>> output = new HashMap<>();
+        output.put("a", metadata);
+        
+        return output; // Spring converts this Map structure directly to the output JSON
+    }
+}
+
+output:
+
+
+{
+  "a": {
+    "format": "YYYY-MM-dd"
+  }
+}

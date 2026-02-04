@@ -1,0 +1,23 @@
+flatMap:
+
+
+
+input:
+
+from("direct:flatMapExample")
+    // 1. Unmarshal if the input is a JSON string
+    .unmarshal().json()
+    
+    // 2. Transform: Equivalent to (value, index) -> value in flatMap
+    // In Groovy, .flatten() collapses nested collections into a single list
+    .setBody().groovy("request.body.flatten()")
+    
+    // 3. Marshal back to JSON
+    .marshal().json()
+    .log("Flattened Result: ${body}");
+
+output:
+
+
+[3, 5, 0.9, 5.5]
+

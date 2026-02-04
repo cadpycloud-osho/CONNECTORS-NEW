@@ -1,0 +1,32 @@
+levenshteinDistance:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
+public class LevenshteinRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:calculateEditDistance")
+            .process(exchange -> {
+                String source = "kitten";
+                String target = "sitting";
+
+                // Using Apache Commons Text for Levenshtein logic
+                LevenshteinDistance metric = new LevenshteinDistance();
+                Integer result = metric.apply(source, target);
+
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+
+output:
+
+3
+
+

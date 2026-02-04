@@ -1,0 +1,79 @@
+atBeginningOfMonth:
+
+atBeginningOfMonth(dateTime: DateTime): DateTime
+
+atBeginningOfMonth(dateTime: DateTime): DateTime
+Returns a new DateTime value that changes the Day value from the input to the first day of the specified month. It also sets the Time value to 00:00:00.
+
+The day and time in the input changes to 01T00:00:00.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  "atBeginningOfMonthDateTime": atBeginningOfMonth(|2020-10-06T18:23:20.351-03:00|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfMonthDateTime": "2020-10-01T00:00:00-03:00"
+}
+
+--------------------------------------------------------------------
+
+atBeginningOfMonth(localDateTime: LocalDateTime): LocalDateTime
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+ "atBeginningOfMonthLocalDateTime": atBeginningOfMonth(|2020-10-06T18:23:20.351|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfMonthLocalDateTime": "2020-10-01T00:00:00"
+}
+
+
+------------------------------------------------------------------------
+
+
+
+atBeginningOfMonth(date: Date): Date
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfMonthDate: atBeginningOfMonth(|2020-10-06|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfMonthDate": "2020-10-01"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

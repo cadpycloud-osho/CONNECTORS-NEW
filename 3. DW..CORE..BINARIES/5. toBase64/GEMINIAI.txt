@@ -1,0 +1,92 @@
+toBase64:
+
+INPUT:
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.util.Base64;
+import java.util.HexFormat;
+import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class GravatarExample {
+
+    // 1. Replicates Crypto::MD5(email as Binary)
+    public static String calculateMD5Hash(String email) throws Exception {
+        // MD5 hash of the email string (assuming UTF-8 encoding as binary)
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] emailBytes = email.getBytes("UTF-8");
+        byte[] hashBytes = md.digest(emailBytes);
+
+        // Convert the byte array to a lowercase hexadecimal string (MD5 checksum format)
+        // HexFormat is Java 17+. Use custom loop or DatatypeConverter for older versions.
+        return HexFormat.of().formatHex(hashBytes).toLowerCase();
+    }
+
+    // 2. Replicates readUrl(...) and toBase64(image)
+    public static String getImageBase64(String urlString) throws Exception {
+        URL url = new URL(urlString);
+        
+        // Use try-with-resources to ensure the connection and stream are closed
+        try (InputStream inputStream = url.openStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            // Read all bytes from the URL stream
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            
+            byte[] rawImageBytes = outputStream.toByteArray();
+
+            // Encode the raw binary data (image) to Base64
+            return Base64.getEncoder().encodeToString(rawImageBytes);
+        }
+    }
+
+    public static void main(String[] args) {
+        String email = "achaval@gmail.com";
+        String gravatarBaseUrl = "https://www.gravatar.com/avatar/";
+
+        try {
+            // Step 1 & 2: Calculate MD5 and construct the URL
+            String emailChecksum = calculateMD5Hash(email);
+            String imageUrl = gravatarBaseUrl + emailChecksum;
+            
+            System.out.println("--- DataWeave MD5 & Gravatar URL Construction ---");
+            System.out.println("Email Checksum (MD5): " + emailChecksum);
+            System.out.println("Final Image URL: " + imageUrl);
+            System.out.println("-----------------------------------------------\n");
+
+            // Step 3 & 4: Retrieve and Encode Image
+            String base64Image = getImageBase64(imageUrl);
+
+            // --- Output Generation (Simulating DataWeave JSON output) ---
+            Map<String, String> result = Map.of(
+                "Base64 Image (Shortened)", base64Image.substring(0, 30) + "..."
+            );
+            
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+            System.out.println("--- Final Base64 Output (toBase64(image)) ---");
+            System.out.println(mapper.writeValueAsString(result));
+            
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+
+OUTPUT:
+
+{
+  "Base64 Image (Shortened)" : "/9j/4AAQSkZJRgABAQEAYABgAAD//..."
+}

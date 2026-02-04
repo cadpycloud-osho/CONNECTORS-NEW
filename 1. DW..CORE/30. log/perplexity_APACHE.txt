@@ -1,0 +1,82 @@
+log:
+
+example 1:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class LogRoute extends RouteBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(LogRoute.class);
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:logDemo")
+            .process(exchange -> {
+                String message = "Houston, we have a problem";
+                
+                // Log to console (WARNING level)
+                LOG.warn("WARNING - {}", message);
+                
+                // Return the message (matches DataWeave log return value)
+                exchange.getIn().setBody(message);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+"Houston, we have a problem"
+
+
+----------------------------------------------------------
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class LogUserRoute extends RouteBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(LogUserRoute.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:logUser")
+            .setBody(simple("{\"user\":{\"friend\":{\"name\":\"Shoki\"},\"id\":1,\"name\":\"Tomo\"},\"accountId\":\"leansh\"}"))
+            .unmarshal().json(JsonLibrary.Jackson)
+            .process(exchange -> {
+                JsonNode userObj = exchange.getIn().getBody(JsonNode.class)
+                    .path("user");
+                
+                // Log the user object (matches DataWeave console output)
+                LOG.info("User - {}", mapper.writeValueAsString(userObj));
+                
+                // Return friend.name (matches expression output)
+                String name = userObj.path("friend").path("name").asText();
+                exchange.getIn().setBody(name);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+
+INFO  [LogUserRoute] User - {"friend":{"name":"Shoki"},"id":1,"name":"Tomo"}
+
+
+"Shoki"
+
+

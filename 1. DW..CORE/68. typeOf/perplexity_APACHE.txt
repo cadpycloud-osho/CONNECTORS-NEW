@@ -1,0 +1,97 @@
+typeOf:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class TypeOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:typeOf")
+            .process(exchange -> {
+                List<String> results = Arrays.asList(
+                    getTypeName("A b"),      // String
+                    getTypeName(Arrays.asList(1, 2)),  // Array
+                    getTypeName(34),         // Number  
+                    getTypeName(true),       // Boolean
+                    getTypeName(Map.of("a", 5))  // Object
+                );
+                
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private String getTypeName(Object value) {
+        if (value == null) return "Null";
+        return switch (value) {
+            case String s -> "String";
+            case List<?> l -> "Array";
+            case Number n -> "Number";
+            case Boolean b -> "Boolean";
+            case Map<?, ?> m -> "Object";
+            default -> value.getClass().getSimpleName();
+        };
+    }
+}
+
+
+output:
+
+[ "String", "Array", "Number", "Boolean", "Object" ]
+
+
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class UnionTypeOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:unionTypeOf")
+            .process(exchange -> {
+                // var x: String | Number = "clearly a string" → runtime String
+                String x = "clearly a string";
+                
+                // var y: "because" = "because" → runtime String
+                String y = "because";
+                
+                List<String> results = Arrays.asList(
+                    getTypeName(x),  // String
+                    getTypeName(y)   // String
+                );
+                
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private String getTypeName(Object value) {
+        return switch (value) {
+            case String s -> "String";
+            case Number n -> "Number";
+            default -> value.getClass().getSimpleName();
+        };
+    }
+}
+
+
+output:
+
+["String", "String"]
+
+
+
+-------------------------------------------------------

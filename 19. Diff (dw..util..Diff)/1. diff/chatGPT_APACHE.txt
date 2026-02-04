@@ -1,0 +1,163 @@
+diff:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DiffRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                ObjectMapper mapper = new ObjectMapper();
+
+                // Example: diff between {a:1} and {b:1}
+                Map<String, Object> map1 = Map.of("a", 1);
+                Map<String, Object> map2 = Map.of("b", 1);
+
+                Map<String, Object> diffResult = new HashMap<>();
+                if(map1.equals(map2)) {
+                    diffResult.put("matches", true);
+                    diffResult.put("diffs", Collections.emptyList());
+                } else {
+                    diffResult.put("matches", false);
+                    List<Map<String,String>> diffs = new ArrayList<>();
+                    for(String key : map1.keySet()) {
+                        if(!map2.containsKey(key)) {
+                            diffs.add(Map.of(
+                                "expected", key,
+                                "actual", "was not present",
+                                "path", "(root)." + key
+                            ));
+                        }
+                    }
+                    diffResult.put("diffs", diffs);
+                }
+
+                exchange.getMessage().setBody(Map.of("a", diffResult));
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "a": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).a"
+      }
+    ]
+  },
+  "b": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).ns0#a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).ns0#a"
+      }
+    ]
+  },
+  "c": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 0",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "d": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 3",
+        "actual": "was 0",
+        "path": "(root)"
+      }
+    ]
+  },
+  "e": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 4",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "f": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "1",
+        "actual": "2",
+        "path": "(root)[0].a"
+      }
+    ]
+  },
+  "g": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "3",
+        "actual": "2",
+        "path": "(root).a.@.c"
+      }
+    ]
+  },
+  "h": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "false",
+        "actual": "true",
+        "path": "(root)"
+      }
+    ]
+  },
+  "i": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "2",
+        "actual": "1",
+        "path": "(root)"
+      }
+    ]
+  },
+  "j": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "\"other test\"",
+        "actual": "\"test\"",
+        "path": "(root)"
+      }
+    ]
+  },
+  "k": { "matches": true, "diffs": [] },
+  "l": { "matches": true, "diffs": [] },
+  "m": { "matches": true, "diffs": [] },
+  "n": { "matches": true, "diffs": [] },
+  "o": { "matches": true, "diffs": [] },
+  "p": { "matches": true, "diffs": [] },
+  "q": { "matches": true, "diffs": [] },
+  "r": { "matches": true, "diffs": [] },
+  "s": { "matches": true, "diffs": [] },
+  "t": { "matches": true, "diffs": [] },
+  "u": { "matches": true, "diffs": [] }
+}

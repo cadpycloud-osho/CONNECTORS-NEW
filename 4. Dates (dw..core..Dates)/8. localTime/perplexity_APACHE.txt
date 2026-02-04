@@ -1,0 +1,24 @@
+localTime:
+
+
+input:
+
+from("direct:newLocalTime")
+    .process(exchange -> {
+        LocalTime newLocalTime = LocalTime.of(12, 30, 40);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("newLocalTime", newLocalTime.format(DateTimeFormatter.ISO_LOCAL_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+
+{
+   "newLocalTime": "12:30:40"
+}
+
+

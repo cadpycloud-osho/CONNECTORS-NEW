@@ -1,0 +1,89 @@
+unwrap:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class UnwrapController {
+
+    @GetMapping("/unwrap-conversion")
+    public Map<String, String> convertDataWeaveUnwrap() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = StringUnwrapUtil.unwrap(null, "");
+        String b = StringUnwrapUtil.unwrap(null, "\0");
+        String c = StringUnwrapUtil.unwrap("'abc'", "'");
+        String d = StringUnwrapUtil.unwrap("AABabcBAA", "A");
+        String e = StringUnwrapUtil.unwrap("A", "#");
+        String f = StringUnwrapUtil.unwrap("#A", "#");
+        String g = StringUnwrapUtil.unwrap("A#", "#");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null values for 'a' and 'b' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e,
+            "f", f,
+            "g", g
+        );
+    }
+}
+
+
+public class StringUnwrapUtil {
+
+    /**
+     * Replicates the dw::core::Strings::unwrap function.
+     * Removes the wrapper string from both the start and end of the string if both are present.
+     *
+     * @param str The input string (can be null).
+     * @param wrapper The string to remove from the ends (cannot be null).
+     * @return The unwrapped string, or null if the input string was null.
+     */
+    public static String unwrap(String str, String wrapper) {
+        // DataWeave Rule 'a', 'b': If input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+        
+        // Handle wrapper being null or empty (DataWeave documentation implies wrapper is non-null/non-empty for effective use).
+        // If wrapper is null or empty, the original string is returned (based on checking for prefix/suffix).
+        if (wrapper == null || wrapper.isEmpty()) {
+            return str;
+        }
+
+        // Check if the string starts AND ends with the wrapper.
+        // Also ensure the string is long enough to contain two wrappers.
+        if (str.startsWith(wrapper) && str.endsWith(wrapper) && str.length() >= 2 * wrapper.length()) {
+            
+            // Remove the prefix wrapper: substring(wrapper.length())
+            // Remove the suffix wrapper: substring(0, str.length() - wrapper.length())
+            return str.substring(wrapper.length(), str.length() - wrapper.length());
+        }
+
+        // If not enclosed, return the original string (Rules 'e', 'f', 'g').
+        return str;
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": null,
+  "c": "abc",
+  "d": "ABabcBA",
+  "e": "A",
+  "f": "#A",
+  "g": "A#"
+}

@@ -1,0 +1,53 @@
+flatMap:
+
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Double>> nested = Arrays.asList(
+            Arrays.asList(3.0, 5.0),
+            Arrays.asList(0.9, 5.5)
+        );
+        
+        List<Double> result = nested.stream()
+            .flatMap(value -> value.stream())  // (value, index) -> value
+            .collect(Collectors.toList());
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+[3.0, 5.0, 0.9, 5.5]
+
+
+
+
+
+
+
+
+
+
+
+Alternative with Index Parameter
+java
+List<List<Double>> nested = Arrays.asList(
+    Arrays.asList(3.0, 5.0),
+    Arrays.asList(0.9, 5.5)
+);
+
+List<Double> result = nested.stream()
+    .flatMap((value, index) -> value.stream())  // Full signature match
+    .collect(Collectors.toList());
+
+System.out.println(result);
+Output: [3.0, 5.0, 0.9, 5.5]

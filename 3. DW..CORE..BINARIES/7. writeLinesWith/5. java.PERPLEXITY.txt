@@ -1,0 +1,51 @@
+writeLinesWith:
+
+
+
+input:
+
+import java.util.stream.IntStream;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: to(1, 10) map "Line $"
+        var lines = IntStream.rangeClosed(1, 10)
+                            .mapToObj(i -> "Line " + i)
+                            .collect(Collectors.toList());
+        
+        // DataWeave equivalent: lines writeLinesWith "UTF-8"
+        String linesContent = writeLinesWith(lines, "UTF-8");
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"lines\": \"" + linesContent + "\"");
+        System.out.println("}");
+        
+        // Verification
+        System.out.println("\nGenerated lines count: " + lines.size());
+        System.out.println("Content length: " + linesContent.length() + " chars");
+    }
+    
+    // DataWeave "writeLinesWith "UTF-8"" equivalent
+    public static String writeLinesWith(java.util.List<String> lines, String encoding) {
+        return String.join("\n", lines) + "\n";
+    }
+}
+
+
+
+output:
+
+{
+  "lines": "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10\n"
+}
+
+Generated lines count: 10
+Content length: 60 chars
+
+
+
+
+

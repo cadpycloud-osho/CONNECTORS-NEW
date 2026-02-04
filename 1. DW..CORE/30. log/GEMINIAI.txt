@@ -1,0 +1,97 @@
+log:
+
+example 1:
+
+input:
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.Collections;
+
+@RestController
+public class LogController {
+
+    // Get the logger instance for this class
+    private static final Logger logger = LoggerFactory.getLogger(LogController.class);
+
+    /**
+     * Equivalent to: log("WARNING", "Houston, we have a problem")
+     * The method logs the message and returns the message content in a JSON structure.
+     * Accessible at http://localhost:8080/simple-log
+     */
+    @GetMapping("/simple-log")
+    public Map<String, String> simpleLogExample() {
+        String logMessage = "Houston, we have a problem";
+
+        // 1. Log the message at the WARNING level (MuleSoft's "WARNING" is generally SLF4J's WARN)
+        // This is the functional equivalent of the DataWeave log() call.
+        logger.warn("WARNING - {}", logMessage);
+
+        // 2. Return the result of the expression (the message content itself)
+        // The DataWeave expression output is the string "Houston, we have a problem".
+        return Collections.singletonMap("Expression Output", logMessage);
+    }
+
+    // ... second logging method will be added here ...
+}
+
+
+output:
+
+{
+  "Expression Output": "Houston, we have a problem"
+}
+
+
+_______________________________________________________________
+
+
+example 2:
+
+input:
+
+// ... inside the LogController class ...
+
+    /**
+     * Equivalent to: log("User", myUser.user).friend.name
+     * The method logs the intermediate object and returns the final value.
+     * Accessible at http://localhost:8080/mid-flow-log
+     */
+    @GetMapping("/mid-flow-log")
+    public Map<String, String> midFlowLogExample() {
+        // 1. Define the data structure (using Maps to represent the JSON object)
+        Map<String, String> friend = Collections.singletonMap("name", "Shoki");
+        Map<String, Object> user = new LinkedHashMap<>();
+        user.put("friend", friend);
+        user.put("id", 1);
+        user.put("name", "Tomo");
+        
+        // This is the variable myUser in DataWeave
+        Map<String, Object> myUser = new LinkedHashMap<>();
+        myUser.put("user", user);
+        myUser.put("accountId", "leansh");
+
+        // The DataWeave logic: log("User", myUser.user).friend.name
+        
+        // Log the intermediate object (myUser.user)
+        logger.info("User - {}", user.toString());
+
+        // The expression continues to resolve the final value: .friend.name
+        String finalOutput = (String) friend.get("name");
+
+        // 2. Construct the JSON output
+        return Collections.singletonMap("Expression Output", finalOutput);
+    }
+}
+
+
+
+output:
+
+{
+  "Expression Output": "Shoki"
+}

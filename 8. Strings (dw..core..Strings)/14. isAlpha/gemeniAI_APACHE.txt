@@ -1,0 +1,45 @@
+isAlpha:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsAlphaRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:validateAlpha")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Using Apache Commons StringUtils for perfect parity
+                results.put("a", StringUtils.isAlpha(null));
+                results.put("b", StringUtils.isAlpha(""));
+                results.put("c", StringUtils.isAlpha("  "));
+                results.put("d", StringUtils.isAlpha("abc"));
+                results.put("e", StringUtils.isAlpha("ab2c"));
+                results.put("f", StringUtils.isAlpha("ab-c"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+

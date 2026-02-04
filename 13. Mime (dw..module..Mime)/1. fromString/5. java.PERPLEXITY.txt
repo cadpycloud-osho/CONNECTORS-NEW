@@ -1,0 +1,111 @@
+fromString:
+
+
+example 1:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        Map<String, Object> mime = new HashMap<>();
+        mime.put("type", "application");
+        mime.put("subtype", "json");
+        mime.put("parameters", new HashMap<>());
+        result.put("result", mime);
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+{success=true, result={type=application, subtype=json, parameters={}}}
+
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        Map<String, Object> mime = new HashMap<>();
+        mime.put("type", "multipart");
+        mime.put("subtype", "form-data");
+        Map<String, String> params = new HashMap<>();
+        params.put("boundary", "the-boundary");
+        mime.put("parameters", params);
+        result.put("result", mime);
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{success=true, result={type=multipart, subtype=form-data, parameters={boundary=the-boundary}}}
+
+------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", false);
+        Map<String, String> error = new HashMap<>();
+        error.put("message", "Unable to find a sub type in `Invalid MIME type`.");
+        result.put("error", error);
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{success=false, error={message=Unable to find a sub type in `Invalid MIME type`.}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

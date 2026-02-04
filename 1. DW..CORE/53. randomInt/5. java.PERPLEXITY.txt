@@ -1,0 +1,53 @@
+randomInt:
+
+
+input:
+
+import java.util.Random;
+
+public class Main {
+    public static void main(String[] args) {
+        Random random = new Random();
+        
+        // randomInt(1000) equivalent: generates random int [0, 1000)
+        int price = random.nextInt(1000);
+        
+        // Output JSON format (DataWeave shows as double, but it's integer value)
+        System.out.println("{\"price\":" + price + "}");
+    }
+}
+
+
+output:
+
+{"price":442}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alternative using Math.random():
+
+java
+public class RandomIntMathExample {
+    public static void main(String[] args) {
+        // randomInt(1000) equivalent using Math.random()
+        int price = (int) (Math.random() * 1000);
+        
+        System.out.println("{\"price\":" + price + "}");
+    }
+}
+Sample Output:
+
+text
+{"price":827}

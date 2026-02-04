@@ -1,0 +1,44 @@
+version:
+
+version(): String
+
+Copy link to clipboardversion(): String
+Returns the DataWeave version that is currently running.
+
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+version()
+
+
+DataWeave
+Output
+"2.5"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

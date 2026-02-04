@@ -1,0 +1,34 @@
+isNumberType:
+
+
+input:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isNumberType(Class<?> type) {
+        return Number.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ANumber = Number.class;
+
+        result.put("a", isNumberType(ANumber));
+        result.put("b", isNumberType(Number.class));
+        result.put("c", isNumberType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+{a=true, b=true, c=false}
+

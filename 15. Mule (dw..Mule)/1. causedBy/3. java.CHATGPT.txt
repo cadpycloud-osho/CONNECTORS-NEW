@@ -1,0 +1,61 @@
+causedBy:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        try {
+
+            simulateError("401");    // Change this to "403" or "other"
+
+        } catch (Exception e) {
+
+            if (e instanceof UnauthorizedException) {
+                System.out.println("Handled: HTTP UNAUTHORIZED");
+            }
+            else if (e instanceof ForbiddenException) {
+                System.out.println("Handled: HTTP FORBIDDEN");
+            }
+            else {
+                System.out.println("GENERAL SECURITY ERROR HANDLED");
+            }
+        }
+    }
+
+    static void simulateError(String type) {
+
+        if (type.equals("401")) {
+            throw new UnauthorizedException("Unauthorized");
+        }
+        if (type.equals("403")) {
+            throw new ForbiddenException("Forbidden");
+        }
+
+        throw new RuntimeException("Other security issue");
+    }
+}
+
+class UnauthorizedException extends RuntimeException {
+    public UnauthorizedException(String msg) { super(msg); }
+}
+
+class ForbiddenException extends RuntimeException {
+    public ForbiddenException(String msg) { super(msg); }
+}
+
+
+output:
+
+Pure Java Output
+If simulateError("401"):
+Handled: HTTP UNAUTHORIZED
+
+If simulateError("403"):
+Handled: HTTP FORBIDDEN
+
+If simulateError("other"):
+GENERAL SECURITY ERROR HANDLED

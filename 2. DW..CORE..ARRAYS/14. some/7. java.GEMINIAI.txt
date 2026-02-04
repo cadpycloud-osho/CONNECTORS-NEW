@@ -1,0 +1,167 @@
+some:
+
+
+input:
+
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class Main {
+
+    /**
+     * Mimics DataWeave's 'some' function using Java Streams.
+     * Checks if any element in the list matches the predicate (short-circuiting).
+     */
+    public static <T> boolean arraySome(List<T> list, Predicate<T> predicate) {
+        // anyMatch() is the functional equivalent and includes short-circuiting.
+        return list.stream().anyMatch(predicate);
+    }
+    
+    // Predicate used in DataWeave example to demonstrate short-circuiting 
+    // (The condition stops at the first element equal to 2)
+    private static Predicate<Integer> logPredicate = n -> {
+        // This simulates: (log('should stop at 2 ==', $) == 2)
+        // System.out.println("Checking element: " + n); // Uncomment to see the short-circuiting
+        return n == 2; 
+    };
+
+    public static void main(String[] args) {
+
+        // --- "ok" (Expected True) Cases ---
+        List<Integer> list_ok1 = Arrays.asList(1, 2, 3);
+        List<Integer> list_ok2 = Arrays.asList(1, 2, 3);
+        List<Integer> list_ok3 = Arrays.asList(1, 2, 3);
+        List<Integer> list_ok4 = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
+        List<Integer> list_ok5 = Arrays.asList(1, 2, 3);
+        List<Integer> list_ok6 = Arrays.asList(1, 1, 1);
+        List<Integer> list_ok7 = Arrays.asList(1);
+
+        boolean ok1 = arraySome(list_ok1, n -> (n % 2) == 0); // Check for even (stops at 2)
+        boolean ok2 = arraySome(list_ok2, n -> (n % 2) == 0); // Check for even (stops at 2)
+        boolean ok3 = arraySome(list_ok3, n -> (n % 2) == 1); // Check for odd (stops at 1)
+        boolean ok4 = arraySome(list_ok4, logPredicate);      // Check for 2 (stops at 2)
+        boolean ok5 = arraySome(list_ok5, n -> n == 1);       // Check for 1 (stops at 1)
+        boolean ok6 = arraySome(list_ok6, n -> n == 1);       // Check for 1 (stops at 1)
+        boolean ok7 = arraySome(list_ok7, n -> n == 1);       // Check for 1 (stops at 1)
+        
+        List<Boolean> results_ok = Arrays.asList(ok1, ok2, ok3, ok4, ok5, ok6, ok7);
+
+        // --- "err" (Expected False) Cases ---
+        List<Integer> list_err1 = Arrays.asList(1, 2, 3);
+        List<Integer> list_err2 = Arrays.asList(1);
+        
+        boolean err1 = arraySome(list_err1, n -> n == 100);
+        boolean err2 = arraySome(list_err2, n -> n == 2);
+        
+        List<Boolean> results_err = Arrays.asList(err1, err2);
+
+        // Print the final combined JSON-like output structure
+        System.out.println("Output structure:");
+        System.out.println("{");
+        System.out.println("  \"results\": [");
+        System.out.println("    { \"ok\": " + results_ok + " },");
+        System.out.println("    { \"err\": " + results_err + " }");
+        System.out.println("  ]");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "results": [
+    { "ok": [true, true, true, true, true, true, true] },
+    { "err": [false, false] }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Java Code (Using an Imperative Loop)
+This approach uses a standard for loop, which explicitly implements the short-circuiting logic with a return true statement.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class DataWeaveSomeImperative {
+
+    /**
+     * Mimics DataWeave's 'some' function using an imperative loop.
+     */
+    public static <T> boolean arraySome(List<T> list, Predicate<T> predicate) {
+        // Loop and check condition for each element
+        for (T item : list) {
+            if (predicate.test(item)) {
+                return true; // Short-circuit: stop immediately if one succeeds
+            }
+        }
+        return false; // If the loop completes, no elements passed
+    }
+    
+    // Predicate checking if element is 2
+    private static Predicate<Integer> isTwoPredicate = n -> n == 2;
+
+
+    public static void main(String[] args) {
+        
+        // --- "ok" (Expected True) Cases ---
+        boolean ok1 = arraySome(Arrays.asList(1, 2, 3), n -> (n % 2) == 0); 
+        boolean ok2 = arraySome(Arrays.asList(1, 2, 3), n -> (n % 2) == 0); 
+        boolean ok3 = arraySome(Arrays.asList(1, 2, 3), n -> (n % 2) == 1); 
+        boolean ok4 = arraySome(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8), isTwoPredicate);      
+        boolean ok5 = arraySome(Arrays.asList(1, 2, 3), n -> n == 1);       
+        boolean ok6 = arraySome(Arrays.asList(1, 1, 1), n -> n == 1);       
+        boolean ok7 = arraySome(Arrays.asList(1), n -> n == 1);       
+        
+        List<Boolean> results_ok = Arrays.asList(ok1, ok2, ok3, ok4, ok5, ok6, ok7);
+
+        // --- "err" (Expected False) Cases ---
+        boolean err1 = arraySome(Arrays.asList(1, 2, 3), n -> n == 100);
+        boolean err2 = arraySome(Arrays.asList(1), n -> n == 2);
+        
+        List<Boolean> results_err = Arrays.asList(err1, err2);
+
+        // Print the final combined JSON-like output structure
+        System.out.println("Output structure:");
+        System.out.println("{");
+        System.out.println("  \"results\": [");
+        System.out.println("    { \"ok\": " + results_ok + " },");
+        System.out.println("    { \"err\": " + results_err + " }");
+        System.out.println("  ]");
+        System.out.println("}");
+    }
+}
+
+Output for Both Java Codes
+The output from both Java implementations is identical and consistent with the DataWeave output:
+
+JSON
+
+Output structure:
+{
+  "results": [
+    { "ok": [true, true, true, true, true, true, true] },
+    { "err": [false, false] }
+  ]
+}

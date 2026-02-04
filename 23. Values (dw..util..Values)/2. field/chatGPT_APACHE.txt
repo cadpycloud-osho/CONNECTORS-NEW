@@ -1,0 +1,21 @@
+field:
+
+
+input:
+
+Map<String, Object> result = new LinkedHashMap<>();
+result.put("kind", "Object");
+result.put("namespace", "http://acme.com/foo");
+result.put("selector", "myFieldName");
+
+
+output:
+
+
+{
+  "kind": "Object",
+  "namespace": "http://acme.com/foo",
+  "selector": "myFieldName"
+}
+
+

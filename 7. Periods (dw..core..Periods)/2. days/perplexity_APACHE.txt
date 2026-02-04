@@ -1,0 +1,74 @@
+days:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+public class DaysPeriodRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:daysPeriod")
+            .process(exchange -> {
+                ZonedDateTime base = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                ZonedDateTime baseMidnight = LocalDate.parse("2020-10-05").atStartOfDay(ZoneOffset.UTC);
+                
+                Map<String, String> result = new LinkedHashMap<>();
+                
+                // tomorrow: + days(1)
+                result.put("tomorrow", base.plusDays(1).toString());
+                
+                // yesterday: - days(1)
+                result.put("yesterday", base.minusDays(1).toString());
+                
+                // decimalDaysPlusQuarter: + days(0.25) = +6h
+                result.put("decimalDaysPlusQuarter", baseMidnight.plusHours(6).toString());
+                
+                // decimalDaysPlusHalf: + days(0.5) = +12h
+                result.put("decimalDaysPlusHalf", baseMidnight.plusHours(12).toString());
+                
+                // decimalDaysPlusThreeQuarters: + days(0.75) = +18h
+                result.put("decimalDaysPlusThreeQuarters", baseMidnight.plusHours(18).toString());
+                
+                // decimalInputAsPeriod: days(4.555) → 4d + 0.555*24h
+                double decimalDays = 4.555;
+                long totalHours = (long)(decimalDays * 24);  // 109h
+                long hours = totalHours % 24;                // 13h
+                long days = totalHours / 24;                 // 4d  
+                long minutes = (long)((decimalDays * 24 * 60) % 60);  // 19m
+                long seconds = (long)((decimalDays * 24 * 60 * 60) % 60); // 12s
+                result.put("decimalInputAsPeriod", String.format("PT%dH%dM%dS", hours, minutes, seconds));
+                
+                // fourDayPeriod: days(4)
+                result.put("fourDayPeriod", "P4D");
+                
+                // negativeValue: days(-1)
+                result.put("negativeValue", "P-1D");
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "tomorrow": "2020-10-06T20:22:34.385Z",
+  "yesterday": "2020-10-04T20:22:34.385Z",
+  "decimalDaysPlusQuarter": "2020-10-05T06:00:00Z",
+  "decimalDaysPlusHalf": "2020-10-05T12:00:00Z",
+  "decimalDaysPlusThreeQuarters": "2020-10-05T18:00:00Z",
+  "decimalInputAsPeriod": "PT13H19M12S",
+  "fourDayPeriod": "P4D",
+  "negativeValue": "P-1D"
+}
+
+
+
+

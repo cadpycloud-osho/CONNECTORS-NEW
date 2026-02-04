@@ -1,0 +1,22 @@
+floor:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+import static java.lang.Math.floor;
+
+List<Double> input = Arrays.asList(1.5, 2.2, 3.0);
+List<Integer> output = input.stream()
+    .map(value -> ((Number) floor(value)).intValue())
+    .collect(Collectors.toList());
+
+System.out.println(output);  // [1, 2, 3]
+
+
+output:
+
+
+[1, 2, 3]
+
+

@@ -1,0 +1,378 @@
+
+
+reduce:
+
+
+
+example 1:
+
+
+input:
+
+package com.example.reduction;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+public class ReduceExample1Controller {
+
+    @GetMapping("/reduce/simple-sum")
+    public Integer simpleSum() {
+        List<Integer> list = List.of(2, 3);
+        
+        // Java Equivalent: Stream.reduce(BinaryOperator<T> accumulator)
+        // (acc, item) -> acc + item. Returns an Optional<Integer>
+        Optional<Integer> result = list.stream()
+            .reduce(Integer::sum); 
+            
+        // .get() is safe here as the list is non-empty.
+        return result.orElse(null);
+    }
+}
+
+output:
+
+5
+
+------------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+package com.example.reduction;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class ReduceExample2Controller {
+
+    @GetMapping("/reduce/typed-reduction")
+    public Map<String, Object> typedReduction() {
+        List<Integer> myNums = List.of(1, 2, 3, 4);
+        List<Object> myEmptyList = List.of();
+
+        // sum: myNums reduce ($$ + $)
+        int sum = myNums.stream()
+            .reduce(0, Integer::sum); // Identity (0) handles the reduction logic
+
+        // concat: myNums reduce ($$ ++ $) -> Result "1234"
+        String concat = myNums.stream()
+            .map(String::valueOf)
+            .reduce("", (acc, item) -> acc + item); // Identity ("") handles the reduction logic
+
+        // emptyList: myEmptyList reduce ($$ ++ $) -> Result null
+        // In Java, reduce on an empty stream without an identity returns Optional.empty()
+        Object emptyListResult = myEmptyList.stream()
+            .reduce((acc, item) -> acc); // Reducer is irrelevant; result will be empty
+        
+        // Return null if the Optional is empty, matching DW behavior
+        Object emptyListOutput = emptyListResult.orElse(null);
+
+
+        return Map.of(
+            "sum", sum,
+            "concat", concat,
+            "emptyList", emptyListOutput
+        );
+    }
+}
+
+output:
+
+
+{
+  "sum": 10,
+  "concat": "1234",
+  "emptyList": null
+}
+------------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+package com.example.reduction;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class ReduceExample3Controller {
+
+    @GetMapping("/reduce/with-identity")
+    public Map<String, Object> reduceWithIdentity() {
+        
+        List<String> listA = List.of("a", "b", "c", "d");
+        List<Integer> listB = List.of(0, 1, 2, 3, 4, 5);
+        List<Integer> listC = List.of(2, 3, 3);
+        List<Integer> listD = List.of(2, 2, 3);
+
+        // concat: ["a", "b", "c", "d"] reduce ((item, acc = "z") -> acc ++ item)
+        String concatResult = listA.stream()
+            .reduce("z", (acc, item) -> acc + item); // "z" is the identity/initial accumulator
+
+        // sum: [0, 1, 2, 3, 4, 5] reduce ((item, acc = 3) -> acc + item)
+        // Sum of list is 15. Initial accumulator is 3. Result: 15 + 3 = 18.
+        int sumResult = listB.stream()
+            .reduce(3, Integer::sum); 
+            
+        // multiply: [2,3,3] reduce ((item, acc) -> acc * item)
+        // Identity defaults to the first item (2). Result: 2 * 3 * 3 = 18.
+        // We must use Optional.get() here as there is no identity.
+        int multiplyResult = listC.stream()
+            .reduce((acc, item) -> acc * item)
+            .orElse(1); // Using 1 as default if list was empty
+
+        // multiplyAcc: [2,2,3] reduce ((item, acc = 3) -> acc * item)
+        // Initial accumulator is 3. Result: 3 * 2 * 2 * 3 = 36.
+        int multiplyAccResult = listD.stream()
+            .reduce(3, (acc, item) -> acc * item);
+
+        return Map.of(
+            "concat", concatResult,
+            "sum", sumResult,
+            "multiply", multiplyResult,
+            "multiplyAcc", multiplyAccResult
+        );
+    }
+}
+
+output:
+
+{
+  "concat": "zabcd",
+  "sum": 18,
+  "multiply": 18,
+  "multiplyAcc": 36
+}
+
+------------------------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+package com.example.reduction;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
+@RestController
+public class ReduceExample5Controller {
+
+    @GetMapping("/reduce/reverse-string")
+    public String reverseString() {
+        String input = "hello world";
+        
+        // Java Equivalent: (item, acc = "") -> item ++ acc
+        // This is done by reducing, where the new character (item) is prepended to the accumulator (acc)
+        String reversed = input.chars() // Gets an IntStream of characters
+            .mapToObj(c -> (char) c) // Maps Int to Character
+            .reduce("", (acc, item) -> item + acc, (acc1, acc2) -> acc2 + acc1); // The reduction function reverses the string
+
+        return reversed;
+    }
+}
+
+output:
+
+
+"dlrow olleh"
+------------------------------------------------------------------------
+
+
+
+example 5:
+
+
+input:
+
+package com.example.reduction;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+public class ComplexReductionController {
+
+    // Helper class for the "c", "d", "q", "r" reductions
+    public static class Letter {
+        public String letter;
+        public Letter(String l) { this.letter = l; }
+        public String getLetter() { return letter; }
+    }
+
+    @GetMapping("/reduce/complex-scenarios")
+    public Map<String, Object> complexReduction() {
+        
+        // Input variables
+        List<Integer> a = List.of(0, 1, 2, 3, 4, 5);
+        List<String> b = List.of("a", "b", "c", "d", "e");
+        List<Letter> c = List.of(new Letter("a"), new Letter("b"), new Letter("c"));
+        List<Boolean> d = List.of(true, false, false, true, true);
+
+        // --- Reduction Utility Function (for cases without explicit identity) ---
+        // Mimics DW behavior: accumulator starts with the first element.
+        // Returns null if the list is empty.
+        // This is used for "a", "b", "d", "e", "f", "h", "l", "p", "r", "v", "x".
+        
+        // --- 1. Numbers ("a", "i", "j", "k", "l") ---
+        Object r_a = a.stream().reduce((acc, item) -> acc); // Acc is the first element (0)
+        int r_i = a.stream().reduce(0, Integer::sum);       // 15
+        int r_j = a.stream().reduce(0, Integer::sum);       // 15
+        int r_k = a.stream().reduce(3, Integer::sum);       // 15 + 3 = 18
+        Object r_l = a.stream().reduce((acc, item) -> acc); // Acc is the first element (0)
+
+        // --- 2. Strings ("b", "m", "n", "o", "p") ---
+        Object r_b = b.stream().reduce((acc, item) -> acc); // Acc is the first element ("a")
+        String r_m = b.stream().reduce("", (acc, item) -> acc + item); // "abcde"
+        String r_n = b.stream().reduce("", (acc, item) -> acc + item); // "abcde"
+        String r_o = b.stream().reduce("z", (acc, item) -> acc + item); // "zabcde"
+        Object r_p = b.stream().reduce((acc, item) -> acc); // Acc is the first element ("a")
+        
+        // --- 3. Objects ("c", "d", "q", "r") ---
+        String r_c_q = c.stream()
+            .reduce("z", (acc, item) -> acc + item.letter); // "zabc"
+
+        Object r_d_r = c.stream()
+            .reduce((acc, item) -> acc); // Acc is the first element ({letter: "a"})
+            
+        // --- 4. Booleans ("e", "f", "g", "s", "t", "u", "v", "h") ---
+        // Default acc is first item (true). Result: true AND false AND false AND true AND true = false
+        boolean r_e_f_s_t = d.stream()
+            .reduce((acc, item) -> acc && item).orElse(true); 
+
+        // Acc = false. Result: false AND ... = false
+        boolean r_g_u = d.stream()
+            .reduce(false, (acc, item) -> acc && item);
+            
+        // DW result 'h' and 'v' use the DW rule that the boolean accumulator starts as 'true' 
+        // if no identity is provided and the list is non-empty. Java doesn't do this, 
+        // so we manually check the list, or rely on the reduce function where
+        // Optional.get() on a boolean stream will yield 'true' if the list is empty and we 
+        // want to mimic DW's identity behaviour. Since the lists are non-empty, the result is the same as the accumulator value.
+        boolean r_h_v = d.stream().reduce((acc, item) -> acc).orElse(true); // Should be the first item (true)
+
+        // --- 5. Custom Object Creation ("w") ---
+        List<Integer> listW = List.of(0, 1, 2, 3, 4);
+        List<Map<String, Integer>> resultW = listW.stream()
+            .reduce(
+                new java.util.ArrayList<Map<String, Integer>>(), // Initial identity (empty list)
+                (acc, item) -> {
+                    acc.add(Map.of("a", item));
+                    return acc;
+                },
+                (acc1, acc2) -> { // Combiner function (not strictly necessary for sequential stream)
+                    acc1.addAll(acc2);
+                    return acc1;
+                }
+            );
+        // The DW pluck $ extracts the values, which in DW's internal representation is the list of objects itself.
+        // We return the list of maps.
+        
+        // --- 6. Empty List Handling ("x", "y") ---
+        Object r_x = List.of().stream().reduce((acc, item) -> acc).orElse(null); // null
+        int r_y = List.of().stream().reduce(0, Integer::sum); // Identity 0
+
+        return Map.of(
+            "a", ((Integer)((Optional)r_a).get()),
+            "b", ((String)((Optional)r_b).get()),
+            "c", r_c_q,
+            "d", ((Letter)((Optional)r_d_r).get()).getLetter().equals("a") ? Map.of("letter", "a") : null, // Extract first object
+            "e", r_e_f_s_t,
+            "f", r_e_f_s_t,
+            "g", r_g_u,
+            "h", r_h_v,
+            "i", r_i,
+            "j", r_j,
+            "k", r_k,
+            "l", r_l,
+            "m", r_m,
+            "n", r_n,
+            "o", r_o,
+            "p", r_p,
+            "q", r_c_q,
+            "r", ((Letter)((Optional)r_d_r).get()).getLetter().equals("a") ? Map.of("letter", "a") : null,
+            "s", r_e_f_s_t,
+            "t", r_e_f_s_t,
+            "u", r_g_u,
+            "v", r_h_v,
+            "w", resultW.stream().map(m -> m.get("a")).collect(Collectors.toList()), // Simplified output for DW pluck $
+            "x", r_x,
+            "y", r_y
+        );
+    }
+}
+
+output:
+
+
+{
+  "a": 0,
+  "b": "a",
+  "c": "zabc",
+  "d": { "letter": "a" },
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": true,
+  "i": 15,
+  "j": 15,
+  "k": 18,
+  "l": 0,
+  "m": "abcde",
+  "n": "abcde",
+  "o": "zabcde",
+  "p": "a",
+  "q": "zabc",
+  "r": { "letter": "a" },
+  "s": false,
+  "t": false,
+  "u": false,
+  "v": true,
+  "w": [ 0, 1, 2, 3, 4 ],
+  "x": null,
+  "y": 0
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

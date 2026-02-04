@@ -1,0 +1,33 @@
+writeLinesWith:
+
+
+input:
+
+from("direct:writeLines")
+.process(exchange -> {
+
+    StringBuilder sb = new StringBuilder();
+
+    // to(1,10) map "Line $"
+    for (int i = 1; i <= 5; i++) {
+        sb.append("Line ").append(i).append("\n");
+    }
+
+    // JSON-style output
+    java.util.Map<String, Object> result = new java.util.HashMap<>();
+    result.put("lines", sb.toString());
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+output:
+
+
+{
+  "lines": "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n"
+}
+
+
+

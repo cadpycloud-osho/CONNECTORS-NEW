@@ -1,0 +1,20 @@
+matches:
+
+
+input:
+
+from("direct:regexMatches")
+.setBody(simple(
+    "[" +
+    "${'admin123'} regex 'a.*\\d+'," +
+    "${'admin123'} regex '^b.+'" +
+    "]"
+));
+
+
+output:
+
+[ true, false ]
+
+
+

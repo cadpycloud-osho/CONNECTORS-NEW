@@ -1,0 +1,67 @@
+someEntry:
+
+
+
+input:
+
+package com.example.someentry;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@SpringBootApplication
+public class SomeEntryApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SomeEntryApplication.class, args);
+    }
+}
+
+@RestController
+class SomeEntryController {
+
+    @GetMapping("/some-entry")
+    public Map<String, Boolean> testSomeEntry() {
+        return Map.of(
+            "a", someEntry(Map.of(), (value, key) -> value instanceof String),
+            "b", someEntry(Map.of("a", "", "b", "123"), (value, key) -> value instanceof String),
+            "c", someEntry(Map.of("a", "", "b", 123), (value, key) -> value instanceof String),
+            "d", someEntry(Map.of("a", "", "b", 123), (value, key) -> "a".equals(key)),
+            "e", someEntry(Map.of("a", ""), (value, key) -> "b".equals(key)),
+            "f", someEntry(null, (value, key) -> "a".equals(key))
+        );
+    }
+
+    /**
+     * Returns true if any entry in the map matches the predicate.
+     * Returns false if map is null or empty.
+     */
+    private boolean someEntry(Map<String, Object> map, EntryPredicate predicate) {
+        if (map == null || map.isEmpty()) {
+            return false;
+        }
+        return map.entrySet().stream().anyMatch(e -> predicate.test(e.getValue(), e.getKey()));
+    }
+
+    @FunctionalInterface
+    interface EntryPredicate {
+        boolean test(Object value, String key);
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false
+}
+

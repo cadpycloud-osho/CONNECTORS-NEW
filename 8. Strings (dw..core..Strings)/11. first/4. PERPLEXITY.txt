@@ -1,0 +1,30 @@
+first:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class FirstController {
+    
+    @GetMapping(value = "/first", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String firstCharacters() {
+        String input = "hello world!";
+        return input.substring(0, Math.min(5, input.length()));
+    }
+}
+
+
+
+output:
+
+
+"hello"
+

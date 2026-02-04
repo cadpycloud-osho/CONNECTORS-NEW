@@ -1,0 +1,35 @@
+field:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class DataWeaveFieldProcessor {
+    public static Map<String, Object> field(String namespaceUri, String fieldName) {
+        // DataWeave: field(ns0, "myFieldName")
+        return new LinkedHashMap<String, Object>() {{
+            put("kind", "Object");
+            put("namespace", namespaceUri);     // "http://acme.com/foo"
+            put("selector", fieldName);         // "myFieldName"
+        }};
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = field("http://acme.com/foo", "myFieldName");
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+   "kind": "Object",
+   "namespace": "http://acme.com/foo",
+   "selector": "myFieldName"
+}
+
+
+

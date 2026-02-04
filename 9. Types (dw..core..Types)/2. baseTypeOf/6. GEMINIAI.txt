@@ -1,0 +1,72 @@
+baseTypeOf:
+
+
+
+input:
+
+package com.com.example.typeconverter.service;
+
+import java.util.Map;
+import org.springframework.stereotype.Service;
+
+@Service
+public class TypeConverterService {
+
+    // Simulating the DataWeave Type definition structure
+    public class AType {
+        // In DW, this is String. In Java, we'll store its name/type.
+        private final String baseType = "String"; 
+        
+        // Simulating the facet/constraint
+        private final Map<String, String> constraints = Map.of("format", "YYYY-MM-dd");
+
+        public String getBaseType() {
+            return baseType;
+        }
+    }
+
+    /**
+     * Mimics the DataWeave baseTypeOf(AType) function.
+     */
+    public Map<String, String> convertType() {
+        AType aType = new AType();
+        
+        // The transformation: { a: baseTypeOf(AType) }
+        return Map.of(
+            "a", aType.getBaseType() // This returns "String"
+        );
+    }
+}
+
+
+package com.example.typeconverter.controller;
+
+import com.example.typeconverter.service.TypeConverterService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class TypeConverterController {
+
+    private final TypeConverterService typeConverterService;
+
+    public TypeConverterController(TypeConverterService typeConverterService) {
+        this.typeConverterService = typeConverterService;
+    }
+
+    // Maps to http://localhost:8080/get-base-type
+    @GetMapping("/get-base-type")
+    public Map<String, String> getBaseType() {
+        // Calls the service method that holds the transformation logic
+        return typeConverterService.convertType();
+    }
+}
+
+output:
+
+{
+  "a": "String"
+}
+
+

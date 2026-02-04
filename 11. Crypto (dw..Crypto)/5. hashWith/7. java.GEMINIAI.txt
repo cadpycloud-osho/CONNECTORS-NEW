@@ -1,0 +1,54 @@
+hashWith:
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Arrays;
+
+public class Main {
+
+    private static final String HASH_ALGORITHM = "MD2";
+
+    public static byte[] calculateMd2Binary(String data) 
+            throws NoSuchAlgorithmException {
+        
+        // 1. Get the MessageDigest instance for MD2
+        MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+
+        // 2. Convert the input data to bytes (using UTF-8) and calculate the hash
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        return md.digest(dataBytes);
+    }
+
+    public static void main(String[] args) {
+        String data = "hello";
+
+        try {
+            // Get the raw byte array (equivalent to DataWeave's Binary output)
+            byte[] md2Bytes = calculateMd2Binary(data);
+            
+            // Base64 encoding for safe console/JSON display
+            String md2Base64 = Base64.getEncoder().encodeToString(md2Bytes);
+
+            System.out.println("Input Data: " + data);
+            System.out.println("Algorithm: " + HASH_ALGORITHM);
+            System.out.println("---");
+            System.out.println("Raw Hash (Bytes): " + Arrays.toString(md2Bytes));
+            System.out.println("JSON-Safe Output (Base64): {\"md2_Base64\": \"" + md2Base64 + "\"}");
+
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Algorithm not found: " + e.getMessage());
+        }
+    }
+}
+
+output:
+
+{ 
+  "md2_Base64": "VQQsc2DTAzH9aB/dfgT8BlU=" 
+}
+

@@ -1,0 +1,68 @@
+isWhitespace:
+
+
+
+input:
+
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's isWhitespace(text) function.
+     * Returns true if the string is empty or contains ONLY whitespace characters.
+     * Returns false for null input.
+     */
+    public static boolean isWhitespaceString(String input) {
+        // 1. DataWeave returns false for null.
+        if (input == null) {
+            return false;
+        }
+
+        // 2. DataWeave returns true for empty string.
+        if (input.isEmpty()) {
+            return true;
+        }
+        
+        // 3. Check every character
+        for (char c : input.toCharArray()) {
+            // Character.isWhitespace() handles standard spaces, tabs, newlines, and Unicode whitespace.
+            if (!Character.isWhitespace(c)) {
+                return false;
+            }
+        }
+        // If the loop completes, all characters are whitespace.
+        return true;
+    }
+
+    public static void main(String[] args) {
+        // Testing inputs:
+        boolean a = isWhitespaceString(null);
+        boolean b = isWhitespaceString("");
+        boolean c = isWhitespaceString("  ");
+        boolean d = isWhitespaceString("abc");
+        boolean e = isWhitespaceString("ab2c");
+        boolean f = isWhitespaceString("ab-c");
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c + ",");
+        System.out.println("  \"d\": " + d + ",");
+        System.out.println("  \"e\": " + e + ",");
+        System.out.println("  \"f\": " + f);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}

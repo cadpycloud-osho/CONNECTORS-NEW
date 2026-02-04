@@ -1,0 +1,36 @@
+toPeriod:
+
+
+
+input:
+
+import java.time.Duration;
+import java.time.Period;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // Period example
+        Period periodEx1 = Period.parse("P1D");
+        result.put("toPeriodEx1", periodEx1.toString());
+
+        // Duration example
+        Duration durationEx2 = Duration.parse("PT1H1M");
+        result.put("toPeriodEx2", durationEx2.toString());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{toPeriodEx1=P1D, toPeriodEx2=PT1H1M}
+
+
+

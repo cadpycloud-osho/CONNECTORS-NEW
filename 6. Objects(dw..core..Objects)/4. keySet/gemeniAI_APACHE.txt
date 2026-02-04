@@ -1,0 +1,131 @@
+keyset:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class KeySetRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getKeySet")
+            .routeId("KeySet-Extraction-Route")
+            .process(exchange -> {
+                // 1. Source Object (LinkedHashMap to preserve "a", "b" order)
+                Map<String, Object> source = new LinkedHashMap<>();
+                source.put("a", true);
+                source.put("b", 1);
+
+                // 2. Logic: keySet()
+                // Map.keySet() returns a Set; we convert to List for the JSON array
+                List<String> keys = new ArrayList<>(source.keySet());
+
+                // 3. Structure for JSON output
+                Map<String, Object> response = new HashMap<>();
+                response.put("keySet", keys);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Extracted Keys: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "keySet": ["a", "b"]
+}
+
+
+
+-----------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MetadataSetRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getMetadata")
+            .routeId("XML-Metadata-Set-Route")
+            .process(exchange -> {
+                // 1. Data Logic
+                // We represent the two users as Objects with Attributes
+                Map<String, String> attr1 = new LinkedHashMap<>();
+                attr1.put("name", "Mariano");
+                attr1.put("lastName", "Achaval");
+
+                Map<String, String> attr2 = new LinkedHashMap<>();
+                attr2.put("name", "Stacey");
+                attr2.put("lastName", "Duke");
+
+                String namespace = "http://test.com";
+
+                // 2. Logic: keySet map $.# (Namespaces) and $.@ (Attributes)
+                List<Object> keySetList = new ArrayList<>();
+                keySetList.add(namespace); // Namespace of first user entry
+                keySetList.add(namespace); // Namespace of second user entry
+                keySetList.add(attr1);     // Attributes of first user entry
+                keySetList.add(attr2);     // Attributes of second user entry
+
+                // 3. Logic: nameSet map $.# and $.@
+                // nameSet refers to the local names. Since local names 
+                // don't carry the metadata themselves in this context, they return null.
+                List<Object> nameSetList = Arrays.asList(null, null, null, null);
+
+                // 4. Construct Final Response
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("keySet", keySetList);
+                response.put("nameSet", nameSetList);
+
+                exchange.getIn().setBody(response);
+            })
+            // 5. Output application/json
+            .marshal().json()
+            .log("Metadata Output: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "keySet": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "nameSet": [
+    null,
+    null,
+    null,
+    null
+  ]
+}
+
+
+
+-----------------------------------------------
+
+
+

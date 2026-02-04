@@ -1,0 +1,49 @@
+isUnionType:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+// Marker interface for union types
+interface UnionType {}
+
+@RestController
+public class UnionTypeController {
+
+    private boolean isUnionType(Object value) {
+        return value instanceof UnionType;
+    }
+
+    @GetMapping("/union-type-check")
+    public Map<String, Boolean> checkUnionTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AType = String | Number (union type)
+        class ATypeUnion implements UnionType {}
+        ATypeUnion aType = new ATypeUnion();
+        
+        // Boolean (simple type, not union)
+        Boolean boolValue = true;
+        
+        result.put("a", isUnionType(aType));
+        result.put("b", isUnionType(boolValue));
+        
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+

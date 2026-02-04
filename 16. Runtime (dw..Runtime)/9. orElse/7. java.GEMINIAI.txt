@@ -1,0 +1,63 @@
+orElse:
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+
+    // Simple class to simulate the structure, using null to represent missing data
+    static class SimpleUser {
+        public final String name;
+        public SimpleUser(String name) { this.name = name; }
+    }
+
+    public static Map<String, String> executeTryOrElseLogic() {
+        // --- Replicate DW variables ---
+        // user: Represents a user where accessing name causes an error (null pointer)
+        SimpleUser user = new SimpleUser(null);
+        
+        // otherUser
+        SimpleUser otherUser = new SimpleUser("DW");
+
+        String resultA;
+        String resultB;
+
+        // --- Replicate DW Expression 'a': try(() -> user.name!) orElse "No User Name" ---
+        try {
+            // Simulating user.name!: Accessing a field that causes an error/exception
+            if (user.name == null) {
+                // We must explicitly throw an exception to simulate the DW '!' operator's behavior
+                throw new NullPointerException("User name is missing.");
+            }
+            resultA = user.name;
+        } catch (NullPointerException | RuntimeException e) {
+            // orElse "No User Name"
+            resultA = "No User Name";
+        }
+
+        // --- Replicate DW Expression 'b': try(() -> otherUser.name) orElse "No User Name" ---
+        try {
+            // Simulating safe access to otherUser.name
+            resultB = otherUser.name;
+        } catch (RuntimeException e) {
+            // orElse "No User Name" (This block is skipped because no exception is thrown)
+            resultB = "No User Name";
+        }
+        
+        return Map.of("a", resultA, "b", resultB);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Try/Catch Simulation ---");
+        System.out.println(executeTryOrElseLogic());
+    }
+}
+
+output:
+
+--- Pure Java Try/Catch Simulation ---
+{a=No User Name, b=DW}
+
+

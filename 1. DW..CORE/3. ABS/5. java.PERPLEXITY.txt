@@ -1,0 +1,68 @@
+abs(number: Number): Number
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Number> numbers = Arrays.asList(-2, 2.5, -3.4, 3);
+        
+        List<Double> result = numbers.stream()
+            .map(n -> Math.abs(n.doubleValue()))
+            .collect(Collectors.toList());
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+
+
+
+//Alternative Using Math.absExact
+//java
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Number> inputs = Arrays.asList(-2, 2.5, -3.4, 3);
+        List<Double> result = inputs.stream()
+            .map(num -> {
+                if (num instanceof Integer i) {
+                    return (double) Math.absExact(i);
+                }
+                return Math.abs(num.doubleValue());
+            })
+            .collect(Collectors.toList());
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+
+
+output:
+
+[2.0, 2.5, 3.4, 3.0]
+
+
+
+
+
+
+
+

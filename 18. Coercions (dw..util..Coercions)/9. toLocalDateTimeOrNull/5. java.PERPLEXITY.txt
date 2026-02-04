@@ -1,0 +1,62 @@
+toLocalDateTimeOrNull:
+
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String input = "2003-10-01 23:57:59";
+
+        // Equivalent to DataWeave 'a'
+        LocalDateTime resultA = parseWithMultipleFormats(input);
+
+        // Equivalent to DataWeave 'b'
+        LocalDateTime resultB = parseWithSingleFormat(input);
+
+        // Map.of() does NOT allow nulls → use HashMap
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", resultA);
+        result.put("b", resultB);
+
+        System.out.println("Result: " + result);
+    }
+
+    private static LocalDateTime parseWithMultipleFormats(String input) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd HH:mm:ss")
+                .parseCaseInsensitive()
+                .toFormatter();
+        try {
+            return LocalDateTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    private static LocalDateTime parseWithSingleFormat(String input) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        try {
+            return LocalDateTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+}
+
+
+output:
+
+Result: {a=2003-10-01T23:57:59, b=null}
+
+
+

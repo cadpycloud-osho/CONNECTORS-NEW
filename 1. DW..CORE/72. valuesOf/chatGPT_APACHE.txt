@@ -1,0 +1,25 @@
+valuesOf:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String, Object> input = new java.util.HashMap<>();
+        input.put("a", true);
+        input.put("b", 1);
+
+        java.util.Collection<Object> values = input.values();
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("valuesOf", new java.util.ArrayList<>(values));
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+
+{ "valuesOf" : [true, 1] }
+

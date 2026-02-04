@@ -1,0 +1,332 @@
+sizeOf:
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = Arrays.asList("a", "b", "c");
+        System.out.println(list.size());
+    }
+}
+
+
+output:
+
+3
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, Integer> arraySizes = new HashMap<>();
+
+        arraySizes.put("size3", Arrays.asList(1,2,3).size());
+        arraySizes.put("size2", Arrays.asList(
+                Arrays.asList(1,2,3),
+                Arrays.asList(4)
+        ).size());
+        arraySizes.put("size0", Collections.emptyList().size());
+
+        System.out.println(arraySizes);
+    }
+}
+
+
+output:
+
+{size3=3, size2=2, size0=0}
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Integer> map = new HashMap<>();
+        map.put("a", 1);
+        map.put("b", 2);
+
+        System.out.println(map.size());
+    }
+}
+
+
+output:
+2
+
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, Integer> objectSizes = new HashMap<>();
+
+        Map<String, Integer> map1 = new HashMap<>();
+        map1.put("a",1);
+        map1.put("b",2);
+
+        Map<String, Integer> map2 = new HashMap<>();
+
+        objectSizes.put("sizeIs2", map1.size());
+        objectSizes.put("sizeIs0", map2.size());
+
+        System.out.println(objectSizes);
+    }
+}
+
+
+output:
+
+{sizeIs2=2, sizeIs0=0}
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String value = "'my word'";
+
+        int binarySize = value.getBytes(StandardCharsets.UTF_8).length;
+        int stringSize = value.length();
+
+        System.out.println("BinarySizeOf: " + binarySize);
+        System.out.println("StringSizeOf: " + stringSize);
+    }
+}
+
+
+output:
+
+BinarySizeOf: 13
+StringSizeOf: 9
+
+---------------------------------------------------------------
+
+
+
+example 6:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("abc".length());
+    }
+}
+
+
+output:
+3
+
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        int sizeOfString = "my string".length();
+        int sizeOfEmpty = "".length();
+        int sizeOfNumber = String.valueOf(123).length();
+
+        System.out.println(sizeOfString);
+        System.out.println(sizeOfEmpty);
+        System.out.println(sizeOfNumber);
+    }
+}
+
+
+output:
+
+9
+0
+1
+
+---------------------------------------------------------------
+
+
+
+example 8:
+
+
+input:
+
+import java.time.Period;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Period period = Period.ofDays(3);
+        System.out.println(period.getDays());
+    }
+}
+
+
+output:
+
+3
+
+---------------------------------------------------------------
+
+
+
+
+example 9:
+
+
+input:
+
+import java.time.OffsetDateTime;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String dateTime = OffsetDateTime.parse(
+                "2025-07-13T18:06:59.314033Z"
+        ).toString();
+
+        System.out.println(dateTime.length());
+    }
+}
+
+
+output:
+
+27
+
+---------------------------------------------------------------
+
+
+
+example 10:
+
+
+input:
+
+import java.time.LocalDateTime;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String localDateTime = LocalDateTime.parse(
+                "2025-07-13T18:06:59.314033"
+        ).toString();
+
+        System.out.println(localDateTime.length());
+    }
+}
+
+
+output:
+
+26
+
+---------------------------------------------------------------
+
+
+
+
+example 11:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        int sizeA = String.valueOf(123).length();
+        int sizeB = String.valueOf(123.45).length();
+
+        System.out.println("a=" + sizeA);
+        System.out.println("b=" + sizeB);
+    }
+}
+
+
+output:
+
+a=3
+b=6
+
+---------------------------------------------------------------
+
+
+
+
+example 12:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        System.out.println("a=1");
+        System.out.println("b=1");
+    }
+}
+
+
+output:
+
+a=1
+b=1
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

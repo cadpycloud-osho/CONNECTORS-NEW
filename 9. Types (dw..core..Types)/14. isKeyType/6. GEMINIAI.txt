@@ -1,0 +1,78 @@
+isKeyType:
+
+
+INPUT:
+
+package com.example.typecheck.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class KeyTypeCheckService {
+
+    // Define the constant for the DataWeave 'Key' type representation
+    private static final String DW_KEY_TYPE = "Key";
+
+    /**
+     * Helper method to simulate DataWeave's isKeyType() function.
+     * Checks if the given type name is equivalent to the 'Key' type.
+     */
+    private boolean isKeyType(String typeName) {
+        // Checks if the type name matches the expected "Key" type string.
+        return typeName.equals(DW_KEY_TYPE);
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, Boolean> checkTypes() {
+        
+        // Emulating the type definitions and uses from the DW script:
+        final String AKey_Type = "Key"; // Emulates type AKey = Key
+        final String Builtin_Key = "Key";
+        final String Builtin_Boolean = "Boolean";
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: isKeyType(AKey), b: isKeyType(Key), c: isKeyType(Boolean) }
+        return Map.of(
+            "a", isKeyType(AKey_Type),
+            "b", isKeyType(Builtin_Key),
+            "c", isKeyType(Builtin_Boolean)
+        );
+    }
+}
+
+package com.example.typecheck.controller;
+
+import com.example.typecheck.service.KeyTypeCheckService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final KeyTypeCheckService keyTypeCheckService;
+
+    public DataWeaveController(KeyTypeCheckService keyTypeCheckService) {
+        this.keyTypeCheckService = keyTypeCheckService;
+    }
+
+    // Maps to http://localhost:8080/check-key-type
+    @GetMapping("/check-key-type")
+    public Map<String, Boolean> checkKeyType() {
+        // Calls the service method that holds the transformation logic
+        return keyTypeCheckService.checkTypes();
+    }
+}
+
+
+OUTPUT:
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

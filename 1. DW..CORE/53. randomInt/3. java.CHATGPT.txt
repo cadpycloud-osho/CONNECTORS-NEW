@@ -1,0 +1,25 @@
+randomInt:
+
+
+input:
+
+import java.util.Random;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Random random = new Random();
+
+        // generates a random integer between 0 and 999
+        int price = random.nextInt(1000);
+
+        // print JSON-style output
+        System.out.println("{ \"price\": " + price + " }");
+    }
+}
+
+
+output:
+
+{ "price": 442 }
+

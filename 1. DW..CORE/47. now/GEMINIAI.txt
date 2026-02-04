@@ -1,0 +1,130 @@
+now:
+
+example 1:
+
+input:
+
+package com.example.datetime;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TimeZoneController {
+
+    @GetMapping("/current-time")
+    public Map<String, String> getCurrentTime() {
+        // Get the current time in the system's default timezone (equivalent to now())
+        ZonedDateTime now = ZonedDateTime.now();
+
+        // Convert the current time to America/New_York timezone
+        ZonedDateTime nowNewYork = now.withZoneSameInstant(ZoneId.of("America/New_York"));
+        
+        Map<String, String> result = new HashMap<>();
+        
+        // Output format is ISO 8601, which ZonedDateTime's toString() provides
+        // Example: 2025-12-09T10:09:34.123+05:30[Asia/Kolkata]
+        // Note: The specific format in DW is slightly simpler, but ZonedDateTime's default is compliant.
+        result.put("nowCalled", now.toOffsetDateTime().toString()); 
+        
+        // Example: 2025-12-09T00:39:34.123-05:00
+        result.put("nowCalledSpecificTimeZone", nowNewYork.toOffsetDateTime().toString());
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "nowCalled": "2025-12-09T10:09:34.123+05:30",
+  "nowCalledSpecificTimeZone": "2025-12-09T00:39:34.123-05:00"
+}
+
+-----------------------------------------------------------------------
+example 2:
+
+
+
+input:
+
+package com.example.datetime;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+@RestController
+public class DateTimeComponentsController {
+
+    @GetMapping("/date-components")
+    public Map<String, Object> getDateTimeComponents() {
+        ZonedDateTime now = ZonedDateTime.now();
+        
+        // epochTime: now() as Number
+        long epochTime = now.toEpochSecond(); 
+        
+        // formattedDate: now() as String {format: "y-MM-dd"}
+        String formattedDate = now.format(DateTimeFormatter.ofPattern("y-MM-dd"));
+        
+        // formattedTime: now() as String {format: "hh:m:s"}
+        // Note: 'h' is 1-12 hour, 'm' is minute, 's' is second.
+        String formattedTime = now.format(DateTimeFormatter.ofPattern("hh:m:s", Locale.US));
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("now", now.toOffsetDateTime().toString());
+        result.put("epochTime", epochTime);
+        // Nanoseconds are available, but usually used via getNano() for precision
+        result.put("nanoseconds", now.getNano()); 
+        result.put("milliseconds", now.getNano() / 1_000_000);
+        result.put("seconds", now.getSecond());
+        result.put("minutes", now.getMinute());
+        result.put("hour", now.getHour()); // 24-hour format
+        result.put("day", now.getDayOfMonth());
+        result.put("month", now.getMonthValue());
+        result.put("year", now.getYear());
+        // quarter is not a direct method, calculated as (month-1)/3 + 1
+        result.put("quarter", ((now.getMonthValue() - 1) / 3) + 1); 
+        // dayOfWeek is an enum (1-7), but DW usually expects an int value like 2 (Tuesday)
+        result.put("dayOfWeek", now.getDayOfWeek().getValue()); 
+        result.put("dayOfYear", now.getDayOfYear());
+        // offsetSeconds: now().getOffset() returns ZoneOffset, getTotalSeconds() returns the offset in seconds
+        result.put("offsetSeconds", now.getOffset().getTotalSeconds()); 
+        result.put("formattedDate", formattedDate);
+        result.put("formattedTime", formattedTime);
+        
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "now": "2025-12-09T10:09:34.123+05:30",
+  "epochTime": 1733719174,
+  "nanoseconds": 123456789,
+  "milliseconds": 123,
+  "seconds": 34,
+  "minutes": 9,
+  "hour": 10,
+  "day": 9,
+  "month": 12,
+  "year": 2025,
+  "quarter": 4,
+  "dayOfWeek": 2,
+  "dayOfYear": 343,
+  "offsetSeconds": 19800,
+  "formattedDate": "2025-12-09",
+  "formattedTime": "10:9:34"
+}

@@ -1,0 +1,29 @@
+nameSet:
+
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: nameSet({ "a" : true, "b" : 1})
+        Map<String, Object> input = Map.of("a", true, "b", 1);
+        List<String> nameSet = new ArrayList<>(input.keySet());
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"nameSet\": " + nameSet.toString().replace(" ", ""));
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+
+
+{ "nameSet" : ["a","b"] }

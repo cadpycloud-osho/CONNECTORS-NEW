@@ -1,0 +1,36 @@
+withMaxSize:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + withMaxSize("123", 10) + "\",");
+        System.out.println("  \"b\": \"" + withMaxSize("123", 3) + "\",");
+        System.out.println("  \"c\": \"" + withMaxSize("123", 2) + "\",");
+        System.out.println("  \"d\": \"" + withMaxSize("123", 0) + "\",");
+        System.out.println("  \"e\": " + withMaxSize(null, 23));
+        System.out.println("}");
+    }
+    
+    private static String withMaxSize(String input, int maxSize) {
+        if (input == null) return null;
+        if (maxSize <= 0) return input;
+        return input.length() <= maxSize ? input : input.substring(0, maxSize);
+    }
+}
+
+output:
+
+
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}

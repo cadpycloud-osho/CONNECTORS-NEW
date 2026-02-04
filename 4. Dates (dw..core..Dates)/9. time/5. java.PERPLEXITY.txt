@@ -1,0 +1,32 @@
+time:
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: time({ hour: 12, minutes: 30, seconds: 40, timeZone: |-03:00| })
+        OffsetTime newTime = OffsetTime.of(12, 30, 40, 0, ZoneOffset.ofHours(-3));
+        
+        // Output as JSON structure matching DataWeave
+        String output = newTime.format(DateTimeFormatter.ISO_OFFSET_TIME);
+        
+        System.out.println("{");
+        System.out.println("  \"newTime\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "newTime": "12:30:40-03:00"
+}
+

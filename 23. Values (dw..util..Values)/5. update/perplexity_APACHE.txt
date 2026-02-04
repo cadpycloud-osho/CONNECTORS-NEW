@@ -1,0 +1,313 @@
+update:
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.HashMap;
+import java.util.Map;
+
+public class UpdateValuesProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // {name: "Mariano"} equivalent
+        Map<String, String> input = new HashMap<>();
+        input.put("name", "Mariano");
+        
+        // update "name" with "Data Weave" equivalent
+        input.put("name", "Data Weave");
+        
+        exchange.getIn().setBody(input);
+    }
+}
+
+from("direct:updateValues")
+    .process(new UpdateValuesProcessor())
+    .log("${body}");
+
+
+output:
+
+
+{
+  "name": "Data Weave"
+}
+
+
+
+--------------------------------------------------------
+example 2:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.HashMap;
+import java.util.Map;
+
+public class UpdateFieldProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // {name: "Mariano"} input
+        Map<String, String> input = new HashMap<>();
+        input.put("name", "Mariano");
+        
+        // update field("name") with "Data Weave" equivalent
+        String fieldName = "name";
+        input.put(fieldName, "Data Weave");
+        
+        exchange.getIn().setBody(input);
+    }
+}
+
+from("direct:updateField")
+    .process(new UpdateFieldProcessor())
+    .log("${body}");
+
+
+output:
+
+
+{
+  "name": "Data Weave"
+}
+
+
+
+--------------------------------------------------------
+example 3:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class UpdateArrayProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // [1,2,3] input array (0-indexed in Java)
+        List<Integer> array = new ArrayList<>(Arrays.asList(1, 2, 3));
+        
+        // update 1 with 5 (index 1, second element)
+        array.set(1, 5);
+        
+        exchange.getIn().setBody(array);
+    }
+}
+
+from("direct:updateArray")
+    .process(new UpdateArrayProcessor())
+    .log("${body}");
+
+
+output:
+
+
+[1, 5, 3]
+
+
+
+--------------------------------------------------------
+example 4:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+
+public class UpdateObjectArrayProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Input array of objects
+        List<Map<String, String>> array = Arrays.asList(
+            createMap("role", "a", "name", "spiderman"),
+            createMap("role", "b", "name", "batman")
+        );
+        
+        // Convert to mutable list for update
+        List<Map<String, String>> mutableArray = new ArrayList<>(array);
+        
+        // update "role" with "Super Hero" - update ALL objects' "role" field
+        for (Map<String, String> obj : mutableArray) {
+            obj.put("role", "Super Hero");
+        }
+        
+        exchange.getIn().setBody(mutableArray);
+    }
+    
+    private Map<String, String> createMap(String key1, String value1, String key2, String value2) {
+        Map<String, String> map = new HashMap<>();
+        map.put(key1, value1);
+        map.put(key2, value2);
+        return map;
+    }
+}
+
+from("direct:updateObjectArray")
+    .process(new UpdateObjectArrayProcessor())
+    .log("${body}");
+
+
+output:
+
+
+[
+  {
+    "role": "Super Hero",
+    "name": "spiderman"
+  },
+  {
+    "role": "Super Hero", 
+    "name": "batman"
+  }
+]
+
+
+
+--------------------------------------------------------
+example 5:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class UpdateArrayIndexProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // [1,2,3] input array
+        List<Integer> array = new ArrayList<>(Arrays.asList(1, 2, 3));
+        
+        // update index(1) with 5 - explicitly using index selector
+        array.set(1, 5);  // index 1 (second element)
+        
+        exchange.getIn().setBody(array);
+    }
+}
+
+from("direct:updateArrayIndex")
+    .process(new UpdateArrayIndexProcessor())
+    .log("${body}");
+
+
+output:
+
+[1, 5, 3]
+
+
+
+
+--------------------------------------------------------
+example 6:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+
+public class UpdateNestedFieldProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Input: {user: {name: "Mariano"}}
+        Map<String, Object> input = new HashMap<>();
+        Map<String, String> user = new HashMap<>();
+        user.put("name", "Mariano");
+        input.put("user", user);
+        
+        // update ["user", field("name")] with "Data Weave"
+        // Navigate: input["user"]["name"] = "Data Weave"
+        ((Map<String, String>) input.get("user")).put("name", "Data Weave");
+        
+        exchange.getIn().setBody(input);
+    }
+}
+
+from("direct:updateNestedField")
+    .process(new UpdateNestedFieldProcessor())
+    .log("${body}");
+
+
+output:
+
+
+{
+  "user": {
+    "name": "Data Weave"
+  }
+}
+
+
+
+--------------------------------------------------------
+example 7:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.converter.jaxp.XmlConverter;
+import javax.xml.transform.stream.StreamSource;
+import java.util.List;
+import java.util.Map;
+
+public class UpdateXmlPathProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Simulate XML input parsing (users/user/language paths)
+        List<Map<String, String>> users = Arrays.asList(
+            createUser("Phoebe", "French"),
+            createUser("Joey", "English")
+        );
+        
+        // Update ["users", "user", "language"] with conditional logic
+        // Navigate: users[*].language where language == "English" → "Gibberish"
+        for (Map<String, String> user : users) {
+            if ("English".equals(user.get("language"))) {
+                user.put("language", "Gibberish");
+            }
+        }
+        
+        // Convert back to XML structure
+        exchange.getIn().setBody(users);
+    }
+    
+    private Map<String, String> createUser(String name, String language) {
+        Map<String
+
+
+
+output:
+
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>Gibberish</language>
+  </user>
+</users>
+
+
+
+
+--------------------------------------------------------
+
+

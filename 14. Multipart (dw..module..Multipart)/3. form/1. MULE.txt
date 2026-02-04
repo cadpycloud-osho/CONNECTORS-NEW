@@ -1,0 +1,107 @@
+form:
+
+form(parts: Array<MultipartPart>): Multipart
+
+form(parts: Array<MultipartPart>): Multipart
+Creates a Multipart data structure using a specified array of parts.
+
+
+
+
+
+Source
+%dw 2.0
+import dw::module::Multipart
+output multipart/form-data
+var myOrders = "./orders.xml"
+var fileArgs = { name: "file", path: myOrders, mime: "application/xml", fileName: "myorders.xml"}
+var fieldArgs = {name:"userName",value: "Annie Point", mime: "text/plain"}
+---
+Multipart::form([
+  Multipart::file(fileArgs),
+  Multipart::field(fieldArgs),
+  Multipart::field("myJson", {"user": "Annie Point"}, "application/json", "userInfo.json")
+])
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+------=_Part_146_143704079.1560394078604
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_146_143704079.1560394078604
+Content-Type: text/plain
+Content-Disposition: form-data; name="userName"
+Annie Point
+------=_Part_146_143704079.1560394078604
+Content-Type: application/json
+Content-Disposition: form-data; name="myJson"; filename="userInfo.json"
+{
+  "user": "Annie Point"
+}
+------=_Part_146_143704079.1560394078604--
+
+
+---------------------------------------------------------------------
+
+
+Source
+%dw 2.0
+import dw::module::Multipart
+output multipart/form-data
+var firstPart = "content for my first part"
+var secondPart = "content for my second part"
+---
+{
+  parts: {
+    part1: Multipart::field({name:"myFirstPart",value: firstPart}),
+    part2: Multipart::field("mySecondPart", secondPart)
+  }
+}
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161.1542639222352--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

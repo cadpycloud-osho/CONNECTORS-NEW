@@ -1,0 +1,41 @@
+charCodeAt:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CharCodeAtController {
+    
+    @GetMapping(value = "/charcodeat", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CharCodeAtResponse getCharCodeAt() {
+        String input = "MuleSoft";
+        char charAtIndex1 = input.charAt(1);
+        int charCode = (int) charAtIndex1;
+        return new CharCodeAtResponse(charCode);
+    }
+    
+    public static class CharCodeAtResponse {
+        private final int charCodeAt;
+        
+        public CharCodeAtResponse(int charCodeAt) {
+            this.charCodeAt = charCodeAt;
+        }
+        
+        public int getCharCodeAt() {
+            return charCodeAt;
+        }
+    }
+}
+
+
+output:
+
+{"charCodeAt":117}
+

@@ -1,0 +1,106 @@
+sumBy:
+
+
+
+input:
+
+public class Main {
+    public static int sumByA(String[] arr) {
+        int sum = 0;
+        for (String obj : arr) {
+            int start = obj.indexOf("\"a\":") + 4;
+            int end = obj.indexOf("}", start);
+            sum += Integer.parseInt(obj.substring(start, end).trim());
+        }
+        return sum;
+    }
+    
+    public static void main(String[] args) {
+        String[] objects = {
+            "{\"a\":1}",
+            "{\"a\":2}",
+            "{\"a\":3}"
+        };
+        
+        String result = String.format("{ \"sumBy\": [ %d, %d ] }", 
+            sumByA(objects), sumByA(objects));
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "sumBy": [6, 6]
+}
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional approach using Streams with mapToInt to sum extracted values.
+
+java
+
+
+
+import java.util.stream.IntStream;
+
+public class Main {
+    public static void main(String[] args) {
+        String[] objects = {
+            "{\"a\":1}",
+            "{\"a\":2}",
+            "{\"a\":3}"
+        };
+        
+        int sum1 = (int) IntStream.range(0, objects.length)
+                                 .mapToObj(i -> Integer.parseInt(objects[i].split(":")[1].split("}")[0].trim()))
+                                 .mapToInt(Integer::intValue)
+                                 .sum();
+        
+        int sum2 = (int) IntStream.range(0, objects.length)
+                                 .mapToObj(i -> Integer.parseInt(objects[i].split(":")[1].split("}")[0].trim()))
+                                 .mapToInt(Integer::intValue)
+                                 .sum();
+        
+        String result = String.format("{ \"sumBy\": [ %d, %d ] }", sum1, sum2);
+        System.out.println(result);
+    }
+}
+
+
+
+Output: Identical to loop version: {"sumBy": [6, 6]}
+
+Simple Array Version (No JSON)
+Pure primitives without external dependencies.
+
+java
+
+
+
+public class Main {
+    public static void main(String[] args) {
+        int[] values = {1, 2, 3};
+        int sum1 = 0, sum2 = 0;
+        
+        for (int val : values) {
+            sum1 += val;
+            sum2 += val;
+        }
+        
+        System.out.println("{ \"sumBy\" : [" + sum1 + ", " + sum2 + "] }");
+    }
+}
+
+
+Output: {"sumBy" : [6, 6]}

@@ -1,0 +1,5 @@
+<fetch mapping="logical" count="1">
+    <entity name="account">
+        <attribute name="name"/>
+    </entity>
+</fetch>

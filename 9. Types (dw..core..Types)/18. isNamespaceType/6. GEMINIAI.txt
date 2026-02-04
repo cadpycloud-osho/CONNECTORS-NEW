@@ -1,0 +1,63 @@
+isNamespaceType:
+
+
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import javax.xml.namespace.QName; // Used as the Java proxy for the DataWeave Namespace concept
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NamespaceCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isNamespaceType(Type).
+     */
+    private boolean isNamespaceType(Class<?> type) {
+        return QName.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/namespace-typecheck")
+    public Map<String, Boolean> checkNamespaceTypes() {
+        
+        // DataWeave type ANamespace is an alias for Namespace (Conceptually QName in Java context)
+        Class<?> aNamespace = QName.class;
+        
+        // DataWeave type Namespace (Conceptually QName in Java context)
+        Class<?> namespaceType = QName.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isNamespaceType(aNamespace);
+        boolean b = isNamespaceType(namespaceType);
+        boolean c = isNamespaceType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

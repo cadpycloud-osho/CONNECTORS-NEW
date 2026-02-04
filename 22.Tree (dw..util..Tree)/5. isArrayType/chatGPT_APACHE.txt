@@ -1,0 +1,62 @@
+isArrayType:
+
+
+input:
+
+import java.util.*;
+
+public class IsArrayTypeExample {
+
+    public static void main(String[] args) {
+
+        // Example arrays of tree nodes
+        List<Map<String, Object>> aList = Arrays.asList(
+                node("OBJECT_TYPE", "user", null),
+                node("ATTRIBUTE_TYPE", "name", null)
+        );
+
+        List<Map<String, Object>> bList = Arrays.asList(
+                node("OBJECT_TYPE", "user", null),
+                node("ARRAY_TYPE", 0, null)
+        );
+
+        List<Map<String, Object>> cList = Arrays.asList(
+                node("ARRAY_TYPE", 0, null)
+        );
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", isArrayType(aList));
+        output.put("b", isArrayType(bList));
+        output.put("c", isArrayType(cList));
+
+        System.out.println(output);
+    }
+
+    private static Map<String, Object> node(String kind, Object selector, String namespace) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("kind", kind);
+        map.put("selector", selector);
+        map.put("namespace", namespace);
+        return map;
+    }
+
+    private static boolean isArrayType(List<Map<String, Object>> nodes) {
+        for (Map<String, Object> node : nodes) {
+            if ("ARRAY_TYPE".equals(node.get("kind"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+
+

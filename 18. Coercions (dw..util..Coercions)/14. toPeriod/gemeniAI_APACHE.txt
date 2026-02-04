@@ -1,0 +1,42 @@
+toPeriod:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Duration;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class PeriodCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coercePeriod")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Case 1: P1D (Date-based)
+                // Use java.time.Period for Days, Months, Years
+                results.put("toPeriodEx1", Period.parse("P1D"));
+
+                // Case 2: PT1H1M (Time-based)
+                // Use java.time.Duration for Hours, Minutes, Seconds
+                results.put("toPeriodEx2", Duration.parse("PT1H1M"));
+
+                exchange.getIn().setBody(results);
+            });
+    }
+}
+
+
+output:
+
+
+{
+  toPeriodEx1: |P1D|,
+  toPeriodEx2: |PT1H1M|
+}
+
+

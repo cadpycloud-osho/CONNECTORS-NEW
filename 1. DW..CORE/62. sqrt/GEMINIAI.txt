@@ -1,0 +1,45 @@
+sqrt:
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class SquareRootExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SquareRootExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        // 1. sqrt(4)
+        double result1 = Math.sqrt(4); 
+
+        // 2. sqrt(25)
+        double result2 = Math.sqrt(25); 
+
+        // 3. sqrt(100)
+        double result3 = Math.sqrt(100); 
+
+        // Java's Math.sqrt returns a 'double'. We cast to Integer 
+        // or Long in the list creation to match the integer type output in DWL/JSON.
+        // Since the results are clean integers, we cast to Integer.
+        List<Integer> finalOutput = Arrays.asList(
+            (int) result1, 
+            (int) result2, 
+            (int) result3
+        );
+        
+        System.out.println("--- DWL Square Root Equivalent Output ---");
+        System.out.println(finalOutput); 
+    }
+}
+
+output:
+
+[2, 5, 10]

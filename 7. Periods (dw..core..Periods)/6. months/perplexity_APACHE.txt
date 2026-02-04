@@ -1,0 +1,47 @@
+months:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+
+public class MonthsPeriodRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:monthsPeriod")
+            .process(exchange -> {
+                ZonedDateTime base = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // nextMonth: + months(1) → October 5 → November 5
+                result.put("nextMonth", base.plusMonths(1).toString());
+                
+                // fourMonthPeriod: months(4)
+                result.put("fourMonthPeriod", "P4M");
+                
+                // addNegativeValue: months(-1) + months(2) = 1 month
+                result.put("addNegativeValue", 1);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+
+

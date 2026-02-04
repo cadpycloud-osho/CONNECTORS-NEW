@@ -1,0 +1,46 @@
+with:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Map;
+
+public class CamelRegexReplace {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String ssn = "987-65-4321";
+                        
+                        // Java equivalent: replaceAll(regex, replacement)
+                        // [0-9] matches any digit; we replace each with "x"
+                        String maskedSsn = ssn.replaceAll("[0-9]", "x");
+
+                        exchange.getIn().setBody(Map.of("ssn", maskedSsn));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "ssn": "xxx-xx-xxxx"
+}
+

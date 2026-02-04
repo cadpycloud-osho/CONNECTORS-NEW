@@ -1,0 +1,513 @@
+run:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+@RestController
+public class SimulatedDwController {
+
+    private final DwSimulator simulator = new DwSimulator();
+
+    @GetMapping(value = "/simulate-dw-run", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> simulate() throws Exception {
+        // Build the inputs the same as your DataWeave sample
+        Map<String,Object> payloadJsonValue = new HashMap<>();
+        payloadJsonValue.put("value", "{\"name\": \"Mariano\"}");
+        payloadJsonValue.put("encoding", "UTF-8");
+        payloadJsonValue.put("properties", Collections.emptyMap());
+        payloadJsonValue.put("mimeType", "application/json");
+
+        Map<String,Object> payloadJsonValue2 = new HashMap<>();
+        payloadJsonValue2.put("value", "{\"name\": \"Mariano\", \"lastName\": \"achaval\"}");
+        payloadJsonValue2.put("encoding", "UTF-8");
+        payloadJsonValue2.put("properties", Collections.emptyMap());
+        payloadJsonValue2.put("mimeType", "application/json");
+
+        Map<String,Object> invalidJsonPayload = new HashMap<>();
+        invalidJsonPayload.put("value", "{\"name\": \"Mariano");
+        invalidJsonPayload.put("encoding", "UTF-8");
+        invalidJsonPayload.put("properties", Collections.emptyMap());
+        invalidJsonPayload.put("mimeType", "application/json");
+
+        String utilsLibrary = "fun sum(a,b) = a + b"; // used for library test
+
+        Map<String,Object> output = new LinkedHashMap<>();
+
+        // execute_ok
+        DwResult executeOk = simulator.run(
+                "main.dwl",
+                Collections.singletonMap("main.dwl", "{a: 1}"),
+                Collections.singletonMap("payload", payloadJsonValue),
+                null, // options
+                null // security manager
+        );
+        output.put("execute_ok", executeOk.asMap());
+
+        // logs
+        DwResult logsRes = simulator.run(
+                "main.dwl",
+                Collections.singletonMap("main.dwl", "{a: log(1)}"),
+                Collections.singletonMap("payload", payloadJsonValue),
+                null,
+                null
+        );
+        Map<String,Object> logsOut = new HashMap<>();
+        logsOut.put("m", logsRes.logs);
+        logsOut.put("l", logsRes.levels);
+        output.put("logs", logsOut);
+
+        // grant (security denied)
+        DwResult grantRes = simulator.run(
+                "main.dwl",
+                Collections.singletonMap("main.dwl", "{a: readUrl(`http://google.com`)}"),
+                Collections.singletonMap("payload", payloadJsonValue),
+                null,
+                (grant,args) -> false // security manager denies resource access
+        );
+        output.put("grant", grantRes.asMap());
+
+        // library
+        Map<String,String> filesForLib = new HashMap<>();
+        filesForLib.put("main.dwl", "Utils::sum(1,2)");
+        filesForLib.put("/Utils.dwl", utilsLibrary);
+        DwResult libRes = simulator.run("main.dwl", filesForLib, Collections.singletonMap("payload", payloadJsonValue), null, null);
+        output.put("library", libRes.asMap());
+
+        // timeout (simulate long computation, timeout 2s)
+        Map<String,Object> timeoutOptions = new HashMap<>();
+        timeoutOptions.put("timeOutSeconds", 2);
+        DwResult timeoutRes = simulator.run(
+                "main.dwl",
+                Collections.singletonMap("main.dwl", "(1 to 1000000000000) map $ + 1"),
+                Collections.singletonMap("payload", payloadJsonValue),
+                timeoutOptions,
+                null
+        );
+        output.put("timeout", timeoutRes.success);
+
+        // execFail (explicit fail)
+        DwResult execFail = simulator.run("main.dwl",
+                Collections.singletonMap("main.dwl", "dw::Runtime::fail('My Bad')"),
+                Collections.singletonMap("payload", payloadJsonValue),
+                null,
+                null);
+        output.put("execFail", execFail.asMap());
+
+        // parseFail
+        DwResult parseFail = simulator.run("main.dwl",
+                Collections.singletonMap("main.dwl", "(1 + "),
+                Collections.singletonMap("payload", payloadJsonValue),
+                null, null);
+        output.put("parseFail", parseFail.asMap());
+
+        // writerFail
+        DwResult writerFail = simulator.run("main.dwl",
+                Collections.singletonMap("main.dwl", "output application/xml --- 2"),
+                Collections.singletonMap("payload", payloadJsonValue),
+                null, null);
+        output.put("writerFail", writerFail.asMap());
+
+        // readerFail (invalid JSON payload)
+        DwResult readerFail = simulator.run("main.dwl",
+                Collections.singletonMap("main.dwl", "output application/xml --- payload"),
+                Collections.singletonMap("payload", invalidJsonPayload),
+                null, null);
+        output.put("readerFail", readerFail.asMap());
+
+        // defaultOutput (request CSV)
+        Map<String,Object> defaultOutputOptions = new HashMap<>();
+        defaultOutputOptions.put("outputMimeType", "application/csv");
+        defaultOutputOptions.put("writerProperties", Collections.singletonMap("separator", "|"));
+        DwResult defaultOutputRes = simulator.run("main.dwl",
+                Collections.singletonMap("main.dwl", "payload"),
+                Collections.singletonMap("payload", payloadJsonValue2),
+                defaultOutputOptions, null);
+        output.put("defaultOutput", defaultOutputRes.asMap());
+
+        return output;
+    }
+
+    // ------------------------------
+    // Mini simulator classes
+    // ------------------------------
+    public static class DwSimulator {
+
+        private final ObjectMapper mapper = new ObjectMapper();
+
+        public DwResult run(String entryFile, Map<String,String> files, Map<String,Object> vars,
+                            Map<String,Object> options, SecurityManagerCallback securityManager) {
+            // Inspect the main script
+            String script = files.getOrDefault("main.dwl", "");
+            DwResult r = new DwResult();
+            r.logs = new ArrayList<>();
+            r.levels = new ArrayList<>();
+
+            // Simple dispatch by script content (this is simulation, not an interpreter)
+            try {
+                // Logging case
+                if (script.contains("log(1)")) {
+                    r.success = true;
+                    r.value = "{\n  a: log(1)\n}";
+                    r.mimeType = "application/dw";
+                    r.encoding = "UTF-8";
+                    r.logs.add("1");
+                    r.levels.add("INFO");
+                    return r;
+                }
+
+                // simple execute ok (literal)
+                if (script.trim().equals("{a: 1}") || script.contains("{a: 1}")) {
+                    r.success = true;
+                    r.value = "{\n  a: 1\n}";
+                    r.mimeType = "application/dw";
+                    r.encoding = "UTF-8";
+                    return r;
+                }
+
+                // readUrl + security manager
+                if (script.contains("readUrl(")) {
+                    if (securityManager != null && !securityManager.check("Resource", new Object[]{})) {
+                        r.success = false;
+                        r.message = "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)";
+                        r.location = DwResult.locationStub();
+                        r.stack = Arrays.asList("readUrl (anonymous:0:0)", "main (main:1:5)");
+                        return r;
+                    } else {
+                        r.success = true;
+                        r.value = "\"readUrl-result\"";
+                        r.mimeType = "application/dw";
+                        r.encoding = "UTF-8";
+                        return r;
+                    }
+                }
+
+                // library case: Utils::sum(1,2)
+                if (script.contains("Utils::sum(1,2)")) {
+                    r.success = true;
+                    r.value = "3";
+                    r.mimeType = "application/dw";
+                    r.encoding = "UTF-8";
+                    return r;
+                }
+
+                // timeout simulation: long loop + timeout option
+                if (script.contains("1 to 1000000000000") || script.contains("1000000000000")) {
+                    int timeOutSeconds = options != null && options.get("timeOutSeconds") instanceof Number
+                            ? ((Number)options.get("timeOutSeconds")).intValue()
+                            : 0;
+                    // simulate work on executor with timeout
+                    ExecutorService ex = Executors.newSingleThreadExecutor();
+                    Future<Boolean> fut = ex.submit(() -> {
+                        // simulate very long computation
+                        try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
+                        return true;
+                    });
+                    try {
+                        if (timeOutSeconds > 0) {
+                            fut.get(timeOutSeconds, TimeUnit.SECONDS);
+                            r.success = true;
+                        } else {
+                            fut.get();
+                            r.success = true;
+                        }
+                    } catch (TimeoutException te) {
+                        r.success = false;
+                    } catch (Exception e) {
+                        r.success = false;
+                    } finally {
+                        fut.cancel(true);
+                        ex.shutdownNow();
+                    }
+                    return r;
+                }
+
+                // explicit runtime fail
+                if (script.contains("dw::Runtime::fail")) {
+                    r.success = false;
+                    r.message = "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)";
+                    r.location = DwResult.locationStub();
+                    r.stack = Arrays.asList("fail (anonymous:0:0)", "main (main:1:1)");
+                    return r;
+                }
+
+                // parse failure detection
+                if (script.trim().startsWith("(1 +")) {
+                    r.success = false;
+                    r.message = "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)";
+                    r.location = DwResult.locationForParse();
+                    r.stack = Collections.emptyList();
+                    return r;
+                }
+
+                // writer failure (attempt to write XML but returning a bare scalar or invalid structure)
+                if (script.contains("output application/xml --- 2")) {
+                    r.success = false;
+                    r.message = "Trying to output non-whitespace characters outside main element tree (in prolog or epilog), while writing Xml at .";
+                    r.location = DwResult.locationEmptyContent();
+                    return r;
+                }
+
+                // reader failure: when payload has invalid JSON
+                if (script.contains("payload") && containsInvalidJson(vars)) {
+                    r.success = false;
+                    r.message = "Unexpected end-of-input at payload@[1:18] (line:column), expected '\"', while reading `payload` as Json.\n \n1| {\"name\": \"Mariano\n                    ^";
+                    r.location = DwResult.locationWithContent("\n1| {\"name\": \"Mariano\n                    ^");
+                    return r;
+                }
+
+                // default output: request for CSV, writerProperties - we produce CSV
+                if ("payload".equals(script.trim()) || script.trim().equals("payload")) {
+                    String mime = options != null && options.get("outputMimeType") instanceof String
+                            ? (String)options.get("outputMimeType") : "application/dw";
+                    if ("application/csv".equals(mime)) {
+                        // build CSV from payload value string, here we expect {"name":"Mariano","lastName":"achaval"}
+                        Map<String,Object> payload = (Map<String,Object>)vars.get("payload");
+                        String value = (String)payload.get("value");
+                        // crude parse (for this example only)
+                        String name = extractField(value, "name");
+                        String lastName = extractField(value, "lastName");
+                        String sep = "|";
+                        if (options != null && options.get("writerProperties") instanceof Map) {
+                            Object s = ((Map)options.get("writerProperties")).get("separator");
+                            if (s instanceof String) sep = (String)s;
+                        }
+                        r.success = true;
+                        r.value = "name"+sep+"lastName\n"+name+sep+lastName+"\n";
+                        r.mimeType = mime;
+                        r.encoding = "UTF-8";
+                        return r;
+                    }
+                }
+
+                // fallback: return unknown success
+                r.success = true;
+                r.value = "\"ok\"";
+                r.mimeType = "application/dw";
+                r.encoding = "UTF-8";
+                return r;
+
+            } catch (Exception ex) {
+                r.success = false;
+                r.message = ex.getMessage();
+                return r;
+            }
+        }
+
+        private static boolean containsInvalidJson(Map<String,Object> vars) {
+            if (vars == null) return false;
+            Object p = vars.get("payload");
+            if (!(p instanceof Map)) return false;
+            Object val = ((Map)p).get("value");
+            if (!(val instanceof String)) return false;
+            String s = (String)val;
+            return !s.trim().endsWith("\"}") && s.contains("\"name\": \"Mariano");
+        }
+
+        private static String extractField(String jsonish, String key) {
+            try {
+                int idx = jsonish.indexOf("\"" + key + "\"");
+                if (idx == -1) {
+                    // also try "key":
+                    idx = jsonish.indexOf(key + "\":");
+                }
+                if (idx == -1) return "";
+                int colon = jsonish.indexOf(":", idx);
+                int firstQuote = jsonish.indexOf("\"", colon);
+                int secondQuote = jsonish.indexOf("\"", firstQuote+1);
+                return jsonish.substring(firstQuote+1, secondQuote);
+            } catch (Exception e) {
+                return "";
+            }
+        }
+    }
+
+    // Callback interface
+    public interface SecurityManagerCallback {
+        boolean check(String grant, Object[] args);
+    }
+
+    // Structured result type
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class DwResult {
+        public Boolean success;
+        public String value;
+        public String mimeType;
+        public String encoding;
+        public List<String> logs;
+        public List<String> levels;
+        public String message;
+        public Map<String,Object> location;
+        public List<String> stack;
+
+        public List<String> getLogs(){ return logs; }
+        public List<String> getLevels(){ return levels; }
+
+        public Map<String,Object> asMap() {
+            Map<String,Object> m = new LinkedHashMap<>();
+            if (success != null) m.put("success", success);
+            if (value != null) m.put("value", value);
+            if (mimeType != null) m.put("mimeType", mimeType);
+            if (encoding != null) m.put("encoding", encoding);
+            if (logs != null) m.put("logs", logs);
+            if (levels != null) m.put("levels", levels);
+            if (message != null) m.put("message", message);
+            if (location != null) m.put("location", location);
+            if (stack != null) m.put("stack", stack);
+            return m;
+        }
+
+        static Map<String,Object> locationStub() {
+            Map<String,Object> l = new LinkedHashMap<>();
+            Map<String,Object> s = new LinkedHashMap<>();
+            s.put("index",0); s.put("line",0); s.put("column",0);
+            Map<String,Object> e = new LinkedHashMap<>();
+            e.put("index",0); e.put("line",0); e.put("column",0);
+            l.put("start", s); l.put("end", e); l.put("content","Unknown location");
+            return l;
+        }
+
+        static Map<String,Object> locationForParse() {
+            Map<String,Object> l = new LinkedHashMap<>();
+            Map<String,Object> s = new LinkedHashMap<>();
+            s.put("index",0); s.put("line",1); s.put("column",2);
+            Map<String,Object> e = new LinkedHashMap<>();
+            e.put("index",4); e.put("line",1); e.put("column",6);
+            l.put("start", s); l.put("end", e);
+            l.put("content","\n1| (1 + \n    ^^^^");
+            return l;
+        }
+
+        static Map<String,Object> locationEmptyContent() {
+            Map<String,Object> l = new LinkedHashMap<>();
+            l.put("content","");
+            return l;
+        }
+
+        static Map<String,Object> locationWithContent(String content) {
+            Map<String,Object> l = new LinkedHashMap<>();
+            l.put("content", content);
+            return l;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "{\n  a: 1\n}",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8"
+  },
+  "logs": {
+    "m": [
+      "1"
+    ],
+    "l": [
+      "INFO"
+    ]
+  },
+  "grant": {
+    "success": false,
+    "message": "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+    "location": {
+      "start": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "end": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "content": "Unknown location"
+    },
+    "stack": [
+      "readUrl (anonymous:0:0)",
+      "main (main:1:5)"
+    ]
+  },
+  "library": {
+    "success": true,
+    "value": "3",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8"
+  },
+  "timeout": false,
+  "execFail": {
+    "success": false,
+    "message": "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+    "location": {
+      "start": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "end": {
+        "index": 0,
+        "line": 0,
+        "column": 0
+      },
+      "content": "Unknown location"
+    },
+    "stack": [
+      "fail (anonymous:0:0)",
+      "main (main:1:1)"
+    ]
+  },
+  "parseFail": {
+    "success": false,
+    "message": "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+    "location": {
+      "start": {
+        "index": 0,
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "index": 4,
+        "line": 1,
+        "column": 6
+      },
+      "content": "\n1| (1 + \n    ^^^^"
+    }
+  },
+  "writerFail": {
+    "success": false,
+    "message": "Trying to output non-whitespace characters outside main element tree (in prolog or epilog), while writing Xml at .",
+    "location": {
+      "content": ""
+    }
+  },
+  "readerFail": {
+    "success": false,
+    "message": "Unexpected end-of-input at payload@[1:18] (line:column), expected '\"', while reading `payload` as Json.\n \n1| {\"name\": \"Mariano\n                    ^",
+    "location": {
+      "content": "\n1| {\"name\": \"Mariano\n                    ^"
+    }
+  },
+  "defaultOutput": {
+    "success": true,
+    "value": "name|lastName\nMariano|achaval\n",
+    "mimeType": "application/csv",
+    "encoding": "UTF-8"
+  }
+}
+
+

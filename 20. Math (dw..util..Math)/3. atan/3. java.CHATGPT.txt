@@ -1,0 +1,30 @@
+atan:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("atan0", Math.atan(0));
+        result.put("atan13", Math.atan(0.13));
+        result.put("atan-1", Math.atan(-1));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{atan0=0.0, atan13=0.12927500404814307, atan-1=-0.7853981633974483}
+
+

@@ -1,0 +1,67 @@
+isUpperCase:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static boolean isUpperCaseDW(String input) {
+        if (input == null || input.isEmpty()) return false;
+
+        // DW behavior: only uppercase letters, no digits, spaces, symbols
+        if (!input.matches("^[\\p{Lu}]+$")) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+Spring Boot Controller:
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class UpperCaseController {
+
+    @GetMapping("/isuppercase")
+    public Map<String, Boolean> checkUppercase() {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.isUpperCaseDW(null));
+        result.put("b", StringUtils.isUpperCaseDW(""));
+        result.put("c", StringUtils.isUpperCaseDW("  "));
+        result.put("d", StringUtils.isUpperCaseDW("ABC"));
+        result.put("e", StringUtils.isUpperCaseDW("aBC"));
+        result.put("f", StringUtils.isUpperCaseDW("A C"));
+        result.put("g", StringUtils.isUpperCaseDW("A1C"));
+        result.put("h", StringUtils.isUpperCaseDW("A/C"));
+
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}
+
+

@@ -1,0 +1,157 @@
+entrySet:
+
+XML
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+
+
+
+input:
+
+
+package com.example.dataweaveconverter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+// =========================================================================
+// 1. SPRING BOOT APPLICATION MAIN CLASS & MODELS
+// =========================================================================
+@SpringBootApplication
+public class DataweaveConverterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveConverterApplication.class, args);
+    }
+
+    // DTO for the single entry structure in the final array
+    public record Entry(
+        String key,
+        Map<String, String> value, // Child elements
+        Map<String, String> attributes
+    ) {}
+
+    // DTO for the final output JSON structure
+    public record DataWeaveOutput(
+        List<Entry> entrySet
+    ) {}
+
+    // =========================================================================
+    // 2. REST CONTROLLER
+    // =========================================================================
+    @RestController
+    @RequestMapping("/convert")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+        private static final String XML_SOURCE = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+        @Autowired
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/entrySet")
+        public DataWeaveOutput runDataWeaveLogic() {
+            return dataWeaveService.processEntrySet(XML_SOURCE);
+        }
+    }
+
+    // =========================================================================
+    // 3. SERVICE LAYER (LOGIC IMPLEMENTATION)
+    // =========================================================================
+    @Service
+    public static class DataWeaveService {
+
+        private final XmlMapper xmlMapper;
+
+        public DataWeaveService() {
+            // Initialize the XML mapper for parsing
+            this.xmlMapper = new XmlMapper();
+        }
+
+        /**
+         * Replicates the DataWeave logic: read XML, then apply entrySet.
+         */
+        public DataWeaveOutput processEntrySet(String xmlString) {
+            try {
+                // Step 1: Parse the XML string into a generic Map structure.
+                // Jackson's default parsing for: <xml attr="x"><a>true</a><b>1</b></xml>
+                // gives: { "xml": { "@attr": "x", "a": "true", "b": "1" } }
+                Map<String, Object> xmlObjectMap = xmlMapper.readValue(xmlString, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+
+                // Since there is only one top-level element, we grab the first entry.
+                Map.Entry<String, Object> topLevelEntry = xmlObjectMap.entrySet().iterator().next();
+                String key = topLevelEntry.getKey(); // "xml"
+
+                // The value is the inner map of elements and attributes
+                Map<String, Object> innerMap = (Map<String, Object>) topLevelEntry.getValue();
+
+                // Step 2: Separate attributes from child elements (the value)
+                Map<String, String> attributes = new LinkedHashMap<>();
+                Map<String, String> value = new LinkedHashMap<>();
+
+                innerMap.forEach((k, v) -> {
+                    // Jackson attributes start with '@'
+                    if (k.startsWith("@")) {
+                        attributes.put(k.substring(1), (String) v); // e.g., "attr": "x"
+                    } else {
+                        // Child elements, which become the "value" map
+                        value.put(k, (String) v); // e.g., "a": "true", "b": "1"
+                    }
+                });
+
+                // Step 3: Create the final Entry object
+                Entry entry = new Entry(key, value, attributes);
+
+                // Step 4: Wrap the single entry in the final DataWeave output structure
+                return new DataWeaveOutput(List.of(entry));
+
+            } catch (IOException e) {
+                // Handle parsing errors
+                e.printStackTrace();
+                return new DataWeaveOutput(Collections.emptyList());
+            }
+        }
+    }
+}
+
+output:
+
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+

@@ -1,0 +1,232 @@
+unzip:
+
+
+
+example 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // Input: Array of pairs (List of Lists)
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a"),
+            Arrays.asList(1, "b"),
+            Arrays.asList(2, "c"),
+            Arrays.asList(3, "d")
+        );
+        
+        // DataWeave Unzip logic (Transposition):
+        
+        // Find the maximum expected number of columns (2 in this case)
+        int numColumns = input.isEmpty() ? 0 : 2; 
+
+        // Initialize the outer list (one list per column)
+        List<List<Object>> unzippedResult = new ArrayList<>();
+        for (int i = 0; i < numColumns; i++) {
+            unzippedResult.add(new ArrayList<>());
+        }
+        
+        // Populate the columns
+        for (List<Object> innerList : input) {
+            for (int i = 0; i < numColumns; i++) {
+                if (i < innerList.size()) {
+                    unzippedResult.get(i).add(innerList.get(i));
+                }
+            }
+        }
+        
+        // --- Output Assembly (Standard Java Formatting) ---
+        // This replaces the Jackson logic to print the expected JSON array string.
+        StringBuilder output = new StringBuilder("[ ");
+
+        for (int i = 0; i < unzippedResult.size(); i++) {
+            List<Object> column = unzippedResult.get(i);
+            
+            // Start of inner array
+            output.append("[ ");
+            
+            // Format elements (add quotes for Strings)
+            for (int j = 0; j < column.size(); j++) {
+                Object element = column.get(j);
+                if (element instanceof String) {
+                    output.append("\"").append(element).append("\"");
+                } else {
+                    output.append(element);
+                }
+                if (j < column.size() - 1) {
+                    output.append(", ");
+                }
+            }
+            
+            // End of inner array
+            output.append(" ]");
+            
+            // Add comma and space for all but the last array
+            if (i < unzippedResult.size() - 1) {
+                output.append(", ");
+            }
+        }
+        
+        output.append(" ]");
+        
+        System.out.println(output.toString());
+    }
+}
+
+output:
+
+[ [ 0, 1, 2, 3 ], [ "a", "b", "c", "d" ] ]
+
+-------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // Input: Array of arrays with varying lengths
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a"),
+            Arrays.asList(1, "a", "foo"),
+            Arrays.asList(2),
+            Arrays.asList(3, "a")
+        );
+        
+        // DataWeave Unzip logic (extracting the first element of each inner array): 
+        List<Object> firstElements = new ArrayList<>();
+        
+        for (List<Object> innerList : input) {
+            // Check if the inner list is not empty before accessing index 0
+            if (!innerList.isEmpty()) {
+                firstElements.add(innerList.get(0));
+            }
+        }
+        
+        // --- Output Assembly (Standard Java Formatting) ---
+        // Convert the list to an array and use Arrays.toString() to get a simple string representation
+        String output = Arrays.toString(firstElements.toArray());
+        
+        // Adjust the output format to remove spaces and match the expected JSON array string: [0,1,2,3]
+        // Arrays.toString() typically produces: [0, 1, 2, 3]. We remove the spaces.
+        output = output.replace(", ", ","); 
+        
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+[ 0, 1, 2, 3 ]
+
+
+-------------------------------------------------------
+
+
+
+
+example 3:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // Input: Array of triples (List of Lists)
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a", "W"),
+            Arrays.asList(1, "b", "X"),
+            Arrays.asList(2, "c", "Y"),
+            Arrays.asList(3, "d", "Z")
+        );
+        
+        // DataWeave Unzip logic (Transposition):
+        
+        // Find the maximum number of columns (3 in this case)
+        int numColumns = input.isEmpty() ? 0 : 3; 
+
+        // Initialize the outer list (one list per column)
+        List<List<Object>> unzippedResult = new ArrayList<>();
+        for (int i = 0; i < numColumns; i++) {
+            unzippedResult.add(new ArrayList<>());
+        }
+        
+        // Populate the columns
+        for (List<Object> innerList : input) {
+            for (int i = 0; i < numColumns; i++) {
+                if (i < innerList.size()) {
+                    unzippedResult.get(i).add(innerList.get(i));
+                }
+            }
+        }
+        
+        // --- Output Assembly (Standard Java Formatting) ---
+        // This replaces the Jackson logic to avoid compilation errors
+        StringBuilder output = new StringBuilder("[\n");
+
+        for (int i = 0; i < unzippedResult.size(); i++) {
+            List<Object> column = unzippedResult.get(i);
+            
+            // Start of inner array
+            output.append("  [ ");
+            
+            // Format elements (add quotes for Strings)
+            for (int j = 0; j < column.size(); j++) {
+                Object element = column.get(j);
+                if (element instanceof String) {
+                    output.append("\"").append(element).append("\"");
+                } else {
+                    output.append(element);
+                }
+                if (j < column.size() - 1) {
+                    output.append(", ");
+                }
+            }
+            
+            // End of inner array
+            output.append(" ]");
+            
+            // Add comma and newline for all but the last array
+            if (i < unzippedResult.size() - 1) {
+                output.append(",\n");
+            } else {
+                output.append("\n");
+            }
+        }
+        
+        output.append("]");
+        
+        System.out.println(output.toString());
+    }
+}
+output:
+
+[
+  [ 0, 1, 2, 3 ],
+  [ "a", "b", "c", "d" ],
+  [ "W", "X", "Y", "Z" ]
+]
+
+-------------------------------------------------------

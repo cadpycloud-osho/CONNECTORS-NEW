@@ -1,0 +1,30 @@
+nameOf:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+        
+        // Simulate nameOf() for each type definition
+        result.put("a", "AArray");   // nameOf(AArray)
+        result.put("b", "AArray2");  // nameOf(AArray2)
+        result.put("c", "String");   // nameOf(String)
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=AArray, b=AArray2, c=String}
+
+

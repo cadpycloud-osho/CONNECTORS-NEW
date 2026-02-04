@@ -1,0 +1,121 @@
+write:
+
+example 1:
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        
+        // Input string value to be written
+        String value = "world";
+        
+        // --- 1. Define the operation ---
+        // DataWeave: write("world", "text/plain")
+        // Java equivalent: The result is the string itself.
+        String writtenValue = value; 
+
+        // --- 2. Assemble the final JSON object using standard String formatting ---
+        // This replaces the complex Jackson logic to avoid compilation errors
+        String outputJson = String.format("{\n  \"hello\" : \"%s\"\n}", writtenValue);
+        
+        // 3. Output the result
+        System.out.println(outputJson);
+    }
+}
+
+
+
+output:
+
+{
+  "hello" : "world"
+}
+
+--------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList; // Added missing import
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashMap; // Added missing import
+
+public class Main {
+
+    // Helper to generate the CSV string manually based on DW properties
+    private static String writeToCsv(List<Map<String, String>> data, String separator, boolean includeHeader) {
+        if (data == null || data.isEmpty()) {
+            return "";
+        }
+        
+        StringBuilder csv = new StringBuilder();
+        // Use the key set of the first map to define the header and order
+        Set<String> headers = data.get(0).keySet(); 
+        
+        // 1. Write Header
+        if (includeHeader) {
+            csv.append(String.join(separator, headers)).append("\n");
+        }
+        
+        // 2. Write Data Rows
+        for (Map<String, String> row : data) {
+            List<String> values = new ArrayList<>();
+            for (String header : headers) {
+                // Get values in the order defined by the headers
+                values.add(row.getOrDefault(header, "")); 
+            }
+            csv.append(String.join(separator, values)).append("\n");
+        }
+        
+        // Remove trailing newline if present
+        if (csv.length() > 0 && csv.charAt(csv.length() - 1) == '\n') {
+            csv.setLength(csv.length() - 1);
+        }
+
+        return csv.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        // DataWeave Input (JSON Payload represented as a List of LinkedHashMaps to preserve key order)
+        // LinkedHashMap is crucial here to ensure the header order is consistent (Name, Email, Id, Title)
+        List<Map<String, String>> payload = Arrays.asList(
+            new LinkedHashMap<String, String>() {{ 
+                put("Name", "Mr White"); put("Email", "white@mulesoft.com"); 
+                put("Id", "1234"); put("Title", "Chief Java Prophet"); 
+            }},
+            new LinkedHashMap<String, String>() {{ 
+                put("Name", "Mr Orange"); put("Email", "orange@mulesoft.com"); 
+                put("Id", "4567"); put("Title", "Integration Ninja"); 
+            }}
+        );
+        
+        // --- 1. DataWeave write(payload, "application/csv", ...) ---
+        String csvString = writeToCsv(payload, "|", true); 
+
+        // --- 2. Assemble the final XML object using standard string concatenation ---
+        // This replaces the complex and error-prone Jackson XML marshalling code
+        String expectedXml = "<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n" +
+                             "<output>" + csvString + "</output>";
+
+        System.out.println(expectedXml);
+    }
+}
+
+
+
+output:
+
+
+<?xml version="1.0" encoding="US-ASCII"?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja</output>
+--------------------------------------------------

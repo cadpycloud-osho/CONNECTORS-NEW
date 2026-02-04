@@ -1,0 +1,31 @@
+cos:
+
+
+input:
+
+import java.util.*;
+import static java.lang.Math.*;
+
+public class CosConverter {
+    public static void main(String[] args) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        result.put("cos0", cos(0));
+        result.put("cos13", cos(0.13));
+        result.put("cos-1", cos(-1));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{
+  "cos0": 1.0,
+  "cos13": 0.9915618937147881,
+  "cos-1": 0.5403023058681398
+}
+
+
+

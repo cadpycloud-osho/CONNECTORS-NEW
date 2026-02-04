@@ -1,0 +1,68 @@
+isAlphanumeric:
+
+
+
+input:
+
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's isAlphanumeric(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY letters or digits.
+     */
+    public static boolean isAlphanumericString(String input) {
+        // DataWeave's isAlphanumeric returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // Iterate through all characters. If any is not a letter or a digit, return false.
+        for (char c : input.toCharArray()) {
+            if (!Character.isLetterOrDigit(c)) {
+                return false;
+            }
+        }
+        // If the loop completes, all characters are alphanumeric.
+        return true;
+    }
+
+    public static void main(String[] args) {
+        // Testing various inputs:
+        boolean a = isAlphanumericString(null);
+        boolean b = isAlphanumericString("");
+        boolean c = isAlphanumericString("  "); // Contains non-breaking space
+        boolean d = isAlphanumericString("abc");
+        boolean e = isAlphanumericString("ab c");
+        boolean f = isAlphanumericString("ab2c");
+        boolean g = isAlphanumericString("ab-c");
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c + ",");
+        System.out.println("  \"d\": " + d + ",");
+        System.out.println("  \"e\": " + e + ",");
+        System.out.println("  \"f\": " + f + ",");
+        System.out.println("  \"g\": " + g);
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": true,
+  "g": false
+}

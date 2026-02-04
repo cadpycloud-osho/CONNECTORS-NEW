@@ -1,0 +1,77 @@
+isReferenceType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveReferenceTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processReferenceChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processReferenceChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AArray = Array<String> {n: 1} - concrete array type (not reference)
+        result.put("a", isReferenceType(createAArrayType()));
+        
+        // arrayItem(AArray2) where AArray2 = Array<AArray> - nested reference type
+        result.put("b", isReferenceType(createArrayItemReference()));
+        
+        // String - primitive type
+        result.put("c", isReferenceType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isReferenceType(Object type) {
+        // DataWeave isReferenceType checks for type parameters/references
+        // arrayItem(AArray2) creates a reference to the item type of nested array
+        if (type instanceof Map) {
+            Map<?,?> typeMap = (Map<?,?>) type;
+            // Direct array types are concrete, not references
+            if (typeMap.containsKey("n")) return false;
+            // arrayItem() references return true
+            return typeMap.containsKey("arrayItemRef");
+        }
+        return false;
+    }
+    
+    private Map<String, Object> createAArrayType() {
+        // Array<String> {n: 1} - concrete type with fixed size
+        Map<String, Object> type = new HashMap<>();
+        type.put("base", "Array");
+        type.put("item", "String");
+        type.put("n", 1); // Fixed size makes it concrete
+        return type;
+    }
+    
+    private Map<String, Object> createArrayItemReference() {
+        // arrayItem(AArray2) - reference to nested array item type
+        Map<String, Object> type = new HashMap<>();
+        type.put("base", "Array");
+        type.put("arrayItemRef", true); // Marks as reference type
+        return type;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": false
+}
+
+

@@ -1,0 +1,71 @@
+findDataFormatDescriptorByMime:
+
+
+input:
+
+import java.util.Map;
+import java.util.Optional;
+
+public class Main {
+
+    static class DataFormatDescriptor {
+        String name;
+        String defaultMimeType;
+
+        DataFormatDescriptor(String name, String defaultMimeType) {
+            this.name = name;
+            this.defaultMimeType = defaultMimeType;
+        }
+    }
+
+    public static void main(String[] args) {
+        DataFormatDescriptor jsonDF = findDataFormatDescriptorByMime("*", "json");
+        DataFormatDescriptor unknownDF = findDataFormatDescriptorByMime("*", "*");
+
+        Map<String, Object> output = Map.of(
+            "json", simplify(jsonDF),
+            "unknown", simplify(unknownDF)
+        );
+
+        System.out.println(output);
+    }
+
+    private static DataFormatDescriptor findDataFormatDescriptorByMime(String type, String subtype) {
+        if ("json".equalsIgnoreCase(subtype)) {
+            return new DataFormatDescriptor("json", "application/json");
+        }
+        if ("xml".equalsIgnoreCase(subtype)) {
+            return new DataFormatDescriptor("xml", "application/xml");
+        }
+        return null;
+    }
+
+    private static Map<String, String> simplify(DataFormatDescriptor df) {
+        return Optional.ofNullable(df)
+            .map(d -> Map.of(
+                "name", d.name,
+                "defaultMimeType", d.defaultMimeType
+            ))
+            .orElseGet(() -> Map.of(
+                "name", "unknown",
+                "defaultMimeType", "unknown"
+            ));
+    }
+}
+
+
+output:
+
+{
+  "json": {
+    "name": "json",
+    "defaultMimeType": "application/json"
+  },
+  "unknown": {
+    "name": "unknown",
+    "defaultMimeType": "unknown"
+  }
+}
+
+
+

@@ -1,0 +1,59 @@
+isEmpty:
+
+isEmpty(elements: Array<Any>): Boolean
+Returns true if the given input value is empty, false if not.
+
+This version of isEmpty acts on an array. Other versions act on a string or object, and handle null values.
+
+EXAMPLE 1:
+
+Source
+%dw 2.0
+output application/json
+---
+[ isEmpty([]), isEmpty([1]) ]
+
+DataWeave
+Output
+[ true, false ]
+
+
+_________________________________________________________________
+EXAMPLE 2:
+
+Source
+%dw 2.0
+output application/json
+---
+[ isEmpty(""), isEmpty("DataWeave") ]
+
+DataWeave
+Output
+[ true, false ]
+
+_________________________________________________________________
+
+EXAMPLE 3:
+
+Source
+%dw 2.0
+output application/json
+---
+[ isEmpty({}), isEmpty({name: "DataWeave"}) ]
+
+DataWeave
+Output
+[ true, false ]
+_________________________________________________________________
+
+EXAMPLE 4:
+
+Source
+%dw 2.0
+output application/json
+---
+{ "nullValue" : isEmpty(null) }
+
+DataWeave
+Output
+{ "nullValue": true }

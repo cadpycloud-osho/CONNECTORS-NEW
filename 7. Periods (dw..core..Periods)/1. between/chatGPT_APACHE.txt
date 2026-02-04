@@ -1,0 +1,63 @@
+between:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class PeriodBetweenProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        // DataWeave: between(date1, date2)
+        // Java equivalent: Period.between(date2, date1)
+
+        Period a = Period.between(
+                LocalDate.parse("2010-12-10"),
+                LocalDate.parse("2010-12-12")
+        );
+
+        Period b = Period.between(
+                LocalDate.parse("2010-11-10"),
+                LocalDate.parse("2011-12-11")
+        );
+
+        Period c = Period.between(
+                LocalDate.parse("2020-03-30"),
+                LocalDate.parse("2020-02-29")
+        );
+
+        result.put("a", a.toString());
+        result.put("b", b.toString());
+        result.put("c", c.toString());
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:start")
+    .process(new PeriodBetweenProcessor())
+    .to("log:period-result");
+
+
+output:
+
+
+{
+  "a": "P2D",
+  "b": "P1Y1M1D",
+  "c": "P-1M-1D"
+}
+
+
+
+

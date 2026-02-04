@@ -1,0 +1,39 @@
+lookup:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class Flow1Flow2Route extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // Flow2 equivalent
+        from("direct:flow2")
+            .process(exchange -> {
+                // Get input payload
+                Map<String, Object> payload = exchange.getIn().getBody(Map.class);
+                String result = payload.get("test") + "world";
+                exchange.getMessage().setBody(result);
+            })
+            .log("${body}"); // Logs "hello world"
+
+        // Flow1 equivalent (HTTP listener)
+        from("jetty:http://0.0.0.0:8080/source")
+            .process(exchange -> {
+                // Prepare payload to send to flow2
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("test", "hello ");
+                exchange.getMessage().setBody(payload);
+            })
+            .to("direct:flow2"); // Call "flow2"
+    }
+}
+
+
+output:
+hello world
+
+
+

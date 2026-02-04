@@ -1,0 +1,91 @@
+divideBy:
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: {"a": 1, "b" : true, "a" : 2, "b" : false, "c" : 3}
+        Map<String, Object> inputMap = new LinkedHashMap<>();
+        inputMap.put("a", 1);
+        inputMap.put("b", true);
+        inputMap.put("a", 2);  // Overwrites previous "a":1
+        inputMap.put("b", false);  // Overwrites previous "b":true
+        inputMap.put("c", 3);
+        
+        // DataWeave equivalent: input divideBy 2
+        List<Map<String, Object>> result = divideBy(inputMap, 2);
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"divideBy\": " + mapListToJson(result));
+        System.out.println("}");
+    }
+    
+    // DataWeave "object divideBy n" equivalent - groups every n entries into separate objects
+    public static List<Map<String, Object>> divideBy(Map<String, Object> input, int n) {
+        List<Map.Entry<String, Object>> entries = new ArrayList<>(input.entrySet());
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        for (int i = 0; i < entries.size(); i += n) {
+            Map<String, Object> chunk = new LinkedHashMap<>();
+            int end = Math.min(i + n, entries.size());
+            for (int j = i; j < end; j++) {
+                chunk.put(entries.get(j).getKey(), entries.get(j).getValue());
+            }
+            result.add(chunk);
+        }
+        return result;
+    }
+    
+    // Utility to format list of maps as JSON-like string
+    private static String mapListToJson(List<Map<String, Object>> maps) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < maps.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(mapToJson(maps.get(i)));
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    private static String mapToJson(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder("{");
+        map.forEach((k, v) -> {
+            sb.append("\"").append(k).append("\": ");
+            if (v instanceof Boolean) {
+                sb.append(v);
+            } else {
+                sb.append("\"").append(v).append("\"");
+            }
+            sb.append(", ");
+        });
+        if (!map.isEmpty()) sb.setLength(sb.length() - 2); // Remove last ", "
+        sb.append("}");
+        return sb.toString();
+    }
+}
+
+
+
+output:
+
+
+{
+  "divideBy": [
+    {
+      "a": 2,
+      "b": false
+    },
+    {
+      "c": 3
+    }
+  ]
+}
+
+
+

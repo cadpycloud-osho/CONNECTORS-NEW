@@ -1,0 +1,33 @@
+toHex:
+
+
+input:
+
+from("direct:binaryToHex")
+.process(exchange -> {
+
+    // 1. String → Binary (byte[])
+    byte[] myBinary = "Mule".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+    // 2. Binary → Hex (same as toHex)
+    StringBuilder hex = new StringBuilder();
+    for (byte b : myBinary) {
+        hex.append(String.format("%02X", b));
+    }
+
+    // 3. Set JSON-style output
+    exchange.getIn().setBody(
+        java.util.Collections.singletonMap("binaryToHex", hex.toString())
+    );
+});
+
+
+output:
+
+{
+  "binaryToHex": "4D756C65"
+}
+
+
+
+

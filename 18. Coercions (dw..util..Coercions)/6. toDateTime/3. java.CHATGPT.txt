@@ -1,0 +1,153 @@
+toDateTime:
+
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a
+        result.put("a", toDateTime(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz",
+                        "uuuu-MM-dd HH:mm:ssz"
+                }
+        ));
+
+        // b
+        result.put("b", tryToDateTime(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz"
+                }
+        ));
+
+        System.out.println(result);
+    }
+
+    private static String toDateTime(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                ZonedDateTime zdt = ZonedDateTime.parse(value, formatter);
+                return zdt.toString();
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    private static String tryToDateTime(String value, String[] formats) {
+        try {
+            return toDateTime(value, formats);
+        } catch (RuntimeException e) {
+            return e.getMessage();
+        }
+    }
+}
+
+
+output:
+
+{a=2003-10-01T23:57:59Z, b=Could not find a valid formatter for '2003-10-01 23:57:59Z'}
+
+
+
+----------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        ZonedDateTime fromEpoch =
+                Instant.ofEpochSecond(1443743879)
+                        .atZone(ZoneOffset.UTC);
+
+        ZonedDateTime fromMillis =
+                Instant.ofEpochMilli(1443743879000L)
+                        .atZone(ZoneOffset.UTC);
+
+        result.put("fromEpoch", fromEpoch.toString());
+        result.put("fromMillis", fromMillis.toString());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{fromEpoch=2015-10-01T23:57:59Z, fromMillis=2015-10-01T23:57:59Z}
+
+----------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: ISO DateTime
+        ZonedDateTime a =
+                ZonedDateTime.parse("2015-10-01T23:57:59Z");
+
+        // b: custom formatted DateTime
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssz");
+        ZonedDateTime b =
+                ZonedDateTime.parse("2003-10-01 23:57:59Z", formatter);
+
+        result.put("a", a.toString());
+        result.put("b", b.toString());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=2015-10-01T23:57:59Z, b=2003-10-01T23:57:59Z}
+
+
+
+

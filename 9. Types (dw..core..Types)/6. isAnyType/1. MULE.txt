@@ -1,0 +1,51 @@
+isAnyType:
+
+isAnyType(t: Type): Boolean
+
+isAnyType(t: Type): Boolean
+Returns true if the input is the Any type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AAny = Any
+output application/json
+---
+{
+   a: isAnyType(AAny),
+   b: isAnyType(Any),
+   c: isAnyType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

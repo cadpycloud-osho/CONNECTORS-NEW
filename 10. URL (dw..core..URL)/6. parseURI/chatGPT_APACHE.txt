@@ -1,0 +1,59 @@
+parseURI:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
+
+public class ParseUriRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                String uriStr =
+                    "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+
+                URI uri = URI.create(uriStr);
+
+                String body =
+                    "{ \"composition\": {"
+                  + "\"isValid\": true,"
+                  + "\"raw\": \"" + uriStr + "\","
+                  + "\"host\": \"" + uri.getHost() + "\","
+                  + "\"authority\": \"" + uri.getAuthority() + "\","
+                  + "\"fragment\": \"" + uri.getFragment() + "\","
+                  + "\"path\": \"" + uri.getPath() + "\","
+                  + "\"scheme\": \"" + uri.getScheme() + "\","
+                  + "\"isAbsolute\": " + uri.isAbsolute() + ","
+                  + "\"isOpaque\": " + uri.isOpaque()
+                  + "} }";
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+

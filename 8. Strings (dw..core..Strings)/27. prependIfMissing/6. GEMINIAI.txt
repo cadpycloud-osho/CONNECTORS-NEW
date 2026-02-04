@@ -1,0 +1,72 @@
+prependIfMissing:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class PrependController {
+
+    @GetMapping("/prepend-conversion")
+    public Map<String, String> convertDataWeavePrepend() {
+        
+        // Note: For 'a', we must return a null value for the key "a". 
+        // In Map.of, a null value for a value is not allowed, so we use a mutable Map.
+        String a = PrependUtil.prependIfMissing(null, "");
+        String b = PrependUtil.prependIfMissing("abc", "");
+        String c = PrependUtil.prependIfMissing("", "xyz");
+        String d = PrependUtil.prependIfMissing("abc", "xyz");
+        String e = PrependUtil.prependIfMissing("xyzabc", "xyz");
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value correctly.
+        return Map.of(
+            "a", a, 
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e
+        );
+    }
+}
+
+public class PrependUtil {
+
+    /**
+     * Replicates the dw::core::Strings::prependIfMissing function.
+     * Prepends the prefix to the string if the string does not already start with the prefix.
+     * * @param str The input string (can be null).
+     * @param prefix The string to prepend (cannot be null, based on DW behavior).
+     * @return The resulting string, or null if the input string was null.
+     */
+    public static String prependIfMissing(String str, String prefix) {
+        // 1. DataWeave Rule: If the input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+
+        // 2. Check if the string already starts with the prefix.
+        if (str.startsWith(prefix)) {
+            return str;
+        }
+
+        // 3. Otherwise, prepend the prefix.
+        return prefix + str;
+    }
+}
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}

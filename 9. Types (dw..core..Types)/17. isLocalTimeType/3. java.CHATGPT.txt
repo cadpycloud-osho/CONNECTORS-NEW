@@ -1,0 +1,40 @@
+isLocalTimeType:
+
+
+
+
+
+input:
+
+import java.time.LocalTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isLocalTimeType(Class<?> type) {
+        return LocalTime.class.equals(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ALocalTime = LocalTime.class;
+
+        result.put("a", isLocalTimeType(ALocalTime));
+        result.put("b", isLocalTimeType(LocalTime.class));
+        result.put("c", isLocalTimeType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=true, c=false}
+
+
+

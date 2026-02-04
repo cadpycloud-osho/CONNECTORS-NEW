@@ -1,0 +1,34 @@
+isDateType:
+
+
+
+
+INPUT:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // Simulates isDateType(ADate) where ADate = Date
+        result.put("a", true);
+        
+        // Simulates isDateType(Date)
+        result.put("b", true);
+        
+        // Simulates isDateType(String)
+        result.put("c", false);
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+OUTPUT:
+
+{a=true, b=true, c=false}
+

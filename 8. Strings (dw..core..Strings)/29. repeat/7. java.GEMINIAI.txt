@@ -1,0 +1,46 @@
+repeat:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = repeatString("e", 0);
+        String b = repeatString("e", 3);
+        String c = repeatString("e", -2);
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": \"%s\",\n  \"b\": \"%s\",\n  \"c\": \"%s\"\n}",
+            a, b, c
+        );
+
+        System.out.println(output);
+    }
+    
+    /**
+     * Implements the logic of the DataWeave 'repeat' function, handling 
+     * non-negative counts and translating negative counts to 0.
+     */
+    public static String repeatString(String str, int count) {
+        // DataWeave behavior: if count < 0, it behaves as count = 0.
+        int effectiveCount = Math.max(0, count);
+        
+        // Use the Java 11+ String.repeat() method.
+        return str.repeat(effectiveCount);
+    }
+}
+
+output:
+
+{
+  "a": "",
+  "b": "eee",
+  "c": ""
+}
+
+

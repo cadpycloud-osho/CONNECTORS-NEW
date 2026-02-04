@@ -1,0 +1,67 @@
+isTimeZoneType:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+import java.util.TimeZone;
+
+public class CamelTimeZoneTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type ATimeZone = TimeZone (alias simulation)
+                        Class<?> ATimeZone = TimeZone.class;
+
+                        // Simulating DataWeave isTimeZoneType
+                        boolean a = isTimeZoneType(ATimeZone);
+                        boolean b = isTimeZoneType(TimeZone.class);
+                        boolean c = isTimeZoneType(String.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + ",\n" +
+                                "  \"c\": " + c + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave isTimeZoneType
+    private static boolean isTimeZoneType(Class<?> clazz) {
+        return clazz == TimeZone.class;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

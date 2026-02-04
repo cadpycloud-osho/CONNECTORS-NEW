@@ -1,0 +1,45 @@
+isTimeType:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TimeTypeController {
+
+    private boolean isTimeType(Object value) {
+        return value instanceof LocalTime;
+    }
+
+    @GetMapping("/time-type-check")
+    public Map<String, Boolean> checkTimeTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        LocalTime aTime = LocalTime.now();   // ATime alias
+        LocalTime timeType = LocalTime.of(12, 30); // Time
+        String str = "test";                 // String
+        
+        result.put("a", isTimeType(aTime));
+        result.put("b", isTimeType(timeType));
+        result.put("c", isTimeType(str));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

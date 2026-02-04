@@ -1,0 +1,53 @@
+index:
+
+
+index:
+
+public class IndexRepresentation {
+    private String kind;
+    private Object namespace; // Using Object to explicitly hold null
+    private int selector;
+
+    // Constructor to mimic the DataWeave function call
+    public IndexRepresentation(int indexValue) {
+        // The kind is fixed to "Array" for the 'index' function output
+        this.kind = "Array"; 
+        this.namespace = null;
+        this.selector = indexValue;
+    }
+
+    // Getters (needed for Jackson serialization)
+    public String getKind() {
+        return kind;
+    }
+    public Object getNamespace() {
+        return namespace;
+    }
+    public int getSelector() {
+        return selector;
+    }
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveController {
+
+    private static final int INDEX_VALUE = 0;
+
+    @GetMapping("/create-index")
+    public IndexRepresentation createIndex() {
+        // This instantiates the Java object, mimicking the DataWeave 'index' function
+        return new IndexRepresentation(INDEX_VALUE);
+    }
+}
+
+output:
+
+{
+  "kind": "Array",
+  "namespace": null,
+  "selector": 0
+}
+

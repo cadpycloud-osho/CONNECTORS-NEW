@@ -1,0 +1,28 @@
+isBlank:
+
+
+input:
+
+import java.util.*;
+
+String someString = "something";
+String nullString = null;
+
+Map<String, Boolean> output = Map.of(
+    "emptyString", "".isBlank(),
+    "stringWithSpaces", "      ".isBlank(),
+    "textString", someString.isBlank(),
+    "somePayloadValue", Objects.isNull(null) ? true : "".isBlank(),
+    "nullString", Objects.isNull(nullString) ? true : nullString.isBlank(),
+    "notEmptyTextString", !" 1234".isBlank(),
+    "notEmptyTextStringTwo", !"".isBlank()
+);
+
+System.out.println(output);
+
+
+output:
+{emptyString=true, stringWithSpaces=true, textString=false, somePayloadValue=true, nullString=true, notEmptyTextString=true, notEmptyTextStringTwo=false}
+
+
+

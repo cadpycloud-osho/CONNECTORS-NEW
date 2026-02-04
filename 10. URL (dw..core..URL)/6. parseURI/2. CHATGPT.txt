@@ -1,0 +1,92 @@
+parseURI:
+
+
+
+input:
+
+package com.example.demo.model;
+
+public class URIComposition {
+    public boolean isValid;
+    public String raw;
+    public String host;
+    public String authority;
+    public String fragment;
+    public String path;
+    public String scheme;
+    public boolean isAbsolute;
+    public boolean isOpaque;
+
+    public URIComposition(boolean isValid, String raw, String host, String authority,
+                          String fragment, String path, String scheme, boolean isAbsolute, boolean isOpaque) {
+        this.isValid = isValid;
+        this.raw = raw;
+        this.host = host;
+        this.authority = authority;
+        this.fragment = fragment;
+        this.path = path;
+        this.scheme = scheme;
+        this.isAbsolute = isAbsolute;
+        this.isOpaque = isOpaque;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.model.URIComposition;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class URIParseController {
+
+    @GetMapping("/parseURI")
+    public Map<String, URIComposition> parseURIExample() {
+        Map<String, URIComposition> result = new HashMap<>();
+
+        String uriString = "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+
+        try {
+            URI uri = new URI(uriString);
+            URIComposition composition = new URIComposition(
+                    true,
+                    uriString,
+                    uri.getHost(),
+                    uri.getAuthority(),
+                    uri.getFragment(),
+                    uri.getPath(),
+                    uri.getScheme(),
+                    uri.isAbsolute(),
+                    uri.isOpaque()
+            );
+            result.put("composition", composition);
+        } catch (Exception e) {
+            result.put("composition", new URIComposition(false, uriString, null, null, null, null, null, false, false));
+        }
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+
+
+

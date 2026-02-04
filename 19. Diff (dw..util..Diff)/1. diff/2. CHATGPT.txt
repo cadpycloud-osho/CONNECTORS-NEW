@@ -1,0 +1,166 @@
+diff:
+
+Maven Dependencies
+<dependencies>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>com.flipkart.zjsonpatch</groupId>
+        <artifactId>zjsonpatch</artifactId>
+        <version>0.4.14</version>
+    </dependency>
+</dependencies>
+
+input:
+
+package com.example.demo.util;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flipkart.zjsonpatch.JsonDiff;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class DiffUtil {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static Map<String, Object> diff(Object expected, Object actual) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            JsonNode expectedNode = mapper.valueToTree(expected);
+            JsonNode actualNode = mapper.valueToTree(actual);
+
+            JsonNode patch = JsonDiff.asJson(expectedNode, actualNode);
+
+            boolean matches = patch.isEmpty();
+
+            result.put("matches", matches);
+            result.put("diffs", patch);
+
+        } catch (Exception e) {
+            result.put("matches", false);
+            result.put("diffs", e.getMessage());
+        }
+
+        return result;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.DiffUtil;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class DiffController {
+
+    @GetMapping("/diff")
+    public Map<String, Object> diffExamples() {
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("a", DiffUtil.diff(
+                Map.of("a", 1),
+                Map.of("b", 1)
+        ));
+
+        response.put("c", DiffUtil.diff(
+                List.of(1,2,3),
+                List.of()
+        ));
+
+        response.put("h", DiffUtil.diff(true, false));
+        response.put("i", DiffUtil.diff(1, 2));
+        response.put("j", DiffUtil.diff("test", "other test"));
+
+        response.put("k", DiffUtil.diff(
+                Map.of("a", 1),
+                Map.of("a", 1)
+        ));
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "matches": false,
+    "diffs": [
+      {
+        "op": "remove",
+        "path": "/a"
+      },
+      {
+        "op": "add",
+        "path": "/b",
+        "value": 1
+      }
+    ]
+  },
+  "c": {
+    "matches": false,
+    "diffs": [
+      {
+        "op": "remove",
+        "path": "/0"
+      },
+      {
+        "op": "remove",
+        "path": "/1"
+      },
+      {
+        "op": "remove",
+        "path": "/2"
+      }
+    ]
+  },
+  "h": {
+    "matches": false,
+    "diffs": [
+      {
+        "op": "replace",
+        "path": "",
+        "value": false
+      }
+    ]
+  },
+  "i": {
+    "matches": false,
+    "diffs": [
+      {
+        "op": "replace",
+        "path": "",
+        "value": 2
+      }
+    ]
+  },
+  "j": {
+    "matches": false,
+    "diffs": [
+      {
+        "op": "replace",
+        "path": "",
+        "value": "other test"
+      }
+    ]
+  },
+  "k": {
+    "matches": true,
+    "diffs": []
+  }
+}
+
+

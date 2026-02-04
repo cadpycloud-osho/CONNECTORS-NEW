@@ -1,0 +1,83 @@
+nodeExists:
+
+
+input:
+
+import java.util.*;
+
+public class NodeExistsExample {
+
+    public static void main(String[] args) {
+
+        // Construct the object
+        Map<String, Object> myObject = new LinkedHashMap<>();
+
+        Map<String, Object> user1 = new LinkedHashMap<>();
+        user1.put("name", "mariano");
+        user1.put("lastName", "achaval");
+        user1.put("friends", Arrays.asList(
+                Collections.singletonMap("name", "julian"),
+                Collections.singletonMap("name", "tom")
+        ));
+
+        Map<String, Object> user2 = new LinkedHashMap<>();
+        user2.put("name", "leandro");
+        user2.put("lastName", "shokida");
+        user2.put("friends", Arrays.asList(
+                Collections.singletonMap("name", "peter"),
+                Collections.singletonMap("name", "robert")
+        ));
+
+        myObject.put("user", Arrays.asList(user1, user2));
+
+        // Evaluate nodeExists conditions
+        Map<String, Boolean> output = new LinkedHashMap<>();
+        output.put("mariano", nodeExists(myObject, "name", "mariano"));
+        output.put("julian", nodeExists(myObject, "name", "julian"));
+        output.put("tom", nodeExists(myObject, "name", "tom"));
+        output.put("leandro", nodeExists(myObject, "name", "leandro"));
+        output.put("peter", nodeExists(myObject, "name", "peter"));
+        output.put("wrongField", nodeExists(myObject, "wrongField", null));
+        output.put("teo", nodeExists(myObject, "name", "teo"));
+
+        System.out.println(output);
+    }
+
+    private static boolean nodeExists(Object obj, String selector, Object value) {
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if (entry.getKey().equals(selector)) {
+                    if (value == null || entry.getValue().equals(value)) {
+                        return true;
+                    }
+                }
+                if (nodeExists(entry.getValue(), selector, value)) {
+                    return true;
+                }
+            }
+        } else if (obj instanceof List) {
+            for (Object item : (List<?>) obj) {
+                if (nodeExists(item, selector, value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+
+output:
+
+
+{
+  "mariano": true,
+  "julian": true,
+  "tom": true,
+  "leandro": true,
+  "peter": true,
+  "wrongField": false,
+  "teo": false
+}
+

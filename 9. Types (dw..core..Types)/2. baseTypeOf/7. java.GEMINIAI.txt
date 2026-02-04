@@ -1,0 +1,52 @@
+baseTypeOf:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    // 1. Emulate the DataWeave Type definition (AType)
+    public static class AType {
+        // The base type of AType is String
+        private final String baseType = "String"; 
+        
+        public String getBaseType() {
+            return baseType;
+        }
+    }
+
+    /**
+     * Pure Java method to mimic the DataWeave baseTypeOf(AType) function.
+     */
+    public static String baseTypeOf(AType type) {
+        // Directly returns the base type defined in the custom type class
+        return type.getBaseType();
+    }
+
+    public static void main(String[] args) {
+        // Create an instance of the custom type
+        AType customType = new AType();
+
+        // Perform the transformation: { a: baseTypeOf(AType) }
+        String resultValue = baseTypeOf(customType);
+
+        // Structure the final output map
+        Map<String, String> output = new HashMap<>();
+        output.put("a", resultValue);
+
+        // Print the result to the console
+        System.out.println("DataWeave Output Emulation:");
+        // For simple printing, we can use the map's toString()
+        System.out.println(output.toString().replace("=", ": "));
+    }
+}
+
+output:
+
+{a: String}
+
+

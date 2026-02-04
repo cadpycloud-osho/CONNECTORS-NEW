@@ -1,0 +1,50 @@
+substringAfter:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringAfterExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringAfter(null, "'"));
+        result.put("b", substringAfter("", "-"));
+        result.put("c", substringAfter("abc", "b"));
+        result.put("d", substringAfter("abcba", "b"));
+        result.put("e", substringAfter("abc", "d"));
+        result.put("f", substringAfter("abc", ""));
+
+        System.out.println(result);
+    }
+
+    public static String substringAfter(String value, String delimiter) {
+        if (value == null) {
+            return null;
+        }
+        if (delimiter == null || delimiter.isEmpty()) {
+            return value;
+        }
+        int index = value.indexOf(delimiter);
+        if (index == -1) {
+            return "";
+        }
+        return value.substring(index + delimiter.length());
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "cba",
+  "e": "",
+  "f": "abc"
+}
+
+

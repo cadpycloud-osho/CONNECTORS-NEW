@@ -1,0 +1,38 @@
+isUriType:
+
+
+
+input:
+
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isUriType(Object value) {
+        return value instanceof URI;
+    }
+
+    public static void main(String[] args) throws Exception {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        URI aUri = URI.create("https://example.com");           // AUri
+        URI uriType = URI.create("http://localhost:8080");      // Uri
+        String str = "test";                                    // String
+        
+        result.put("a", isUriType(aUri));
+        result.put("b", isUriType(uriType));
+        result.put("c", isUriType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=true, b=true, c=false}
+
+

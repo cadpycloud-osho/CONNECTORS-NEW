@@ -1,0 +1,159 @@
+filterObject:
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class FilterByValueApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FilterByValueApp.class, args);
+
+        Map<String, String> source = Map.of(
+                "a", "apple",
+                "b", "banana"
+        );
+
+        Map<String, String> filtered = source.entrySet().stream()
+                .filter(e -> "apple".equals(e.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.println(filtered); // Output: {a=apple}
+    }
+}
+
+
+OUTPUT:
+
+{a=apple}
+
+
+___________________________________________________________________
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class FilterByKeyApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FilterByKeyApp.class, args);
+
+        Map<String, Object> source = Map.of(
+                "letter1", "a",
+                "letter2", "b",
+                "id", 1
+        );
+
+        Map<String, Object> filtered = source.entrySet().stream()
+                .filter(e -> e.getKey().startsWith("letter"))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.println(filtered); // Output: {letter1=a, letter2=b}
+    }
+}
+
+
+OUTPUT:
+
+
+{letter1=a, letter2=b}
+
+
+
+
+
+___________________________________________________________________
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@SpringBootApplication
+public class FilterByIndexApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FilterByIndexApp.class, args);
+
+        Map<String, String> source = new LinkedHashMap<>(Map.of(
+                "1", "a",
+                "2", "b",
+                "3", "c"
+        ));
+
+        AtomicInteger index = new AtomicInteger(0);
+
+        Map<String, String> filtered = source.entrySet().stream()
+                .filter(e -> index.getAndIncrement() < 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a,b)->b, LinkedHashMap::new));
+
+        System.out.println(filtered); // Output: {1=a}
+    }
+}
+
+
+OUTPUT:
+
+
+{1=a}
+
+
+
+
+
+
+___________________________________________________________________
+
+INPUT:
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class FilterNonNullApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FilterNonNullApp.class, args);
+
+        Map<String, String> myObject = new LinkedHashMap<>();
+        myObject.put("str1", "String 1");
+        myObject.put("str2", "String 2");
+        myObject.put("str3", null);
+        myObject.put("str4", "String 4");
+
+        Map<String, String> filtered = myObject.entrySet().stream()
+                .filter(e -> e.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
+
+        System.out.println(filtered);
+        // Output: {str1=String 1, str2=String 2, str4=String 4}
+    }
+}
+
+
+
+OUTPUT:
+
+{str1=String 1, str2=String 2, str4=String 4}

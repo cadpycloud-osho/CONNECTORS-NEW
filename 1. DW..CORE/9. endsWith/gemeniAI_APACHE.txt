@@ -1,0 +1,39 @@
+
+endsWith:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+// This class needs to be added to your Camel Context configuration
+public class StringEndsWithRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() {
+        
+        from("direct:startEndsWithCheck")
+            .routeId("DataWeave-EndsWith-Conversion")
+            
+            // The Simple language uses built-in string methods like 'ends with' (case-insensitive)
+            // or the exact Java method call 'endsWith'. We'll use the friendly operator.
+            // The expression evaluates both boolean comparisons and formats the result as a string 
+            // that represents the final JSON array: "[true, false]".
+            .setBody()
+                .simple("[\"Mariano\" ends with \"no\", \"Mariano\" ends with \"to\"]")
+            
+            // Log the result (optional, but good for tracing)
+            .to("log:result?showBody=true")
+            
+            // Mock endpoint to capture the final message body
+            .to("mock:result");
+    }
+}
+
+
+output:
+
+
+[ "true", "false" ]
+
+

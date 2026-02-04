@@ -1,0 +1,31 @@
+fromRadixNumber:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Equivalent of DataWeave fromRadixNumber()
+        int a = Integer.parseInt("10", 2);
+        int b = Integer.parseInt("FF", 16);
+
+        Map<String, Integer> result = new HashMap<>();
+        result.put("a", a);
+        result.put("b", b);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=2, b=255}
+
+

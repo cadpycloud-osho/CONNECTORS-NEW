@@ -1,0 +1,62 @@
+today:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Retrieves the current local date.
+     * This mimics the DataWeave 'today()' function.
+     * @return The current date string in ISO 8601 format (YYYY-MM-DD).
+     */
+    public static String getTodayDate() {
+        // 1. Get the current date (DW: today())
+        LocalDate today = LocalDate.now();
+        
+        // 2. Format the date to the standard ISO output (DW output format)
+        // DateTimeFormatter.ISO_LOCAL_DATE produces the "YYYY-MM-DD" format
+        return today.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // Calculate the current date string
+        String todayDateString = getTodayDate();
+        
+        // 3. Format the final JSON output
+        String jsonOutput = String.format("{\n  \"today\": \"%s\"\n}", todayDateString);
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("DW Function: today()");
+        System.out.println("Current Date String: " + todayDateString);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+--- Intermediate Data (For Context) ---
+DW Function: today()
+Current Date String: 2025-12-16
+---------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "today": "2025-12-16"
+}
+

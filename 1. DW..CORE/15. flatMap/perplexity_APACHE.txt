@@ -1,0 +1,25 @@
+flatMap:
+
+
+
+input:
+
+import java.util.*;
+import java.util.stream.*;
+
+List<List<Double>> input = Arrays.asList(
+    Arrays.asList(3.0, 5.0),
+    Arrays.asList(0.9, 5.5)
+);
+
+List<Double> output = input.stream()
+    .flatMap(List::stream)
+    .collect(Collectors.toList());
+
+System.out.println(output);  // [3.0, 5.0, 0.9, 5.5]
+
+
+output:
+
+[3.0, 5.0, 0.9, 5.5]
+

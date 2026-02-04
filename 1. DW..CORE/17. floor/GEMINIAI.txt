@@ -1,0 +1,37 @@
+FLOOR:
+
+INPUT:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class FloorExample {
+
+    /**
+     * DataWeave equivalent using Java Streams to apply Math.floor to a list of numbers.
+     */
+    public static List<Long> calculateFloorValues(List<Double> inputList) {
+        // We use Math.floor() which returns a double, so we cast it to a long 
+        // (which represents the largest integer value) to match the DataWeave output type.
+        return inputList.stream()
+                .map(Math::floor)
+                .map(Double::longValue) // Convert the resulting double back to a long integer type
+                .collect(Collectors.toList());
+    }
+
+    public static void main(String[] args) {
+        // Input matching the DataWeave example
+        List<Double> input = Arrays.asList(1.5, 2.2, 3.0);
+        
+        List<Long> output = calculateFloorValues(input);
+        
+        System.out.println("Input List: " + input);
+        System.out.println("Output: " + output);
+    }
+}
+
+
+OUTPUT:
+
+[1, 2, 3]

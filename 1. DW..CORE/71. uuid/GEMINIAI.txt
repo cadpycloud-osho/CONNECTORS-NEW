@@ -1,0 +1,35 @@
+uuid:
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.UUID;
+
+@SpringBootApplication
+public class UuidExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(UuidExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        
+        // Java equivalent of DWL uuid(): UUID.randomUUID()
+        // This generates a random UUID (version 4)
+        UUID generatedUuid = UUID.randomUUID();
+        
+        // Convert the UUID object to its standard string representation
+        String uuidString = generatedUuid.toString();
+        
+        System.out.println("--- DWL uuid Equivalent Output ---");
+        System.out.println("\"" + uuidString + "\""); 
+    }
+}
+
+output:
+
+"c6c39a0e-9b7e-4f12-9c3f-a5b67d8e9012"

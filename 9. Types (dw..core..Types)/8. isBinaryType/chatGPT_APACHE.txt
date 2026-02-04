@@ -1,0 +1,35 @@
+isBinaryType:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsBinaryTypeExample {
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isBinaryType("Binary"));
+        result.put("b", isBinaryType("Binary"));
+        result.put("c", isBinaryType("String"));
+
+        System.out.println(result);
+    }
+
+    public static boolean isBinaryType(String type) {
+        if (type == null) return false;
+        return type.equals("Binary");
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

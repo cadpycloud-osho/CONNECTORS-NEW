@@ -1,0 +1,49 @@
+dropWhile:
+
+
+
+
+input:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class DropWhileDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DropWhileDemoApplication.class, args);
+    }
+}
+
+@RestController
+class DropWhileController {
+    
+    private <T> List<T> dropWhile(List<T> list, java.util.function.Predicate<T> predicate) {
+        int dropCount = 0;
+        while (dropCount < list.size() && predicate.test(list.get(dropCount))) {
+            dropCount++;
+        }
+        return list.subList(dropCount, list.size());
+    }
+    
+    @GetMapping("/dropWhile")
+    public List<Integer> dropWhileExample() {
+        List<Integer> arr = Arrays.asList(0, 1, 3, 2, 1);
+        return dropWhile(arr, x -> x < 3);
+    }
+}
+
+
+output:
+
+[
+  3,
+  2,
+  1
+]
+

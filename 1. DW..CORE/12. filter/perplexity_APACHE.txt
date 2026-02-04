@@ -1,0 +1,155 @@
+filter:
+
+
+example 1:
+
+input:
+from("direct:ex1")
+    .unmarshal().json(JsonLibrary.Jackson)
+    .bean(MyFilter.class, "filterArrayGt2")
+    .marshal().json(JsonLibrary.Jackson)
+    .to("mock:ex1");
+
+public class MyFilter {
+    public static List<Integer> filterArrayGt2(List<Integer> list) {
+        return list.stream().filter(value -> value > 2).collect(Collectors.toList());
+    }
+}
+
+public static List<User> filterUsersAge30(List<User> users) {
+    return users.stream().filter(u -> u.getAge() >= 30).collect(Collectors.toList());
+}
+class User { private String name; private int age; /* getters/setters */ }
+
+output:
+
+[9,3,4,5]
+-----------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:ex2")
+    .unmarshal().json(JsonLibrary.Jackson)
+    .bean(MyFilter.class, "filterUsersAge30")
+    .marshal().json(JsonLibrary.Jackson)
+    .to("mock:ex2");
+
+
+output:
+[{ "name": "Mariano", "age": 37 }, { "name": "Shoki", "age": 30 }]
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:ex3")
+    .unmarshal().json(JsonLibrary.Jackson)
+    .bean(MyFilter.class, "filterArrayRange")
+    .marshal().json(JsonLibrary.Jackson)
+    .to("mock:ex3");
+
+public static List<Integer> filterArrayRange(List<Integer> list) {
+    return list.stream().filter($ -> $ > 1 && $ < 5).collect(Collectors.toList());
+}
+
+output:
+[3,4]
+
+-----------------------------------------------------------
+
+
+example 4:
+
+input:
+from("direct:ex4")
+    .unmarshal().json(JsonLibrary.Jackson)
+    .bean(MyFilter.class, "filterNoError")
+    .marshal().json(JsonLibrary.Jackson)
+    .to("mock:ex4");
+
+public static List<UserError> filterNoError(List<UserError> users) {
+    return users.stream().filter(item -> item.getError() == null).collect(Collectors.toList());
+}
+class UserError { private User user; private String error; /* getters/setters */ }
+
+output:
+[{ "user": { "name": "John", "lastName": "Johnson" }, "error": null }]
+
+
+-----------------------------------------------------------
+
+
+example 5:
+
+input:
+
+from("direct:ex5")
+    .unmarshal().json(JsonLibrary.Jackson)
+    .bean(MyFilter.class, "extractPhoneNumber")
+    .marshal().json(JsonLibrary.Jackson)
+    .to("mock:ex5");
+public static Map<String, Object> extractPhoneNumber(Map<String, Object> payload) {
+    String username = ((Map) ((Map) payload.get("profile")).get("base")).get("username").toString();
+    @SuppressWarnings("unchecked")
+    List<Map<String, String>> phones = (List) ((Map) ((Map) payload.get("profile")).get("base")).get("phone");
+    List<String> phoneNumbers = phones.stream()
+        .filter(p -> "Y".equals(p.get("activeInd")) && "Y".equals(p.get("primaryInd")))
+        .map(p -> p.get("number")).defaultIfEmpty(new ArrayList<>()).collect(Collectors.toList());
+    Map<String, Object> result = new HashMap<>();
+    result.put("id", payload.get("Id"));
+    result.put("markCode", payload.get("marketCode"));
+    result.put("languageCode", payload.get("languageCode"));
+    result.put("username", username);
+    result.put("phoneNumber", phoneNumbers);
+    return result;
+}
+
+
+output:
+{ "id": "1184001100000000517", "markCode": "US", "languageCode": "en-US", "username": "TheMule", "phoneNumber": ["230678123", "154896523"] }
+
+
+-----------------------------------------------------------
+
+
+example 6:
+
+input:
+
+from("direct:ex6")
+    .transform(simple("${body}"))
+    .bean(MyFilter.class, "filterEvenIndices")
+    .to("mock:ex6");
+
+public static String filterEvenIndices(String text) {
+    return IntStream.range(0, text.length()).filter($$ -> $$ % 2 == 0)
+        .mapToObj(i -> text.substring(i, i + 1)).collect(Collectors.joining());
+}
+
+
+output:
+
+
+"hlowrd"
+
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

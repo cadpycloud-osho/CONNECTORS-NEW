@@ -1,0 +1,46 @@
+mergeWith:
+
+mergeWith<T <: Object, V <: Object>(source: T, target: V): ?
+
+mergeWith<T <: Object, V <: Object>(source: T, target: V): ?
+Appends any key-value pairs from a source object to a target object.
+
+If source and target objects have the same key, the function appends that source object to the target and removes that target object from the output.
+
+
+
+Source
+%dw 2.0
+import mergeWith from dw::core::Objects
+output application/json
+---
+{ "mergeWith" : { "a" : true, "b" : 1} mergeWith { "a" : false, "c" : "Test"} }
+
+DataWeave
+Output
+"mergeWith": {
+    "b": 1,
+    "a": false,
+    "c": "Test"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

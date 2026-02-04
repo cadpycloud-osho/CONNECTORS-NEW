@@ -1,0 +1,51 @@
+isUriType:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UriTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkUri")
+            .process(exchange -> {
+                // Mapping the DataWeave source logic:
+                // a: The type definition AUri
+                // b: The Uri keyword
+                // c: A different type (String)
+                Object refA = URI.class;
+                Object refB = URI.create("https://apache.org"); // A URI instance
+                Object refC = "https://apache.org";             // A String literal
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if it is the URI class or an instance of it
+                result.put("a", isUriType(refA));
+                result.put("b", isUriType(refB));
+                result.put("c", isUriType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isUriType(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the class reference (URI.class) or an actual instance
+        return obj instanceof URI || obj.equals(URI.class);
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

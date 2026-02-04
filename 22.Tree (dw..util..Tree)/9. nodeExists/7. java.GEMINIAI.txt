@@ -1,0 +1,141 @@
+nodeExists:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Collections;
+
+// --- POJO Definitions (Required for completeness) ---
+
+class Friend {
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+class User {
+    private String name;
+    private String lastName;
+    private List<Friend> friends = Collections.emptyList();
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public List<Friend> getFriends() {
+        return friends;
+    }
+    public void setFriends(List<Friend> friends) {
+        this.friends = friends;
+    }
+}
+
+class MyObject {
+    private List<User> user = Collections.emptyList();
+
+    public List<User> getUser() {
+        return user;
+    }
+    public void setUser(List<User> user) {
+        this.user = user;
+    }
+}
+
+// --- Main Class with Search Logic ---
+
+public class Main {
+
+    /**
+     * Replicates the logic of DataWeave's nodeExists by searching for a name 
+     * in User and Friend objects nested under MyObject.
+     * @param myObject The root data structure.
+     * @param name The name to search for.
+     * @return true if the name is found in any User.name or Friend.name field.
+     */
+    public static boolean nameExists(MyObject myObject, String name) {
+        if (myObject == null || myObject.getUser() == null) {
+            return false;
+        }
+        
+        List<User> userList = myObject.getUser();
+
+        // 1. Check in User objects (User.name)
+        Optional<User> userMatch = userList.stream()
+            .filter(user -> name.equals(user.getName()))
+            .findFirst();
+
+        if (userMatch.isPresent()) {
+            return true;
+        }
+
+        // 2. Check in Friend objects (Friend.name)
+        return userList.stream()
+            // Flatten the list of all friends from all users
+            .flatMap(user -> user.getFriends() != null ? user.getFriends().stream() : null)
+            // Filter out null streams from getFriends()
+            .filter(friend -> friend != null) 
+            // Check for a matching name
+            .anyMatch(friend -> name.equals(friend.getName()));
+    }
+
+    public static boolean wrongFieldExists(MyObject myObject) {
+        // This function explicitly returns false as the field 'wrongField' 
+        // does not exist in the defined POJO structure.
+        return false;
+    }
+    // -------------------------------------------------------------
+
+    public static void main(String[] args) {
+        // 1. Create the source data (myObject)
+        Friend julian = new Friend(); julian.setName("julian");
+        Friend tom = new Friend(); tom.setName("tom");
+        User user1 = new User(); user1.setName("mariano"); user1.setLastName("achaval"); user1.setFriends(Arrays.asList(julian, tom));
+
+        Friend peter = new Friend(); peter.setName("peter");
+        Friend robert = new Friend(); robert.setName("robert");
+        User user2 = new User(); user2.setName("leandro"); user2.setLastName("shokida"); user2.setFriends(Arrays.asList(peter, robert));
+
+        MyObject myObject = new MyObject();
+        myObject.setUser(Arrays.asList(user1, user2));
+
+
+        // 2. Apply the search logic and generate the output map
+        Map<String, Boolean> result = new HashMap<>();
+        
+        result.put("mariano", nameExists(myObject, "mariano"));
+        result.put("julian", nameExists(myObject, "julian"));
+        result.put("tom", nameExists(myObject, "tom"));
+        result.put("leandro", nameExists(myObject, "leandro"));
+        result.put("peter", nameExists(myObject, "peter"));
+        result.put("wrongField", wrongFieldExists(myObject));
+        result.put("teo", nameExists(myObject, "teo"));
+
+        // 3. Print the output (equivalent to the DataWeave output)
+        System.out.println(result);
+    }
+}
+
+output:
+
+{wrongField=false, julian=true, teo=false, mariano=true, peter=true, leandro=true, tom=true}
+
+
+

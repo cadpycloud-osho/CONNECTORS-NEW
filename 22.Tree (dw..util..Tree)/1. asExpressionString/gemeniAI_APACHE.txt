@@ -1,0 +1,47 @@
+asExpressionString:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class ExpressionBuilderRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:buildPath")
+            .routeId("Expression-String-Generator")
+            .process(exchange -> {
+                // 1. Input: List of selector metadata
+                List<Map<String, String>> selectors = List.of(
+                    Map.of("kind", "Object", "selector", "user"),
+                    Map.of("kind", "Attribute", "selector", "name")
+                );
+
+                // 2. Logic: Replicating asExpressionString
+                String path = selectors.stream()
+                    .map(s -> {
+                        String selector = s.get("selector");
+                        // If it's an attribute, prepend '@', otherwise just '.'
+                        return "Attribute".equalsIgnoreCase(s.get("kind")) 
+                                ? ".@" + selector 
+                                : "." + selector;
+                    })
+                    .collect(Collectors.joining(""));
+
+                exchange.getIn().setBody(path);
+            })
+            // Marshal is used here to wrap the string in JSON quotes to match DW output
+            .marshal().json()
+            .log("Generated Path Expression: ${body}");
+    }
+}
+
+output:
+
+".user.@name"

@@ -1,0 +1,42 @@
+fail:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.datasonnet.DatasonnetException;
+import java.util.List;
+
+public class FailRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        // Define a simple route to handle validation
+        from("direct:validateData")
+            .choice()
+                // Equivalent to sizeOf(result) <= 0
+                .when(body().isInstanceOf(List.class).and(simple("${body.size} == 0")))
+                    .throwException(new RuntimeException("Data was empty"))
+                .otherwise()
+                    .marshal().json() // output application/json
+            .end();
+
+        // Global Error Handler to format the output as seen in your logs
+        onException(RuntimeException.class)
+            .handled(true)
+            .log("ERROR ${date:now:yyyy-MM-dd HH:mm:ss,SSS}\n*********************************\nMessage : ${exception.message}");
+    }
+}
+
+output:
+
+ERROR 2026-01-26 09:58:44,983
+*********************************
+Message               : "Data was empty"
+Cause                 : java.lang.RuntimeException
+Route                 : validateData
+*********************************
+
+
+

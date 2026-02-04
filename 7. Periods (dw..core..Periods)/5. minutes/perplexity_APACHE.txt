@@ -1,0 +1,57 @@
+minutes:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.util.*;
+
+public class MinutesPeriodRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:minutesPeriod")
+            .process(exchange -> {
+                ZonedDateTime base = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // nextMinute: + minutes(1)
+                result.put("nextMinute", base.plusMinutes(1).toString());
+                
+                // previousMinute: - minutes(1)
+                result.put("previousMinute", base.minusMinutes(1).toString());
+                
+                // decimalInputPeriod: minutes(4.555) → 4m + 0.555*60s = 4m33.3s
+                double decimalMinutes = 4.555;
+                long wholeMinutes = (long) decimalMinutes;
+                double fractionalSeconds = (decimalMinutes - wholeMinutes) * 60;
+                result.put("decimalInputPeriod", String.format("PT%dM%.1fS", wholeMinutes, fractionalSeconds));
+                
+                // wholeNumberInputPeriod: minutes(4)
+                result.put("wholeNumberInputPeriod", "PT4M");
+                
+                // addNegativeValue: minutes(-1) + minutes(2) = 1m = 60s
+                result.put("addNegativeValue", 60);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "nextMinute": "2020-10-05T20:23:34.385Z",
+  "previousMinute": "2020-10-05T20:21:34.385Z",
+  "decimalInputPeriod": "PT4M33.3S",
+  "wholeNumberInputPeriod": "PT4M",
+  "addNegativeValue": 60
+}
+
+
+

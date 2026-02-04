@@ -1,0 +1,93 @@
+indexOf:
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.List;
+
+@SpringBootApplication
+public class ListIndexOfApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ListIndexOfApp.class, args);
+
+        List<String> presentList = List.of("a", "b", "c", "d");
+        List<String> notPresentList = List.of("x", "w", "x");
+        List<String> presentMoreThanOnceList = List.of("a", "b", "c", "c");
+
+        int presentIndex = presentList.indexOf("c");
+        int notPresentIndex = notPresentList.indexOf("c");
+        int presentMoreThanOnceIndex = presentMoreThanOnceList.indexOf("c");
+
+        System.out.println("{");
+        System.out.println("  \"present\": " + presentIndex + ",");
+        System.out.println("  \"notPresent\": " + notPresentIndex + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnceIndex);
+        System.out.println("}");
+        // Output:
+        // {
+        //   "present": 2,
+        //   "notPresent": -1,
+        //   "presentMoreThanOnce": 2
+        // }
+    }
+}
+
+
+OUTPUT:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+
+
+_______________________________________________________________________
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class StringIndexOfApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(StringIndexOfApp.class, args);
+
+        String present = "abcd";
+        String notPresent = "xyz";
+        String presentMoreThanOnce = "abcdc";
+
+        int presentIndex = present.indexOf('c');
+        int notPresentIndex = notPresent.indexOf('c');
+        int presentMoreThanOnceIndex = presentMoreThanOnce.indexOf('c');
+
+        System.out.println("{");
+        System.out.println("  \"present\": " + presentIndex + ",");
+        System.out.println("  \"notPresent\": " + notPresentIndex + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnceIndex);
+        System.out.println("}");
+        // Output:
+        // {
+        //   "present": 2,
+        //   "notPresent": -1,
+        //   "presentMoreThanOnce": 2
+        // }
+    }
+}
+
+
+OUTPUT:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+

@@ -1,0 +1,116 @@
+
+join:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+// FULL CODE IN SINGLE FILE 👇
+@RestController
+public class JoinController {
+
+    // Inner Model Classes (User, Product, JoinResult)
+    static class User {
+        public String id;
+        public String name;
+
+        public User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    static class Product {
+        public String ownerId;
+        public String name;
+
+        public Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+    }
+
+    static class JoinResult {
+        public User l; // left row (user)
+        public Product r; // right row (product)
+
+        public JoinResult(User l, Product r) {
+            this.l = l;
+            this.r = r;
+        }
+    }
+
+    @GetMapping("/join")
+    public List<JoinResult> joinUsersAndProducts() {
+
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"),
+            new User("2", "Leandro"),
+            new User("3", "Julian"),
+            new User("5", "Julian")
+        );
+
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"),
+            new Product("1", "BAT"),
+            new Product("3", "DataSense"),
+            new Product("4", "SmartConnectors")
+        );
+
+        List<JoinResult> result = new ArrayList<>();
+
+        for (User user : users) {
+            for (Product prod : products) {
+                if (user.id.equals(prod.ownerId)) {
+                    result.add(new JoinResult(user, prod));
+                }
+            }
+        }
+
+        return result;
+    }
+}
+
+
+
+output:
+
+
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  }
+]
+

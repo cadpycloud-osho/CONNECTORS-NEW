@@ -1,0 +1,57 @@
+encodeURI:
+
+
+input:
+
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String encodeURI(String input) {
+        if (input == null) return null;
+        try {
+            String encoded = URLEncoder.encode(input, "UTF-8");
+            encoded = encoded.replaceAll("\\+", "%20")
+                             .replaceAll("%21", "!")
+                             .replaceAll("%27", "'")
+                             .replaceAll("%28", "(")
+                             .replaceAll("%29", ")")
+                             .replaceAll("%7E", "~")
+                             .replaceAll("%3A", ":")
+                             .replaceAll("%2F", "/")
+                             .replaceAll("%3F", "?")
+                             .replaceAll("%23", "#")
+                             .replaceAll("%5B", "[")
+                             .replaceAll("%5D", "]")
+                             .replaceAll("%40", "@")
+                             .replaceAll("%24", "\\$")
+                             .replaceAll("%26", "&")
+                             .replaceAll("%2C", ",")
+                             .replaceAll("%3B", ";")
+                             .replaceAll("%3D", "=");
+            return encoded;
+        } catch (UnsupportedEncodingException e) {
+            return input;
+        }
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("encodeURI", encodeURI("http://asd/ text to decode /%/\"\\/text"));
+        result.put("not_encoded", encodeURI("http://:;,/?:@&=$_-_.!~*'()"));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{encodeURI=http://asd/%20text%20to%20decode%20/%25/%22%5C/text, not_encoded=http://:;,/?:@&=$_-_.!~*'()}
+
+

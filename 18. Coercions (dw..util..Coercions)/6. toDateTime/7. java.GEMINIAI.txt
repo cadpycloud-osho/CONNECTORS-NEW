@@ -1,0 +1,222 @@
+toDateTime:
+
+example 1:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private final String sourceDateTimeString = "2003-10-01 23:57:59Z";
+
+    /**
+     * Mimics DataWeave's toDateTime() with chained formatters: 
+     * Tries each formatter in order until one succeeds.
+     */
+    private ZonedDateTime chainedToDateTime(String dateTimeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return ZonedDateTime.parse(dateTimeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Ignore the error and try the next formatter
+            }
+        }
+        // Return null if all formatters fail
+        return null;
+    }
+
+    public Map<String, Object> getDateTimeParsingMap() {
+        // Define formatters
+        // Formatter 1: Fails (Expected slashes 'uuuu/MM/dd', found hyphens 'uuuu-MM-dd')
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX", Locale.US);
+        // Formatter 2: Succeeds (Matches 'uuuu-MM-dd HH:mm:ssX')
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssX", Locale.US);
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        // Fails with formatter1, succeeds with formatter2 -> returns a ZonedDateTime
+        ZonedDateTime parsedDateA = chainedToDateTime(sourceDateTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        // Simulates a failed transformation in DataWeave's try/catch
+        String errorMessageB;
+        try {
+            // Only try the failing formatter (formatter1)
+            ZonedDateTime.parse(sourceDateTimeString, formatter1);
+            errorMessageB = "No error occurred."; // This line will not be reached
+        } catch (DateTimeParseException e) {
+            // Use the DataWeave specific error message that is requested in the output
+            errorMessageB = "Could not find a valid formatter for '" + sourceDateTimeString + "'";
+        }
+
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results. ZonedDateTime.toString() provides the ISO format.
+        rootMap.put("a", parsedDateA != null ? parsedDateA.toString() : null);
+        rootMap.put("b", errorMessageB);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Object> result = converter.getDateTimeParsingMap();
+        
+        // Reformat the Map output to match the requested JSON-like string exactly
+        String formattedOutput = "{" + 
+            result.entrySet().stream()
+                .map(entry -> {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    
+                    // Quote the string values
+                    return String.format("\"%s\":\"%s\"", key, value.toString());
+                })
+                .collect(Collectors.joining(",")) + 
+            "}";
+
+        System.out.println(formattedOutput);
+    }
+}
+
+output:
+
+{a=2003-10-01T23:57:59Z, b=Could not find a valid formatter for '2003-10-01 23:57:59Z'}
+
+
+----------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    /**
+     * Converts epoch seconds (Long) to ZonedDateTime (UTC).
+     */
+    private ZonedDateTime fromEpochSeconds(long epochSeconds) {
+        // Instant.ofEpochSecond() handles the conversion from seconds since the epoch.
+        Instant instant = Instant.ofEpochSecond(epochSeconds);
+        // atZone(ZoneOffset.UTC) sets the timezone to Z (Zulu/UTC).
+        return instant.atZone(ZoneOffset.UTC);
+    }
+    
+    /**
+     * Converts epoch milliseconds (Long) to ZonedDateTime (UTC).
+     */
+    private ZonedDateTime fromEpochMilliseconds(long epochMillis) {
+        // Instant.ofEpochMilli() handles the conversion from milliseconds since the epoch.
+        Instant instant = Instant.ofEpochMilli(epochMillis);
+        return instant.atZone(ZoneOffset.UTC);
+    }
+
+
+    public Map<String, String> getEpochConversionMap() {
+        
+        // --- Input values ---
+        long epochSeconds = 1443743879L;
+        long epochMillis = 1443743879000L; // 1443743879 * 1000
+
+        // --- Logic for Key 'fromEpoch' ---
+        ZonedDateTime convertedFromEpoch = fromEpochSeconds(epochSeconds);
+
+        // --- Logic for Key 'fromMillis' ---
+        ZonedDateTime convertedFromMillis = fromEpochMilliseconds(epochMillis);
+        
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results. ZonedDateTime.toString() provides the ISO format ("yyyy-MM-ddTHH:mm:ssZ").
+        rootMap.put("fromEpoch", convertedFromEpoch.toString());
+        rootMap.put("fromMillis", convertedFromMillis.toString());
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, String> result = converter.getEpochConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+{fromEpoch=2015-10-01T23:57:59Z, fromMillis=2015-10-01T23:57:59Z}
+
+----------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    public Map<String, String> getDateTimeParsingMap() {
+        
+        // --- Logic for Key 'a' ---
+        String dateTimeStringA = "2015-10-01T23:57:59Z";
+        ZonedDateTime parsedDateA = ZonedDateTime.parse(dateTimeStringA); 
+
+        // --- Logic for Key 'b' ---
+        String dateTimeStringB = "2003-10-01 23:57:59Z";
+        // Use 'X' for the 'Z' (Zulu time) zone indicator at the end.
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssX", Locale.US);
+        ZonedDateTime parsedDateB = ZonedDateTime.parse(dateTimeStringB, customFormatter);
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results (ZonedDateTime.toString() provides the ISO format)
+        rootMap.put("a", parsedDateA.toString());
+        rootMap.put("b", parsedDateB.toString());
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaDateTimeParsingConverter converter = new PureJavaDateTimeParsingConverter();
+        Map<String, String> result = converter.getDateTimeParsingMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+{a=2015-10-01T23:57:59Z, b=2003-10-01T23:57:59Z}

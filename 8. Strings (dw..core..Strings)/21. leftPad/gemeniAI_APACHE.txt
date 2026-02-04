@@ -1,0 +1,53 @@
+leftPad:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LeftPadRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:applyLeftPad")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                results.put("a", dwLeftPad(null, 3));
+                results.put("b", dwLeftPad("", 3));
+                results.put("c", dwLeftPad("bat", 5));
+                results.put("d", dwLeftPad("bat", 3));
+                results.put("e", dwLeftPad("bat", -1));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic for DataWeave parity:
+     * 1. If null, return null (Apache Commons returns padded empty string).
+     * 2. If length <= input length, return original.
+     */
+    private String dwLeftPad(String str, int size) {
+        if (str == null) return null;
+        // StringUtils.leftPad handles negative sizes or sizes smaller 
+        // than the string by returning the original string.
+        return StringUtils.leftPad(str, size);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}
+

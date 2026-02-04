@@ -1,0 +1,55 @@
+HMACWith:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat; // Available in Java 17+
+import java.util.Map;
+
+public class HmacWithRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateHmacWith")
+            .routeId("HMAC-With-Route")
+            .process(exchange -> {
+                // 1. Inputs
+                String key = "secret_key";
+                String content = "Some value to hash";
+                String algorithm = "HmacSHA256";
+
+                // 2. Logic: Initialize HMAC
+                SecretKeySpec secretKey = new SecretKeySpec(
+                    key.getBytes(StandardCharsets.UTF_8), 
+                    algorithm
+                );
+                Mac mac = Mac.getInstance(algorithm);
+                mac.init(secretKey);
+
+                // 3. Generate raw bytes
+                byte[] rawHmac = mac.doFinal(content.getBytes(StandardCharsets.UTF_8));
+
+                // 4. Convert to Hex String (replicates HMACWith behavior)
+                // Using Java 17+ HexFormat; for older versions use String.format or Apache Commons Codec
+                String hexResult = HexFormat.of().formatHex(rawHmac);
+
+                exchange.getIn().setBody(Map.of("HMACWith", hexResult));
+            })
+            .marshal().json()
+            .log("HMAC Hex Result: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "HMACWith": "b51b4fe8c4e37304605753272b5b4321f9644a9b09cb1179d7016c25041d1747"
+}
+
+

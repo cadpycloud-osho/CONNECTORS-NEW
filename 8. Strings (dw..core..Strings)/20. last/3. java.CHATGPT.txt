@@ -1,0 +1,35 @@
+last:
+
+
+
+input:
+
+
+public class Main {
+
+    public static String last(String input, int n) {
+        if (input == null || n <= 0) {
+            return "";
+        }
+        if (n >= input.length()) {
+            return input;
+        }
+        return input.substring(input.length() - n);
+    }
+
+    public static void main(String[] args) {
+        String input = "hello world!";
+        String result = last(input, 6);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+world!
+
+
+

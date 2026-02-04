@@ -1,0 +1,39 @@
+entriesOf:
+entriesOf<T <: Object>(obj: T): Array<{| key: Key, value: Any, attributes: Object |}>
+Returns an array of key-value pairs that describe the key, value, and any attributes in the input object.
+
+
+Source
+%dw 2.0
+var myVar = read('<xml attr="x"><a>true</a><b>1</b></xml>', 'application/xml')
+output application/json
+---
+{ "entriesOf" : entriesOf(myVar) }
+
+
+
+DataWeave
+Output
+{
+  "entriesOf": [
+    {
+       "key": "xml",
+       "value": {
+         "a": "true",
+         "b": "1"
+       },
+       "attributes": {
+         "attr": "x"
+       }
+    }
+  ]
+}
+
+
+
+
+_____________________________________________________________________
+
+
+entriesOf(obj: Null): Null
+Helper function that enables entriesOf to work with a null value.

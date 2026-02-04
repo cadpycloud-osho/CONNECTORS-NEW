@@ -1,0 +1,60 @@
+isInteger
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsIntegerController {
+
+    private boolean isInteger(Object obj) {
+        if (obj == null) return false;
+
+        if (obj instanceof Integer) return true;
+
+        if (obj instanceof Double) {
+            double d = (Double) obj;
+            return d == Math.floor(d);
+        }
+
+        if (obj instanceof String) {
+            try {
+                Integer.parseInt((String) obj);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    @GetMapping("/check-integer")
+    public List<Boolean> checkInteger() {
+
+        List<Boolean> result = new ArrayList<>();
+        result.add(isInteger(1));        // true
+        result.add(isInteger(2.0));      // true
+        result.add(isInteger(2.2));      // false
+        result.add(isInteger("1"));      // true
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+[
+  true,
+  true,
+  false,
+  true
+]
+

@@ -1,0 +1,55 @@
+isNamespaceType:
+
+
+
+input:
+
+package com.example.demo.util;
+
+import javax.xml.namespace.NamespaceContext;
+
+public class TypeUtils {
+
+    public static boolean isNamespaceType(Class<?> type) {
+        return NamespaceContext.class.isAssignableFrom(type);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.xml.namespace.NamespaceContext;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class NamespaceTypeController {
+
+    @GetMapping("/isNamespaceType")
+    public Map<String, Boolean> checkNamespaceTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to "type ANamespace = Namespace"
+        Class<?> ANamespace = NamespaceContext.class;
+
+        result.put("a", TypeUtils.isNamespaceType(ANamespace));
+        result.put("b", TypeUtils.isNamespaceType(NamespaceContext.class));
+        result.put("c", TypeUtils.isNamespaceType(String.class));
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

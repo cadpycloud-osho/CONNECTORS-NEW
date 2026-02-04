@@ -1,0 +1,25 @@
+sqrt:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        // sqrt() equivalents using Math.sqrt()
+        int sqrt1 = (int) Math.sqrt(4);
+        int sqrt2 = (int) Math.sqrt(25);
+        int sqrt3 = (int) Math.sqrt(100);
+        
+        // Output array format
+        System.out.println("[" + sqrt1 + ", " + sqrt2 + ", " + sqrt3 + "]");
+    }
+}
+
+
+
+output:
+
+[2, 5, 10]
+
+
+

@@ -1,0 +1,48 @@
+sumBy:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class SumByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:sumBy")
+            .process(exchange -> {
+                List<Map<String, Integer>> items = Arrays.asList(
+                    Map.of("a", 1),
+                    Map.of("a", 2),
+                    Map.of("a", 3)
+                );
+                
+                // sumBy $.a  →  collect(item -> item.get("a")).sum()
+                int sumBy1 = items.stream()
+                    .mapToInt(item -> item.get("a"))
+                    .sum();
+                
+                // sumBy((item) -> item.a)  →  same logic
+                int sumBy2 = items.stream()
+                    .mapToInt(item -> item.get("a"))
+                    .sum();
+                
+                Map<String, List<Integer>> result = new LinkedHashMap<>();
+                result.put("sumBy", Arrays.asList(sumBy1, sumBy2));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+
+{
+  "sumBy": [6, 6]
+}
+

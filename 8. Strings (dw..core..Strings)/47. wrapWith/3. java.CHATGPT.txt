@@ -1,0 +1,35 @@
+wrapWith:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String wrapWithDW(String input, String wrapper) {
+        if (input == null) return null;
+        if (wrapper == null) wrapper = "";
+
+        return wrapper + input + wrapper;
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", wrapWithDW(null, "'"));
+        result.put("b", wrapWithDW("", "'"));
+        result.put("c", wrapWithDW("ab", "x"));
+        result.put("d", wrapWithDW("'ab'", "'"));
+        result.put("e", wrapWithDW("ab", "'"));
+
+        System.out.println(result);
+    }
+}
+
+output:
+
+{a=null, b='', c=xabx, d=''ab'', e='ab'}
+

@@ -1,0 +1,67 @@
+HMACBinary:
+
+
+
+input:
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
+public class Main {
+
+    private static final String HMAC_ALGORITHM = "HmacSHA512";
+
+    public static byte[] calculateHmacBinary(String data, String key) 
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        
+        // DataWeave's "as Binary" without a charset defaults to platform default, 
+        // typically UTF-8 in modern environments, which we explicitly use here.
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+
+        // Setup the key specification and MAC
+        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, HMAC_ALGORITHM);
+        Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+        mac.init(secretKeySpec);
+
+        // Calculate and return the raw binary HMAC
+        return mac.doFinal(dataBytes);
+    }
+
+    public static void main(String[] args) {
+        String data = "confidential";
+        String key = "xxxxx";
+
+        try {
+            // Get the raw byte array (equivalent to DataWeave's Binary output)
+            byte[] hmacBytes = calculateHmacBinary(data, key);
+            
+            // To safely display the binary result in JSON or console, 
+            // it must be encoded, typically using Base64.
+            String hmacBase64 = Base64.getEncoder().encodeToString(hmacBytes);
+
+            System.out.println("Input Data: " + data);
+            System.out.println("Input Key: " + key);
+            System.out.println("Algorithm: " + HMAC_ALGORITHM);
+            System.out.println("---");
+            System.out.println("Raw HMAC (Bytes): " + java.util.Arrays.toString(hmacBytes));
+            System.out.println("JSON-Safe Output (Base64): {\"HMACBinary\": \"" + hmacBase64 + "\"}");
+
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Algorithm not found: " + e.getMessage());
+        } catch (InvalidKeyException e) {
+            System.err.println("Invalid key: " + e.getMessage());
+        }
+    }
+}
+
+output:
+
+{
+  "HMACBinary_Base64": "k1oV/1d0a51J719+uF+7g/UvTj+N1D87w2+mD1s3xS5b84v1xXzJb2hE3q9mP7QW"
+}
+

@@ -1,0 +1,38 @@
+nameOf:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NameOfController {
+
+    @GetMapping("/name-of")
+    public Map<String, String> nameOfTypes() {
+        Map<String, String> result = new HashMap<>();
+        
+        // nameOf(AArray), nameOf(AArray2), nameOf(String)
+        result.put("a", "AArray");
+        result.put("b", "AArray2");
+        result.put("c", "String");
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "AArray",
+  "b": "AArray2",
+  "c": "String"
+}
+
+
+

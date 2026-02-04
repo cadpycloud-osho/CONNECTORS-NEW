@@ -1,0 +1,23 @@
+max:
+
+max<T <: Comparable>(@StreamCapable values: Array<T>): T | Null
+
+max<T <: Comparable>(@StreamCapable values: Array<T>): T | Null
+Returns the highest Comparable value in an array.
+
+The items must be of the same type, or the function throws an error. The function returns null if the array is empty.
+
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ a: max([1, 1000]), b: max([1, 2, 3]), c: max([1.5, 2.5, 3.5]) }
+
+DataWeave
+Output
+{ "a": 1000, "b": 3, "c": 3.5 }

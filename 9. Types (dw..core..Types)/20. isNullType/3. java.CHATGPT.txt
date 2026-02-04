@@ -1,0 +1,36 @@
+isNullType:
+
+
+
+input:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isNullType(Class<?> type) {
+        return type == null;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ANull = null;
+
+        result.put("a", isNullType(ANull));
+        result.put("b", isNullType(null));
+        result.put("c", isNullType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=true, c=false}
+

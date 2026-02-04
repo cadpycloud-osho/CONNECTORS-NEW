@@ -1,0 +1,37 @@
+with:
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class ReplaceRegexExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ReplaceRegexExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        String ssn = "987-65-4321";
+        
+        // Java equivalent of DWL replace /[0-9]/ with("x"): String.replaceAll()
+        // The regex [0-9] matches any single digit.
+        String maskedSsn = ssn.replaceAll("[0-9]", "x");
+        
+        // Map to mimic the final JSON object structure
+        Map<String, String> outputMap = new LinkedHashMap<>();
+        outputMap.put("ssn", maskedSsn);
+        
+        System.out.println("--- DWL replace Equivalent Output ---");
+        System.out.println(outputMap); 
+    }
+}
+
+output:
+
+{ssn=xxx-xx-xxxx}

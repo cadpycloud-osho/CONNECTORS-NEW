@@ -1,0 +1,76 @@
+match:
+
+
+example 1:
+
+
+input:
+
+
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String email = "me@mulesoft.com";
+        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+        Matcher matcher = pattern.matcher(email);
+        
+        if (matcher.find()) {
+            System.out.println("[" +
+                matcher.group(0) + ", " +
+                matcher.group(1) + ", " +
+                matcher.group(2) +
+            "]");
+        }
+    }
+}
+
+
+output:
+
+[me@mulesoft.com, me, mulesoft]
+
+
+
+-------------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String a = "192.88.99.0/24";
+        String b = "192.168.0.0/16";
+        String c = "192.175.48.0/24";
+        
+        List<String> ips = Arrays.asList(a, b, c);
+        Pattern pattern = Pattern.compile(".*[4].*");
+        List<String> result = new ArrayList<>();
+        
+        for (String ip : ips) {
+            Matcher matcher = pattern.matcher(ip);
+            if (matcher.find()) {
+                result.add(ip);
+            }
+        }
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[192.88.99.0/24, 192.175.48.0/24]
+
+
+
+

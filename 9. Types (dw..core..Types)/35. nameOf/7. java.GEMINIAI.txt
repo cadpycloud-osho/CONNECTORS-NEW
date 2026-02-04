@@ -1,0 +1,66 @@
+nameOf:
+
+
+
+input:
+
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // 1. Proxy class to represent the type alias AArray
+    private static final class AArray {} 
+
+    // 2. Proxy class to represent the type alias AArray2
+    private static final class AArray2 {} 
+
+    /**
+     * Conceptually mirrors DataWeave's nameOf(Type).
+     * It returns the simple name of the Java Class object.
+     */
+    public static String nameOf(Class<?> type) {
+        return type.getSimpleName();
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. AArray alias
+        Class<?> aArrayType = AArray.class;
+
+        // 2. AArray2 alias
+        Class<?> aArray2Type = AArray2.class;
+
+        // 3. Built-in String type
+        Class<?> stringType = String.class;
+        
+        // --- Execution ---
+        
+        // a: nameOf(AArray)
+        String a = nameOf(aArrayType); 
+
+        // b: nameOf(AArray2)
+        String b = nameOf(aArray2Type); 
+        
+        // c: nameOf(String)
+        String c = nameOf(stringType); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a + "\",");
+        System.out.println("  \"b\": \"" + b + "\",");
+        System.out.println("  \"c\": \"" + c + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "a": "AArray",
+  "b": "AArray2",
+  "c": "String"
+}
+

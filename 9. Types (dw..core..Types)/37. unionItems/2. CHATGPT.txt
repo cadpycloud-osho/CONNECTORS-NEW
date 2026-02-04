@@ -1,0 +1,46 @@
+unionItems:
+
+
+input:
+
+package com.example.demo.util;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class TypeUtils {
+
+    public static List<String> unionItems() {
+        // Simulate the union of String | Number
+        return Arrays.asList("String", "Number");
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class UnionItemsController {
+
+    @GetMapping("/unionItems")
+    public Map<String, List<String>> getUnionItems() {
+        Map<String, List<String>> result = new HashMap<>();
+        result.put("a", TypeUtils.unionItems());
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": ["String", "Number"]
+}
+
+

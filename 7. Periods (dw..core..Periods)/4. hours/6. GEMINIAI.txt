@@ -1,0 +1,102 @@
+hours:
+
+
+input:
+
+A. The Model (POJO)
+Java
+
+import lombok.Data; // Requires Lombok dependency
+
+@Data
+public class HourDurationResult {
+    private String nextHour;
+    private String previousHour;
+    private String threeHoursLater;
+    private String addDecimalInput;
+    private String decimalInputAsPeriod;
+    private String fourHourPeriod;
+    private long addNegativeValue;
+}
+B. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class HourDurationService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    public HourDurationResult calculateHours() {
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        LocalTime baseTime = LocalTime.parse("20:22");
+        HourDurationResult result = new HourDurationResult();
+        
+        // --- DateTime and Time Arithmetic ---
+        result.setNextHour(baseDateTime.plusHours(1).format(instantFormatter).replace(".000Z", "Z"));
+        result.setPreviousHour(baseDateTime.minusHours(1).format(instantFormatter).replace(".000Z", "Z"));
+        result.setThreeHoursLater(baseTime.plusHours(3).format(timeFormatter)); 
+
+        // 3.5 hours = 3 hours and 30 minutes
+        Duration decimalHoursDuration = Duration.ofMinutes(30).plusHours(3);
+        result.setAddDecimalInput(baseTime.plus(decimalHoursDuration).format(timeFormatter));
+
+        // --- Duration Construction and Arithmetic ---
+        
+        // 4.555 hours in seconds: 4.555 * 3600 = 16398 seconds
+        long totalSeconds = (long) (4.555 * 3600);
+        result.setDecimalInputAsPeriod(Duration.ofSeconds(totalSeconds).toString()); // PT4H33M18S
+        
+        result.setFourHourPeriod(Duration.ofHours(4).toString()); // PT4H
+
+        // -1 hour + 2 hours = 1 hour = 3600 seconds
+        Duration combinedDuration = Duration.ofHours(-1).plusHours(2);
+        result.setAddNegativeValue(combinedDuration.getSeconds()); // 3600
+
+        return result;
+    }
+}
+C. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DurationController {
+
+    private final HourDurationService durationService;
+
+    public DurationController(HourDurationService durationService) {
+        this.durationService = durationService;
+    }
+
+    @GetMapping("/api/hour-calculations")
+    public HourDurationResult getCalculatedHours() {
+        // Spring Boot automatically converts the object to JSON
+        return durationService.calculateHours();
+    }
+}
+Spring Boot Output (When accessing /api/hour-calculations)
+JSON
+
+
+
+
+output:
+
+{
+  "nextHour": "2020-10-05T21:22:34.385Z",
+  "previousHour": "2020-10-05T19:22:34.385Z",
+  "threeHoursLater": "23:22:00",
+  "addDecimalInput": "23:52:00",
+  "decimalInputAsPeriod": "PT4H33M18S",
+  "fourHourPeriod": "PT4H",
+  "addNegativeValue": 3600
+}

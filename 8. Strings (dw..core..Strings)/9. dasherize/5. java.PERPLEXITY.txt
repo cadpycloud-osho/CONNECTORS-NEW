@@ -1,0 +1,37 @@
+dasherize:
+
+
+input:
+import org.json.JSONObject;
+
+public class Main {
+    public static void main(String[] args) {
+        JSONObject result = new JSONObject();
+        result.put("a", dasherize("customer"));
+        result.put("b", dasherize("customer_first_name"));
+        result.put("c", dasherize("customer NAME"));
+        result.put("d", dasherize("customerName"));
+        
+        System.out.println(result.toString(2));
+    }
+    
+    private static String dasherize(String input) {
+        return input.replaceAll("([a-z])([A-Z])", "$1-$2")
+                   .replaceAll("_", "-")
+                   .replaceAll("\\s+", "-")
+                   .toLowerCase();
+    }
+}
+
+
+output:
+
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+
+
+

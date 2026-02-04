@@ -1,0 +1,90 @@
+minutes:
+
+input:
+
+A. The Model (POJO)
+Java
+
+import lombok.Data; // Requires Lombok dependency
+
+@Data
+public class MinuteDurationResult {
+    private String nextMinute;
+    private String previousMinute;
+    private String decimalInputPeriod;
+    private String wholeNumberInputPeriod;
+    private long addNegativeValue;
+}
+B. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class MinuteDurationService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+    public MinuteDurationResult calculateMinutes() {
+        MinuteDurationResult result = new MinuteDurationResult();
+        
+        // --- DateTime Arithmetic ---
+        result.setNextMinute(baseDateTime.plusMinutes(1).format(instantFormatter).replace(".000Z", "Z"));
+        result.setPreviousMinute(baseDateTime.minusMinutes(1).format(instantFormatter).replace(".000Z", "Z"));
+
+        // --- Duration Construction and Arithmetic ---
+        
+        // decimalInputPeriod: minutes(4.555)
+        double totalSecondsDouble = 4.555 * 60; // 273.3 seconds
+        long totalMilliseconds = (long) (totalSecondsDouble * 1000); 
+        result.setDecimalInputPeriod(Duration.ofMillis(totalMilliseconds).toString()); // PT4M33.3S
+        
+        // wholeNumberInputPeriod: minutes(4)
+        result.setWholeNumberInputPeriod(Duration.ofMinutes(4).toString()); // PT4M
+
+        // addNegativeValue: minutes(-1) + minutes(2)
+        Duration combinedDuration = Duration.ofMinutes(-1).plusMinutes(2);
+        result.setAddNegativeValue(combinedDuration.getSeconds()); // 60
+
+        return result;
+    }
+}
+C. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DurationController {
+
+    private final MinuteDurationService durationService;
+
+    public DurationController(MinuteDurationService durationService) {
+        this.durationService = durationService;
+    }
+
+    @GetMapping("/api/minute-calculations")
+    public MinuteDurationResult getCalculatedMinutes() {
+        // Spring Boot automatically converts the object to JSON
+        return durationService.calculateMinutes();
+    }
+}
+
+
+
+Spring Boot Output (When accessing /api/minute-calculations)
+
+JSON
+
+{
+  "nextMinute": "2020-10-05T20:23:34.385Z",
+  "previousMinute": "2020-10-05T20:21:34.385Z",
+  "decimalInputPeriod": "PT4M33.3S",
+  "wholeNumberInputPeriod": "PT4M",
+  "addNegativeValue": 60
+}

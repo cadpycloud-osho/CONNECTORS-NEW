@@ -1,0 +1,84 @@
+log:
+
+example 1:
+
+input:
+
+// WarningLogApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class WarningLogApp {
+    public static void main(String[] args) {
+        SpringApplication.run(WarningLogApp.class, args);
+
+        // Simulate DataWeave log("WARNING", "Houston, we have a problem")
+        String level = "WARNING";
+        String message = "Houston, we have a problem";
+        System.out.println(level + " - " + message); // Log Output: "WARNING - Houston, we have a problem"
+        
+        // Expression Output
+        System.out.println("\"" + message + "\""); // Output: "Houston, we have a problem"
+    }
+}
+
+
+
+
+output:
+Console Output:
+
+
+WARNING - Houston, we have a problem
+"Houston, we have a problem"
+
+
+
+_______________________________________________________________
+
+
+example 2:
+
+input:
+
+
+// UserLogApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Map;
+
+@SpringBootApplication
+public class UserLogApp {
+    public static void main(String[] args) {
+        SpringApplication.run(UserLogApp.class, args);
+
+        Map<String, Object> user = Map.of(
+            "friend", Map.of("name", "Shoki"),
+            "id", 1,
+            "name", "Tomo"
+        );
+
+        // Log the user object (simulating DataWeave log)
+        System.out.println("User - " + user);
+
+        // Expression output: friend.name
+        Map<String, String> friend = (Map<String, String>) user.get("friend");
+        String friendName = friend.get("name");
+        System.out.println("\"" + friendName + "\""); // Output: "Shoki"
+    }
+}
+
+
+
+output:
+
+Console Output:
+
+User - {friend={name=Shoki}, id=1, name=Tomo}
+"Shoki"

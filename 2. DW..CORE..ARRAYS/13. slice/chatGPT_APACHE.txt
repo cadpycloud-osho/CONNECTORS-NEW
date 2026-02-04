@@ -1,0 +1,27 @@
+slice:
+
+input:
+
+from("direct:slice")
+.process(exchange -> {
+
+    List<Integer> arr = List.of(0, 1, 2, 3, 4, 5);
+
+    int start = 1;
+    int end = 4;
+
+    List<Integer> sliced = new ArrayList<>(arr.subList(start, end));
+
+    exchange.getIn().setBody(sliced);
+});
+
+
+
+
+output:
+
+[1, 2, 3]
+
+
+
+

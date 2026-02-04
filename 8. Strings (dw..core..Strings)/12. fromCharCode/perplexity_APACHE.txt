@@ -1,0 +1,27 @@
+fromCharCode:
+
+
+input:
+
+import java.util.*;
+
+public class FromCharCodeConverter {
+    public static String fromCharCode(int codePoint) {
+        return new String(Character.toChars(codePoint));
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("fromCharCode", fromCharCode(117)); // Unicode 117 = 'u'
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{ "fromCharCode": "u" }
+
+
+

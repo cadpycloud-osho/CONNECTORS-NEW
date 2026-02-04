@@ -1,0 +1,30 @@
+startsWith:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class StartsWithRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:startsWith")
+            .process(exchange -> {
+                boolean[] results = {
+                    "Mari".startsWith("Mar"),  // true
+                    "Mari".startsWith("Em")    // false
+                };
+                
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[ true, false ]
+
+

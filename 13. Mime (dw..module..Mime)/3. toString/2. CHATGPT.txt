@@ -1,0 +1,76 @@
+toString:
+
+example 1:
+
+
+input:
+
+
+@RestController
+public class MimeExample1Controller {
+
+    @GetMapping("/mime1")
+    public Map<String, String> mimeExample1() {
+
+        String type = "application";
+        String subtype = "json";
+        Map<String, String> parameters = new HashMap<>();
+
+        String result = buildMime(type, subtype, parameters);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mime", result);
+        return response;
+    }
+
+    private String buildMime(String type, String subtype, Map<String, String> params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        if (!params.isEmpty()) {
+            params.forEach((k, v) -> sb.append(";").append(k).append("=").append(v));
+        }
+        return sb.toString();
+    }
+}
+
+output:
+
+
+{ "mime": "application/json" }
+
+------------------------------------------------------------
+example 1:
+
+
+input:
+
+@RestController
+public class MimeExample2Controller {
+
+    @GetMapping("/mime2")
+    public Map<String, String> mimeExample2() {
+
+        String type = "multipart";
+        String subtype = "form-data";
+        Map<String, String> parameters = Map.of("boundary", "my-boundary");
+
+        String result = buildMime(type, subtype, parameters);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mime", result);
+        return response;
+    }
+
+    private String buildMime(String type, String subtype, Map<String, String> params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        params.forEach((k, v) -> sb.append(";").append(k).append("=").append(v));
+        return sb.toString();
+    }
+}
+
+output:
+
+{ "mime": "multipart/form-data;boundary=my-boundary" }
+
+

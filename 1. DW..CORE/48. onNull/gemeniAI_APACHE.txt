@@ -1,0 +1,58 @@
+onNull:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+public class CamelReduceThenOnNull {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [] (Empty List)
+                        List<String> input = new ArrayList<>();
+
+                        // 1. Logic: reduce ((item, acc) -> item ++ acc)
+                        // In Java, reducing an empty stream returns an empty Optional
+                        Optional<String> reduced = input.stream()
+                            .reduce((item, accumulator) -> item + accumulator);
+
+                        // 2. Logic: then ((result) -> sizeOf(result))
+                        // 3. Logic: onNull "Empty Text"
+                        Object finalResult = reduced
+                            .map(String::length) // transform result (then)
+                            .map(Object::asString) // Convert to string if necessary
+                            .orElse("Empty Text"); // fallback (onNull)
+
+                        exchange.getIn().setBody(Map.of("onNull", finalResult));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "onNull": "Empty Text"
+}
+

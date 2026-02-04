@@ -1,0 +1,57 @@
+isReferenceType:
+
+
+
+input:
+
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isReferenceType(Class<?> type, boolean isReferenced) {
+        return isReferenced;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class ReferenceTypeController {
+
+    @GetMapping("/isReferenceType")
+    public Map<String, Boolean> checkReferenceTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // AArray is NOT a referenced type (equals false in DW)
+        boolean AArray_isReferenced = false;
+
+        // arrayItem(AArray2) returns AArray (which IS referenced)
+        boolean arrayItemAArray2_isReferenced = true;
+
+        result.put("a", TypeUtils.isReferenceType(String[].class, AArray_isReferenced));
+        result.put("b", TypeUtils.isReferenceType(String[].class, arrayItemAArray2_isReferenced));
+        result.put("c", TypeUtils.isReferenceType(String.class, false));
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": false
+}
+
+
+

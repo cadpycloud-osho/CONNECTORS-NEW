@@ -1,0 +1,31 @@
+xsiType:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        // Build the XML with namespaces and xsi:type
+        String xmlOutput =
+                "<user xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                        "xmlns:acme=\"http://acme.com\" " +
+                        "xsi:type=\"acme:user\">" +
+                        "<name>Peter</name>" +
+                        "<lastName>Parker</lastName>" +
+                "</user>";
+
+        exchange.getIn().setBody(xmlOutput);
+        exchange.getIn().setHeader("Content-Type", "application/xml");
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<user xsi:type="acme:user" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:acme="http://acme.com">
+    <name>Peter</name>
+    <lastName>Parker</lastName>
+</user>
+
+

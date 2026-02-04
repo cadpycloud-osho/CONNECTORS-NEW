@@ -1,0 +1,52 @@
+splitWhere:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> users = List.of(
+            "Mariano",
+            "Leandro",
+            "Julian",
+            "Tomo"
+        );
+
+        List<String> left = new ArrayList<>();
+        List<String> right = new ArrayList<>();
+
+        boolean splitFound = false;
+
+        for (String user : users) {
+            if (!splitFound && user.startsWith("Jul")) {
+                splitFound = true;
+            }
+
+            if (splitFound) {
+                right.add(user);
+            } else {
+                left.add(user);
+            }
+        }
+
+        Map<String, List<String>> result = new LinkedHashMap<>();
+        result.put("l", left);
+        result.put("r", right);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "l": ["Mariano", "Leandro"],
+  "r": ["Julian", "Tomo"]
+}
+

@@ -1,0 +1,31 @@
+round:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+
+public class RoundFunctionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:round")
+            .process(exchange -> {
+                // Simulate DataWeave input values
+                double[] values = {1.2, 4.6, 3.5};
+                Integer[] result = Arrays.stream(values)
+                    .mapToInt(Math::round)
+                    .boxed()
+                    .toArray(Integer[]::new);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[ 1, 5, 4 ]
+

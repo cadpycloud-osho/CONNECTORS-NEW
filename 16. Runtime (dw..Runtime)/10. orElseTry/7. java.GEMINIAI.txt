@@ -1,0 +1,87 @@
+orElseTry:
+
+
+input:
+
+import java.util.Collections;
+import java.util.Map;
+
+// Custom Exception definition
+class DWKeyNotFoundException extends RuntimeException {
+    public DWKeyNotFoundException(String message) { super(message); }
+}
+
+public class Main {
+
+    // Utility to simulate DW's forceful key access (user.name!)
+    private static void simulateKeyAccess(Map<?, ?> data, String key) {
+        if (!data.containsKey(key)) {
+            throw new DWKeyNotFoundException("There is no key named '" + key + "'");
+        }
+    }
+
+    // Utility to build the DW failure object structure
+    private static Map<String, Object> buildFailureObject(Exception e) {
+        return Map.of(
+            "success", false,
+            "error", Map.of("kind", e.getClass().getSimpleName(), "message", e.getMessage())
+        );
+    }
+    
+    public static Map<String, Object> executeTryOrElseTryLogic() {
+        final Map<String, Object> user = Collections.emptyMap();
+        final Map<String, Object> otherUser = Collections.emptyMap();
+
+        Map<String, Object> resultA;
+        Map<String, Object> resultB;
+
+        // --- Expression 'a': try(() -> user.name!) orElseTry otherUser.name! ---
+        try {
+            simulateKeyAccess(user, "name"); // Fails
+            resultA = Map.of("success", true, "result", "Success from user"); // Unreachable
+        } catch (Exception e1) {
+            // First failure (user.name! failed) -> Try fallback
+            try {
+                simulateKeyAccess(otherUser, "name"); // Second attempt fails
+                resultA = Map.of("success", true, "result", "Success from otherUser"); // Unreachable
+            } catch (Exception e2) {
+                // Second failure (otherUser.name! failed) -> Return failure object of E2
+                resultA = buildFailureObject(e2);
+            }
+        }
+
+        // --- Expression 'b': try(() -> user.name!) orElseTry "No User Name" ---
+        try {
+            simulateKeyAccess(user, "name"); // Fails
+            resultB = Map.of("success", true, "result", user.get("name")); // Unreachable
+        } catch (Exception e1) {
+            // First failure (user.name! failed) -> Try fallback constant
+            try {
+                String fallbackValue = "No User Name"; // Fallback success
+                resultB = Map.of("success", true, "result", fallbackValue);
+            } catch (Exception e2) {
+                // Unlikely to happen for a constant string
+                resultB = buildFailureObject(e2);
+            }
+        }
+
+        return Map.of("a", resultA, "b", resultB);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java TryOrElseTry Simulation ---");
+        System.out.println(executeTryOrElseTryLogic());
+    }
+}
+
+output:
+
+
+{
+  a={
+    success=false, 
+    error={kind=DWKeyNotFoundException, message=There is no key named 'name'}
+  }, 
+  b={success=true, result=No User Name}
+}
+

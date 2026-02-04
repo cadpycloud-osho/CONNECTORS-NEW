@@ -1,0 +1,71 @@
+locationString:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DwLocationStringTest {
+
+    // Simulate source code tracking - maps values to their defining source lines
+    static final Map<Object, String> SOURCE_LINES = new HashMap<>();
+    
+    static {
+        SOURCE_LINES.put(123, "var a = 123");
+    }
+
+    // Simulate dw::Runtime::locationString(var) - returns source code line defining the variable
+    static String locationString(Object value) {
+        return SOURCE_LINES.getOrDefault(value, "unknown location");
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new LocationStringRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class LocationStringRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // var a = 123
+                        Integer a = 123;
+
+                        // Simulate: locationString(a)
+                        String location = locationString(a);
+
+                        String output = mapper.writeValueAsString(location);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+Output:
+"var a = 123"
+
+

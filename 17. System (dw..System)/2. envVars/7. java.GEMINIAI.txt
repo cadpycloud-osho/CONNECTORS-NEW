@@ -1,0 +1,45 @@
+
+envVars():
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Reads the SHELL environment variable and returns a Java Map.
+     */
+    public Map<String, String> getEnvironmentVariableMap() {
+        // Get environment variable using standard Java
+        String shellValue = System.getenv("SHELL");
+
+        // Create the root object (Map in Java)
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the key-value pair
+        // Note: This matches the key 'envVars' in the desired output.
+        rootMap.put("envVars", shellValue); 
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Change 'SimplePureJavaEnvReader' to 'Main'
+        Main reader = new Main(); 
+        Map<String, String> result = reader.getEnvironmentVariableMap();
+        
+        // Print the Java structure (looks like the desired JSON when printed)
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{envVars=/bin/bash}
+

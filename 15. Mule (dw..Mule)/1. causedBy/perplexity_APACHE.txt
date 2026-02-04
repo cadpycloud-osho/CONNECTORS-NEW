@@ -1,0 +1,72 @@
+causedBy:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.support.task.ErrorHandlerRoute;
+
+public class SecurityErrorHandlerRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        // Global error handling for SECURITY errors (on-error-continue equivalent)
+        errorHandler(routeContext -> new ErrorHandlerRoute() {
+            @Override
+            public void onException(Exchange exchange, Throwable exception) {
+                if (exception.getClass().getSimpleName().contains("SecurityException") ||
+                    exception.getMessage().contains("SECURITY")) {
+                    
+                    // Choice equivalent - conditional error handling
+                    if (exception.getMessage().contains("UNAUTHORIZED") || 
+                        isCausedBy(exchange, "HTTP:UNAUTHORIZED")) {
+                        // Handle HTTP:UNAUTHORIZED errors
+                        exchange.getIn().setBody("UNAUTHORIZED access - 401");
+                        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 401);
+                    } 
+                    else if (exception.getMessage().contains("FORBIDDEN") || 
+                             isCausedBy(exchange, "HTTP:FORBIDDEN")) {
+                        // Handle HTTP:FORBIDDEN errors  
+                        exchange.getIn().setBody("FORBIDDEN access - 403");
+                        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 403);
+                    }
+                    // Continue processing (not propagate)
+                }
+            }
+        });
+        
+        restConfiguration()
+            .component("servlet")
+            .host("0.0.0.0").port(8081)
+            .bindingMode(RestBindingMode.json);
+            
+        // Example route that might throw security errors
+        from("rest:post:/secure")
+            .process(exchange -> {
+                // Simulate security check
+                String auth = exchange.getIn().getHeader("Authorization", String.class);
+                if (auth == null || !auth.equals("Bearer valid-token")) {
+                    throw new SecurityException("HTTP:UNAUTHORIZED");
+                }
+                exchange.getIn().setBody("Access granted");
+            });
+    }
+    
+    private boolean isCausedBy(Exchange exchange, String errorType) {
+        Throwable cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
+        return cause != null && cause.getMessage().contains(errorType);
+    }
+}
+
+
+output:
+
+SECURITY error caught: HTTP:UNAUTHORIZED
+Status: 401
+UNAUTHORIZED access - 401
+
+
+
+

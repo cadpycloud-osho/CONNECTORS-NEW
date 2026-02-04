@@ -1,0 +1,59 @@
+
+isNothingType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveNothingTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processNothingChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processNothingChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ANothing = Nothing (type alias)
+        result.put("a", isNothingType(Nothing.class));
+        
+        // Built-in Nothing type
+        result.put("b", isNothingType(Nothing.class));
+        
+        // String - not Nothing
+        result.put("c", isNothingType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isNothingType(Class<?> type) {
+        // DataWeave Nothing type check equivalent
+        // Returns true for Nothing and its aliases (null/empty representation)
+        return type == Nothing.class || 
+               "Nothing".equals(type.getSimpleName()) ||
+               type.getName().contains("Nothing");
+    }
+    
+    // Nothing interface equivalent for DataWeave Nothing type simulation
+    private interface Nothing {}
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

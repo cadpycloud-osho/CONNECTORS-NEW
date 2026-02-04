@@ -1,0 +1,29 @@
+fromBinary:
+
+
+input:
+
+from("direct:fromBinary")
+    .process(exchange -> {
+        Map<String, Object> result = new HashMap<>();
+        
+        result.put("a", new BigInteger("-10", 2).intValue());  // -2
+        result.put("b", new BigInteger("11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000", 2));
+        result.put("c", new BigInteger("0", 2).intValue());    // 0
+        result.put("d", null);
+        result.put("e", new BigInteger("100", 2).intValue());  // 4
+        
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+{
+  "a": -2,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 4
+}

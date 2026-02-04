@@ -1,0 +1,51 @@
+isOdd:
+
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // --- Utility method to replicate DataWeave's isOdd() behavior ---
+    /**
+     * Checks if an integer is odd using the modulo operator.
+     */
+    public static boolean isOdd(int number) {
+        // A number is odd if its remainder when divided by 2 is NOT 0.
+        // We use Math.abs() to handle negative numbers correctly (e.g., -1 % 2 == -1)
+        return Math.abs(number % 2) == 1; 
+    }
+
+    public static void main(String[] args) {
+        
+        // --- DataWeave Expressions to be evaluated ---
+        
+        // isOdd(0)
+        boolean result1 = isOdd(0);
+        
+        // isOdd(1)
+        boolean result2 = isOdd(1);
+        
+        // isOdd(2+2) -> isOdd(4)
+        boolean result3 = isOdd(2 + 2);
+
+        // Collect the results into a List (equivalent to the JSON array output)
+        List<Boolean> isOddResults = Arrays.asList(result1, result2, result3);
+
+        // --- Output Generation (Replicating the JSON structure) ---
+        System.out.println("--- DataWeave isOdd() Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{ \"isOdd\": " + isOddResults + " }");
+    }
+}
+
+output:
+
+
+{ "isOdd": [false, true, false] }
+

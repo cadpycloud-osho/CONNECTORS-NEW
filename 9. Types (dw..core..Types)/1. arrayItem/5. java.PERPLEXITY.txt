@@ -1,0 +1,55 @@
+arrayItem:
+
+
+
+input:
+
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+
+abstract class TypeToken<T> {
+    private final Type type;
+    
+    protected TypeToken() {
+        this.type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+    
+    public Type getType() { 
+        return type; 
+    }
+}
+
+class ArrayOfStringToken extends TypeToken<String[]> {}
+class ArrayOfNumberToken extends TypeToken<Number[]> {}
+class ArrayOfAnyToken extends TypeToken<Object[]> {}
+class ArrayOfAnyDefaultToken extends TypeToken<Object[]> {}
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+        result.put("a", getElementType(new ArrayOfStringToken()).getSimpleName());
+        result.put("b", getElementType(new ArrayOfNumberToken()).getSimpleName());
+        result.put("c", getElementType(new ArrayOfAnyToken()).getSimpleName());
+        result.put("d", "Any");  // Default array fallback
+        System.out.println(result);
+    }
+    
+    private static Class<?> getElementType(TypeToken<?> token) {
+        Type type = token.getType();
+        if (type instanceof Class<?> cls && cls.isArray()) {
+            return cls.getComponentType();
+        }
+        return Object.class;
+    }
+}
+
+
+output:
+
+{a=String, b=Number, c=Object, d=Any}
+
+
+

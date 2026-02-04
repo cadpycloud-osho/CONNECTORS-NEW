@@ -1,0 +1,198 @@
+update:
+
+update(objectValue: Object, fieldName: String): UpdaterValueProvider<Object>
+
+update(objectValue: Object, fieldName: String): UpdaterValueProvider<Object>
+This update function updates a field in an object with the specified string value.
+
+The function returns a new object with the specified field and value.
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+{name: "Mariano"} update "name" with "Data Weave"
+DataWeave
+Output
+{
+  "name": "Data Weave"
+}
+
+----------------------------------------------------------------
+update(objectValue: Object, fieldName: PathElement): UpdaterValueProvider<Object>
+This update function updates an object field with the specified PathElement value.
+
+The function returns a new object with the specified field and value.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+{name: "Mariano"} update field("name") with "Data Weave"
+
+
+DataWeave
+Output
+{
+  "name": "Data Weave"
+}
+
+
+
+----------------------------------------------------------------
+
+update(arrayValue: Array, indexToUpdate: Number): UpdaterValueProvider<Array>
+Updates an array index with the specified value.
+
+This update function returns a new array that changes the value of the specified index.
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+[1,2,3] update 1 with 5
+
+DataWeave
+Output
+[
+   1,
+   5,
+   3
+ ]
+----------------------------------------------------------------
+
+
+update(arrayValue: Array, indexToUpdate: String): UpdaterValueProvider<Array>
+This update function updates all objects within the specified array with the given string value.
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+[{role: "a", name: "spiderman"}, {role: "b", name: "batman"}] update "role" with "Super Hero"
+DataWeave
+Output
+[{
+   "role": "Super Hero",
+   "name": "spiderman"
+ },
+ {
+   "role": "Super Hero",
+   "name": "batman"
+}]
+
+
+----------------------------------------------------------------
+
+
+update(arrayValue: Array, indexToUpdate: PathElement): UpdaterValueProvider<Array>
+This update function updates the specified index of an array with the given PathElement value.
+
+The function returns a new array that contains given value at the specified index.
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+[1,2,3] update index(1) with 5
+DataWeave
+Output
+[
+   1,
+   5,
+   3
+ ]
+
+
+
+----------------------------------------------------------------
+
+update(value: Array | Object | Null, path: Array<String | Number | PathElement>): UpdaterValueProvider<Array | Object | Null>
+Updates the value at the specified path with the given value.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+{user: {name: "Mariano"}} update ["user", field("name")] with "Data Weave"
+DataWeave
+Output
+{
+   "user": {
+     "name": "Data Weave"
+   }
+ }
+
+
+----------------------------------------------------------------
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/xml
+---
+payload update ["users", "user", "language"] with (if ($ == "English") "Gibberish" else $)
+DataWeave
+Input
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>English</language>
+  </user>
+</users>
+XML
+Output
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>Gibberish</language>
+  </user>
+</users>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

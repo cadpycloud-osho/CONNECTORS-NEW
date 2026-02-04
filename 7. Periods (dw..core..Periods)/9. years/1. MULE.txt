@@ -1,0 +1,45 @@
+years:
+
+years(nYears: Number): Period
+
+years(nYears: Number): Period
+Creates a Period value from the provided number of years.
+
+The function applies the period function to the input value.
+
+
+Source
+%dw 2.0
+
+import * from dw::core::Periods
+output application/json
+---
+{
+  nextYear: |2020-10-05T20:22:34.385Z| + years(1),
+  fourYearPeriod: years(4),
+  addNegativeValue: years(-1) + years(2)
+}
+
+
+DataWeave
+Output
+{
+   "nextYear": "2021-10-05T20:22:34.385Z",
+   "fourYearPeriod": "P4Y",
+   "addNegativeValue": 12
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

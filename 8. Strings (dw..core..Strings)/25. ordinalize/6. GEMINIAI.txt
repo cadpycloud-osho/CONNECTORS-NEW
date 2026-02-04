@@ -1,0 +1,79 @@
+ordinalize:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class OrdinalizeController {
+
+    @GetMapping("/ordinal-conversion")
+    public Map<String, String> convertDataWeaveOrdinals() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = OrdinalizeUtil.ordinalize(1);
+        String b = OrdinalizeUtil.ordinalize(2);
+        String c = OrdinalizeUtil.ordinalize(5);
+        String d = OrdinalizeUtil.ordinalize(103);
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot automatically converts to the required JSON
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d
+        );
+    }
+}
+
+
+public class OrdinalizeUtil {
+
+    /**
+     * Implements the logic of the DataWeave 'ordinalize' function.
+     * Converts an integer to its ordinal string representation (e.g., 1 -> "1st").
+     */
+    public static String ordinalize(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Ordinalization is typically for positive integers.");
+        }
+        
+        // Special case for 11, 12, 13 (which end in 'th')
+        if (n % 100 >= 11 && n % 100 <= 13) {
+            return n + "th";
+        }
+        
+        // Determine the suffix based on the last digit
+        String suffix;
+        switch (n % 10) {
+            case 1:
+                suffix = "st";
+                break;
+            case 2:
+                suffix = "nd";
+                break;
+            case 3:
+                suffix = "rd";
+                break;
+            default:
+                suffix = "th"; // 0, 4, 5, 6, 7, 8, 9
+                break;
+        }
+        
+        return n + suffix;
+    }
+}
+
+output:
+
+{
+  "a": "1st",
+  "b": "2nd",
+  "c": "5th",
+  "d": "103rd"
+}
+

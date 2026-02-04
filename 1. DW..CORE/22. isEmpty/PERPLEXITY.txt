@@ -1,0 +1,157 @@
+isEmpty:
+
+EXAMPLE 1:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.List;
+
+@SpringBootApplication
+public class IsEmptyListApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IsEmptyListApp.class, args);
+
+        List<Integer> emptyList = List.of();
+        List<Integer> nonEmptyList = List.of(1);
+
+        System.out.println(List.of(emptyList.isEmpty(), nonEmptyList.isEmpty())); 
+        // Output: [true, false]
+    }
+}
+
+
+OUTPUT:
+
+
+[true, false]
+
+
+
+
+
+_________________________________________________________________
+
+
+EXAMPLE 2:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class IsEmptyStringApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IsEmptyStringApp.class, args);
+
+        String emptyStr = "";
+        String nonEmptyStr = "DataWeave";
+
+        System.out.println(List.of(isEmpty(emptyStr), isEmpty(nonEmptyStr)));
+        // Output: [true, false]
+    }
+
+    private static boolean isEmpty(String s) {
+        return s == null || s.isEmpty();
+    }
+}
+
+
+OUTPUT:
+
+
+[true, false]
+
+
+
+_________________________________________________________________
+
+EXAMPLE 3:
+
+isEmpty:
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Collections;
+import java.util.Map;
+
+@SpringBootApplication
+public class IsEmptyMapApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IsEmptyMapApp.class, args);
+
+        Map<String, String> emptyMap = Collections.emptyMap();
+        Map<String, String> nonEmptyMap = Map.of("name", "DataWeave");
+
+        System.out.println(List.of(emptyMap.isEmpty(), nonEmptyMap.isEmpty()));
+        // Output: [true, false]
+    }
+}
+
+
+OUTPUT:
+
+
+[true, false]
+
+
+
+_________________________________________________________________
+
+
+EXAMPLE 4:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class IsEmptyNullApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IsEmptyNullApp.class, args);
+
+        Object nullValue = null;
+        boolean isNullEmpty = isEmpty(nullValue);
+
+        System.out.println("{ \"nullValue\": " + isNullEmpty + "}");
+        // Output: { "nullValue": true }
+    }
+
+    private static boolean isEmpty(Object obj) {
+        if (obj == null) return true;
+
+        if (obj instanceof String) {
+            return ((String) obj).isEmpty();
+        }
+        if (obj instanceof java.util.Collection) {
+            return ((java.util.Collection<?>) obj).isEmpty();
+        }
+        if (obj instanceof java.util.Map) {
+            return ((java.util.Map<?, ?>) obj).isEmpty();
+        }
+        return false;
+    }
+}
+
+
+OUTPUT:
+
+
+{ "nullValue": true }
+
+
+
+
+

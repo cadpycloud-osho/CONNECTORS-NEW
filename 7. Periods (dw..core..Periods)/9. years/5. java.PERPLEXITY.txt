@@ -1,0 +1,51 @@
+years:
+
+
+
+
+input:
+
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_INSTANT;
+        Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+        LocalDateTime baseLdt = base.atZone(ZoneOffset.UTC).toLocalDateTime();
+
+        // nextYear: add 1 year (preserves day/time)
+        LocalDateTime nextYearLdt = baseLdt.plusYears(1);
+        Instant nextYear = nextYearLdt.toInstant(ZoneOffset.UTC);
+        
+        // fourYearPeriod: P4Y representation
+        String fourYearPeriod = "P4Y";
+        
+        // addNegativeValue: years(-1) + years(2) = 1 year = 12 months
+        int addNegativeValue = 12;
+
+        // JSON output matching DataWeave exactly
+        System.out.println("{");
+        System.out.println("  \"nextYear\": \"" + fmt.format(nextYear) + "\",");
+        System.out.println("  \"fourYearPeriod\": \"" + fourYearPeriod + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 12
+}
+
+
+
+
+

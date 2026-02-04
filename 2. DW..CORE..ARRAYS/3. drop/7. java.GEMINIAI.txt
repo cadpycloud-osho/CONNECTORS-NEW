@@ -1,0 +1,79 @@
+drop:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: drop(users, 2)
+        // The skip(2) operation removes the first 2 elements.
+        List<String> result = users.stream()
+            .skip(2)
+            .collect(Collectors.toList());
+
+        // Output the result in the JSON array format
+        System.out.println("Output structure:");
+        // The output uses the standard Java list toString() format, 
+        // which represents the JSON array output.
+        System.out.println(result); 
+    }
+}
+
+
+
+
+
+
+
+
+Java Code (Using the Imperative subList Method)
+The subList method in Java allows you to get a view of a portion of the list, which is an efficient way to implement the drop logic.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // The number of elements to drop
+        int elementsToDrop = 2;
+        
+        // DataWeave Logic: drop(users, 2)
+        // subList(startIndex, endIndex)
+        // If startIndex (2) is greater than list size (3), it returns an empty list.
+        // If startIndex is 2 and size is 3, it returns the elements from index 2 up to index 3-1.
+        List<String> result;
+        
+        if (elementsToDrop >= users.size()) {
+            // Handle case where we drop all or more elements (results in empty array)
+            result = List.of(); 
+        } else {
+            // The starting index is the number of elements to drop
+            result = users.subList(elementsToDrop, users.size());
+        }
+
+        // Output the result in the JSON array format
+        System.out.println("Output structure:");
+        // The output uses the standard Java list toString() format.
+        System.out.println(result);
+    }
+}
+
+output:
+
+[Julian]
+
+

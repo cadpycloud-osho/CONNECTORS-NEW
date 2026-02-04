@@ -1,0 +1,52 @@
+field:
+
+field(namespace: Namespace | Null = null, name: String): PathElement
+
+field(namespace: Namespace | Null = null, name: String): PathElement
+This function creates a PathElement data type to use for selecting an object field and populates the type’s selector field with the given string.
+
+Some versions of the update and mask functions accept a PathElement as an argument.
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::util::Values
+ns ns0 http://acme.com/foo
+---
+field(ns0 , "myFieldName")
+
+
+DataWeave
+Output
+{
+   "kind": "Object",
+   "namespace": "http://acme.com/foo",
+   "selector": "myFieldName"
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

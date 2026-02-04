@@ -1,0 +1,33 @@
+envVars
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+
+public class EnvVarRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .process(exchange -> {
+                // Read SHELL environment variable
+                String shellVar = System.getenv("SHELL");
+
+                // Set JSON body
+                Map<String, Object> body = Map.of("envVars", shellVar);
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+
+output:
+
+{ "envVars": "/bin/bash" }
+
+

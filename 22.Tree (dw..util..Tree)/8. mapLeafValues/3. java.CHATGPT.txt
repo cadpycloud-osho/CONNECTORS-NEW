@@ -1,0 +1,146 @@
+
+
+mapLeafValues:
+
+example 1:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> input = new HashMap<>();
+
+        List<Map<String, Object>> users = new ArrayList<>();
+        Map<String, Object> user1 = new HashMap<>();
+        user1.put("name", "mariano");
+        user1.put("lastName", "achaval");
+        users.add(user1);
+
+        input.put("user", users);
+        input.put("group", "data-weave");
+
+        Map<String, Object> output = mapLeafValues(input);
+
+        System.out.println(output);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> mapLeafValues(Map<String, Object> map) {
+        Map<String, Object> result = new HashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof String) {
+                result.put(entry.getKey(), ((String) value).toUpperCase());
+            } else if (value instanceof Map) {
+                result.put(entry.getKey(), mapLeafValues((Map<String, Object>) value));
+            } else if (value instanceof List) {
+                result.put(entry.getKey(), mapLeafList((List<Object>) value));
+            } else {
+                result.put(entry.getKey(), value);
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Object> mapLeafList(List<Object> list) {
+        List<Object> result = new ArrayList<>();
+        for (Object item : list) {
+            if (item instanceof String) {
+                result.add(((String) item).toUpperCase());
+            } else if (item instanceof Map) {
+                result.add(mapLeafValues((Map<String, Object>) item));
+            } else if (item instanceof List) {
+                result.add(mapLeafList((List<Object>) item));
+            } else {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+}
+
+
+output:
+
+{user=[{name=MARIANO, lastName=ACHAVAL}], group=DATA-WEAVE}
+
+
+
+-----------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+
+    enum Kind { OBJECT_TYPE, ARRAY_TYPE, ATTRIBUTE_TYPE }
+
+    static class PathSegment {
+        Kind kind;
+        String selector;
+
+        PathSegment(Kind kind, String selector) {
+            this.kind = kind;
+            this.selector = selector;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> input = new HashMap<>();
+        input.put("name", "Mariano");
+        input.put("test", Arrays.asList(1, 2, 3));
+
+        Map<String, Object> result = mapLeafValues(input, new ArrayList<>());
+
+        System.out.println(result);
+    }
+
+    private static Map<String, Object> mapLeafValues(Map<String, Object> obj, List<PathSegment> path) {
+        Map<String, Object> result = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : obj.entrySet()) {
+            List<PathSegment> currentPath = new ArrayList<>(path);
+            currentPath.add(new PathSegment(Kind.OBJECT_TYPE, entry.getKey()));
+
+            Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                // Nested object
+                result.put(entry.getKey(), mapLeafValues((Map<String, Object>) value, currentPath));
+            } else if (value instanceof List) {
+                // Array
+                List<Object> arr = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    arr.add("In an array");
+                }
+                result.put(entry.getKey(), arr);
+            } else {
+                // Attribute
+                result.put(entry.getKey(), "***");
+            }
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{name=***, test=[In an array, In an array, In an array]}
+

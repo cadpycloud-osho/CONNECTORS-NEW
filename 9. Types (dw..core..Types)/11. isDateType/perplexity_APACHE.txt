@@ -1,0 +1,34 @@
+isDateType:
+
+
+input:
+
+import java.util.*;
+
+public class IsDateTypeConverter {
+    public static boolean isDateType(String typeName) {
+        return "Date".equals(typeName) || "ADate".equals(typeName);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isDateType("ADate"));      // type ADate = Date
+        result.put("b", isDateType("Date"));       // built-in Date
+        result.put("c", isDateType("String"));     // concrete type
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

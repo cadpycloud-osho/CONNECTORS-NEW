@@ -1,0 +1,65 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        String rootName = "cXML";
+        String systemId = "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd";
+        
+        String result = docTypeAsString(rootName, systemId);
+        System.out.println(result);
+    }
+    
+    public static String docTypeAsString(String rootName, String systemId) {
+        return String.format("%s SYSTEM %s", rootName, systemId);
+    }
+}
+
+
+output:
+
+cXML SYSTEM http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd
+
+
+
+---------------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String rootName = "html";
+        String publicId = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+        String systemId = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+        
+        String result = docTypeAsString(rootName, publicId, systemId);
+        System.out.println(result);
+    }
+    
+    public static String docTypeAsString(String rootName, String publicId, String systemId) {
+        if (publicId != null && !publicId.isEmpty()) {
+            return String.format("%s PUBLIC %s %s", rootName, publicId, systemId);
+        }
+        return String.format("%s SYSTEM %s", rootName, systemId);
+    }
+}
+
+
+
+output:
+
+html PUBLIC -//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd
+
+
+
+

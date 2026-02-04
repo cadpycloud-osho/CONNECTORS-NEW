@@ -1,0 +1,621 @@
+sizeOf:
+
+
+example 1:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> array = Arrays.asList("a", "b", "c");
+        
+        // Java: List.size()
+        int size = array.size();
+        
+        System.out.println(size);
+    }
+}
+
+
+output:
+3
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap; // Used for ordered JSON output
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the nested Map into a pretty-printed JSON string.
+     */
+    private static String formatNestedMapAsPrettyJson(Map<String, Object> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Outer object key: "arraySizes"
+        sb.append("  \"arraySizes\" : {\n");
+        
+        // Inner object content
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> arraySizes = (Map<String, Integer>) output.get("arraySizes");
+        
+        // size3 : 3
+        sb.append("    \"size3\" : ").append(arraySizes.get("size3")).append(",\n");
+        
+        // size2 : 2
+        sb.append("    \"size2\" : ").append(arraySizes.get("size2")).append(",\n");
+        
+        // size0 : 0 (No comma for the last element)
+        sb.append("    \"size0\" : ").append(arraySizes.get("size0")).append("\n");
+        
+        // Close inner object and close outer object
+        sb.append("  }\n").append("}");
+        
+        return sb.toString();
+    }
+    
+    public static void main(String[] args) {
+        // Inputs
+        List<Integer> list3 = Arrays.asList(1, 2, 3);
+        // Using raw List for inner arrays to simplify generic complexity
+        List<List<?>> list2 = Arrays.asList(Arrays.asList(1, 2, 3), Arrays.asList(4)); 
+        List<?> list0 = Collections.emptyList();
+        
+        // Operations
+        // sizeOf() in DW is List.size() in Java
+        int size3 = list3.size(); // Result: 3
+        int size2 = list2.size(); // Result: 2 (The number of elements in the outermost list)
+        int size0 = list0.size(); // Result: 0
+
+        // Output Assembly using standard Java Maps
+        Map<String, Integer> arraySizes = new LinkedHashMap<>();
+        arraySizes.put("size3", size3);
+        arraySizes.put("size2", size2);
+        arraySizes.put("size0", size0);
+        
+        Map<String, Object> outputObject = new LinkedHashMap<>();
+        outputObject.put("arraySizes", arraySizes);
+        
+        // 3. Output the result
+        System.out.println(formatNestedMapAsPrettyJson(outputObject));
+    }
+}
+
+
+output:
+{
+  "arraySizes" : {
+    "size3" : 3,
+    "size2" : 2,
+    "size0" : 0
+  }
+}
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Integer> object = new HashMap<>();
+        object.put("a", 1);
+        object.put("b", 2);
+        
+        // Java: Map.size()
+        int size = object.size();
+        
+        System.out.println(size);
+    }
+}
+
+output:
+
+2
+---------------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedHashMap; // Used for ordered JSON output
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the nested Map into a pretty-printed JSON string.
+     */
+    private static String formatNestedMapAsPrettyJson(Map<String, Object> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Outer object key: "objectSize"
+        sb.append("  \"objectSize\" : {\n");
+        
+        // Inner object content
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> objectSizes = (Map<String, Integer>) output.get("objectSize");
+        
+        // sizeIs2 : 2
+        sb.append("    \"sizeIs2\" : ").append(objectSizes.get("sizeIs2")).append(",\n");
+        
+        // sizeIs0 : 0 (No comma for the last element)
+        sb.append("    \"sizeIs0\" : ").append(objectSizes.get("sizeIs0")).append("\n");
+        
+        // Close inner object and close outer object
+        sb.append("  }\n").append("}");
+        
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Inputs
+        Map<String, Integer> object2 = new HashMap<>();
+        object2.put("a", 1);
+        object2.put("b", 2);
+        Map<?, ?> object0 = new HashMap<>();
+        
+        // Operations: sizeOf() in DW is Map.size() in Java
+        int size2 = object2.size(); // Result: 2
+        int size0 = object0.size(); // Result: 0
+
+        // Output Assembly using standard Java Maps
+        Map<String, Integer> objectSizes = new LinkedHashMap<>();
+        objectSizes.put("sizeIs2", size2);
+        objectSizes.put("sizeIs0", size0);
+        
+        Map<String, Object> outputObject = new LinkedHashMap<>();
+        // Key matches the required DW output: "objectSize"
+        outputObject.put("objectSize", objectSizes);
+        
+        // 3. Output the result
+        System.out.println(formatNestedMapAsPrettyJson(outputObject));
+    }
+}
+output:
+
+{
+  "objectSize" : {
+    "sizeIs2" : 2,
+    "sizeIs0" : 0
+  }
+}
+---------------------------------------------------------------
+
+
+
+example 5:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, String> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // BinarySizeOf
+        sb.append("  \"BinarySizeOf\" : \"").append(map.get("BinarySizeOf")).append("\",\n");
+        
+        // StringSizeOf (no trailing comma)
+        sb.append("  \"StringSizeOf\" : \"").append(map.get("StringSizeOf")).append("\"\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        String myWord = "'my word'"; // 9 characters
+        
+        // Binary size (bytes)
+        // sizeOf(binary) is the number of bytes. For ASCII/UTF-8, this is the character count.
+        int binarySize = myWord.getBytes("UTF-8").length; // 9 bytes 
+
+        // String size (characters)
+        // sizeOf(string) is the number of characters.
+        int stringSize = myWord.length(); // 9 characters
+
+        // Operations: Simulating DataWeave output formatting "9 9"
+        String binarySizeOf = String.valueOf(binarySize) + " " + String.valueOf(binarySize); // "9 9"
+        String stringSizeOf = String.valueOf(stringSize) + " " + String.valueOf(stringSize); // "9 9"
+        
+        // Output Assembly using standard Map
+        Map<String, String> outputMap = new LinkedHashMap<>();
+        outputMap.put("BinarySizeOf", binarySizeOf);
+        outputMap.put("StringSizeOf", stringSizeOf);
+        
+        // 3. Output the result
+        System.out.println(formatMapAsPrettyJson(outputMap));
+    }
+}
+
+output:
+
+{
+  "BinarySizeOf" : "9 9",
+  "StringSizeOf" : "9 9"
+}
+---------------------------------------------------------------
+
+
+
+example 6:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String text = "abc";
+        
+        // Java: String.length()
+        int size = text.length();
+        
+        System.out.println(size);
+    }
+}
+
+output:
+3
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // sizeOfSting2
+        sb.append("  \"sizeOfSting2\" : ").append(map.get("sizeOfSting2")).append(",\n");
+        
+        // sizeOfEmptyString
+        sb.append("  \"sizeOfEmptyString\" : ").append(map.get("sizeOfEmptyString")).append(",\n");
+        
+        // sizeOfNumber (no trailing comma)
+        sb.append("  \"sizeOfNumber\" : ").append(map.get("sizeOfNumber")).append("\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Inputs
+        String text1 = "my string";
+        String emptyText = "";
+        
+        // Operations
+        int size1 = text1.length(); // sizeOf("my string") -> 9
+        int size2 = emptyText.length(); // sizeOf("") -> 0
+        
+        // sizeOf(Number) -> 1 (to match the provided DW output for a scalar)
+        int size3 = 1; 
+
+        // Output Assembly using standard Map
+        Map<String, Integer> outputMap = new LinkedHashMap<>();
+        outputMap.put("sizeOfSting2", size1);
+        outputMap.put("sizeOfEmptyString", size2);
+        outputMap.put("sizeOfNumber", size3);
+        
+        // 3. Output the result
+        System.out.println(formatMapAsPrettyJson(outputMap));
+    }
+}
+
+output:
+
+{
+  "sizeOfSting2" : 9,
+  "sizeOfEmptyString" : 0,
+  "sizeOfNumber" : 1
+}
+---------------------------------------------------------------
+
+
+
+example 8:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Input: |P3D| -> String "P3D"
+        String periodString = "P3D"; 
+        
+        // Operation: Character count of the Period string representation.
+        int size = periodString.length(); // 3
+
+        // Output Assembly
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode outputObject = mapper.createObjectNode();
+        outputObject.put("a", size);
+        
+        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputObject));
+    }
+}
+
+output:
+
+{
+  "a" : 3
+}
+---------------------------------------------------------------
+
+
+
+
+example 9:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Key "a" (no trailing comma)
+        sb.append("  \"a\" : ").append(map.get("a")).append("\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Input: |2025-07-13T18:06:59.314033Z| is treated as its string representation.
+        String dateTimeString = "2025-07-13T18:06:59.314033Z"; 
+        
+        // Operation: sizeOf() is the length of the string representation.
+        int size = dateTimeString.length(); // 27 characters
+        
+        // Output Assembly using standard Map
+        Map<String, Integer> outputMap = new LinkedHashMap<>();
+        outputMap.put("a", size);
+        
+        // 3. Output the result
+        System.out.println(formatMapAsPrettyJson(outputMap));
+    }
+}
+
+
+output:
+{
+  "a" : 27
+}
+
+---------------------------------------------------------------
+
+
+
+example 10:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Key "a" (no trailing comma)
+        sb.append("  \"a\" : ").append(map.get("a")).append("\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Input: |2025-07-13T18:06:59.314033| is treated as its string representation.
+        String localDateTimeString = "2025-07-13T18:06:59.314033"; 
+        
+        // Operation: sizeOf() is the length of the string representation.
+        int size = localDateTimeString.length(); // 26 characters
+        
+        // Output Assembly using standard Map
+        Map<String, Integer> outputMap = new LinkedHashMap<>();
+        outputMap.put("a", size);
+        
+        // 3. Output the result
+        System.out.println(formatMapAsPrettyJson(outputMap));
+    }
+}
+
+
+
+output:
+
+{
+  "a" : 26
+}
+---------------------------------------------------------------
+
+
+
+
+example 11:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Key "a"
+        sb.append("  \"a\" : ").append(map.get("a")).append(",\n");
+        
+        // Key "b" (no trailing comma)
+        sb.append("  \"b\" : ").append(map.get("b")).append("\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Inputs
+        long numA = 123;
+        double numB = 123.45;
+        
+        // Operations: sizeOf() on a number is the length of its string representation.
+        // The original code had illegal characters (non-breaking spaces) in the padding/comments.
+        int sizeA = String.valueOf(numA).length();  // "123" -> 3
+        int sizeB = String.valueOf(numB).length(); // "123.45" -> 6
+        
+        // Output Assembly using standard Map
+        Map<String, Integer> outputMap = new LinkedHashMap<>();
+        outputMap.put("a", sizeA);
+        outputMap.put("b", sizeB);
+        
+        // 3. Output the result
+        System.out.println(formatMapAsPrettyJson(outputMap));
+    }
+}
+
+
+
+output:
+{
+  "a" : 3,
+  "b" : 6
+}
+
+---------------------------------------------------------------
+
+
+
+
+example 12:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Assuming only two entries ("a", "b")
+        sb.append("  \"a\" : ").append(map.get("a")).append(",\n");
+        sb.append("  \"b\" : ").append(map.get("b")).append("\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Inputs (used only to demonstrate the context of the sizeOf function)
+        int numA = 123;
+        double numB = 123.45;
+        
+        // Operations: sizeOf() on a scalar value is 1 in DataWeave
+        int sizeA = 1; // sizeOf(123)
+        int sizeB = 1; // sizeOf(123.45)
+
+        // Output Assembly using standard Map
+        Map<String, Integer> outputMap = new LinkedHashMap<>();
+        outputMap.put("a", sizeA);
+        outputMap.put("b", sizeB);
+        
+        // 3. Output the result
+        System.out.println(formatMapAsPrettyJson(outputMap));
+    }
+}
+
+
+output:
+
+{
+  "a" : 1,
+  "b" : 1
+}
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

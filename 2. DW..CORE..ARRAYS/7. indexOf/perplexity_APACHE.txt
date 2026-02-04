@@ -1,0 +1,31 @@
+indexOf:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.List;
+
+public class IndexOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:indexOf")
+            .process(exchange -> {
+                List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+                
+                // indexOf(users, "Julian") → first occurrence at index 2
+                int index = users.indexOf("Julian");
+                
+                exchange.getIn().setBody(index);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+2
+

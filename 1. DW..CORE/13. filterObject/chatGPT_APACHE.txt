@@ -1,0 +1,122 @@
+filterObject:
+
+
+example 1:
+
+
+input:
+
+from("direct:filterByValue")
+.setBody(constant(Map.of(
+    "a", "apple",
+    "b", "banana"
+)))
+
+.split(simple("${body.entrySet()}"))
+    .filter(simple("${body.value} == 'apple'"))
+    .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedExchangeAggregationStrategy())
+    .completionTimeout(100)
+.end()
+
+.setBody(simple("{ \"${body[0].body.key}\": \"${body[0].body.value}\" }"));
+
+
+output:
+
+{ "a": "apple" }
+
+
+------------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:filterByKey")
+.setBody(constant(Map.of(
+    "letter1", "a",
+    "letter2", "b",
+    "id", 1
+)))
+
+.split(simple("${body.entrySet()}"))
+    .filter(simple("${body.key} startsWith 'letter'"))
+    .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end()
+
+.setBody(simple("{ \"letter1\": \"a\", \"letter2\": \"b\" }"));
+
+
+output:
+
+{ "letter1": "a", "letter2": "b" }
+
+
+------------------------------------------------------
+
+example 3:
+
+
+input:
+
+from("direct:filterByIndex")
+.setBody(constant(Map.of(
+    "1", "a",
+    "2", "b",
+    "3", "c"
+)))
+
+.split(simple("${body.entrySet()}"))
+    .setProperty("idx", simple("${exchangeProperty.CamelSplitIndex}"))
+    .filter(simple("${exchangeProperty.idx} < 1"))
+    .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end()
+
+.setBody(simple("{ \"1\": \"a\" }"));
+
+
+output:
+
+{ "1": "a" }
+
+
+------------------------------------------------------
+
+example 4:
+
+
+input:
+
+from("direct:filterNulls")
+.setBody(constant(Map.of(
+    "str1", "String 1",
+    "str2", "String 2",
+    "str3", null,
+    "str4", "String 4"
+)))
+
+.split(simple("${body.entrySet()}"))
+    .filter(simple("${body.value} != null"))
+    .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end()
+
+.setBody(simple(
+"{ \"str1\": \"String 1\", \"str2\": \"String 2\", \"str4\": \"String 4\" }"
+));
+
+
+output:
+
+{
+  "str1": "String 1",
+  "str2": "String 2",
+  "str4": "String 4"
+}
+
+
+------------------------------------------------------
+

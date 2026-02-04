@@ -1,0 +1,41 @@
+flatMap:
+
+
+INPUT:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class FlatMapExample {
+    
+    /**
+     * DataWeave: [ [3,5], [0.9,5.5] ] flatMap (value, index) -> value
+     * Equivalent to Java Stream's flatMap.
+     */
+    public static List<Number> flattenList(List<List<Number>> inputList) {
+        return inputList.stream()
+                // The inner stream (value) is returned for each element.
+                // It's then merged/flattened into the main stream.
+                .flatMap(innerList -> innerList.stream())
+                .collect(Collectors.toList());
+    }
+
+    public static void main(String[] args) {
+        // Input: List of Lists containing integers and doubles
+        List<List<Number>> input = Arrays.asList(
+            Arrays.asList(3, 5),
+            Arrays.asList(0.9, 5.5)
+        );
+        
+        List<Number> output = flattenList(input);
+        
+        System.out.println("Input List: " + input);
+        System.out.println("Output: " + output);
+    }
+}
+
+
+OUTPUT:
+
+[3, 5, 0.9, 5.5]

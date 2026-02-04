@@ -1,0 +1,41 @@
+duration:
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Function that waits for 100ms and returns a result
+    public static String myFunction() {
+        try {
+            Thread.sleep(100); // wait for 100 milliseconds
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return "My result";
+    }
+
+    public static void main(String[] args) {
+
+        long startTime = System.currentTimeMillis(); // start timer
+        String result = myFunction();               // call the function
+        long endTime = System.currentTimeMillis();  // end timer
+
+        long duration = endTime - startTime;        // calculate duration
+
+        // Create a Map to represent JSON output
+        Map<String, Object> output = new HashMap<>();
+        output.put("time", duration);
+        output.put("result", result);
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{time=101, result=My result}

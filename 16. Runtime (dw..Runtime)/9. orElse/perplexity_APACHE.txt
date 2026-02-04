@@ -1,0 +1,124 @@
+orElse:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DwTryOrElseExample {
+
+    // Simple TryResult simulation like dw::Runtime::try
+    static class TryResult<T> {
+        final boolean success;
+        final T result;
+        final Throwable error;
+
+        private TryResult(boolean success, T result, Throwable error) {
+            this.success = success;
+            this.result = result;
+            this.error = error;
+        }
+
+        static <T> TryResult<T> success(T value) {
+            return new TryResult<>(true, value, null);
+        }
+
+        static <T> TryResult<T> failure(Throwable e) {
+            return new TryResult<>(false, null, e);
+        }
+
+        T orElse(T fallback) {
+            return success ? result : fallback;
+        }
+    }
+
+    // Simulate dw::Runtime::try(() -> expr)
+    static <T> TryResult<T> dwTry(CallableWithException<T> delegate) {
+        try {
+            return TryResult.success(delegate.call());
+        } catch (Exception e) {
+            return TryResult.failure(e);
+        }
+    }
+
+    @FunctionalInterface
+    interface CallableWithException<T> {
+        T call() throws Exception;
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new DwTryOrElseRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class DwTryOrElseRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // var user = {}
+                        Map<String, Object> user = new HashMap<>();
+
+                        // var otherUser = {name: "DW"}
+                        Map<String, Object> otherUser = new HashMap<>();
+                        otherUser.put("name", "DW");
+
+                        // a: try(() -> user.name!) orElse "No User Name"
+                        String a = dwTry(() -> {
+                            Object v = user.get("name");
+                            if (v == null) {
+                                throw new RuntimeException("There is no key named 'name'");
+                            }
+                            return v.toString();
+                        }).orElse("No User Name");
+
+                        // b: try(() -> otherUser.name) orElse "No User Name"
+                        String b = dwTry(() -> {
+                            Object v = otherUser.get("name");
+                            if (v == null) {
+                                throw new RuntimeException("There is no key named 'name'");
+                            }
+                            return v.toString();
+                        }).orElse("No User Name");
+
+                        Map<String, Object> out = new HashMap<>();
+                        out.put("a", a);
+                        out.put("b", b);
+
+                        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(out);
+                        exchange.getIn().setBody(json);
+                        System.out.println(json);
+                    }
+                });
+        }
+    }
+}
+
+
+
+output:
+
+
+
+{
+  "a" : "No User Name",
+  "b" : "DW"
+}
+

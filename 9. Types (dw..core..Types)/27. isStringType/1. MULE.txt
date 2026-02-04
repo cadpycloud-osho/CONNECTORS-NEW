@@ -1,0 +1,54 @@
+isStringType:
+
+isStringType(t: Type): Boolean
+
+isStringType(t: Type): Boolean
+Returns true if the input is the String type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AString = String
+output application/json
+---
+{
+   a: isStringType(AString),
+   b: isStringType(String),
+   c: isStringType(Boolean),
+}
+
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

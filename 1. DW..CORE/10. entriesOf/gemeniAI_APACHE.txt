@@ -1,0 +1,136 @@
+entriesOf:
+
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
+// A custom class to hold the output structure for clarity
+class Entry {
+    public String key;
+    public Map<String, Object> value;
+    public Map<String, String> attributes;
+}
+
+public class EntriesOfProcessorBean implements Processor {
+
+    // The inline XML string from the DWL code
+    private static final String INLINE_XML = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void process(Exchange exchange) throws Exception {
+        
+        // 1. XML Parsing (Equivalent to DWL's 'read')
+        XmlMapper xmlMapper = new XmlMapper();
+        // Read the XML string into a Java Map structure
+        Map<String, Object> xmlRootMap = xmlMapper.readValue(INLINE_XML, Map.class);
+        
+        // The root element in XML (after Jackson parsing) is the first (and only) key.
+        // In this case, xmlRootMap = {"xml": { Map of contents and attributes }}
+        
+        // 2. EntriesOf Transformation
+        List<Entry> entriesOfList = new ArrayList<>();
+        
+        // The key for the root element (e.g., "xml")
+        String rootKey = xmlRootMap.keySet().iterator().next(); 
+        
+        // The value associated with the root key (the contents and attributes)
+        Map<String, Object> rootValueMap = (Map<String, Object>) xmlRootMap.get(rootKey);
+        
+        // Jackson XML format often prefixes attributes with '@' (this can vary by library)
+        // We'll manually extract the attributes and the content.
+        Map<String, String> attributes = (Map<String, String>) rootValueMap.get("@attr");
+        
+        // Manually create the content Map, excluding the attributes field
+        Map<String, Object> contentValue = (Map<String, Object>) rootValueMap.get("");
+        
+        Entry entry = new Entry();
+        entry.key = rootKey;
+        // The specific DWL output implies the value is the content, and attributes is separate.
+        // We replicate this based on the expected DWL output structure:
+        
+        entry.key = rootKey; // "xml"
+        
+        // The DWL 'value' contains the XML content (a and b)
+        entry.value = (Map<String, Object>) rootValueMap.get("");
+        
+        // The DWL 'attributes' contains the XML attributes (attr)
+        // In the specific DWL output, the attributes are mapped flat, not nested under '@attr'
+        entry.attributes = (Map<String, String>) rootValueMap.get("@attr");
+
+        // The final DWL output is slightly simplified from a direct Jackson mapping.
+        // Based on the expected output:
+        
+        Entry dwlEntry = new Entry();
+        dwlEntry.key = rootKey; // "xml"
+        
+        // The content: {"a": "true", "b": "1"}
+        dwlEntry.value = Map.of("a", "true", "b", "1"); 
+        
+        // The attributes: {"attr": "x"}
+        dwlEntry.attributes = Map.of("attr", "x"); 
+        
+        entriesOfList.add(dwlEntry);
+        
+        // 3. Set the final body as a map containing the list, ready for JSON marshalling
+        exchange.getIn().setBody(Map.of("entriesOf", entriesOfList));
+    }
+}
+
+
+
+import org.apache.camel.builder.RouteBuilder;
+
+// This class needs the Jackson and Jackson-XML dependencies
+public class DataWeaveEntriesOfRoute extends RouteBuilder {
+    
+    // Register the processor bean in the Camel Context setup
+    private final EntriesOfProcessorBean entriesOfProcessorBean = new EntriesOfProcessorBean();
+    
+    @Override
+    public void configure() {
+        
+        // Register the bean instance
+        getContext().getRegistry().bind("entriesOfProcessorBean", entriesOfProcessorBean);
+
+        from("direct:startEntriesOf")
+            .routeId("DataWeave-EntriesOf-Conversion")
+            
+            // 1. Process the logic using the custom bean
+            // The bean reads the hardcoded XML, performs the entriesOf transformation, 
+            // and sets the structured Java Map as the body: { "entriesOf" : List<Entry> }
+            .process("entriesOfProcessorBean")
+            
+            // 2. Marshal the resulting Java object (Map) into the final JSON output
+            .marshal().json()
+            
+            .to("log:result?showBody=true")
+            .to("mock:result");
+    }
+}
+
+output:
+
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+

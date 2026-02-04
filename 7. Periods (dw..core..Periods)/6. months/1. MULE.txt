@@ -1,0 +1,59 @@
+months:
+
+months(nMonths: Number): Period
+
+months(nMonths: Number): Period
+Creates a Period value from the provided number of months.
+
+The function applies the period function to the input value.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Periods
+output application/json
+---
+{
+  nextMonth: |2020-10-05T20:22:34.385Z| + months(1),
+  fourMonthPeriod : months(4),
+  addNegativeValue: months(-1) + months(2)
+}
+
+DataWeave
+Output
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

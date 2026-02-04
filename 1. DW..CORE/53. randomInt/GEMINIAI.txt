@@ -1,0 +1,57 @@
+randomInt:
+
+
+
+input:
+
+
+package com.example.random;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Random;
+
+@RestController
+public class RandomIntController {
+
+    private final Random random = new Random();
+    private static final int MAX_VALUE = 1000;
+
+    // Helper class to structure the output JSON { "price": ... }
+    public static class PriceResponse {
+        private int price; // Use int to match the integer output of DW randomInt
+
+        public PriceResponse(int price) {
+            this.price = price;
+        }
+
+        // Getter for Jackson serialization
+        public int getPrice() {
+            return price;
+        }
+
+        public void setPrice(int price) {
+            this.price = price;
+        }
+    }
+
+    @GetMapping("/random-int-price")
+    public PriceResponse generateRandomIntPrice() {
+        
+        // Java Equivalent: randomInt(1000)
+        // nextInt(bound) returns a value between 0 (inclusive) and bound (exclusive).
+        // So nextInt(1000) returns a number between 0 and 999.
+        int price = random.nextInt(MAX_VALUE); 
+
+        // Return the result in the structured object.
+        return new PriceResponse(price);
+    }
+}
+
+output:
+
+
+
+{
+  "price": 789
+}

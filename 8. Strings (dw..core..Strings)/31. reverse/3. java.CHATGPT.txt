@@ -1,0 +1,62 @@
+reverse:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = ReverseUtil.reverseString("Mariano");
+        String b = ReverseUtil.reverseString(null);
+        String c = ReverseUtil.reverseString("");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s,\n  \"c\": %s\n}",
+            formatJsonString(a), 
+            formatJsonString(b), 
+            formatJsonString(c)
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class ReverseUtil {
+        public static String reverseString(String str) {
+            // DataWeave Rule: If the input string is null, return null.
+            if (str == null) {
+                return null;
+            }
+            // Use StringBuilder for efficient string reversal in Java.
+            return new StringBuilder(str).reverse().toString();
+        }
+    }
+
+    /**
+     * Helper to format the Java String result into a valid JSON string (with quotes)
+     * or the JSON literal 'null'.
+     */
+    private static String formatJsonString(String value) {
+        // If the Java String is null, return the JSON literal "null". Otherwise, quote the string value.
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+output:
+
+{
+  "a": "onairaM",
+  "b": null,
+  "c": ""
+}
+
+
+
+
+
+

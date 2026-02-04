@@ -1,0 +1,54 @@
+isArrayType:
+
+isArrayType(path: Path): Boolean
+
+isArrayType(path: Path): Boolean
+Returns true if the provided Path value is an ARRAY_TYPE expression.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Tree
+output application/json
+---
+{
+  a: isArrayType([{kind: OBJECT_TYPE, selector: "user", namespace: null},
+                  {kind: ATTRIBUTE_TYPE, selector: "name", namespace: null}]),
+  b: isArrayType([{kind: OBJECT_TYPE, selector: "user", namespace: null},
+                  {kind: ARRAY_TYPE, selector: 0, namespace: null}]),
+  c: isArrayType([{kind: ARRAY_TYPE, selector: 0, namespace: null}])
+}
+DataWeave
+Output
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,78 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+public class Main {
+
+    private static final String ROOT_NAME = "cXML";
+    private static final String SYSTEM_ID = "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd";
+    private static final String DTD_TYPE = "SYSTEM";
+
+    /**
+     * Method to generate the DTD string.
+     */
+    public static String docTypeAsString(String rootName, String dtdType, String systemId) {
+        return rootName + " " + dtdType + " " + systemId;
+    }
+
+    public static void main(String[] args) {
+        // 1. Execute the string construction
+        String output = docTypeAsString(ROOT_NAME, DTD_TYPE, SYSTEM_ID);
+
+        // 2. Print the output
+        System.out.println("Output (Pure Java String):");
+        System.out.println("\"" + output + "\"");
+    }
+}
+
+
+
+output:
+
+"cXML SYSTEM http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"
+
+
+---------------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+public class Main {
+
+    private static final String ROOT_NAME = "html";
+    private static final String PUBLIC_ID = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+    private static final String SYSTEM_ID = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+    private static final String DTD_TYPE = "PUBLIC";
+
+    /**
+     * Method to generate the PUBLIC DTD string.
+     */
+    public static String docTypeAsString(String rootName, String dtdType, String publicId, String systemId) {
+        // Concatenates the required parts with spaces
+        return rootName + " " + dtdType + " " + publicId + " " + systemId;
+    }
+
+    public static void main(String[] args) {
+        // 1. Execute the string construction
+        String output = docTypeAsString(ROOT_NAME, DTD_TYPE, PUBLIC_ID, SYSTEM_ID);
+
+        // 2. Print the output
+        System.out.println("Output (Pure Java String):");
+        System.out.println("\"" + output + "\"");
+    }
+}
+
+
+output:
+
+
+"html PUBLIC -//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+
+

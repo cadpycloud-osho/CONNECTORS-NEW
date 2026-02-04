@@ -1,0 +1,80 @@
+divideBy:
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    /**
+     * Mimics the DataWeave 'divideBy' function.
+     * Splits a list into sub-lists, each of size 'chunkSize', 
+     * except possibly the last one.
+     */
+    public static <T> List<List<T>> divideBy(List<T> list, int chunkSize) {
+        if (chunkSize <= 0) {
+            throw new IllegalArgumentException("Chunk size must be positive.");
+        }
+
+        List<List<T>> chunks = new ArrayList<>();
+        int listSize = list.size();
+        
+        for (int i = 0; i < listSize; i += chunkSize) {
+            // Calculate the end index for the current sub-list.
+            // Math.min ensures we don't go out of bounds for the last chunk.
+            int end = Math.min(i + chunkSize, listSize);
+            
+            // Extract the sub-list (chunk)
+            List<T> sublist = list.subList(i, end);
+            chunks.add(sublist);
+        }
+        return chunks;
+    }
+
+    public static void main(String[] args) {
+        
+        // --- Scenario 1: [1, 2, 3, 4, 5] divideBy 2 ---
+        List<Integer> list1 = Arrays.asList(1, 2, 3, 4, 5);
+        List<List<Integer>> result1 = divideBy(list1, 2);
+        
+        // --- Scenario 2: [1, 2, 3, 4, 5, 6] divideBy 2 ---
+        List<Integer> list2 = Arrays.asList(1, 2, 3, 4, 5, 6);
+        List<List<Integer>> result2 = divideBy(list2, 2);
+
+        // --- Scenario 3: [1, 2, 3, 4, 5] divideBy 3 ---
+        List<Integer> list3 = Arrays.asList(1, 2, 3, 4, 5);
+        List<List<Integer>> result3 = divideBy(list3, 3);
+        
+        // Print the final combined JSON-like output structure
+        System.out.println("Output structure:");
+        System.out.println("{");
+        System.out.println("  \"divideBy\": [");
+        System.out.println("    { \"divideBy2\": " + result1 + " }," + 
+                           " // Scenario 1: [[1, 2], [3, 4], [5]]");
+        System.out.println("    { \"divideBy2\": " + result2 + " }," + 
+                           " // Scenario 2: [[1, 2], [3, 4], [5, 6]]");
+        System.out.println("    { \"divideBy3\": " + result3 + " }" + 
+                           "  // Scenario 3: [[1, 2, 3], [4, 5]]");
+        System.out.println("  ]");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+Output structure:
+{
+  "divideBy": [
+    { "divideBy2": [[1, 2], [3, 4], [5]] }, // Scenario 1: [[1, 2], [3, 4], [5]]
+    { "divideBy2": [[1, 2], [3, 4], [5, 6]] }, // Scenario 2: [[1, 2], [3, 4], [5, 6]]
+    { "divideBy3": [[1, 2, 3], [4, 5]] }  // Scenario 3: [[1, 2, 3], [4, 5]]
+  ]
+}
+
+

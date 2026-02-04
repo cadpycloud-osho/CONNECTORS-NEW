@@ -1,0 +1,84 @@
+log:
+
+
+example 1:
+
+
+input:
+
+
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
+public class Main {
+    public static void main(String[] args) {
+        // Fixed: Use Main.class instead of non-existent LogSimple.class
+        Logger logger = Logger.getLogger(Main.class.getName());
+        
+        // Equivalent to log("WARNING", "Houston, we have a problem")
+        logger.log(Level.WARNING, "Houston, we have a problem");
+        
+        // Expression output (the message itself)
+        System.out.println("Houston, we have a problem");
+    }
+}
+
+
+
+output:
+
+Dec 15, 2025 1:33:PM IST WARNING: Houston, we have a problem
+Houston, we have a problem
+
+
+-------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+    public static void main(String[] args) {
+        Logger logger = Logger.getLogger(Main.class.getName());
+        
+        // Setup data equivalent to myUser
+        Map<String, Object> user = new HashMap<>();
+        Map<String, Object> friend = new HashMap<>();
+        friend.put("name", "Shoki");
+        user.put("friend", friend);
+        user.put("id", 1);
+        user.put("name", "Tomo");
+        
+        Map<String, Object> myUser = new HashMap<>();
+        myUser.put("user", user);
+        myUser.put("accountId", "leansh");
+        
+        // Equivalent to log("User", myUser.user)
+        logger.log(Level.INFO, "User", user);
+        
+        // Expression output: .friend.name
+        System.out.println(((Map<?, ?>) user.get("friend")).get("name"));
+    }
+}
+
+
+
+
+output:
+
+
+Dec 15, 2025 1:33:PM IST INFO: User {friend={name=Shoki}, id=1, name=Tomo}
+Shoki
+
+-------------------------------------------------------
+
+

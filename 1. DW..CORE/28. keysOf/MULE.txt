@@ -1,0 +1,88 @@
+keysOf:
+
+keysOf<K, V>(obj: { (K)?: V }): Array<K>
+
+keysOf<K, V>(obj: { (K)?: V }): Array<K>
+Returns an array of keys from key-value pairs within the input object.
+
+The returned keys belong to the Key type. To return each key as a string, you can use namesOf, instead.
+
+Introduced in DataWeave version 2.3.0.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "keysOf" : keysOf({ "a" : true, "b" : 1}) }
+
+DataWeave
+Output
+{ "keysOf" : ["a","b"] }
+
+_____________________________________________________________________
+
+Source
+%dw 2.0
+var myVar = read('<users xmlns="http://test.com">
+                     <user name="Mariano" lastName="Achaval"/>
+                     <user name="Stacey" lastName="Duke"/>
+                  </users>', 'application/xml')
+output application/json
+---
+{ keysOfExample: flatten([keysOf(myVar.users) map $.#,
+                          keysOf(myVar.users) map $.@])
+}
+++
+{ namesOfExample: flatten([namesOf(myVar.users) map $.#,
+                    namesOf(myVar.users) map $.@])
+}
+
+
+DataWeave
+Output
+{
+  "keysOfExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "namesOfExample": [
+    null,
+    null,
+    null,
+    null
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

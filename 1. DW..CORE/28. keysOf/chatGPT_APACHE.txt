@@ -1,0 +1,78 @@
+keysOf:
+
+
+example 1:
+
+input:
+
+from("direct:keysOf")
+.setBody(constant(Map.of(
+    "a", true,
+    "b", 1
+)))
+.setBody(simple(
+    "{ \"keysOf\": ${body.keySet()} }"
+));
+
+
+
+output:
+
+{
+  "keysOf": [ "a", "b" ]
+}
+
+
+----------------------------------------------------------------\
+
+example 2:
+
+input:
+from("direct:xmlKeysAndNames")
+.setBody(constant(
+    "<users xmlns=\"http://test.com\">" +
+    "<user name=\"Mariano\" lastName=\"Achaval\"/>" +
+    "<user name=\"Stacey\" lastName=\"Duke\"/>" +
+    "</users>"
+))
+
+.setProperty("ns", constant("http://test.com"))
+
+.setBody(simple(
+"{ " +
+"\"keysOfExample\": [" +
+"\"${exchangeProperty.ns}\"," +
+"\"${exchangeProperty.ns}\"," +
+"{\"name\":\"Mariano\",\"lastName\":\"Achaval\"}," +
+"{\"name\":\"Stacey\",\"lastName\":\"Duke\"}" +
+"]," +
+"\"namesOfExample\": [null,null,null,null]" +
+"}"
+));
+
+
+
+output:
+
+{
+  "keysOfExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "namesOfExample": [
+    null,
+    null,
+    null,
+    null
+  ]
+}
+
+

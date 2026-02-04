@@ -1,0 +1,91 @@
+asExpressionString:
+
+
+
+input:
+
+
+@SpringBootApplication
+public class DataWeaveTreeAsExpressionStringApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTreeAsExpressionStringApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/tree")
+@RequiredArgsConstructor
+class TreeController {
+    
+    private final TreeService treeService;
+    
+    @GetMapping("/asExpressionString")
+    public String asExpressionString() {
+        return treeService.asExpressionString();
+    }
+}
+
+@Service
+class TreeService {
+    
+    /**
+     * DataWeave Tree.asExpressionString() equivalent:
+     * Converts tree path nodes to XPath-like expression string
+     */
+    public String asExpressionString() {
+        List<TreeNode> path = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        return TreeExpressionBuilder.asExpressionString(path);
+    }
+    
+    public static class TreeNode {
+        private final String kind;
+        private final String selector;
+        private final String namespace;
+        
+        public TreeNode(String kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+        
+        // Getters
+        public String getKind() { return kind; }
+        public String getSelector() { return selector; }
+        public String getNamespace() { return namespace; }
+    }
+}
+
+class TreeExpressionBuilder {
+    
+    public static String asExpressionString(List<TreeService.TreeNode> nodes) {
+        return nodes.stream()
+            .map(TreeExpressionBuilder::nodeToExpression)
+            .collect(Collectors.joining(""));
+    }
+    
+    private static String nodeToExpression(TreeService.TreeNode node) {
+        return switch (node.getKind()) {
+            case "OBJECT_TYPE" -> "." + node.getSelector();
+            case "ATTRIBUTE_TYPE" -> ".@" + node.getSelector();
+            default -> "";
+        };
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+
+output:
+
+".user.@name"
+
+
+

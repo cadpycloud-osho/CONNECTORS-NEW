@@ -1,0 +1,72 @@
+hours:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+public class HoursPeriodRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:hoursPeriod")
+            .process(exchange -> {
+                ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                LocalTime baseTime = LocalTime.parse("20:22");
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // nextHour: + hours(1)
+                result.put("nextHour", baseDateTime.plusHours(1).toString());
+                
+                // previousHour: - hours(1)
+                result.put("previousHour", baseDateTime.minusHours(1).toString());
+                
+                // threeHoursLater: time + hours(3)
+                result.put("threeHoursLater", baseTime.plusHours(3).toString());
+                
+                // addDecimalInput: time + hours(3.5) = +3h30m
+                result.put("addDecimalInput", baseTime.plusHours(3).plusMinutes(30).toString());
+                
+                // decimalInputAsPeriod: hours(4.555) → 4h + 0.555*60m = 4h33m18s
+                double decimalHours = 4.555;
+                long totalSeconds = (long)(decimalHours * 3600);
+                long hours = totalSeconds / 3600;
+                long minutes = (totalSeconds % 3600) / 60;
+                long seconds = totalSeconds % 60;
+                result.put("decimalInputAsPeriod", String.format("PT%dH%dM%dS", hours, minutes, seconds));
+                
+                // fourHourPeriod: hours(4)
+                result.put("fourHourPeriod", "PT4H");
+                
+                // addNegativeValue: hours(-1) + hours(2) = 1h = 3600s
+                result.put("addNegativeValue", 3600);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "nextHour": "2020-10-05T21:22:34.385Z",
+  "previousHour": "2020-10-05T19:22:34.385Z",
+  "threeHoursLater": "23:22:00",
+  "addDecimalInput": "23:52:00",
+  "decimalInputAsPeriod": "PT4H33M18S",
+  "fourHourPeriod": "PT4H",
+  "addNegativeValue": 3600
+}
+
+
+
+
+

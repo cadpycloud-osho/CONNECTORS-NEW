@@ -1,0 +1,88 @@
+hours:
+
+
+input:
+
+
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Define input date/time literals
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        LocalTime baseTime = LocalTime.parse("20:22");
+        
+        // Formatter for ZonedDateTime output in ISO 8601 format
+        DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+        // Formatter for LocalTime output (HH:mm:ss format)
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        // --- 1. DateTime and Time Arithmetic ---
+
+        // nextHour: |2020-10-05T20:22:34.385Z| + hours(1)
+        ZonedDateTime nextHour = baseDateTime.plusHours(1);
+        String nextHourOutput = nextHour.format(instantFormatter).replace(".000Z", "Z");
+
+        // previousHour: |2020-10-05T20:22:34.385Z| - hours(1)
+        ZonedDateTime previousHour = baseDateTime.minusHours(1);
+        String previousHourOutput = previousHour.format(instantFormatter).replace(".000Z", "Z");
+
+        // threeHoursLater: |20:22| + hours(3)
+        LocalTime threeHoursLater = baseTime.plusHours(3);
+        String threeHoursLaterOutput = threeHoursLater.format(timeFormatter);
+
+        // addDecimalInput: |20:22| + hours(3.5)
+        // 3.5 hours = 3 hours and 30 minutes
+        Duration decimalHoursDuration = Duration.ofMinutes(30).plusHours(3);
+        LocalTime addDecimalInput = baseTime.plus(decimalHoursDuration);
+        String addDecimalInputOutput = addDecimalInput.format(timeFormatter);
+
+        // --- 2. Duration Construction and Arithmetic ---
+
+        // decimalInputAsPeriod : hours(4.555)
+        // 4.555 hours = 4 hours + 0.555 * 60 minutes/hour = 4 hours + 33.3 minutes
+        // 33.3 minutes = 33 minutes + 0.3 * 60 seconds/minute = 33 minutes + 18 seconds
+        // Total seconds: 4.555 * 3600 = 16398 seconds
+        long totalSeconds = (long) (4.555 * 3600);
+        Duration decimalInputAsPeriod = Duration.ofSeconds(totalSeconds); // PT4H33M18S
+        
+        // fourHourPeriod : hours(4)
+        Duration fourHourPeriod = Duration.ofHours(4); // PT4H
+
+        // addNegativeValue: hours(-1) + hours(2)
+        // -1 hour + 2 hours = 1 hour = 3600 seconds (DW outputs total seconds)
+        Duration combinedDuration = Duration.ofHours(-1).plusHours(2);
+        long addNegativeValue = combinedDuration.getSeconds(); // 3600
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        System.out.println("  \"nextHour\": \"" + nextHourOutput + "\",");
+        System.out.println("  \"previousHour\": \"" + previousHourOutput + "\",");
+        System.out.println("  \"threeHoursLater\": \"" + threeHoursLaterOutput + "\",");
+        System.out.println("  \"addDecimalInput\": \"" + addDecimalInputOutput + "\",");
+        System.out.println("  \"decimalInputAsPeriod\": \"" + decimalInputAsPeriod.toString() + "\",");
+        System.out.println("  \"fourHourPeriod\": \"" + fourHourPeriod.toString() + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "nextHour": "2020-10-05T21:22:34.385Z",
+  "previousHour": "2020-10-05T19:22:34.385Z",
+  "threeHoursLater": "23:22:00",
+  "addDecimalInput": "23:52:00",
+  "decimalInputAsPeriod": "PT4H33M18S",
+  "fourHourPeriod": "PT4H",
+  "addNegativeValue": 3600
+}
+
+
+

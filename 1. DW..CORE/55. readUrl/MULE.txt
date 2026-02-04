@@ -1,0 +1,146 @@
+readUrl:
+
+readUrl(url: String, contentType: String = "application/dw", readerProperties: Object = {}): Any
+
+readUrl(url: String, contentType: String = "application/dw", readerProperties: Object = {}): Any
+Reads a URL, including a classpath-based URL, and returns parsed content. This function works similar to the read function.
+
+The classpath-based URL uses the classpath: protocol prefix, for example: classpath://myfolder/myFile.txt where myFolder is located under src/main/resources in a Mule project. Other than the URL, readURL accepts the same arguments as read.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+readUrl("https://jsonplaceholder.typicode.com/posts/1", "application/json")
+DataWeave
+Output
+{ "userId": 1, "id": 1, "title": "sunt aut ...", "body": "quia et..."}
+
+
+-----------------------------------------------------------------
+
+
+Source
+%dw 2.0
+var myJsonSnippet = readUrl("classpath://myJsonSnippet.json", "application/json")
+output application/csv
+---
+(myJsonSnippet.results map(item) -> item.profile)
+
+DataWeave
+
+Input
+{
+  "results": [
+    {
+      "profile": {
+        "firstName": "john",
+        "lastName": "doe",
+        "email": "johndoe@demo.com"
+      },
+      "data": {
+        "interests": [
+          {
+            "language": "English",
+            "tags": [
+              "digital-strategy:Digital Strategy",
+              "innovation:Innovation"
+            ],
+            "contenttypes": []
+          }
+        ]
+      }
+    },
+    {
+      "profile": {
+      "firstName": "jane",
+        "lastName": "doe",
+        "email": "janedoe@demo.com"
+      },
+      "data": {
+        "interests": [
+          {
+            "language": "English",
+            "tags": [
+              "tax-reform:Tax Reform",
+              "retail-health:Retail Health"
+            ],
+            "contenttypes": [
+              "News",
+              "Analysis",
+              "Case studies",
+              "Press releases"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+
+JSON
+Output
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+-----------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+readUrl("https://mywebsite.com/data.csv", "application/csv", {"header" : false})
+
+DataWeave
+Input
+Max,the Mule,MuleSoft
+Output
+[
+ {
+   "column_0": "Max",
+   "column_1": "the Mule",
+   "column_2": "MuleSoft"
+ }
+]
+
+
+
+-----------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+(readUrl("classpath://name.dwl", "application/dw")).firstName
+
+DataWeave
+Input
+{
+  "firstName" : "Somebody",
+  "lastName" : "Special"
+}
+
+JSON
+Output
+"Somebody"
+CSV
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

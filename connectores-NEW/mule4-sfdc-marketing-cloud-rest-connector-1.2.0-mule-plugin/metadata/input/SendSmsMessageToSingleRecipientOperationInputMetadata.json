@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "definitionKey",
+        "recipient"
+      ],
+      "properties": {
+        "definitionKey": {
+          "type": "string"
+        },
+        "recipient": {
+          "$ref": "#/definitions/recipient"
+        },
+        "subscriptions": {
+          "$ref": "#/definitions/subscriptions"
+        }
+      }
+    },
+    "recipient": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "to"
+      ],
+      "properties": {
+        "contactKey": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object"
+        }
+      }
+    },
+    "subscriptions": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "resubscribe": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

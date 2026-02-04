@@ -1,0 +1,48 @@
+toBinary:
+
+
+input:
+
+import java.util.*;
+import java.nio.charset.*;
+import java.util.Base64;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ToBinarySimulation {
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, String> output = new LinkedHashMap<>();
+
+        String text = "DW";
+
+        // UTF-16 / UnicodeBig
+        String utf16Base64 = Base64.getEncoder().encodeToString(text.getBytes("UTF-16BE"));
+        output.put("UTF-16Ex", utf16Base64);
+        output.put("utf16Ex", utf16Base64);
+        output.put("UnicodeBigEx", utf16Base64);
+
+        // UTF-32
+        byte[] utf32Bytes = text.getBytes(Charset.forName("UTF-32BE"));
+        String utf32Base64 = Base64.getEncoder().encodeToString(utf32Bytes);
+        output.put("UTF-32Ex", utf32Base64);
+        output.put("UTF_32Ex", utf32Base64);
+
+        // Print as JSON
+        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(output));
+    }
+}
+
+
+
+output:
+
+
+{
+  "UTF-16Ex": "/v8ARABX",
+  "utf16Ex": "/v8ARABX",
+  "UnicodeBigEx": "/v8ARABX",
+  "UTF-32Ex": "AAAARAAAAFc=",
+  "UTF_32Ex": "AAAARAAAAFc="
+}
+

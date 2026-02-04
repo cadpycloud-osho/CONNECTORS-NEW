@@ -1,0 +1,207 @@
+mapLeafValues:
+
+example 1:
+
+input:
+
+import java.util.*;
+import java.util.function.BiFunction;
+
+public class MapLeafValuesConverter {
+    public static Object mapLeafValues(Object input, BiFunction<Object, List<String>, Object> mapper) {
+        if (input instanceof Map) {
+            return mapObjectLeafs((Map<String, Object>) input, mapper, new ArrayList<>());
+        } else if (input instanceof List) {
+            return mapArrayLeafs((List<Object>) input, mapper, new ArrayList<>());
+        }
+        return mapper.apply(input, new ArrayList<>());
+    }
+    
+    private static Map<String, Object> mapObjectLeafs(Map<String, Object> obj, 
+                                                    BiFunction<Object, List<String>, Object> mapper,
+                                                    List<String> path) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        
+        obj.forEach((key, value) -> {
+            List<String> newPath = new ArrayList<>(path);
+            newPath.add(key);
+            
+            if (isLeaf(value)) {
+                result.put(key, mapper.apply(value, newPath));
+            } else {
+                result.put(key, mapLeafValues(value, mapper));
+            }
+        });
+        return result;
+    }
+    
+    private static List<Object> mapArrayLeafs(List<Object> array, 
+                                            BiFunction<Object, List<String>, Object> mapper,
+                                            List<String> path) {
+        List<Object> result = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            List<String> newPath = new ArrayList<>(path);
+            newPath.add(String.valueOf(i));
+            
+            Object value = array.get(i);
+            if (isLeaf(value)) {
+                result.add(mapper.apply(value, newPath));
+            } else {
+                result.add(mapLeafValues(value, mapper));
+            }
+        }
+        return result;
+    }
+    
+    private static boolean isLeaf(Object value) {
+        return value == null || 
+               value instanceof String || 
+               value instanceof Number || 
+               value instanceof Boolean;
+    }
+    
+    // Test execution
+    public static void main(String[] args) {
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("user", Arrays.asList(
+            createUser("mariano", "achaval")
+        ));
+        input.put("group", "data-weave");
+        
+        BiFunction<Object, List<String>, Object> upperMapper = (value, path) -> {
+            if (value instanceof String s) return s.toUpperCase();
+            return value;
+        };
+        
+        Object result = mapLeafValues(input, upperMapper);
+        System.out.println(result);
+    }
+    
+    private static Map<String, String> createUser(String name, String lastName) {
+        Map<String, String> user = new LinkedHashMap<>();
+        user.put("name", name);
+        user.put("lastName", lastName);
+        return user;
+    }
+}
+
+
+
+output:
+
+{
+   "user": [
+     {
+       "name": "MARIANO",
+       "lastName": "ACHAVAL"
+     }
+   ],
+   "group": "DATA-WEAVE"
+}
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.*;
+import java.util.function.BiFunction;
+
+public class PathAwareMapLeafValues {
+    public static Object mapLeafValues(Object input, BiFunction<Object, List<String>, Object> mapper) {
+        if (input instanceof Map) {
+            return mapObjectLeafs((Map<String, Object>) input, mapper, new ArrayList<>());
+        } else if (input instanceof List) {
+            return mapArrayLeafs((List<Object>) input, mapper, new ArrayList<>());
+        }
+        return mapper.apply(input, new ArrayList<>());
+    }
+    
+    private static Map<String, Object> mapObjectLeafs(Map<String, Object> obj, 
+                                                    BiFunction<Object, List<String>, Object> mapper,
+                                                    List<String> path) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        obj.forEach((key, value) -> {
+            List<String> newPath = new ArrayList<>(path);
+            newPath.add(key);
+            
+            if (isLeaf(value)) {
+                result.put(key, mapper.apply(value, newPath));
+            } else {
+                result.put(key, mapLeafValues(value, mapper));
+            }
+        });
+        return result;
+    }
+    
+    private static List<Object> mapArrayLeafs(List<Object> array, 
+                                            BiFunction<Object, List<String>, Object> mapper,
+                                            List<String> path) {
+        List<Object> result = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            List<String> newPath = new ArrayList<>(path);
+            newPath.add(String.valueOf(i));
+            
+            Object value = array.get(i);
+            if (isLeaf(value)) {
+                result.add(mapper.apply(value, newPath));
+            } else {
+                result.add(mapLeafValues(value, mapper));
+            }
+        }
+        return result;
+    }
+    
+    private static boolean isLeaf(Object value) {
+        return value == null || 
+               value instanceof String || 
+               value instanceof Number || 
+               value instanceof Boolean;
+    }
+    
+    // Path type detectors from conversation context
+    public static boolean isObjectType(List<String> path) {
+        // LAST element determines object type (from isObjectType conversation)
+        return !path.isEmpty();
+    }
+    
+    public static boolean isArrayType(List<String> path) {
+        // ANY numeric index indicates array path
+        return path.stream().anyMatch(idx -> idx.matches("\\d+"));
+    }
+    
+    // Test
+    public static void main(String[] args) {
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("name", "Mariano");
+        input.put("test", Arrays.asList(1, 2, 3));
+        
+        BiFunction<Object, List<String>, Object> mapper = (value, path) -> {
+            if (isObjectType(path)) return "***";
+            else if (isArrayType(path)) return "In an array";
+            else return "Is an attribute";
+        };
+        
+        Object result = mapLeafValues(input, mapper);
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+  "name": "***",
+  "test": [
+    "In an array",
+    "In an array", 
+    "In an array"
+  ]
+}
+
+

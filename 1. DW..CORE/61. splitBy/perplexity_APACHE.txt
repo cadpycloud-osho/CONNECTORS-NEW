@@ -1,0 +1,252 @@
+splitBy:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.regex.Pattern;
+
+public class SplitByRegexRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:splitByRegex")
+            .process(exchange -> {
+                String input = "192.88.99.0/24";
+                
+                // splitBy(/[.\/]/) → split by dot OR slash
+                String[] result = input.split("[./]");
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+
+["192", "88", "99", "0", "24"]
+
+
+-----------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class MultipleSplitByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:multipleSplitBy")
+            .process(exchange -> {
+                Map<String, String[]> splitters = new HashMap<>();
+                
+                // split1: "a-b-c" splitBy(/.b./) → matches "-b-", result ["a","c"]
+                splitters.put("split1", "a-b-c".split("-[^ ]*?-"));
+                
+                // split2: "hello world" splitBy(/\s/) → whitespace split
+                splitters.put("split2", "hello world".split("\\s"));
+                
+                // split3: "no match" splitBy(/^s/) → no match at start
+                splitters.put("split3", "no match".split("(?<=^)(?=s)"));
+                
+                // split4: "no match" splitBy(/^n../) → matches "no " at start
+                splitters.put("split4", "no match".split("(?=^n..)"));
+                
+                // split5: "a1b2c3d4A1B2C3D" splitBy(/[0-9A-Z]/) → lowercase only
+                splitters.put("split5", "a1b2c3d4A1B2C3D".split("[0-9A-Z]"));
+                
+                exchange.getIn().setBody(Map.of("splitters", splitters));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a", "c"],
+    "split2": ["hello", "world"],
+    "split3": ["no match"],
+    "split4": ["", "match"],
+    "split5": ["a", "b", "c", "d"]
+  }
+}
+
+
+
+-----------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SplitIndexRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:splitIndex")
+            .process(exchange -> {
+                String[] parts = "192.88.99.0".split("\\.");
+                String firstPart = parts[0];
+                
+                exchange.getIn().setBody(firstPart);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+"192"
+
+
+
+-----------------------------------------------------------
+
+example 4:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
+public class BacktickSplitRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:backtickSplit")
+            .process(exchange -> {
+                String input = "root.sources.data.`test.branch.BranchSource`.source.traits";
+                
+                // Regex splits on dot followed by non-backtick content (look-ahead)
+                // Matches dot outside `...` quoted sections
+                String[] result = input.split("\\.(?=(?:[^`]*`[^`]*`)*[^`]*$)");
+                
+                exchange.getIn().setBody(Arrays.asList(result));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  "root",
+  "sources", 
+  "data",
+  "`test.branch.BranchSource`",
+  "source",
+  "traits"
+]
+
+
+
+-----------------------------------------------------------
+
+
+example 5:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SimpleDotSplitRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:dotSplit")
+            .process(exchange -> {
+                // splitBy(".") → literal dot split
+                String[] parts = "192.88.99.0".split("\\.");
+                
+                exchange.getIn().setBody(parts);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+["192", "88", "99", "0"]
+
+
+
+-----------------------------------------------------------
+
+
+example 6:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class LiteralSplitByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:literalSplitBy")
+            .process(exchange -> {
+                Map<String, List<String>> splitters = new HashMap<>();
+                
+                // split1: "a-b-c" splitBy("-")
+                splitters.put("split1", Arrays.asList("a-b-c".split("-")));
+                
+                // split2: "hello world" splitBy("") → character-by-character
+                splitters.put("split2", Arrays.asList("hello world".split("")));
+                
+                // split3: "first,middle,last" splitBy(",")
+                splitters.put("split3", Arrays.asList("first,middle,last".split(",")));
+                
+                // split4: "no split" splitBy("NO") → no match
+                splitters.put("split4", Arrays.asList("no split".split("NO")));
+                
+                exchange.getIn().setBody(Map.of("splitters", splitters));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a","b","c"],
+    "split2": ["h","e","l","l","o","","w","o","r","l","d"],
+    "split3": ["first","middle","last"],
+    "split4": ["no split"]
+  }
+}
+
+
+
+-----------------------------------------------------------
+
+
+
+
+
+
+

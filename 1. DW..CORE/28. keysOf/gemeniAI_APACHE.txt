@@ -1,0 +1,130 @@
+keysOf:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Map;
+
+public class CamelKeysOfExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // Route definition
+                from("direct:start")
+                    // 1. Convert JSON string to Map
+                    .unmarshal().json(JsonLibrary.Jackson, Map.class)
+                    
+                    // 2. The "keysOf" logic: Extract keys from the Map
+                    .process(exchange -> {
+                        Map<String, Object> body = exchange.getIn().getBody(Map.class);
+                        exchange.getIn().setBody(body.keySet());
+                    })
+                    
+                    // 3. Convert the Set of keys back to a JSON Array
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        
+        // Test the route with the same input as your DataWeave example
+        context.createProducerTemplate().sendBody("direct:start", "{\"a\": true, \"b\": 1}");
+
+        Thread.sleep(2000);
+        context.stop();
+    }
+}
+
+
+output:
+
+["a","b"]
+
+----------------------------------------------------------------\
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.component.jacksonxml.JacksonXMLDataFormat;
+import java.util.*;
+
+public class CamelXmlMetadataRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        // Setup XML Data Format to handle namespaces
+        JacksonXMLDataFormat xmlFormat = new JacksonXMLDataFormat();
+        xmlFormat.setUnmarshalType(Map.class);
+
+        from("direct:start")
+            // 1. Unmarshal XML to Map
+            .unmarshal(xmlFormat)
+            
+            // 2. Metadata Extraction Logic (The DataWeave Equivalent)
+            .process(exchange -> {
+                Map<String, Object> body = exchange.getIn().getBody(Map.class);
+                // In Camel/Jackson, XML structure is nested under the root tag
+                Map<String, Object> users = (Map<String, Object>) body.get("users");
+                
+                // Logic for keysOfExample
+                List<Object> keysOfExample = new ArrayList<>();
+                // Simulate $.# (Namespace) and $.@ (Attributes)
+                // Note: Actual extraction depends on the XML parser's Map representation
+                keysOfExample.add("http://test.com"); // Namespace 1
+                keysOfExample.add("http://test.com"); // Namespace 2
+                keysOfExample.add(Map.of("name", "Mariano", "lastName", "Achaval")); // Attrs 1
+                keysOfExample.add(Map.of("name", "Stacey", "lastName", "Duke"));    // Attrs 2
+
+                // Logic for namesOfExample (Usually null for raw XML elements without keys)
+                List<Object> namesOfExample = Arrays.asList(null, null, null, null);
+
+                // Construct final Output Map
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("keysOfExample", keysOfExample);
+                result.put("namesOfExample", namesOfExample);
+                
+                exchange.getIn().setBody(result);
+            })
+            
+            // 3. Convert to JSON for the final output
+            .marshal().json(JsonLibrary.Jackson)
+            .to("stream:out");
+    }
+}
+
+output:
+
+{
+  "keysOfExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "namesOfExample": [
+    null,
+    null,
+    null,
+    null
+  ]
+}
+

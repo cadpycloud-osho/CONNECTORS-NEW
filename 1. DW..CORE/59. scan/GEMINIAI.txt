@@ -1,0 +1,102 @@
+scan:
+
+example 1:
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class DataWeaveScanExample1 {
+
+    // Helper method to simulate DataWeave's 'scan' and 'flatten'
+    private static List<String> scanAndFlatten(String input, String regex) {
+        List<String> results = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()) {
+            // DWL's scan output is always [full_match, group1, group2, ...]
+            
+            // 1. Add the full match (index 0)
+            results.add(matcher.group(0)); 
+            
+            // 2. Add the captured groups (indices 1 to groupCount)
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                results.add(matcher.group(i));
+            }
+        }
+        return results;
+    }
+
+    public static void main(String[] args) {
+        // --- Example 1: Single Match with Flatten ---
+        String input1 = "www.mulesoft.com";
+        // Java requires double backslashes for escaping
+        String regex1 = "([w]*)\\.([a-z]*)\\.([a-z]*)";
+        
+        List<String> output1 = scanAndFlatten(input1, regex1);
+        
+        System.out.println("--- DWL Example 1 Output (scan & flatten) ---");
+        System.out.println(output1);
+    }
+}
+
+output:
+
+[www.mulesoft.com, www, mulesoft, com]
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class DataWeaveScanExample2 {
+
+    // Helper method to simulate DataWeave's 'scan' with multiple matches
+    private static List<List<String>> scanMultiple(String input, String regex) {
+        List<List<String>> allMatches = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        // Find all non-overlapping matches
+        while (matcher.find()) {
+            List<String> currentMatch = new ArrayList<>();
+            // 1. Add the full match (index 0)
+            currentMatch.add(matcher.group(0)); 
+            
+            // 2. Add the captured groups (indices 1 to groupCount)
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                currentMatch.add(matcher.group(i));
+            }
+            allMatches.add(currentMatch);
+        }
+        return allMatches;
+    }
+
+    public static void main(String[] args) {
+        // --- Example 2: Multiple Matches ---
+        String input2 = "anypt@mulesoft.com,max@mulesoft.com";
+        // Escape the dot (.) in .com
+        String regex2 = "([a-z]*)@([a-z]*)\\.com"; 
+        
+        List<List<String>> output2 = scanMultiple(input2, regex2);
+
+        System.out.println("--- DWL Example 2 Output (scan multiple) ---");
+        // Print the nested list to represent the JSON array of arrays
+        System.out.println(output2);
+    }
+}
+
+output:
+
+[[anypt@mulesoft.com, anypt, mulesoft], [max@mulesoft.com, max, mulesoft]]
+---------------------------------------------------------------

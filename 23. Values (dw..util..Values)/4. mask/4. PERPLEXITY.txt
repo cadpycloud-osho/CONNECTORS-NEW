@@ -1,0 +1,141 @@
+mask:
+
+example 1:
+
+
+input:
+
+@RestController
+public class UserController {
+    
+    @GetMapping("/users")
+    public List<Map<String, String>> getUsers() {
+        List<Map<String, String>> users = new ArrayList<>();
+        
+        Map<String, String> peter = new HashMap<>();
+        peter.put("name", "Peter Parker");
+        peter.put("password", "*****");
+        users.add(peter);
+        
+        Map<String, String> bruce = new HashMap<>();
+        bruce.put("name", "Bruce Wayne");
+        bruce.put("password", "*****");
+        users.add(bruce);
+        
+        return users;
+    }
+}
+
+
+
+output:
+
+[
+   {
+     "name": "Peter Parker",
+     "password": "*****"
+   },
+   {
+     "name": "Bruce Wayne",
+     "password": "*****"
+   }
+]
+
+
+
+--------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+
+@RestController
+public class MaskController {
+    
+    @PostMapping("/mask-data")
+    public List<Map<String, String>> maskData(@RequestBody List<Map<String, String>> input) {
+        String[] fieldsToMask = {"password"};
+        String maskValue = "*****";
+        return maskFields(input, fieldsToMask, maskValue);
+    }
+    
+    private List<Map<String, String>> maskFields(List<Map<String, String>> data, 
+                                               String[] fieldsToMask, String maskValue) {
+        return data.stream().map(record -> {
+            Map<String, String> masked = new HashMap<>(record);
+            for (String field : fieldsToMask) {
+                masked.put(field, maskValue);
+            }
+            return masked;
+        }).collect(Collectors.toList());
+    }
+}
+
+
+output:
+
+
+[
+   {
+     "name": "Peter Parker",
+     "password": "*****"
+   },
+   {
+     "name": "Bruce Wayne",
+     "password": "*****"
+   }
+]
+
+
+
+
+--------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+@RestController
+public class ArrayMaskController {
+    
+    @PostMapping("/mask-array")
+    public List<List<Object>> maskArray(@RequestBody List<List<Object>> input) {
+        int indexToMask = 1;
+        Object maskValue = false;
+        return maskArrayElements(input, indexToMask, maskValue);
+    }
+    
+    private List<List<Object>> maskArrayElements(List<List<Object>> arrays, 
+                                               int indexToMask, Object maskValue) {
+        return arrays.stream().map(array -> {
+            List<Object> maskedArray = new ArrayList<>(array);
+            if (maskedArray.size() > indexToMask) {
+                maskedArray.set(indexToMask, maskValue);
+            }
+            return maskedArray;
+        }).collect(Collectors.toList());
+    }
+}
+
+
+
+output:
+
+
+[
+   [
+     123,
+     false
+   ],
+   [
+     456,
+     false
+   ]
+]
+
+
+
+--------------------------------------------------------------------------

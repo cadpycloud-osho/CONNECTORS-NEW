@@ -1,0 +1,54 @@
+everyEntry:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    // Equivalent of DataWeave everyEntry()
+    private static boolean everyEntry(Map<String, Object> map, EntryPredicate predicate) {
+        if (map == null || map.isEmpty()) return true;
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (!predicate.test(entry.getKey(), entry.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Functional interface for entry predicate
+    @FunctionalInterface
+    interface EntryPredicate {
+        boolean test(String key, Object value);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> mapA = new LinkedHashMap<>();
+        Map<String, Object> mapB = Map.of("a", "", "b", "123");
+        Map<String, Object> mapC = Map.of("a", "", "b", 123);
+        Map<String, Object> mapD = Map.of("a", "", "b", 123);
+        Map<String, Object> mapE = Map.of("a", "");
+        Map<String, Object> mapF = null;
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", everyEntry(mapA, (k, v) -> v instanceof String));
+        result.put("b", everyEntry(mapB, (k, v) -> v instanceof String));
+        result.put("c", everyEntry(mapC, (k, v) -> v instanceof String));
+        result.put("d", everyEntry(mapD, (k, v) -> "a".equals(k)));
+        result.put("e", everyEntry(mapE, (k, v) -> "a".equals(k)));
+        result.put("f", everyEntry(mapF, (k, v) -> "a".equals(k)));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=true, b=true, c=false, d=false, e=true, f=true}
+

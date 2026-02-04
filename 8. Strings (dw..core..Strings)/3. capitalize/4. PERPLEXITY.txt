@@ -1,0 +1,58 @@
+capitalize:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class CapitalizeController {
+
+    @GetMapping("/capitalize")
+    public Map<String, String> getCapitalized() {
+        Map<String, String> result = new LinkedHashMap<>();
+        
+        result.put("a", capitalize("customer"));
+        result.put("b", capitalize("customer_first_name"));
+        result.put("c", capitalize("customer NAME"));
+        result.put("d", capitalize("customerName"));
+        result.put("e", capitalize("a*s_b's"));
+        
+        return result;
+    }
+    
+    private static String capitalize(String input) {
+        if (input == null || input.isEmpty()) return input;
+        
+        String[] words = input.split("[_\\s]+");
+        StringBuilder result = new StringBuilder();
+        
+        for (int i = 0; i < words.length; i++) {
+            if (i > 0) {
+                result.append(" ");
+            }
+            String word = words[i];
+            if (!word.isEmpty()) {
+                result.append(Character.toUpperCase(word.charAt(0)))
+                      .append(word.substring(1).toLowerCase());
+            }
+        }
+        return result.toString();
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "a": "Customer",
+  "b": "Customer First Name",
+  "c": "Customer Name",
+  "d": "Customer Name",
+  "e": "A*s B's"
+}

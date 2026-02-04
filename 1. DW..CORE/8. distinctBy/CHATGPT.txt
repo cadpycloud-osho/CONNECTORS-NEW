@@ -1,0 +1,150 @@
+distinctBy:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class DistinctController {
+
+    @GetMapping("/distinct")
+    public Map<String, Object> getDistinctAuthors() {
+        // Input data similar to record in DataWeave
+        List<String> authors = Arrays.asList(
+                "James McGovern",
+                "Per Bothner",
+                "Kurt Cagle",
+                "James Linn",
+                "Kurt Cagle",
+                "Kurt Cagle",
+                "Kurt Cagle",
+                "Vaidyanathan Nagarajan"
+        );
+
+        // Remove duplicates using LinkedHashSet (keeps order)
+        List<String> distinctAuthors = new ArrayList<>(new LinkedHashSet<>(authors));
+
+        Map<String, Object> book = new LinkedHashMap<>();
+        book.put("title", "XQuery Kick Start");
+        book.put("year", "2000");
+        book.put("authors", distinctAuthors);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("book", book);
+
+        return response;
+    }
+
+    @GetMapping("/distinct-numbers")
+    public List<Integer> getDistinctNumbers() {
+        List<Integer> numbers = Arrays.asList(0, 1, 2, 3, 3, 2, 1, 4);
+        return new ArrayList<>(new LinkedHashSet<>(numbers)); // distinct result
+    }
+}
+
+
+
+Output:
+[0, 1, 2, 3, 4]
+
+
+
+Output JSON (same as DataWeave)
+{
+  "book": {
+    "title": "XQuery Kick Start",
+    "year": "2000",
+    "authors": [
+      "James McGovern",
+      "Per Bothner",
+      "Kurt Cagle",
+      "James Linn",
+      "Vaidyanathan Nagarajan"
+    ]
+  }
+}
+
+
+____________________________________________________________________
+distinctBy<K, V>(object: { (K)?: V }, criteria: (value: V, key: K) -> Any): Object
+Removes duplicate key-value pairs from an object.
+
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class AuthorController {
+
+    @GetMapping("/unique-authors")
+    public Map<String, Object> getUniqueAuthors() {
+
+        Map<String, Object> record = new HashMap<>();
+        record.put("title", "XQuery Kick Start");
+        record.put("year", "2000");
+
+        List<String> authors = Arrays.asList(
+                "James McGovern",
+                "Per Bothner",
+                "Kurt Cagle",
+                "James Linn",
+                "Kurt Cagle",
+                "Kurt Cagle",
+                "Kurt Cagle",
+                "Vaidyanathan Nagarajan"
+        );
+
+        // distinctBy preserving order
+        List<String> uniqueAuthors = new ArrayList<>(new LinkedHashSet<>(authors));
+
+        Map<String, Object> book = new LinkedHashMap<>();
+        book.put("title", record.get("title"));
+        book.put("year", record.get("year"));
+        book.put("authors", uniqueAuthors);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("book", book);
+
+        return response;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "book": {
+    "title": "XQuery Kick Start",
+    "year": "2000",
+    "authors": [
+      "James McGovern",
+      "Per Bothner",
+      "Kurt Cagle",
+      "James Linn",
+      "Vaidyanathan Nagarajan"
+    ]
+  }
+}
+
+
+
+_______________________________________________________________________-
+
+distinctBy(@StreamCapable items: Null, criteria: (item: Nothing, index: Nothing) -> Any): Null
+
+Helper function that enables distinctBy to work with a null value.
+
+
+
+
+
+

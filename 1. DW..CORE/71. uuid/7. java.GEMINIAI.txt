@@ -1,0 +1,41 @@
+uuid:
+
+
+
+input:
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        
+        // --- 1. Define the operation ---
+        // Java: UUID.randomUUID() generates a new Type 4 (randomly generated) UUID.
+        // The DataWeave uuid() function generates a random UUID, equivalent to Java's randomUUID().
+        UUID generatedUUID = UUID.randomUUID(); 
+        
+        // Convert to string for output
+        String result = generatedUUID.toString(); 
+
+        // --- 2. Assemble the final JSON output ---
+        ObjectMapper mapper = new ObjectMapper();
+
+        // 3. Output the result
+        // The output is a raw string (the UUID itself) as the value for the expression.
+        String outputJson = mapper.writeValueAsString(result);
+        
+        System.out.println(outputJson);
+        
+        // Print a note explaining the non-deterministic output
+        System.out.println("\n// Note: The output is a randomly generated UUID (Type 4), so the specific string will be different from the DataWeave example's snapshot.");
+        System.out.println("// Example of a typical Java output (the actual value will vary):");
+        System.out.println(String.format("\"%s\"", generatedUUID.toString()));
+    }
+}
+
+output:
+
+"c4b7e8d1-a5f9-4c2b-8a7d-0f31e2c9a0b6"

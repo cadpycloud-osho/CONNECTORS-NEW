@@ -1,0 +1,32 @@
+
+envVars():
+
+
+input:
+
+public class Main {
+    public static class EnvResponse {
+        public String envVars;
+        
+        public EnvResponse(String envVars) {
+            this.envVars = envVars;
+        }
+    }
+    
+    public static void main(String[] args) {
+        EnvResponse response = new EnvResponse(System.getenv("SHELL"));
+        System.out.println("{");
+        System.out.println("  \"envVars\" : \"" + System.getenv("SHELL") + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "envVars" : "/bin/bash"
+}
+
+

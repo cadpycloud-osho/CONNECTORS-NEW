@@ -1,0 +1,60 @@
+substringBy:
+
+
+input:
+
+package com.example.demo.util;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StringUtils {
+
+    public static List<String> substringByDW(String input) {
+        List<String> result = new ArrayList<>();
+        if (input == null || input.isEmpty()) return result;
+
+        StringBuilder sb = new StringBuilder();
+
+        for (char c : input.toCharArray()) {
+            if (c == '~' || c == '=' || c == '_') {
+                if (sb.length() > 0) {
+                    result.add(sb.toString());
+                    sb.setLength(0);
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+
+        if (sb.length() > 0) {
+            result.add(sb.toString());
+        }
+
+        return result;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class SubstringByController {
+
+    @GetMapping("/substringby")
+    public List<String> substringByExample() {
+        String input = "hello~world=here_data-weave";
+        return StringUtils.substringByDW(input);
+    }
+}
+
+output:
+
+["hello","world","here","data-weave"]
+
+

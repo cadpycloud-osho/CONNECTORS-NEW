@@ -1,0 +1,46 @@
+isNullType:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NullTypeController {
+
+    private boolean isNullType(Object value) {
+        return value == null;
+    }
+
+    @GetMapping("/null-type-check")
+    public Map<String, Boolean> checkNullTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ANull alias and Null both represented as null
+        Object aNull = null;  // ANull
+        Object nullType = null;  // Null
+        Object str = "test";  // String
+        
+        result.put("a", isNullType(aNull));
+        result.put("b", isNullType(nullType));
+        result.put("c", isNullType(str));
+        
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

@@ -1,0 +1,86 @@
+someEntry:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+public class SomeEntryRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // a: empty object -> false (no entries)
+                    result.put("a", someEntry(new LinkedHashMap<>(), (value, key) -> value instanceof String));
+                    
+                    // b: {a: "", b: "123"} -> true (both values are String)
+                    Map<String, Object> objB = new LinkedHashMap<>() {{
+                        put("a", ""); put("b", "123");
+                    }};
+                    result.put("b", someEntry(objB, (value, key) -> value instanceof String));
+                    
+                    // c: {a: "", b: 123} -> true (a is String)
+                    Map<String, Object> objC = new LinkedHashMap<>() {{
+                        put("a", ""); put("b", 123);
+                    }};
+                    result.put("c", someEntry(objC, (value, key) -> value instanceof String));
+                    
+                    // d: {a: "", b: 123} -> true (key "a" exists)
+                    Map<String, Object> objD = new LinkedHashMap<>() {{
+                        put("a", ""); put("b", 123);
+                    }};
+                    result.put("d", someEntry(objD, (value, key) -> key.equals("a")));
+                    
+                    // e: {a: ""} -> false (no key "b")
+                    Map<String, Object> objE = new LinkedHashMap<>() {{
+                        put("a", "");
+                    }};
+                    result.put("e", someEntry(objE, (value, key) -> key.equals("b")));
+                    
+                    // f: null -> false
+                    result.put("f", someEntry(null, (value, key) -> key.equals("a")));
+                    
+                    exchange.getIn().setBody(result);
+                }
+                
+                private boolean someEntry(Map<String, Object> obj, EntryCondition condition) {
+                    if (obj == null) return false;
+                    for (Map.Entry<String, Object> entry : obj.entrySet()) {
+                        if (condition.test(entry.getValue(), entry.getKey())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                
+                @FunctionalInterface
+                interface EntryCondition {
+                    boolean test(Object value, String key);
+                }
+            });
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+

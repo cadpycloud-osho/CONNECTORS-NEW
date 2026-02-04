@@ -1,0 +1,219 @@
+update:
+
+example 1:
+
+input:
+
+@GetMapping("/example1")
+public Map<String, String> example1() {
+    Map<String, String> input = Map.of("name", "Mariano");
+    Map<String, String> result = new HashMap<>(input);
+    result.put("name", "Data Weave");
+    return result;
+}
+
+
+output:
+
+{"name": "Data Weave"}
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+@RestController
+public class FieldUpdateController {
+    
+    @GetMapping("/example2")
+    public Map<String, String> example2() {
+        Map<String, String> input = Map.of("name", "Mariano");
+        // Simulates field("name") selector
+        Map<String, String> fieldSelector = Map.of(
+            "kind", "Object",
+            "namespace", null,
+            "selector", "name"
+        );
+        return updateWithFieldSelector(input, fieldSelector, "Data Weave");
+    }
+    
+    private Map<String, String> updateWithFieldSelector(Map<String, String> input, 
+                                                      Map<String, String> fieldSelector, 
+                                                      String newValue) {
+        Map<String, String> result = new HashMap<>(input);
+        String fieldName = fieldSelector.get("selector");
+        result.put(fieldName, newValue);
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "name": "Data Weave"
+}
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+@GetMapping("/example3")
+public List<Integer> example3() {
+    List<Integer> input = Arrays.asList(1, 2, 3);
+    List<Integer> result = new ArrayList<>(input);
+    result.set(1, 5);
+    return result;
+}
+
+
+output:
+
+List<Integer> ex3 = new ArrayList<>(Arrays.asList(1, 2, 3));
+ex3.set(1, 5);
+System.out.println(ex3);  // [1, 5, 3]
+
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+@GetMapping("/example4")
+public List<Map<String, String>> example4() {
+    List<Map<String, String>> input = Arrays.asList(
+        Map.of("role", "a", "name", "spiderman"),
+        Map.of("role", "b", "name", "batman")
+    );
+    return input.stream().map(item -> {
+        Map<String, String> updated = new HashMap<>(item);
+        updated.put("role", "Super Hero");
+        return updated;
+    }).collect(Collectors.toList());
+}
+
+
+output:
+
+[{"role": "Super Hero", "name": "spiderman"}, {"role": "Super Hero", "name": "batman"}]
+
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+@RestController
+public class IndexUpdateController {
+    
+    @GetMapping("/example5")
+    public List<Integer> example5() {
+        List<Integer> input = Arrays.asList(1, 2, 3);
+        
+        // Simulates index(1) selector
+        Map<String, Object> indexSelector = Map.of(
+            "kind", "Array",
+            "namespace", null,
+            "selector", 1
+        );
+        
+        return updateWithIndexSelector(input, indexSelector, 5);
+    }
+    
+    private List<Integer> updateWithIndexSelector(List<Integer> input, 
+                                                Map<String, Object> indexSelector, 
+                                                int newValue) {
+        List<Integer> result = new ArrayList<>(input);
+        int index = (Integer) indexSelector.get("selector");
+        if (index < result.size()) {
+            result.set(index, newValue);
+        }
+        return result;
+    }
+}
+
+
+output:
+
+[
+   1,
+   5,
+   3
+]
+
+
+---------------------------------------------------------------
+
+
+
+
+example 6:
+
+input:
+
+@GetMapping("/example6")
+public Map<String, Object> example6() {
+    Map<String, Object> input = Map.of("user", Map.of("name", "Mariano"));
+    Map<String, Object> result = new HashMap<>(input);
+    Map<String, Object> user = new HashMap<>((Map<String, Object>) result.get("user"));
+    user.put("name", "Data Weave");
+    result.put("user", user);
+    return result;
+}
+
+
+output:
+
+
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+input:
+
+@GetMapping("/example7")
+public Map<String, Object> example7() {
+    Map<String, Object> input = Map.of("users", Arrays.asList(
+        Map.of("name", "Phoebe", "language", "French"),
+        Map.of("name", "Joey", "language", "English")
+    ));
+    return Map.of("users", ((List<Map<String, Object>>) input.get("users")).stream().map(user -> {
+        Map<String, Object> updated = new HashMap<>(user);
+        if ("English".equals(updated.get("language"))) {
+            updated.put("language", "Gibberish");
+        }
+        return updated;
+    }).collect(Collectors.toList()));
+}
+
+
+output:
+
+{
+  "users": [
+    {"name": "Phoebe", "language": "French"},
+    {"name": "Joey", "language": "Gibberish"}
+  ]
+}
+
+
+---------------------------------------------------------------
+
+
+
+

@@ -1,0 +1,57 @@
+years:
+
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class YearsController {
+    
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ISO_INSTANT;
+    private static final Instant BASE = Instant.parse("2020-10-05T20:22:34.385Z");
+
+    @GetMapping("/years")
+    public Map<String, Object> getYears() {
+        // nextYear: add 1 year (preserves day/time)
+        LocalDateTime baseLdt = BASE.atZone(ZoneOffset.UTC).toLocalDateTime();
+        LocalDateTime nextYearLdt = baseLdt.plusYears(1);
+        Instant nextYear = nextYearLdt.toInstant(ZoneOffset.UTC);
+        
+        // fourYearPeriod: P4Y representation
+        String fourYearPeriod = "P4Y";
+        
+        // addNegativeValue: years(-1) + years(2) = 1 year = 12 months
+        int addNegativeValue = 12;
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("nextYear", FMT.format(nextYear));
+        result.put("fourYearPeriod", fourYearPeriod);
+        result.put("addNegativeValue", addNegativeValue);
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 12
+}
+
+
+
+
+

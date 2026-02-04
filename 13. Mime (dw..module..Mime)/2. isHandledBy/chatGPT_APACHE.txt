@@ -1,0 +1,91 @@
+isHandledBy:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class MimeIsHandledByRoute extends RouteBuilder {
+
+    static class Mime {
+        String type;
+        String subtype;
+
+        Mime(String type, String subtype) {
+            this.type = type;
+            this.subtype = subtype;
+        }
+    }
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                Mime JSON = new Mime("application", "json");
+                Mime MULTIPART = new Mime("multipart", "form-data");
+                Mime ALL = new Mime("*", "*");
+
+                boolean a = isHandledBy(JSON, JSON);
+                boolean b = isHandledBy(new Mime("*", "json"), JSON);
+                boolean c = isHandledBy(new Mime("application", "*"), JSON);
+                boolean d = isHandledBy(ALL, MULTIPART);
+                boolean e = isHandledBy(MULTIPART, ALL);
+                boolean f = isHandledBy(JSON, MULTIPART);
+                boolean g = isHandledBy(
+                        new Mime("application", "*+xml"),
+                        new Mime("application", "soap+xml")
+                );
+
+                String body =
+                    "{"
+                  + "\"a\": " + a + ","
+                  + "\"b\": " + b + ","
+                  + "\"c\": " + c + ","
+                  + "\"d\": " + d + ","
+                  + "\"e\": " + e + ","
+                  + "\"f\": " + f + ","
+                  + "\"g\": " + g
+                  + "}";
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+
+    private boolean isHandledBy(Mime expected, Mime actual) {
+
+        // Type check
+        if (!"*".equals(expected.type) && !expected.type.equals(actual.type)) {
+            return false;
+        }
+
+        // Subtype check
+        if ("*".equals(expected.subtype)) {
+            return true;
+        }
+
+        if (expected.subtype.startsWith("*+")) {
+            return actual.subtype.endsWith(expected.subtype.substring(1));
+        }
+
+        return expected.subtype.equals(actual.subtype);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": true
+}
+
+
+
+
+

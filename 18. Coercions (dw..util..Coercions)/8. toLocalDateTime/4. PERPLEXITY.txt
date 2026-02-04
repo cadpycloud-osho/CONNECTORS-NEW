@@ -1,0 +1,119 @@
+toLocalDateTime:
+
+
+
+example 1:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+
+@RestController
+public class LocalDateTimeCoercionsController {
+    
+    @GetMapping("/local-datetime-coercions")
+    public LocalDateTimeResponse getLocalDateTimeCoercions() {
+        DateTimeFormatter multiFormatter = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy/MM/dd HH:mm:ss")
+            .orAppendPattern("yyyy-MM-dd HH:mm:ss")
+            .toFormatter();
+        
+        LocalDateTime dateA = null;
+        String errorB = null;
+        
+        try {
+            dateA = LocalDateTime.parse("2003-10-01 23:57:59", multiFormatter);
+        } catch (DateTimeParseException e) {
+            errorB = "Could not find a valid formatter for '2003-10-01 23:57:59'";
+        }
+        
+        return new LocalDateTimeResponse(dateA, errorB);
+    }
+    
+    public static class LocalDateTimeResponse {
+        public LocalDateTime a;
+        public String b;
+        
+        public LocalDateTimeResponse(LocalDateTime a, String b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": "2003-10-01T23:57:59",
+  "b": "Could not find a valid formatter for '2003-10-01 23:57:59'"
+}
+
+
+------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@RestController
+public class LocalDateTimeCoercionsController {
+    
+    @GetMapping("/local-datetime-coercions")
+    public LocalDateTimeResponse getLocalDateTimeCoercions() {
+        LocalDateTime dateA = LocalDateTime.parse("2015-10-01T23:57:59");
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateB = LocalDateTime.parse("2003-10-01 23:57:59", formatterB);
+        
+        return new LocalDateTimeResponse(dateA, dateB);
+    }
+    
+    public static class LocalDateTimeResponse {
+        public LocalDateTime a;
+        public LocalDateTime b;
+        
+        public LocalDateTimeResponse(LocalDateTime a, LocalDateTime b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2015-10-01T23:57:59",
+  "b": "2003-10-01T23:57:59"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

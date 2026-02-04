@@ -1,0 +1,74 @@
+toRadixNumber:
+
+
+input:
+
+package com.example.dataweaveconverter.controller;
+
+import com.example.dataweaveconverter.service.DataWeaveService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/convert")
+public class DataWeaveController {
+
+    private final DataWeaveService dataWeaveService;
+
+    @Autowired
+    public DataWeaveController(DataWeaveService dataWeaveService) {
+        this.dataWeaveService = dataWeaveService;
+    }
+
+    // Define a record for the output structure
+    public record DataWeaveOutput(
+        String a,
+        String b
+    ) {}
+
+    @GetMapping("/toRadixNumber")
+    public DataWeaveOutput runDataWeaveLogic() {
+        // The inputs mirror the DataWeave source
+        return new DataWeaveOutput(
+            dataWeaveService.toRadixNumber(2, 2),
+            dataWeaveService.toRadixNumber(255, 16)
+        );
+    }
+}
+
+
+2. The Service Layer
+
+package com.example.dataweaveconverter.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class DataWeaveService {
+
+    /**
+     * Mimics the DataWeave dw::core::Numbers::toRadixNumber function.
+     * This is equivalent to Integer.toString(int i, int radix) in Java.
+     *
+     * @param number The decimal integer to convert.
+     * @param radix The base to convert the number to (e.g., 2 for binary, 16 for hex).
+     * @return The string representation of the number in the given radix.
+     */
+    public String toRadixNumber(int number, int radix) {
+        // Integer.toString(int i, int radix) is the direct Java equivalent for base conversion.
+        // It outputs lowercase hex digits, matching the DataWeave output 'ff'.
+        return Integer.toString(number, radix);
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": "10",
+  "b": "ff"
+}

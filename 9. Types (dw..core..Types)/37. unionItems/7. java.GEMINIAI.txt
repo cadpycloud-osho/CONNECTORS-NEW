@@ -1,0 +1,61 @@
+unionItems:
+
+
+input:
+
+
+import java.lang.Boolean;
+import java.lang.String;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Arrays;
+
+public class Main {
+
+    /**
+     * Conceptual proxy interface for the DataWeave 'String | Number' Union type.
+     * This holds no real logic but serves as the target for our check.
+     */
+    private static interface UnionTypeProxy {}
+
+    /**
+     * Conceptually mimics DataWeave's unionItems(Type).
+     * It returns the string names of the constituent types of the union.
+     */
+    public static List<String> unionItems(Class<?> type) {
+        // In a real system, this would involve parsing the Type definition.
+        // Here, we hardcode the constituent types of the AType Union.
+        if (UnionTypeProxy.class.isAssignableFrom(type)) {
+            return Arrays.asList("String", "Number");
+        }
+        return List.of(); // Should return empty if not a Union type
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. AType (which is the Union type 'String | Number')
+        Class<?> aTypeClass = UnionTypeProxy.class;
+        
+        // --- Execution ---
+        
+        // a: unionItems(AType)
+        List<String> a = unionItems(aTypeClass); 
+
+        // Output the result in JSON format
+        // Use a map to hold the final JSON structure { "a": [...] }
+        Map<String, List<String>> output = new LinkedHashMap<>();
+        output.put("a", a);
+        
+        // Note: For simple console output, we manually format the JSON string.
+        String jsonOutput = String.format("{\n  \"a\": %s\n}", a.toString().replace(" ", ""));
+        
+        System.out.println(jsonOutput);
+    }
+}
+
+output:
+
+{
+  "a": ["String","Number"]
+}

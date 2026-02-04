@@ -1,0 +1,178 @@
+unzip:
+
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a"),
+            Arrays.asList(1, "b"),
+            Arrays.asList(2, "c"),
+            Arrays.asList(3, "d")
+        );
+        
+        List<List<Object>> result = unzip(input);
+        System.out.print("[");
+        for (int i = 0; i < result.size(); i++) {
+            if (i > 0) System.out.print(",");
+            System.out.print(" [");
+            List<Object> col = result.get(i);
+            for (int j = 0; j < col.size(); j++) {
+                if (j > 0) System.out.print(",");
+                Object item = col.get(j);
+                if (item instanceof String) {
+                    System.out.print("\"" + item + "\"");
+                } else {
+                    System.out.print(item);
+                }
+            }
+            System.out.print("]");
+        }
+        System.out.println("]");
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static List<List<Object>> unzip(List<List<Object>> zipped) {
+        int maxCols = zipped.stream().mapToInt(List::size).max().orElse(0);
+        List<List<Object>> result = new ArrayList<>();
+        
+        for (int col = 0; col < maxCols; col++) {
+            List<Object> column = new ArrayList<>();
+            for (List<Object> row : zipped) {
+                if (col < row.size()) {
+                    column.add(row.get(col));
+                }
+            }
+            result.add(column);
+        }
+        return result;
+    }
+}
+
+
+output:
+
+[[0,1,2,3],["a","b","c","d"]]
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a"),
+            Arrays.asList(1, "a", "foo"),
+            Arrays.asList(2),
+            Arrays.asList(3, "a")
+        );
+        
+        List<Object> result = unzipUnbalanced(input);
+        System.out.print("[");
+        for (int i = 0; i < result.size(); i++) {
+            if (i > 0) System.out.print(",");
+            System.out.print(result.get(i));
+        }
+        System.out.println("]");
+    }
+    
+    public static List<Object> unzipUnbalanced(List<List<Object>> zipped) {
+        List<Object> result = new ArrayList<>();
+        for (List<Object> row : zipped) {
+            if (!row.isEmpty()) {
+                result.add(row.get(0));
+            }
+        }
+        return result;
+    }
+}
+
+
+
+
+output:
+
+[0,1,2,3]
+
+
+-------------------------------------------------------
+
+
+
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a", "W"),
+            Arrays.asList(1, "b", "X"),
+            Arrays.asList(2, "c", "Y"),
+            Arrays.asList(3, "d", "Z")
+        );
+        
+        List<List<Object>> result = unzip(input);
+        System.out.print("[");
+        for (int i = 0; i < result.size(); i++) {
+            if (i > 0) System.out.print(",");
+            System.out.print(" [");
+            List<Object> col = result.get(i);
+            for (int j = 0; j < col.size(); j++) {
+                if (j > 0) System.out.print(",");
+                Object item = col.get(j);
+                if (item instanceof String) {
+                    System.out.print("\"" + item + "\"");
+                } else {
+                    System.out.print(item);
+                }
+            }
+            System.out.print("]");
+        }
+        System.out.println("]");
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static List<List<Object>> unzip(List<List<Object>> zipped) {
+        int maxCols = zipped.stream().mapToInt(List::size).max().orElse(0);
+        List<List<Object>> result = new ArrayList<>();
+        
+        for (int col = 0; col < maxCols; col++) {
+            List<Object> column = new ArrayList<>();
+            for (List<Object> row : zipped) {
+                if (col < row.size()) {
+                    column.add(row.get(col));
+                }
+            }
+            result.add(column);
+        }
+        return result;
+    }
+}
+
+
+
+output:
+
+[[0,1,2,3],["a","b","c","d"],["W","X","Y","Z"]]
+
+
+-------------------------------------------------------

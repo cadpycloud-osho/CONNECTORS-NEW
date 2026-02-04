@@ -1,0 +1,72 @@
+wrapWith:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class WrapWithController {
+
+    @GetMapping("/wrap-with-conversion")
+    public Map<String, String> convertDataWeaveWrapWith() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = StringWrapUtil.wrapWith(null, "'");
+        String b = StringWrapUtil.wrapWith("", "'");
+        String c = StringWrapUtil.wrapWith("ab", "x");
+        String d = StringWrapUtil.wrapWith("'ab'", "'");
+        String e = StringWrapUtil.wrapWith("ab", "'");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'a' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e
+        );
+    }
+}
+
+public class StringWrapUtil {
+
+    /**
+     * Replicates the dw::core::Strings::wrapWith function.
+     * Unconditionally surrounds the string with the wrapper: wrapper + str + wrapper.
+     *
+     * @param str The input string (can be null).
+     * @param wrapper The string to use for wrapping.
+     * @return The wrapped string, or null if the input string was null.
+     */
+    public static String wrapWith(String str, String wrapper) {
+        // 1. DataWeave Rule 'a': If input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+
+        // Handle wrapper being null or empty (treating as empty string wrapper for concatenation).
+        String safeWrapper = (wrapper == null) ? "" : wrapper;
+
+        // 2. Core Rule: Concatenates wrapper + str + wrapper.
+        return safeWrapper + str + safeWrapper;
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}

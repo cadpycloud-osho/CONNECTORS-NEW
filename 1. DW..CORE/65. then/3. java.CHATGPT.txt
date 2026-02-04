@@ -1,0 +1,40 @@
+
+then:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<String> names = Arrays.asList("mariano", "de Achaval");
+
+        String reduced = names.stream()
+                .reduce("", (item, acc) -> item + acc);
+
+        int chainResult = reduced.length();
+
+        System.out.println(chainResult);
+    }
+}
+
+
+
+output:
+
+
+17
+
+
+referenceResult
+DataWeave logic
+["mariano", "de Achaval"]
+    map ((item, index) -> upper(item))
+    then {
+        name: $[0],
+        lastName: $[1],
+        length: sizeOf($)
+    }

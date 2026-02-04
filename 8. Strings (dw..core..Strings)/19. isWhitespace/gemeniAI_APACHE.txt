@@ -1,0 +1,54 @@
+isWhitespace:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsWhitespaceRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:validateWhitespace")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                results.put("a", isWhitespaceDW(null));
+                results.put("b", isWhitespaceDW(""));
+                results.put("c", isWhitespaceDW("  "));
+                results.put("d", isWhitespaceDW("abc"));
+                results.put("e", isWhitespaceDW("ab2c"));
+                results.put("f", isWhitespaceDW("ab-c"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Replicates DW isWhitespace logic:
+     * null -> false
+     * empty or spaces -> true
+     */
+    private boolean isWhitespaceDW(String input) {
+        if (input == null) return false;
+        return StringUtils.isWhitespace(input);
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+
+
+

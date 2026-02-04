@@ -1,0 +1,88 @@
+toDateOrNull:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class DwToDateOrNullTest {
+
+    // Simulate dw::util::Coercions::toDateOrNull() - returns null on parse failure
+    static LocalDate toDateOrNull(String dateStr, List<Map<String, Object>> formatters) {
+        for (Map<String, Object> formatter : formatters) {
+            try {
+                String format = (String) formatter.get("format");
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+                return LocalDate.parse(dateStr, dtf);
+            } catch (DateTimeParseException e) {
+                // Try next formatter or return null if none succeed
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToDateOrNullRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToDateOrNullRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // a: toDateOrNull("2023-28-03", [{format: "yyyy/MM/dd"}, {format: "yyyy-dd-MM"}])
+                        List<Map<String, Object>> formattersA = Arrays.asList(
+                            Map.of("format", "yyyy/MM/dd"),
+                            Map.of("format", "yyyy-dd-MM", "locale", "en_US")
+                        );
+                        LocalDate dateA = toDateOrNull("2023-28-03", formattersA);
+
+                        // b: toDateOrNull("2023-28-03", [{format: "yyyy/MM/dd"}])
+                        List<Map<String, Object>> formattersB = Arrays.asList(
+                            Map.of("format", "yyyy/MM/dd")
+                        );
+                        LocalDate dateB = toDateOrNull("2023-28-03", formattersB);
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", dateA != null ? dateA.toString() : null);
+                        result.put("b", dateB);
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+{
+  "a" : "2023-03-28",
+  "b" : null
+}
+
+
+

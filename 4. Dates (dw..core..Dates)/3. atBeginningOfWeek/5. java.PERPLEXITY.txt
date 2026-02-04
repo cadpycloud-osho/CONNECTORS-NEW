@@ -1,0 +1,114 @@
+atBeginningOfWeek:
+
+example 1:
+
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351-03:00|
+        OffsetDateTime input = OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        
+        // DataWeave: atBeginningOfWeek(...) - Sunday start
+        LocalDate inputDate = input.toLocalDate();
+        LocalDate sunday = inputDate.with(DayOfWeek.SUNDAY);
+        OffsetDateTime result = sunday.atStartOfDay().atOffset(input.getOffset());
+        
+        String output = result.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfWeekDateTime\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfWeekDateTime": "2020-10-04T00:00:00-03:00"
+}
+
+------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351|
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        
+        // DataWeave: atBeginningOfWeek(...) - Sunday start
+        LocalDateTime result = input.toLocalDate()
+            .with(DayOfWeek.SUNDAY)
+            .atStartOfDay();
+        
+        String output = result.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfWeekLocalDateTime\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00:00"
+}
+
+
+------------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+
+import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06|
+        LocalDate input = LocalDate.parse("2020-10-06");
+        
+        // DataWeave: atBeginningOfWeek(...) - Sunday start
+        LocalDate result = input.with(DayOfWeek.SUNDAY);
+        
+        String output = result.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfWeekDate\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDate": "2020-10-04"
+}
+
+------------------------------------------------------------------
+

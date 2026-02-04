@@ -1,0 +1,32 @@
+abs(number: Number): Number
+
+
+input:
+
+<route id="DataWeaveAbsTransformation">
+    <from uri="direct:startAbs"/>
+    
+    <transform>
+        <groovy>
+            // Groovy treats the message body as a List
+            def sourceList = request.body
+            
+            // Iterate over the list and apply the absolute value (Math.abs) function 
+            // to each element using Groovy's 'collect' method (similar to DataWeave's map).
+            def resultList = sourceList.collect { Math.abs(it) }
+            
+            // The resulting List is returned as the new body
+            return resultList
+        </groovy>
+    </transform>
+    
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+    <to uri="mock:absOutput"/>
+</route>
+
+output:
+
+[ 2, 2.5, 3.4, 3 ]
+

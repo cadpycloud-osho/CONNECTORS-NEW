@@ -1,0 +1,74 @@
+trim:
+
+example 1:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class TrimExample1 {
+    public static void main(String[] args) {
+        // The input string includes leading and trailing spaces,
+        // and intentional multiple spaces inside.
+        String input = "    my really long  text     "; 
+        
+        // Java's String.trim() removes leading/trailing whitespace.
+        String trimmedString = input.trim(); 
+
+        Map<String, String> output = new LinkedHashMap<>();
+        output.put("trim", trimmedString);
+        
+        System.out.println("--- DWL Example 1 Output (Long String) ---");
+        System.out.println(output);
+    }
+}
+output:
+
+{trim=my really long  text}
+----------------------------------------------------------------
+example 2:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class TrimExample2 {
+
+    // Helper method to safely replicate DWL's trim(null) -> null behavior
+    private static String safeTrim(String str) {
+        if (str == null) {
+            return null; // DWL's behavior
+        }
+        return str.trim(); // Java's behavior for non-null strings
+    }
+
+    public static void main(String[] args) {
+        
+        Map<String, String> output = new LinkedHashMap<>();
+        
+        // 1. "null": trim(null) -> null
+        output.put("null", safeTrim(null));
+        
+        // 2. "empty": trim("") -> ""
+        output.put("empty", safeTrim(""));
+        
+        // 3. "blank": trim("     ") -> ""
+        output.put("blank", safeTrim("     "));
+        
+        // 4. "noBlankSpaces": trim("abc") -> "abc"
+        output.put("noBlankSpaces", safeTrim("abc"));
+        
+        // 5. "withSpaces": trim("    abc    ") -> "abc"
+        output.put("withSpaces", safeTrim("    abc    "));
+        
+        System.out.println("--- DWL Example 2 Output (Edge Cases) ---");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{null=null, empty=, blank=, noBlankSpaces=abc, withSpaces=abc}

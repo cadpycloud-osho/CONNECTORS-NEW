@@ -1,0 +1,111 @@
+write:
+
+
+example 1:
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class WriteTextPlainController {
+
+    @GetMapping("/writeTextPlain")
+    public Map<String, String> writeTextPlain() {
+        String content = "world";
+        // write("world", "text/plain") returns the string as-is
+        return Map.of("hello", content);
+    }
+}
+
+output:
+
+{ "hello": "world" }
+
+-------------------------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class WriteCsvController {
+
+    static class Person {
+        public String Name;
+        public String Email;
+        public String Id;
+        public String Title;
+    }
+
+    @GetMapping(value = "/writeCsv", produces = "application/xml")
+    public Output writeCsv() throws Exception {
+        List<Person> input = List.of(
+            new Person() {{
+                Name = "Mr White"; Email = "white@mulesoft.com"; 
+                Id = "1234"; Title = "Chief Java Prophet";
+            }},
+            new Person() {{
+                Name = "Mr Orange"; Email = "orange@mulesoft.com"; 
+                Id = "4567"; Title = "Integration Ninja";
+            }}
+        );
+
+        // Convert to CSV with header and "|" separator
+        String csvContent = convertToCsv(input);
+
+        Output output = new Output();
+        output.output = csvContent;
+        return output;
+    }
+
+    private String convertToCsv(List<Person> data) {
+        if (data.isEmpty()) return "";
+        
+        StringBuilder csv = new StringBuilder();
+        // Header
+        csv.append("Name|Email|Id|Title").append("\n");
+        
+        // Data rows
+        for (Person person : data) {
+            csv.append(String.format("%s|%s|%s|%s", 
+                person.Name, person.Email, person.Id, person.Title)).append("\n");
+        }
+        
+        return csv.toString().trim();
+    }
+
+    @JacksonXmlRootElement(localName = "output")
+    static class Output {
+        @JacksonXmlProperty(isAttribute = false)
+        public String output;
+    }
+}
+
+
+Output (XML):
+
+<?xml version="1.0" encoding="UTF-8"?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja</output>
+
+
+-------------------------------------------------------------------
+

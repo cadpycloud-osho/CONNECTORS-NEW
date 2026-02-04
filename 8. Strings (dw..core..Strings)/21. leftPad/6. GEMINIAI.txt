@@ -1,0 +1,76 @@
+leftPad:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class LeftPadController {
+
+    /**
+     * Custom method to emulate DataWeave's leftPad(text, length) function.
+     * Pads the start of the string with spaces to reach the specified length.
+     */
+    private String leftPadString(String input, int length) {
+        // 1. Handle null input: DataWeave returns null.
+        if (input == null) {
+            return null;
+        }
+
+        // Get the current length of the string (0 if empty)
+        int currentLength = input.length();
+
+        // 2. Handle length <= currentLength (or negative length): DataWeave returns original string.
+        if (length <= currentLength) {
+            return input;
+        }
+
+        // 3. Calculate the number of spaces needed
+        int paddingCount = length - currentLength;
+
+        // Use StringBuilder or String.repeat (Java 11+) to create the padding
+        String padding;
+        if (paddingCount > 0) {
+            // Create a string of 'paddingCount' spaces.
+            padding = String.join("", Collections.nCopies(paddingCount, " ")); 
+        } else {
+            padding = "";
+        }
+        
+        // Prepend the padding to the original string
+        return padding + input;
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/left-pad-examples")
+    public Map<String, String> getLeftPadExamples() {
+        // Use LinkedHashMap to preserve the output order
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", leftPadString(null, 3));
+        result.put("b", leftPadString("", 3));
+        result.put("c", leftPadString("bat", 5));
+        result.put("d", leftPadString("bat", 3));
+        result.put("e", leftPadString("bat", -1));
+        
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}

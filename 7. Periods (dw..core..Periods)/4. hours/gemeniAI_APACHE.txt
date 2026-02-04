@@ -1,0 +1,74 @@
+hours:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class HoursArithmeticRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateHours")
+            .routeId("Hours-Arithmetic-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // 1. DateTime Arithmetic: 2020-10-05T20:22:34.385Z
+                Instant dateTime = Instant.parse("2020-10-05T20:22:34.385Z");
+                results.put("nextHour", dateTime.plus(Duration.ofHours(1)).toString());
+                results.put("previousHour", dateTime.minus(Duration.ofHours(1)).toString());
+
+                // 2. Time-only Arithmetic: 20:22
+                LocalTime time = LocalTime.parse("20:22");
+                results.put("threeHoursLater", time.plusHours(3).toString() + ":00");
+                
+                // 3. Decimal Input: hours(3.5) = 3h 30m
+                results.put("addDecimalInput", time.plus(toDuration(3.5)).toString() + ":00");
+
+                // 4. Period Representation: hours(4.555)
+                results.put("decimalInputAsPeriod", toDuration(4.555).toString());
+                results.put("fourHourPeriod", Duration.ofHours(4).toString());
+
+                // 5. Negative Arithmetic: (-1h) + (2h) = 1h (3600 seconds)
+                Duration combined = Duration.ofHours(-1).plus(Duration.ofHours(2));
+                results.put("addNegativeValue", combined.getSeconds());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Hours Result: ${body}");
+    }
+
+    /**
+     * Replicates DW hours() for decimal inputs
+     */
+    private Duration toDuration(double hours) {
+        long millis = Math.round(hours * 60 * 60 * 1000);
+        return Duration.ofMillis(millis);
+    }
+}
+
+
+
+output:
+
+{
+   "nextHour": "2020-10-05T21:22:34.385Z",
+   "previousHour": "2020-10-05T19:22:34.385Z",
+   "threeHoursLater": "23:22:00",
+   "addDecimalInput": "23:52:00",
+   "decimalInputAsPeriod": "PT4H33M18S",
+   "fourHourPeriod": "PT4H",
+   "addNegativeValue": 3600
+}
+
+
+
+
+

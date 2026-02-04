@@ -1,0 +1,38 @@
+locationString:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class LocationStringController {
+
+    @GetMapping("/locationString")
+    public Map<String, String> getLocationString() {
+
+        int a = 123;
+
+        // Simulate locationString(a)
+        String location = "var a = 123";
+
+        return Collections.singletonMap("locationString", location);
+    }
+}
+
+
+output:
+
+{
+  "locationString": "var a = 123"
+}
+
+
+

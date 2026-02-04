@@ -1,0 +1,52 @@
+isLiteralType:
+
+
+
+INPUT:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isLiteralType(Class<?> type, Object value) {
+        // Literal types must be a string constant
+        return type == String.class && value instanceof String;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class LiteralTypeController {
+
+    @GetMapping("/isLiteralType")
+    public Map<String, Boolean> checkLiteralTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to "type ALiteralType = 'Mariano'"
+        Class<?> ALiteralType = String.class;
+        String literalValue = "Mariano";
+
+        result.put("a", TypeUtils.isLiteralType(ALiteralType, literalValue));
+        result.put("b", TypeUtils.isLiteralType(Boolean.class, true));
+
+        return result;
+    }
+}
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+
+

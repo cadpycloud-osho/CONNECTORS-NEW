@@ -1,0 +1,54 @@
+firstWith:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class FirstWithRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:firstWith")
+            .process(exchange -> {
+                List<Map<String, String>> users = Arrays.asList(
+                    Map.of("name", "Mariano", "lastName", "Achaval"),
+                    Map.of("name", "Ana", "lastName", "Felisatti"),
+                    Map.of("name", "Mariano", "lastName", "de Sousa")
+                );
+                
+                // a: first user where name == "Mariano"
+                Map<String, String> firstMariano = users.stream()
+                    .filter(user -> "Mariano".equals(user.get("name")))
+                    .findFirst()
+                    .orElse(null);
+                
+                // b: first user where name == "Peter" (not found)
+                Map<String, String> firstPeter = users.stream()
+                    .filter(user -> "Peter".equals(user.get("name")))
+                    .findFirst()
+                    .orElse(null);
+                
+                exchange.getIn().setBody(Map.of(
+                    "a", firstMariano,
+                    "b", firstPeter
+                ));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+
+
+

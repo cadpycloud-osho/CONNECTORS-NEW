@@ -1,0 +1,81 @@
+atBeginningOfDay:
+
+example 1:
+
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351-03:00|
+        String input = "2020-10-06T18:23:20.351-03:00";
+        OffsetDateTime odt = OffsetDateTime.parse(input);
+
+        // DataWeave: atBeginningOfDay(...)
+        OffsetDateTime atBeginningOfDay = odt.with(LocalTime.MIDNIGHT);
+
+        // DataWeave JSON output
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        String result = fmt.format(atBeginningOfDay);
+
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfDayDateTime\": \"" + result + "\"");
+        System.out.println("}");
+        // Output: 2020-10-06T00:00:00-03:00
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfDayDateTime": "2020-10-06T00:00:00-03:00"
+}
+
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351|
+        String input = "2020-10-06T18:23:20.351";
+        LocalDateTime ldt = LocalDateTime.parse(input);
+
+        // DataWeave: atBeginningOfDay(...)
+        LocalDateTime atBeginningOfDay = ldt.with(LocalTime.MIDNIGHT);
+
+        // DataWeave JSON output
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        String result = fmt.format(atBeginningOfDay);
+
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfDayLocalDateTime\": \"" + result + "\"");
+        System.out.println("}");
+        // Output: 2020-10-06T00:00:00
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfDayLocalDateTime": "2020-10-06T00:00:00"
+}
+
+

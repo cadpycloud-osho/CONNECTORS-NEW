@@ -1,0 +1,93 @@
+years:
+
+
+
+
+input:
+
+
+A. The Model (POJO)
+Java
+
+import lombok.Data; 
+// Add dependency: implementation 'org.projectlombok:lombok'
+
+@Data
+public class YearPeriodResult {
+    private String nextYear;
+    private String fourYearPeriod;
+    private long addNegativeValue;
+}
+B. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+import java.time.ZonedDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class YearPeriodService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+    public YearPeriodResult calculateYears() {
+        YearPeriodResult result = new YearPeriodResult();
+        
+        // --- 1. DateTime Arithmetic ---
+        ZonedDateTime nextYear = baseDateTime.plusYears(1);
+        // Use replace() to match DW's preference of omitting ".000" on ISO output
+        result.setNextYear(nextYear.format(instantFormatter).replace(".000Z", "Z"));
+
+        // --- 2. Period Construction and Arithmetic ---
+        
+        // fourYearPeriod: years(4)
+        Period fourYearPeriod = Period.ofYears(4);
+        result.setFourYearPeriod(fourYearPeriod.toString()); // P4Y
+
+        // addNegativeValue: years(-1) + years(2) -> 1 year
+        Period combinedPeriod = Period.ofYears(-1).plus(Period.ofYears(2));
+        // DW outputs the total magnitude in months: 1 year * 12 months/year = 12
+        result.setAddNegativeValue(combinedPeriod.toTotalMonths()); // 12
+
+        return result;
+    }
+}
+C. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class PeriodController {
+
+    private final YearPeriodService yearPeriodService;
+
+    public PeriodController(YearPeriodService yearPeriodService) {
+        this.yearPeriodService = yearPeriodService;
+    }
+
+    @GetMapping("/api/year-calculations")
+    public YearPeriodResult getCalculatedYears() {
+        // Spring Boot automatically converts the YearPeriodResult object to JSON
+        return yearPeriodService.calculateYears();
+    }
+}
+
+
+
+Spring Boot Output (When accessing /api/year-calculations)
+JSON
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 12
+}
+
+
+
+
+

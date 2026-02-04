@@ -1,0 +1,61 @@
+trim:
+
+trim(text: String): String
+
+trim(text: String): String
+Removes any blank spaces from the beginning and end of a string.
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "trim": trim("   my really long  text     ") }
+DataWeave
+Output
+{ "trim": "my really long  text" }
+
+-------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  "null": trim(null),
+  "empty": trim(""),
+  "blank": trim("     "),
+  "noBlankSpaces": trim("abc"),
+  "withSpaces": trim("    abc    ")
+}
+DataWeave
+Output
+{
+  "null": null,
+  "empty": "",
+  "blank": "",
+  "noBlankSpaces": "abc",
+  "withSpaces": "abc"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,102 @@
+toString:
+
+
+example 1:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class MimeToStringRoute extends RouteBuilder {
+
+    static class Mime {
+        String type;
+        String subtype;
+
+        Mime(String type, String subtype) {
+            this.type = type;
+            this.subtype = subtype;
+        }
+    }
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                Mime mime = new Mime("application", "json");
+
+                String result = mime.type + "/" + mime.subtype;
+
+                exchange.getMessage().setBody(
+                    "\"" + result + "\""
+                );
+            });
+    }
+}
+
+
+output:
+
+"application/json"
+
+
+
+-----------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.Map;
+
+public class MimeToStringMultipartRoute extends RouteBuilder {
+
+    static class Mime {
+        String type;
+        String subtype;
+        Map<String, String> parameters;
+
+        Mime(String type, String subtype, Map<String, String> parameters) {
+            this.type = type;
+            this.subtype = subtype;
+            this.parameters = parameters;
+        }
+    }
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                Map<String, String> params = Map.of("boundary", "my-boundary");
+                Mime mime = new Mime("multipart", "form-data", params);
+
+                StringBuilder result = new StringBuilder();
+                result.append(mime.type).append("/").append(mime.subtype);
+
+                if (mime.parameters != null && !mime.parameters.isEmpty()) {
+                    mime.parameters.forEach((k, v) -> result.append(";").append(k).append("=").append(v));
+                }
+
+                exchange.getMessage().setBody(
+                        "\"" + result.toString() + "\""
+                );
+            });
+    }
+}
+
+
+
+output:
+
+
+"multipart/form-data;boundary=my-boundary"
+
+
+-----------------------------------------------

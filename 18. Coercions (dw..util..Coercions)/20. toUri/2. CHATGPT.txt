@@ -1,0 +1,40 @@
+toUri:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriCoercionController {
+
+    @GetMapping("/uriExample")
+    public Map<String, String> getUriExample() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // toUriExample
+        URI uri = URI.create("https://www.google.com/");
+        result.put("toUriExample", uri.toString());
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "toUriExample": "https://www.google.com/"
+}
+
+
+

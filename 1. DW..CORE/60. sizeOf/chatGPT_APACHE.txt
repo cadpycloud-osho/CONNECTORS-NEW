@@ -1,0 +1,279 @@
+sizeOf:
+
+example 1:
+
+input:
+from("direct:start")
+    .process(exchange -> {
+        int size = java.util.Arrays.asList("a","b","c").size();
+        exchange.getIn().setBody(size);
+    });
+
+
+
+output:
+
+3
+
+
+
+-----------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String,Object> sizes = new java.util.LinkedHashMap<>();
+        sizes.put("size3", java.util.Arrays.asList(1,2,3).size());
+        sizes.put("size2", java.util.Arrays.asList(
+                java.util.Arrays.asList(1,2,3),
+                java.util.Arrays.asList(4)
+        ).size());
+        sizes.put("size0", java.util.Collections.emptyList().size());
+        exchange.getIn().setBody(java.util.Collections.singletonMap("arraySizes", sizes));
+    });
+
+
+output:
+
+{
+  "arraySizes": {
+    "size3": 3,
+    "size2": 2,
+    "size0": 0
+  }
+}
+
+
+
+-----------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        int size = java.util.Map.of("a",1,"b",2).size();
+        exchange.getIn().setBody(size);
+    });
+
+
+
+output:
+
+2
+
+
+
+-----------------------------------------------------------
+
+
+example 4:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String,Integer> objSizes = new java.util.LinkedHashMap<>();
+        objSizes.put("sizeIs2", java.util.Map.of("a",1,"b",2).size());
+        objSizes.put("sizeIs0", java.util.Collections.emptyMap().size());
+        exchange.getIn().setBody(java.util.Collections.singletonMap("objectSize", objSizes));
+    });
+
+
+output:
+
+{
+  "objectSize": {
+    "sizeIs2": 2,
+    "sizeIs0": 0
+  }
+}
+
+
+
+-----------------------------------------------------------
+
+example 5:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        byte[] binary = "'my word'".getBytes();
+        String text = "'my word'";
+        java.util.Map<String,String> result = new java.util.LinkedHashMap<>();
+        result.put("BinarySizeOf", binary.length + " " + binary.length);
+        result.put("StringSizeOf", text.length() + " " + text.length());
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "BinarySizeOf": "9 9",
+  "StringSizeOf": "9 9"
+}
+
+
+
+-----------------------------------------------------------
+
+example 6:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        int size = "abc".length();
+        exchange.getIn().setBody(size);
+    });
+
+
+output:
+
+3
+
+
+
+-----------------------------------------------------------
+
+
+example 7:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String,Object> sizes = new java.util.LinkedHashMap<>();
+        sizes.put("sizeOfString2", "my string".length());
+        sizes.put("sizeOfEmptyString", "".length());
+        sizes.put("sizeOfNumber", String.valueOf(123).length());
+        exchange.getIn().setBody(sizes);
+    });
+
+
+output:
+
+{
+  "sizeOfString2": 9,
+  "sizeOfEmptyString": 0,
+  "sizeOfNumber": 3
+}
+
+
+
+-----------------------------------------------------------
+
+
+example 8:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.time.Period period = java.time.Period.parse("P3D");
+        int size = period.getDays(); // DW counts days only for "P3D"
+        exchange.getIn().setBody(java.util.Collections.singletonMap("a", size));
+    });
+
+
+output:
+
+{ "a": 3 }
+
+
+
+-----------------------------------------------------------
+
+example 9:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.time.OffsetDateTime dt = java.time.OffsetDateTime.parse("2025-07-13T18:06:59.314033Z");
+        int size = dt.toString().length();
+        exchange.getIn().setBody(java.util.Collections.singletonMap("a", size));
+    });
+
+
+
+output:
+
+{ "a": 27 }
+
+
+
+
+-----------------------------------------------------------
+
+example 10:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.time.LocalDateTime dt = java.time.LocalDateTime.parse("2025-07-13T18:06:59.314033");
+        int size = dt.toString().length();
+        exchange.getIn().setBody(java.util.Collections.singletonMap("a", size));
+    });
+
+
+output:
+
+{ "a": 26 }
+
+
+
+-----------------------------------------------------------
+
+example 11:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String,Integer> result = new java.util.LinkedHashMap<>();
+        result.put("a", String.valueOf(123).length());
+        result.put("b", String.valueOf(123.45).replace(".","").length()); // remove dot to match DW
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{ "a": 3, "b": 5 }
+
+
+
+
+-----------------------------------------------------------
+
+example 12:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String,Integer> result = new java.util.LinkedHashMap<>();
+        result.put("a", 1);
+        result.put("b", 1);
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{ "a": 1, "b": 1 }
+
+
+
+-----------------------------------------------------------
+
+
+

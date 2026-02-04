@@ -1,0 +1,66 @@
+toLocalDateTimeOrNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DateTimeConversionOrNullRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    String inputDate = "2003-10-01 23:57:59";
+                    
+                    // Equivalent to 'a': toLocalDateTimeOrNull with multiple formats
+                    DateTimeFormatter[] formatsA = {
+                        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                    };
+                    result.put("a", parseDateTimeOrNull(inputDate, formatsA));
+                    
+                    // Equivalent to 'b': toLocalDateTimeOrNull with single format
+                    DateTimeFormatter[] formatsB = {
+                        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+                    };
+                    result.put("b", parseDateTimeOrNull(inputDate, formatsB));
+                    
+                    exchange.getIn().setBody(result);
+                }
+                
+                private String parseDateTimeOrNull(String dateStr, DateTimeFormatter[] formatters) {
+                    for (DateTimeFormatter formatter : formatters) {
+                        try {
+                            LocalDateTime parsed = LocalDateTime.parse(dateStr, formatter);
+                            return parsed.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                        } catch (DateTimeParseException ignored) {
+                            // Continue to next format
+                        }
+                    }
+                    return null;
+                }
+            });
+    }
+}
+
+
+output:
+
+{
+  "a": "2003-10-01T23:57:59",
+  "b": null
+}
+
+
+

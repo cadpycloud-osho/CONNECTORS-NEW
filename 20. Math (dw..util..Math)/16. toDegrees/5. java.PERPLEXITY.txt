@@ -1,0 +1,46 @@
+toDegrees:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = executeToDegreesTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Double> executeToDegreesTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("toDegrees0.17", toDegrees(0.174));
+        result.put("toDegrees0", toDegrees(0.0));
+        result.put("toDegrees-20", toDegrees(-0.20));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave toDegrees() equivalent:
+     * Converts radians to degrees: degrees = radians * (180/π)
+     */
+    public static Double toDegrees(double radians) {
+        return Math.toDegrees(radians);
+    }
+}
+
+
+
+output:
+
+{
+  toDegrees0.17=9.969465635276324,
+  toDegrees0=0.0,
+  toDegrees-20=-11.459155902616464
+}
+
+

@@ -1,0 +1,57 @@
+toLocalTimeOrNull:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+public class LocalTimeOrNullRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceLocalTimeOrNull")
+            .process(exchange -> {
+                String input = "23:57:59";
+
+                // Pattern list A: Includes a fallback that matches
+                List<DateTimeFormatter> listA = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.n"),
+                    DateTimeFormatter.ofPattern("HH:mm:ss")
+                );
+
+                // Pattern list B: No matching pattern
+                List<DateTimeFormatter> listB = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.n")
+                );
+
+                exchange.getIn().setBody(Map.of(
+                    "a", parseTimeOrNull(input, listA),
+                    "b", parseTimeOrNull(input, listB)
+                ));
+            });
+    }
+
+    private LocalTime parseTimeOrNull(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalTime.parse(input, formatter);
+            } catch (Exception ignored) {
+                // Move to next formatter
+            }
+        }
+        return null; // Equivalent to toLocalTimeOrNull
+    }
+}
+
+output:
+
+{
+  a: |23:57:59| as LocalTime {format: "HH:mm:ss"},
+  b: null
+}
+

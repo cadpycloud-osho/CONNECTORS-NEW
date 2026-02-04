@@ -1,0 +1,189 @@
+outerJoin:
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String[] users = {
+            "{\"id\":\"1\",\"name\":\"Mariano\"}",
+            "{\"id\":\"2\",\"name\":\"Leandro\"}",
+            "{\"id\":\"3\",\"name\":\"Julian\"}",
+            "{\"id\":\"5\",\"name\":\"Julian\"}"
+        };
+        
+        String[] products = {
+            "{\"ownerId\":\"1\",\"name\":\"DataWeave\"}",
+            "{\"ownerId\":\"1\",\"name\":\"BAT\"}",
+            "{\"ownerId\":\"3\",\"name\":\"DataSense\"}",
+            "{\"ownerId\":\"4\",\"name\":\"SmartConnectors\"}"
+        };
+        
+        List<String> result = new ArrayList<>();
+        Set<String> matchedOwnerIds = new HashSet<>();
+        
+        // Left join portion: all users with matches
+        for (String user : users) {
+            String userId = getValue(user, "id");
+            boolean hasMatch = false;
+            
+            for (String product : products) {
+                if (userId.equals(getValue(product, "ownerId"))) {
+                    result.add(String.format("{\"l\":%s,\"r\":%s}", user, product));
+                    matchedOwnerIds.add(getValue(product, "ownerId"));
+                    hasMatch = true;
+                }
+            }
+            
+            // Unmatched users (left-only)
+            if (!hasMatch) {
+                result.add(String.format("{\"l\":%s}", user));
+            }
+        }
+        
+        // Right-only: unmatched products
+        for (String product : products) {
+            if (!matchedOwnerIds.contains(getValue(product, "ownerId"))) {
+                result.add(String.format("{\"r\":%s}", product));
+            }
+        }
+        
+        System.out.println("[\n" + String.join(",\n", result).replace("{", "  {\n    ").replace("}", "\n  }") + "\n]");
+    }
+    
+    private static String getValue(String json, String key) {
+        int start = json.indexOf("\"" + key + "\":\"") + key.length() + 4;
+        int end = json.indexOf("\"", start);
+        return json.substring(start, end);
+    }
+}
+
+
+
+output:
+
+[
+  {
+    "l": {"id": "1", "name": "Mariano"},
+    "r": {"ownerId": "1", "name": "DataWeave"}
+  },
+  {
+    "l": {"id": "1", "name": "Mariano"},
+    "r": {"ownerId": "1", "name": "BAT"}
+  },
+  {
+    "l": {"id": "2", "name": "Leandro"}
+  },
+  {
+    "l": {"id": "3", "name": "Julian"},
+    "r": {"ownerId": "3", "name": "DataSense"}
+  },
+  {
+    "l": {"id": "5", "name": "Julian"}
+  },
+  {
+    "r": {"ownerId": "4", "name": "SmartConnectors"}
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional full outer join using Streams, tracking matches with a collector.
+
+java
+
+
+
+import java.util.*;
+import java.util.stream.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String[] users = {
+            "{\"id\":\"1\",\"name\":\"Mariano\"}",
+            "{\"id\":\"2\",\"name\":\"Leandro\"}",
+            "{\"id\":\"3\",\"name\":\"Julian\"}",
+            "{\"id\":\"5\",\"name\":\"Julian\"}"
+        };
+        
+        String[] products = {
+            "{\"ownerId\":\"1\",\"name\":\"DataWeave\"}",
+            "{\"ownerId\":\"1\",\"name\":\"BAT\"}",
+            "{\"ownerId\":\"3\",\"name\":\"DataSense\"}",
+            "{\"ownerId\":\"4\",\"name\":\"SmartConnectors\"}"
+        };
+        
+        // Collect all users and products into lists for streaming
+        List<String> userList = Arrays.asList(users);
+        List<String> productList = Arrays.asList(products);
+        
+        Set<String> matchedIds = new HashSet<>();
+        
+        // Left join + matches
+        List<String> leftJoinResult = userList.stream()
+            .flatMap(user -> productList.stream()
+                .filter(p -> getValue(user, "id").equals(getValue(p, "ownerId")))
+                .peek(p -> matchedIds.add(getValue(p, "ownerId")))
+                .map(p -> String.format("{\"l\":%s,\"r\":%s}", user, p)))
+            .toList();
+        
+        // Left-only records
+        List<String> leftOnly = userList.stream()
+            .filter(u -> productList.stream().noneMatch(p -> getValue(u, "id").equals(getValue(p, "ownerId"))))
+            .map(u -> String.format("{\"l\":%s}", u))
+            .toList();
+        
+        // Right-only records
+        List<String> rightOnly = productList.stream()
+            .filter(p -> !matchedIds.contains(getValue(p, "ownerId")))
+            .map(p -> String.format("{\"r\":%s}", p))
+            .toList();
+        
+        // Combine all
+        List<String> finalResult = new ArrayList<>();
+        finalResult.addAll(leftJoinResult);
+        finalResult.addAll(leftOnly);
+        finalResult.addAll(rightOnly);
+        
+        System.out.println("[\n" + 
+            String.join(",\n", finalResult).replace("{", "  {\n    ").replace("}", "\n  }") + 
+            "\n]");
+    }
+    
+    private static String getValue(String json, String key) {
+        int start = json.indexOf("\"" + key + "\":\"") + key.length() + 4;
+        int end = json.indexOf("\"", start);
+        return json.substring(start, end);
+    }
+}
+

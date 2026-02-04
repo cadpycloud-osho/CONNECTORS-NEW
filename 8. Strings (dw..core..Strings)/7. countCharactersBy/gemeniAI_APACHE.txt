@@ -1,0 +1,30 @@
+countCharactersBy:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class CountCharactersRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:countNumericChars")
+            .process(exchange -> {
+                String input = "42 = 11 * 2 + 20";
+
+                // Use Java Streams to filter and count
+                long count = input.chars()
+                                  .filter(c -> Character.isDigit((char) c))
+                                  .count();
+
+                // Set the result as the message body
+                exchange.getIn().setBody(count);
+            });
+    }
+}
+
+output:
+
+
+7

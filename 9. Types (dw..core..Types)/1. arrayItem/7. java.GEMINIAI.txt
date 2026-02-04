@@ -1,0 +1,52 @@
+arrayItem:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Pure Java method to mimic the DataWeave arrayItem function's behavior.
+     */
+    public static String arrayItem(String typeName) {
+        // Direct implementation of the transformation logic
+        return switch (typeName) {
+            case "ArrayOfString" -> "String";
+            case "ArrayOfNumber" -> "Number";
+            case "ArrayOfAny", "ArrayOfAnyDefault" -> "Any";
+            default -> "Unknown";
+        };
+    }
+
+    public static void main(String[] args) {
+        // 1. Define the input types (mimicking the DW type imports)
+        final String ArrayOfString = "ArrayOfString";
+        final String ArrayOfNumber = "ArrayOfNumber";
+        final String ArrayOfAny = "ArrayOfAny";
+        final String ArrayOfAnyDefault = "ArrayOfAnyDefault";
+
+        // 2. Perform the transformation and store the result
+        Map<String, String> result = new HashMap<>();
+        result.put("a", arrayItem(ArrayOfString));
+        result.put("b", arrayItem(ArrayOfNumber));
+        result.put("c", arrayItem(ArrayOfAny));
+        result.put("d", arrayItem(ArrayOfAnyDefault));
+
+        // 3. Print the result as JSON-like output (using Java's Map structure)
+        System.out.println("DataWeave Output Emulation:");
+        System.out.println(result.toString().replace("=", ": ")); 
+        // Note: This is a simple print; a real JSON library (like Jackson) 
+        // would be used for formal JSON output.
+    }
+}
+
+output:
+
+
+{a: String, b: Number, c: Any, d: Any}
+

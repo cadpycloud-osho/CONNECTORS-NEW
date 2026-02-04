@@ -1,0 +1,69 @@
+every:
+
+input:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class EveryDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EveryDemoApplication.class, args);
+    }
+}
+
+@RestController
+class EveryController {
+    
+    @GetMapping("/every")
+    public Map<String, List<Map<String, List<Boolean>>>> everyExample() {
+        List<Integer> arr0 = new ArrayList<>(); // empty array
+        
+        // OK cases - all true
+        List<Boolean> okResults = Arrays.asList(
+            Arrays.asList(1,1,1).stream().allMatch(x -> x == 1),
+            Arrays.asList(1).stream().allMatch(x -> x == 1)
+        );
+        
+        // ERR cases - all false  
+        List<Boolean> errResults = Arrays.asList(
+            Arrays.asList(1,2,3).stream().allMatch(x -> (x % 2) == 1),  // stops at 2
+            Arrays.asList(1,1,0).stream().allMatch(x -> x == 1),       // fails at 0
+            Arrays.asList(0,1,1,0).stream().allMatch(x -> x == 1),     // fails at first 0
+            Arrays.asList(1,2,3).stream().allMatch(x -> x == 1),       // fails at 2
+            arr0.stream().allMatch(x -> true)                          // empty = true
+        );
+        
+        Map<String, List<Boolean>> ok = new HashMap<>();
+        ok.put("ok", okResults);
+        
+        Map<String, List<Boolean>> err = new HashMap<>();
+        err.put("err", errResults);
+        
+        Map<String, List<Map<String, List<Boolean>>>> results = new HashMap<>();
+        results.put("results", Arrays.asList(ok, err));
+        
+        return results;
+    }
+}
+
+
+output:
+
+
+{
+  "results": [
+    {
+      "ok": [true, true]
+    },
+    {
+      "err": [false, false, false, false, true]
+    }
+  ]
+}
+
+

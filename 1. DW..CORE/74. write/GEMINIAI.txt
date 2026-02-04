@@ -1,0 +1,104 @@
+write:
+
+
+example 1:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class WriteExample1 {
+    public static void main(String[] args) {
+        
+        // The DataWeave 'write("world", "text/plain")' results in the string "world".
+        String resultString = "world";
+
+        // Map to mimic the final JSON object structure { "hello": "world" }
+        Map<String, String> outputMap = new LinkedHashMap<>();
+        outputMap.put("hello", resultString);
+        
+        System.out.println("--- DWL Example 1 Output (text/plain) ---");
+        System.out.println(outputMap);
+    }
+}
+
+output:
+
+{hello=world}
+-------------------------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class WriteExample2 {
+
+    // Represents the structure of the input data
+    static class Employee {
+        String name;
+        String email;
+        String id;
+        String title;
+
+        public Employee(String name, String email, String id, String title) {
+            this.name = name;
+            this.email = email;
+            this.id = id;
+            this.title = title;
+        }
+
+        // Returns the values in the required order for CSV
+        public String toCsvRow(String separator) {
+            return name + separator + email + separator + id + separator + title;
+        }
+    }
+
+    public static void main(String[] args) {
+        // --- 1. Input Data (Equivalent to DWL Payload) ---
+        List<Employee> payload = Arrays.asList(
+            new Employee("Mr White", "white@mulesoft.com", "1234", "Chief Java Prophet"),
+            new Employee("Mr Orange", "orange@mulesoft.com", "4567", "Integration Ninja")
+        );
+        
+        // --- 2. Replication of write(payload, "application/csv", {"header":true, "separator" : "|"}) ---
+        String separator = "|";
+        String header = "Name|Email|Id|Title";
+
+        // Generate the CSV rows
+        String csvBody = payload.stream()
+                                .map(e -> e.toCsvRow(separator))
+                                .collect(Collectors.joining("\n"));
+        
+        // Combine header and body
+        String finalCsvContent = header + "\n" + csvBody;
+
+        // --- 3. Final XML Output ---
+        // Construct the final XML string
+        String xmlOutput = "<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n" +
+                           "<output>" + finalCsvContent + "\n" +
+                           "</output>";
+
+        System.out.println("--- DWL Example 2 Output (CSV to XML) ---");
+        System.out.println(xmlOutput);
+    }
+}
+
+output:
+
+--- DWL Example 2 Output (CSV to XML) ---
+<?xml version="1.0" encoding="US-ASCII"?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja
+</output>
+-------------------------------------------------------------------
+

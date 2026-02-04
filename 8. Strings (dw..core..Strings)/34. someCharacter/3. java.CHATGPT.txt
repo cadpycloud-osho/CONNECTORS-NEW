@@ -1,0 +1,32 @@
+someCharacter:
+
+
+input:
+
+public class Main {
+
+    public static boolean containsUpperCase(String input) {
+        if (input == null) return false;
+
+        for (char ch : input.toCharArray()) {
+            if (Character.isUpperCase(ch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        boolean result = containsUpperCase("someCharacter");
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+true
+
+
+
+

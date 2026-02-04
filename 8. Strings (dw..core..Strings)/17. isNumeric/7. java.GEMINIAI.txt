@@ -1,0 +1,78 @@
+isNumeric:
+
+
+
+input:
+
+// Corrected class name capitalization from 'main' to 'Main'
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's isNumeric(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY numeric digits.
+     */
+    public static boolean isNumericString(String input) {
+        // 1. DataWeave returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // 2. Check every character
+        for (char c : input.toCharArray()) {
+            // Character.isDigit() handles standard digits and many Unicode digit forms.
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        // If the loop completes, all characters are numeric digits.
+        return true;
+    }
+
+    public static void main(String[] args) {
+        // Testing various inputs:
+        boolean a = isNumericString(null);
+        boolean b = isNumericString("");
+        boolean c = isNumericString("  "); // Contains only spaces, not digits -> false
+        boolean d = isNumericString("123");
+        boolean e = isNumericString("१२३"); // Devanagari digits (handled by Character.isDigit)
+        boolean f = isNumericString("12 3"); // Contains space -> false
+        boolean g = isNumericString("ab2c"); // Contains letters -> false
+        boolean h = isNumericString("12-3"); // Contains hyphen -> false
+        boolean i = isNumericString("12.3"); // Contains decimal point -> false
+        boolean j = isNumericString("-123"); // Contains minus sign -> false
+        boolean k = isNumericString("+123"); // Contains plus sign -> false
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c + ",");
+        System.out.println("  \"d\": " + d + ",");
+        System.out.println("  \"e\": " + e + ",");
+        System.out.println("  \"f\": " + f + ",");
+        System.out.println("  \"g\": " + g + ",");
+        System.out.println("  \"h\": " + h + ",");
+        System.out.println("  \"i\": " + i + ",");
+        System.out.println("  \"j\": " + j + ",");
+        System.out.println("  \"k\": " + k);
+        System.out.println("}");
+    }
+}
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+

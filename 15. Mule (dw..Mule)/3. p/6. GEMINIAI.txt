@@ -1,0 +1,44 @@
+p:
+
+# Replicates the Mule property name
+http.port=8081
+
+input:
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PropertyLoggerService implements CommandLineRunner {
+
+    // 1. Inject the property value using @Value (equivalent to Mule::p('http.port'))
+    @Value("${http.port}")
+    private String httpPort;
+
+    // The run method executes automatically after the Spring context is initialized,
+    // simulating the start of a Mule flow.
+    @Override
+    public void run(String... args) throws Exception {
+        // 2. Log the value (equivalent to <logger level="INFO" ... />)
+        System.out.println("--- Spring Boot Property Logger ---");
+        System.out.println("Logger: INFO " + httpPort);
+        System.out.println("-----------------------------------");
+    }
+    
+    // The main application class is also required to bootstrap Spring Boot
+    /* @SpringBootApplication
+    public class Application {
+        public static void main(String[] args) {
+            SpringApplication.run(Application.class, args);
+        }
+    }
+    */
+}
+
+output:
+
+--- Spring Boot Property Logger ---
+Logger: INFO 8081
+-----------------------------------
+

@@ -1,0 +1,36 @@
+localDateTime:
+
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: localDateTime({year: 2012, month: 10, day: 11, hour: 12, minutes: 30, seconds: 40})
+        LocalDateTime newLocalDateTime = LocalDateTime.of(
+            2012, 10, 11,    // year, month, day
+            12, 30, 40       // hour, minute, second
+        );
+        
+        // Output as JSON structure matching DataWeave
+        String output = newLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        System.out.println("{");
+        System.out.println("  \"newLocalDateTime\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "newLocalDateTime": "2012-10-11T12:30:40"
+}
+
+
+
+

@@ -1,0 +1,83 @@
+fromString:
+
+fromString(mimeType: String): Result<MimeType, MimeTypeError>
+
+fromString(mimeType: String): Result<MimeType, MimeTypeError>
+Transforms a MIME type string value representation to a MimeType.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::module::Mime
+output application/json
+---
+fromString("application/json")
+DataWeave
+Output
+{
+  "success": true,
+  "result": {
+      "type": "application",
+      "subtype": "json",
+      "parameters": {}
+  }
+}
+
+
+------------------------------------------------------------------------
+
+
+Source
+%dw 2.0
+import * from dw::module::Mime
+output application/json
+---
+fromString("multipart/form-data; boundary=the-boundary")
+DataWeave
+Output
+{
+  "success": true,
+  "result": {
+      "type": "multipart",
+      "subtype": "form-data",
+      "parameters": {
+          "boundary": "the-boundary"
+      }
+  }
+}
+
+------------------------------------------------------------------------
+
+Source
+%dw 2.0
+import * from dw::module::Mime
+output application/json
+---
+fromString("Invalid MIME type")
+DataWeave
+Output
+{
+  "success": false,
+  "error": {
+      "message": "Unable to find a sub type in `Invalid MIME type`."
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

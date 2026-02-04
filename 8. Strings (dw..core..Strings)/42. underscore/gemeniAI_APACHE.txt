@@ -1,0 +1,47 @@
+underscore:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import com.google.common.base.CaseFormat;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UnderscoreRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:toSnakeCase")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Note: Java logic usually requires knowing the source format
+                // For a 'catch-all' like DataWeave, a regex is often more flexible:
+                results.put("a", toSnakeCase("customer"));
+                results.put("b", toSnakeCase("customer-first-name"));
+                results.put("c", toSnakeCase("customer NAME"));
+                results.put("d", toSnakeCase("customerName"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    private String toSnakeCase(String input) {
+        if (input == null) return null;
+        return input
+            .replaceAll("([a-z])([A-Z])", "$1_$2") // Handle CamelCase
+            .replaceAll("[\\s\\-]+", "_")          // Handle Spaces and Hyphens
+            .toLowerCase();
+    }
+}
+
+output:
+
+{
+   "a": "customer",
+   "b": "customer_first_name",
+   "c": "customer_name",
+   "d": "customer_name"
+}
+

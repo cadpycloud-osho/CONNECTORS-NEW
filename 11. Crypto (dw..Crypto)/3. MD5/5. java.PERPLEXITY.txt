@@ -1,0 +1,40 @@
+MD5:
+
+
+input:
+
+import java.security.MessageDigest;
+
+public class Main {
+
+    public static void main(String[] args) {
+        String input = "asd";
+        String md5Hex = computeMD5Hex(input);
+        System.out.println("{ \"md5\": \"" + md5Hex + "\" }");
+    }
+
+    public static String computeMD5Hex(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(input.getBytes());
+            return bytesToHex(digest);
+        } catch (Exception e) {
+            throw new RuntimeException("MD5 computation failed", e);
+        }
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+{ "md5": "7815696ecbf1c96e6894b779456d330e" }
+
+

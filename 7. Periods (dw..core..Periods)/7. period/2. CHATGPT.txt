@@ -1,0 +1,59 @@
+period:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.*;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class PeriodController {
+
+    @GetMapping("/periods")
+    public Map<String, Object> getPeriods() {
+
+        Map<String, Object> result = new HashMap<>();
+
+        // Original DataWeave operations
+        ZonedDateTime dateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        result.put("dayBeforeDateTime", dateTime.minusDays(1).toString());
+
+        LocalDate date = LocalDate.parse("2020-10-05");
+        result.put("dayAfterDate", date.plusDays(1).toString());
+
+        result.put("yearMonthDayAfterDate",
+                date.plusYears(1).plusMonths(1).plusDays(1).toString());
+
+        Period emptyPeriod = Period.of(0,0,0);
+        result.put("emptyPeriod", emptyPeriod.toString());
+
+        Period constructPeriod = Period.of(4,11,28);
+        result.put("constructPeriod", constructPeriod.toString());
+
+        int selectedMonths = constructPeriod.getMonths();
+        result.put("selectMonthsFromPeriod", selectedMonths);
+
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+  "dayAfterDate": "2020-10-06",
+  "yearMonthDayAfterDate": "2021-11-06",
+  "emptyPeriod": "P0D",
+  "constructPeriod": "P4Y11M28D",
+  "selectMonthsFromPeriod": 11
+}
+
+

@@ -1,0 +1,27 @@
+tomorrow:
+
+tomorrow(): Date
+
+tomorrow(): Date
+Returns the date for tomorrow as a Date type.
+
+
+Source
+%dw 2.0
+import tomorrow from dw::core::Dates
+output application/json
+---
+tomorrow()
+
+DataWeave
+Output
+"2021-05-16"
+
+
+
+
+
+
+
+
+

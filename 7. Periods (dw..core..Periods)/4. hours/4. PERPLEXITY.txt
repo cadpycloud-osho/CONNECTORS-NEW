@@ -1,0 +1,68 @@
+hours:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class HoursController {
+
+    private static final DateTimeFormatter INSTANT_FMT = DateTimeFormatter.ISO_INSTANT;
+    private static final Instant BASE_INSTANT = Instant.parse("2020-10-05T20:22:34.385Z");
+    private static final LocalTime BASE_TIME = LocalTime.parse("20:22");
+
+    @GetMapping("/hours")
+    public Map<String, Object> getHours() {
+        Instant nextHour = BASE_INSTANT.plus(Duration.ofHours(1));
+        Instant previousHour = BASE_INSTANT.minus(Duration.ofHours(1));
+
+        LocalTime threeHoursLater = BASE_TIME.plusHours(3).withSecond(0).withNano(0);
+
+        double addHoursDecimal = 3.5;
+        long secondsToAdd = Math.round(addHoursDecimal * 3600.0);
+        LocalTime addDecimalInput = BASE_TIME.plusSeconds(secondsToAdd).withSecond(0).withNano(0);
+
+        double decimalHours = 4.555;
+        long decimalSeconds = Math.round(decimalHours * 3600.0);
+        Duration decimalInputAsDuration = Duration.ofSeconds(decimalSeconds);
+
+        Duration fourHourPeriod = Duration.ofHours(4);
+
+        Duration addNegativeValueDuration = Duration.ofHours(-1).plus(Duration.ofHours(2));
+        long addNegativeValueSeconds = addNegativeValueDuration.getSeconds();
+
+        Map<String,Object> m = new LinkedHashMap<>();
+        m.put("nextHour", INSTANT_FMT.format(nextHour));
+        m.put("previousHour", INSTANT_FMT.format(previousHour));
+        m.put("threeHoursLater", threeHoursLater.toString());
+        m.put("addDecimalInput", addDecimalInput.toString());
+        m.put("decimalInputAsPeriod", decimalInputAsDuration.toString());
+        m.put("fourHourPeriod", fourHourPeriod.toString());
+        m.put("addNegativeValue", addNegativeValueSeconds);
+
+        return m;
+    }
+}
+
+
+output:
+
+{
+"nextHour": "2020-10-05T21:22:34.385Z",
+"previousHour": "2020-10-05T19:22:34.385Z",
+"threeHoursLater": "23:22:00",
+"addDecimalInput": "23:52:00",
+"decimalInputAsPeriod": "PT4H33M18S",
+"fourHourPeriod": "PT4H",
+"addNegativeValue": 3600
+}

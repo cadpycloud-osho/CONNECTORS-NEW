@@ -1,0 +1,56 @@
+isAttributeType:
+
+isAttributeType(path: Path): Boolean
+
+isAttributeType(path: Path): Boolean
+Returns true if the provided Path value is an ATTRIBUTE_TYPE expression.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Tree
+output application/json
+---
+{
+  a: isAttributeType([{kind: OBJECT_TYPE, selector: "user", namespace: null},
+                      {kind: ATTRIBUTE_TYPE, selector: "name", namespace: null}]),
+  b: isAttributeType([{kind: OBJECT_TYPE, selector: "user", namespace: null},
+                      {kind: ARRAY_TYPE, selector: "name", namespace: null}]),
+  c: isAttributeType([{kind: ATTRIBUTE_TYPE, selector: "name", namespace: null}])
+}
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": false,
+  "c": true
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

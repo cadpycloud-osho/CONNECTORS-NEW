@@ -1,0 +1,70 @@
+collapse:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
+public class CollapseController {
+
+    @GetMapping("/collapse")
+    public List<String> collapseText() {
+
+        String input = "a  b babb a";
+        List<String> result = new ArrayList<>();
+
+        // Implementing DataWeave collapse logic
+        StringBuilder current = new StringBuilder();
+        current.append(input.charAt(0));
+
+        for (int i = 1; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            if (c == current.charAt(0)) {
+                current.append(c); // same char → accumulate
+            } else {
+                result.add(current.toString());
+                current = new StringBuilder();
+                current.append(c);
+            }
+        }
+
+        result.add(current.toString());  // add last segment
+        return result;
+    }
+}
+
+
+
+output:
+
+
+[
+  "a",
+  "  ",
+  "b",
+  " ",
+  "b",
+  "a",
+  "bb",
+  " ",
+  "a"
+]
+
+
+
+
+
+
+
+
+
+
+

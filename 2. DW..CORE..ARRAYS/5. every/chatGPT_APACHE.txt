@@ -1,0 +1,48 @@
+every:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+
+        // Inputs
+        java.util.List<Integer> arr0 = java.util.List.of();
+
+        java.util.List<Boolean> ok = java.util.List.of(
+            java.util.List.of(1, 1, 1).stream().allMatch(i -> i == 1),
+            java.util.List.of(1).stream().allMatch(i -> i == 1)
+        );
+
+        java.util.List<Boolean> err = java.util.List.of(
+            java.util.List.of(1, 2, 3).stream().allMatch(i -> (i % 2) == 1),
+            java.util.List.of(1, 1, 0).stream().allMatch(i -> i == 1),
+            java.util.List.of(0, 1, 1, 0).stream().allMatch(i -> i == 1),
+            java.util.List.of(1, 2, 3).stream().allMatch(i -> i == 1),
+            arr0.stream().allMatch(i -> true)
+        );
+
+        java.util.List<Object> results = java.util.List.of(
+            java.util.Map.of("ok", ok),
+            java.util.Map.of("err", err)
+        );
+
+        exchange.getIn().setBody(java.util.Map.of("results", results));
+    });
+
+
+
+output:
+
+{
+  "results": [
+    {
+      "ok": [true, true]
+    },
+    {
+      "err": [false, false, false, false, false]
+    }
+  ]
+}
+
+

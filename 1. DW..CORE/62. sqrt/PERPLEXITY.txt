@@ -1,0 +1,66 @@
+sqrt:
+
+input:
+
+1. Square root of 4
+@RestController
+class Example1_Sqrt4 {
+
+    @GetMapping("/sqrt4")
+    public double sqrt4() {
+        return Math.sqrt(4);
+    }
+}
+
+Output:
+2.0
+
+2. Square root of 25
+
+@RestController
+class Example2_Sqrt25 {
+
+    @GetMapping("/sqrt25")
+    public double sqrt25() {
+        return Math.sqrt(25);
+    }
+}
+
+Output:
+5.0
+
+3. Square root of 100
+
+@RestController
+class Example3_Sqrt100 {
+
+    @GetMapping("/sqrt100")
+    public double sqrt100() {
+        return Math.sqrt(100);
+    }
+}
+
+
+Output:
+10.0
+
+
+
+Bonus: Square roots as a list (combined example)
+@RestController
+class Example4_SqrtList {
+
+    @GetMapping("/sqrtList")
+    public List<Double> sqrtList() {
+        List<Integer> numbers = List.of(4, 25, 100);
+        return numbers.stream()
+                .map(Math::sqrt)
+                .collect(Collectors.toList());
+    }
+}
+
+
+output:
+
+[2.0, 5.0, 10.0]
+

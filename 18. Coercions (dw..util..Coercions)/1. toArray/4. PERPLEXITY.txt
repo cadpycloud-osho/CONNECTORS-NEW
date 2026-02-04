@@ -1,0 +1,43 @@
+toArray:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CoercionsController {
+    
+    @GetMapping("/coercions")
+    public CoercionsResponse getCoercions() {
+        return new CoercionsResponse(
+            StringUtils.toCharArray(""),
+            StringUtils.toCharArray("hola")
+        );
+    }
+    
+    public static class CoercionsResponse {
+        public char[] a;
+        public char[] b;
+        
+        public CoercionsResponse(char[] a, char[] b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+
+output:
+
+
+{"a":[],"b":["h","o","l","a"]}
+
+
+

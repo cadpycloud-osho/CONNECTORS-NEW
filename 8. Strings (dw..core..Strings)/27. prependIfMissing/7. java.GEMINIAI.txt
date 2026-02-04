@@ -1,0 +1,62 @@
+prependIfMissing:
+
+
+
+input:
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = PrependUtil.prependIfMissing(null, "");
+        String b = PrependUtil.prependIfMissing("abc", "");
+        String c = PrependUtil.prependIfMissing("", "xyz");
+        String d = PrependUtil.prependIfMissing("abc", "xyz");
+        String e = PrependUtil.prependIfMissing("xyzabc", "xyz");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure.
+        // String.format will print "null" as a string if we pass a null reference.
+        // We must manually handle the conversion to the JSON literal 'null' for key 'a'.
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": \"%s\",\n  \"c\": \"%s\",\n  \"d\": \"%s\",\n  \"e\": \"%s\"\n}",
+            // Manual conversion: if 'a' is null, use the string "null" (without quotes)
+            a == null ? "null" : "\"" + a + "\"", 
+            b, 
+            c, 
+            d, 
+            e
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class PrependUtil {
+        public static String prependIfMissing(String str, String prefix) {
+            // 1. DataWeave Rule: If the input string is null, return null.
+            if (str == null) {
+                return null;
+            }
+
+            // 2. Check if the string already starts with the prefix.
+            if (str.startsWith(prefix)) {
+                return str;
+            }
+
+            // 3. Otherwise, prepend the prefix.
+            return prefix + str;
+        }
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+

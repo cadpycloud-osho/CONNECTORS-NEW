@@ -1,0 +1,39 @@
+wait:
+
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class WaitController {
+
+    @GetMapping("/waitExample")
+    public Map<String, Integer> waitExample() {
+
+        try {
+            Thread.sleep(2000); // equivalent to DW: wait 2000 (2 seconds)
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return Collections.singletonMap("user", 1);
+    }
+}
+
+
+output:
+
+
+{
+  "user": 1
+}
+

@@ -1,0 +1,41 @@
+baseTypeOf:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BaseTypeExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", baseTypeOf("String {format: \"YYYY-MM-dd\"}"));
+
+        System.out.println(result);
+    }
+
+    public static String baseTypeOf(String type) {
+        if (type == null || type.isEmpty()) {
+            return "Any";
+        }
+        // Extract base type before any metadata/annotations
+        int braceIndex = type.indexOf('{');
+        if (braceIndex != -1) {
+            return type.substring(0, braceIndex).trim();
+        }
+        return type.trim();
+    }
+}
+
+
+
+output:
+
+{
+  "a": "String"
+}
+
+
+
+

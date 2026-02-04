@@ -1,0 +1,19 @@
+indexOf:
+
+indexOf<T>(array: Array<T>, toFind: T): Number
+
+indexOf<T>(array: Array<T>, toFind: T): Number
+Returns the index of the first occurrence of an element within the array. If the value is not found, the function returns -1.
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var users = ["Mariano", "Leandro", "Julian"]
+---
+indexOf(users, "Julian")
+
+DataWeave
+Output
+2

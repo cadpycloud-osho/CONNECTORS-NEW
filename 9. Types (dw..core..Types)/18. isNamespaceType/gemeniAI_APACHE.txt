@@ -1,0 +1,51 @@
+isNamespaceType:
+
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import javax.xml.namespace.QName;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class NamespaceCheckRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkNamespace")
+            .process(exchange -> {
+                // In Java/Camel, we represent Namespaces via QName or specific Namespace classes
+                Object typeA = QName.class;
+                Object typeB = new QName("http://example.com", "local");
+                Object typeC = "http://example.com"; // Just a String
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Verify if the object represents a Namespace structure
+                result.put("a", isNamespace(typeA));
+                result.put("b", isNamespace(typeB));
+                result.put("c", isNamespace(typeC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isNamespace(Object obj) {
+        if (obj == null) return false;
+        // Check if it's the QName class or an instance of a QName
+        return obj instanceof QName || obj.equals(QName.class);
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

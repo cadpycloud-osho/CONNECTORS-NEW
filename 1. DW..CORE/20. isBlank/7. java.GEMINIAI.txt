@@ -1,0 +1,88 @@
+
+
+isBlank:
+
+
+
+input:
+
+import java.util.Objects;
+
+public class Main {
+
+    // --- Utility method to replicate DataWeave's isBlank() behavior ---
+    /**
+     * Replicates DataWeave's isBlank function: returns true if the string is null, empty, or only whitespace.
+     * Note: In DataWeave, accessing a non-existent payload field (like payload.nonExistingValue) returns null.
+     */
+    public static boolean isBlank(String str) {
+        // 1. Checks if the string is null (DW returns true for null inputs)
+        if (str == null) {
+            return true;
+        }
+        
+        // 2. Checks if the string is empty ("") or contains only whitespace
+        // The Java String.trim().isEmpty() method handles both cases efficiently.
+        return str.trim().isEmpty();
+    }
+
+    public static void main(String[] args) {
+        
+        // DataWeave variable definitions
+        String someString = "something";
+        String nullString = null;
+        
+        // Simulating payload.nonExistingValue, which returns null in DataWeave
+        String nonExistingPayloadValue = null; 
+
+        // --- DataWeave Expressions to be evaluated ---
+        
+        // "emptyString" : isBlank("")
+        boolean emptyString = isBlank("");
+        
+        // "stringWithSpaces" : isBlank("      ")
+        boolean stringWithSpaces = isBlank("       ");
+        
+        // "textString" : isBlank(someString)
+        boolean textString = isBlank(someString);
+        
+        // "somePayloadValue" : isBlank(payload.nonExistingValue)
+        boolean somePayloadValue = isBlank(nonExistingPayloadValue);
+        
+        // "nullString" : isBlank(nullString)
+        boolean isNullString = isBlank(nullString);
+
+        // "notEmptyTextString" : not isBlank(" 1234")
+        boolean notEmptyTextString = !isBlank(" 1234");
+        
+        // "notEmptyTextStringTwo" : ! isBlank("")
+        boolean notEmptyTextStringTwo = !isBlank("");
+
+        // --- Output Generation ---
+        System.out.println("--- DataWeave isBlank() Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{");
+        System.out.println("  \"emptyString\": " + emptyString + ",");
+        System.out.println("  \"stringWithSpaces\": " + stringWithSpaces + ",");
+        System.out.println("  \"textString\": " + textString + ",");
+        System.out.println("  \"somePayloadValue\": " + somePayloadValue + ",");
+        System.out.println("  \"nullString\": " + isNullString + ",");
+        System.out.println("  \"notEmptyTextString\": " + notEmptyTextString + ",");
+        System.out.println("  \"notEmptyTextStringTwo\": " + notEmptyTextStringTwo);
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "emptyString": true,
+  "stringWithSpaces": true,
+  "textString": false,
+  "somePayloadValue": true,
+  "nullString": true,
+  "notEmptyTextString": true,
+  "notEmptyTextStringTwo": false
+}
+

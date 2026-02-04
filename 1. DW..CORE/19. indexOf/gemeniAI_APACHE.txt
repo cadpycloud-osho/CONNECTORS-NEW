@@ -1,0 +1,88 @@
+indexOf:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class IndexOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:findIndices")
+            // 1. Logic to replicate the DataWeave object construction
+            // We define the lists and find the index of "c" for each key
+            .transform().groovy("""
+                def list1 = ["a","b","c","d"]
+                def list2 = ["x","w","x"]
+                def list3 = ["a","b","c","c"]
+                
+                return [
+                    "present": list1.indexOf("c"),
+                    "notPresent": list2.indexOf("c"),
+                    "presentMoreThanOnce": list3.indexOf("c")
+                ]
+            """)
+
+            // 2. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Send to output
+            .to("log:output?showBody=true");
+    }
+}
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+--------------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class StringIndexOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:findStringIndices")
+            // 1. The Pure Camel equivalent of the DataWeave string indexOf logic
+            // We define the strings and calculate indices within a Map
+            .transform().groovy("""
+                return [
+                    "present": "abcd".indexOf("c"),
+                    "notPresent": "xyz".indexOf("c"),
+                    "presentMoreThanOnce": "abcdc".indexOf("c")
+                ]
+            """)
+
+            // 2. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Send to output
+            .to("log:output?showBody=true");
+    }
+}
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+
+--------------------------------------------------------------

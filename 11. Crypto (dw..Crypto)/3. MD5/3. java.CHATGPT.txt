@@ -1,0 +1,41 @@
+MD5:
+
+
+input:
+
+import java.security.MessageDigest;
+
+public class Main {
+
+    public static String md5(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(input.getBytes());
+            byte[] digest = md.digest();
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b));
+            }
+
+            return sb.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void main(String[] args) {
+
+        String result = md5("asd");
+
+        System.out.println("{ \"md5\": \"" + result + "\" }");
+    }
+}
+
+
+output:
+
+{ "md5": "7815696ecbf1c96e6894b779456d330e" }
+
+

@@ -1,0 +1,38 @@
+prependIfMissing:
+
+
+input:
+
+import java.util.*;
+
+public class PrependIfMissingConverter {
+    public static String prependIfMissing(String text, String prefix) {
+        if (text == null) return null;
+        if (prefix == null || prefix.isEmpty()) return text;
+        return text.startsWith(prefix) ? text : prefix + text;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", prependIfMissing(null, ""));
+        result.put("b", prependIfMissing("abc", ""));
+        result.put("c", prependIfMissing("", "xyz"));
+        result.put("d", prependIfMissing("abc", "xyz"));
+        result.put("e", prependIfMissing("xyzabc", "xyz"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+
+

@@ -1,0 +1,32 @@
+pluralize:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class PluralizeController {
+
+    @GetMapping("/pluralize-conversion")
+    public Map<String, String> convertDataWeavePlural() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String pluralizedWord = PluralizeUtil.pluralize("box");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot automatically converts to the required JSON
+        return Map.of(
+            "pluralize", pluralizedWord
+        );
+    }
+}
+
+output:
+
+{
+  "pluralize": "boxes"
+}
+

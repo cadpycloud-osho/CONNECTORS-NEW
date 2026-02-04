@@ -1,0 +1,348 @@
+toString:
+
+
+example 1:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+@RestController
+public class NumberFormatController {
+
+    @GetMapping("/formatNumbers")
+    public Map<String, String> formatNumbers() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: simple conversion
+        result.put("a", Double.toString(1.0));
+
+        // b: 2 decimal places
+        result.put("b", new DecimalFormat(".00").format(0.005));
+
+        // c: 2 decimal places, ES locale (comma)
+        DecimalFormatSymbols esSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
+        result.put("c", new DecimalFormat("#.##", esSymbols).format(0.035));
+
+        // d: rounding HALF_EVEN, ES locale
+        DecimalFormat dfD = new DecimalFormat("#.##", esSymbols);
+        dfD.setRoundingMode(RoundingMode.HALF_EVEN);
+        result.put("d", dfD.format(0.005));
+
+        // e: rounding HALF_EVEN, 2 decimals, default locale
+        DecimalFormat dfE = new DecimalFormat("#.00");
+        dfE.setRoundingMode(RoundingMode.HALF_EVEN);
+        result.put("e", dfE.format(0.035));
+
+        // f: custom pattern with text
+        DecimalFormat dfF = new DecimalFormat("$#.## 'in my account'");
+        dfF.setRoundingMode(RoundingMode.HALF_EVEN);
+        result.put("f", dfF.format(1.1234));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "1",
+  "b": ".01",
+  "c": "0,04",
+  "d": "0",
+  "e": ".04",
+  "f": "$1.12 in my account"
+}
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+@RestController
+public class DateTimeFormattingController {
+
+    @GetMapping("/formatDateTime")
+    public Map<String, String> formatDateTime() {
+        Map<String, String> result = new HashMap<>();
+
+        // aDate
+        LocalDate aDate = LocalDate.parse("2003-10-01");
+        result.put("aDate", aDate.format(DateTimeFormatter.ofPattern("uuuu/MM/dd")));
+
+        // aDateTime
+        OffsetDateTime aDateTime = OffsetDateTime.parse("2018-09-17T22:13:00-03:00");
+        result.put("aDateTime", aDateTime.toString());
+
+        // aLocalTime
+        LocalTime aLocalTime = LocalTime.parse("23:57:59");
+        result.put("aLocalTime", aLocalTime.format(DateTimeFormatter.ofPattern("HH-mm-ss")));
+
+        // aLocalDateTime
+        LocalDateTime aLocalDateTime = LocalDateTime.parse("2015-10-01T23:57:59");
+        result.put("aLocalDateTime", aLocalDateTime.toString());
+
+        // aLocalDateTimeFormatted
+        LocalDateTime aLocalDateTime2 = LocalDateTime.parse("2003-10-01T23:57:59");
+        result.put("aLocalDateTimeFormatted",
+                aLocalDateTime2.format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss a")));
+
+        // aLocalDateTimeFormattedAndLocalizedSpain
+        LocalDateTime aLocalDateTimeSpain = LocalDateTime.parse("2003-01-01T23:57:59");
+        DateTimeFormatter formatterSpain = DateTimeFormatter.ofPattern("eeee, dd MMMM, uuuu HH:mm:ss a", new Locale("es"));
+        result.put("aLocalDateTimeFormattedAndLocalizedSpain", aLocalDateTimeSpain.format(formatterSpain));
+
+        // aTime
+        OffsetTime aTime = OffsetTime.parse("22:10:18Z");
+        result.put("aTime", "Time");
+
+        // aTimeZone
+        ZoneOffset offset = ZoneOffset.of("-03:00");
+        result.put("aTimeZone", offset.toString());
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "aDate": "2003/10/01",
+  "aDateTime": "2018-09-17T22:13:00-03:00",
+  "aLocalTime": "23-57-59",
+  "aLocalDateTime": "2015-10-01T23:57:59",
+  "aLocalDateTimeFormatted": "2003-10-01 23:57:59 PM",
+  "aLocalDateTimeFormattedAndLocalizedSpain": "miércoles, 01 enero, 2003 23:57:59 p. m.",
+  "aTime": "Time",
+  "aTimeZone": "-03:00"
+}
+
+
+---
+
+
+example 3:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class BinaryToStringController {
+
+    @GetMapping("/binaryToString")
+    public Map<String, String> getStringFromBinary() {
+
+        // Simulate DataWeave: "DW Test" as Binary {encoding: "UTF-32"}
+        byte[] binaryData = "DW Test".getBytes(Charset.forName("UTF-32"));
+
+        Map<String, String> result = new HashMap<>();
+        result.put("a", toString(binaryData, "UTF-32"));
+
+        return result;
+    }
+
+    private String toString(byte[] binaryData, String charsetName) {
+        return new String(binaryData, Charset.forName(charsetName));
+    }
+}
+
+
+output:
+
+{
+  "a": "DW Test"
+}
+
+
+---
+
+
+
+example 4:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+import java.time.Period;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+@RestController
+public class ToStringCoercionController {
+
+    @GetMapping("/toString")
+    public Map<String, String> getStringTransformations() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // TimeZone
+        result.put("transformTimeZone", "Z"); // equivalent to |Z| → "Z"
+
+        // Boolean
+        result.put("transformBoolean", Boolean.toString(true));
+
+        // Period P1D
+        result.put("transformPeriod", Period.ofDays(1).toString());
+
+        // Regex /a-Z/
+        result.put("transformRegex", Pattern.compile("a-Z").pattern());
+
+        // Period PT8M10S (Duration)
+        result.put("transformPeriod", Duration.ofMinutes(8).plusSeconds(10).toString());
+
+        // URI
+        result.put("transformUri", URI.create("https://docs.mulesoft.com/").toString());
+
+        // Key of Map
+        Map<String, String> map = new HashMap<>();
+        map.put("aKeyToString", "aValue");
+        String key = map.keySet().iterator().next();
+        result.put("transformKey", key);
+
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "transformTimeZone": "Z",
+  "transformBoolean": "true",
+  "transformPeriod": "PT8M10S",
+  "transformRegex": "a-Z",
+  "transformUri": "https://docs.mulesoft.com/",
+  "transformKey": "aKeyToString"
+}
+
+---
+
+
+
+
+example 5:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+
+@RestController
+public class ToStringController {
+
+    @GetMapping("/toStringArray")
+    public Map<String, String> convertArraysToString() {
+
+        Map<String, String> result = new HashMap<>();
+
+        List<String> emptyList = Arrays.asList(); // []
+        List<String> holaList = Arrays.asList("h", "o", "l", "a");
+
+        result.put("a", toString(emptyList));
+        result.put("b", toString(holaList));
+
+        return result;
+    }
+
+    private String toString(List<String> list) {
+        // Equivalent to DW toString on array → concatenate all elements
+        return list.stream().collect(Collectors.joining());
+    }
+}
+
+
+output:
+
+{
+  "a": "",
+  "b": "hola"
+}
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

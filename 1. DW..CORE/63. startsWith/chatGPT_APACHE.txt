@@ -1,0 +1,24 @@
+startsWith:
+
+
+input:
+
+
+from("direct:start")
+    .process(exchange -> {
+        String str = "Mari";
+        java.util.List<Boolean> result = java.util.Arrays.asList(
+            str.startsWith("Mar"),
+            str.startsWith("Em")
+        );
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+[true, false]
+
+

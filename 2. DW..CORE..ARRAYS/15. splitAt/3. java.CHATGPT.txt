@@ -1,0 +1,40 @@
+splitAt:
+
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> users = List.of("Mariano", "Leandro", "Julian");
+
+        int splitIndex = 1;
+
+        List<String> left = new ArrayList<>(users.subList(0, splitIndex));
+        List<String> right = new ArrayList<>(users.subList(splitIndex, users.size()));
+
+        Map<String, List<String>> result = new LinkedHashMap<>();
+        result.put("l", left);
+        result.put("r", right);
+
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+  "l": ["Mariano"],
+  "r": ["Leandro", "Julian"]
+}
+
+
+

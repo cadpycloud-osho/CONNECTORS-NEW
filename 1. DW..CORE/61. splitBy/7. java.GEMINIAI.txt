@@ -1,0 +1,449 @@
+splitBy:
+
+
+example 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the List of Strings into a JSON array string.
+     */
+    private static String formatListAsJsonArray(List<String> list) {
+        // Collect strings, quoting each one and joining with ", "
+        String quotedElements = list.stream()
+            .map(s -> "\"" + s + "\"")
+            .collect(Collectors.joining(", "));
+            
+        return "[ " + quotedElements + " ]";
+    }
+
+    public static void main(String[] args) {
+        String input = "192.88.99.0/24";
+        
+        // DataWeave: splitBy(/[.\/]/)
+        // Java Regex: [./] splits on literal dot or literal forward slash.
+        String regex = "[./]"; 
+        
+        // Operation: Split the string
+        String[] parts = input.split(regex);
+        List<String> resultList = Arrays.asList(parts);
+        // Result: ["192", "88", "99", "0", "24"]
+        
+        // Output Assembly
+        System.out.println(formatListAsJsonArray(resultList));
+    }
+}
+
+output:
+
+[ "192", "88", "99", "0", "24" ]
+
+------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    /**
+     * Helper method mirroring DataWeave's splitBy behavior, including empty trailing strings.
+     */
+    private static List<String> split(String text, String regex) {
+        // Using -1 limit ensures empty trailing strings are included.
+        // DataWeave's splitBy behavior is generally mirrored by Java's split() with a negative limit.
+        return Arrays.asList(text.split(regex, -1)); 
+    }
+
+    /**
+     * Helper method to manually format the nested Map<String, List<String>> into a pretty-printed JSON string.
+     */
+    private static String formatNestedMapAsPrettyJson(Map<String, Object> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Outer key: "splitters"
+        sb.append("  \"splitters\" : {\n");
+        
+        // Inner map content
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> splitters = (Map<String, List<String>>) output.get("splitters");
+        
+        int i = 0;
+        int size = splitters.size();
+        for (Map.Entry<String, List<String>> entry : splitters.entrySet()) {
+            String key = entry.getKey();
+            List<String> list = entry.getValue();
+
+            // Key: "split1" : [ "a", "c" ]
+            sb.append("    \"").append(key).append("\" : [ ");
+            
+            // Format list elements (must be quoted strings)
+            String quotedElements = list.stream()
+                .map(s -> "\"" + s + "\"")
+                .collect(Collectors.joining(", "));
+            
+            sb.append(quotedElements);
+            sb.append(" ]");
+            
+            if (i < size - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+            i++;
+        }
+        
+        // Close inner object and close outer object
+        sb.append("  }\n").append("}");
+        
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // 1. "a-b-c" splitBy(/.b./)
+        // Regex: .b. matches "-b-", leaves "a" and "c"
+        List<String> split1 = split("a-b-c", ".b.");
+        
+        // 2. "hello world" splitBy(/\s/)
+        // Regex: \s matches whitespace. Note the double backslash in Java string.
+        List<String> split2 = split("hello world", "\\s"); 
+        
+        // 3. "no match" splitBy(/^s/)
+        // Regex: ^s matches 's' only at the start. Since no match, the original string is returned.
+        List<String> split3 = split("no match", "^s"); 
+
+        // 4. "no match" splitBy(/^n../)
+        // Regex: ^n.. matches "no " at the start. Splitting at the start leaves an empty string and "match".
+        List<String> split4 = split("no match", "^n.."); 
+        
+        // 5. "a1b2c3d4A1B2C3D" splitBy(/[0-9A-Z]/)
+        // Regex: [0-9A-Z] matches digits/uppercase letters. Splitting by separators leaves the letters.
+        List<String> split5 = split("a1b2c3d4A1B2C3D", "[0-9A-Z]"); 
+
+        // Output Assembly using standard Java Maps
+        Map<String, List<String>> splitters = new LinkedHashMap<>();
+        splitters.put("split1", split1);
+        splitters.put("split2", split2);
+        splitters.put("split3", split3);
+        splitters.put("split4", split4);
+        splitters.put("split5", split5);
+        
+        Map<String, Object> outputObject = new LinkedHashMap<>();
+        outputObject.put("splitters", splitters);
+        
+        // 3. Output the result
+        System.out.println(formatNestedMapAsPrettyJson(outputObject));
+    }
+}
+
+output:
+
+{
+  "splitters" : {
+    "split1" : [ "a", "c" ],
+    "split2" : [ "hello", "world" ],
+    "split3" : [ "no match" ],
+    "split4" : [ "", "match" ],
+    "split5" : [ "a", "b", "c", "d" ]
+  }
+}
+
+------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "192.88.99.0";
+        
+        // DataWeave: splitBy(".") 
+        // Java Regex: The dot is a special regex character, so it must be escaped with "\\.".
+        String regex = "\\."; 
+        
+        // Operation: Split and access the first element [0]
+        String[] parts = input.split(regex);
+        String result = parts.length > 0 ? parts[0] : "";
+        
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+output:
+
+"192"
+
+------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the List of Strings into a pretty-printed JSON array string.
+     */
+    private static String formatListAsPrettyJsonArray(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\n");
+        
+        int i = 0;
+        int size = list.size();
+        for (String element : list) {
+            // Quote element
+            sb.append("  \"").append(element).append("\"");
+            
+            if (i < size - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+            i++;
+        }
+        
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        String input = "root.sources.data.`test.branch.BranchSource`.source.traits";
+        
+        // DataWeave Regex: /[.](?=(?:[^`]*`[^`]*`)*[^`]*$)/
+        // Java Regex: Splits on '.' only when it's outside of backticks (even number of backticks follow).
+        String regex = "\\.(?=(?:[^`]*`[^`]*`)*[^`]*$)"; 
+        
+        // Operation: Split the string
+        String[] parts = input.split(regex);
+        List<String> resultList = Arrays.asList(parts);
+        
+        // Result: ["root", "sources", "data", "`test.branch.BranchSource`", "source", "traits"]
+        
+        // Output Assembly
+        System.out.println(formatListAsPrettyJsonArray(resultList));
+    }
+}
+
+output:
+
+[
+  "root",
+  "sources",
+  "data",
+  "`test.branch.BranchSource`",
+  "source",
+  "traits"
+]
+
+------------------------------------------------------
+
+
+
+example 5:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the List of Strings into a JSON array string.
+     */
+    private static String formatListAsJsonArray(List<String> list) {
+        // Collect strings, quoting each one and joining with ", "
+        String quotedElements = list.stream()
+            .map(s -> "\"" + s + "\"")
+            .collect(Collectors.joining(", "));
+            
+        // Use a single line format to match the requested output style
+        return "[ " + quotedElements + " ]";
+    }
+
+    public static void main(String[] args) {
+        String input = "192.88.99.0";
+        
+        // DataWeave: splitBy(".")
+        // Java Regex: Escaping the dot is necessary: "\\."
+        String regex = "\\."; 
+        
+        // Operation: Split the string
+        String[] parts = input.split(regex);
+        List<String> resultList = Arrays.asList(parts);
+        // Result: ["192", "88", "99", "0"]
+        
+        // Output Assembly
+        System.out.println(formatListAsJsonArray(resultList));
+    }
+}
+
+
+
+output:
+
+[ "192", "88", "99", "0" ]
+
+------------------------------------------------------
+
+
+
+
+example 6:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    // Helper method to simulate DataWeave's splitBy.
+    private static List<String> split(String text, String separator) {
+        // For non-regex literals, using String.split() is effective.
+        // For "" separator, Java's split("") correctly breaks the string into characters.
+        return Arrays.asList(text.split(separator));
+    }
+
+    /**
+     * Helper method to manually format the nested Map<String, List<String>> into a pretty-printed JSON string.
+     */
+    private static String formatNestedMapAsPrettyJson(Map<String, Object> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Outer key: "splitters"
+        sb.append("  \"splitters\" : {\n");
+        
+        // Inner map content
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> splitters = (Map<String, List<String>>) output.get("splitters");
+        
+        int i = 0;
+        int size = splitters.size();
+        for (Map.Entry<String, List<String>> entry : splitters.entrySet()) {
+            String key = entry.getKey();
+            List<String> list = entry.getValue();
+
+            // Key: "split1" : [ "a", "b", "c" ]
+            sb.append("    \"").append(key).append("\" : [ ");
+            
+            // Format list elements (must be quoted strings)
+            String quotedElements = list.stream()
+                .map(s -> "\"" + s + "\"")
+                .collect(Collectors.joining(", "));
+            
+            sb.append(quotedElements);
+            sb.append(" ]");
+            
+            if (i < size - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+            i++;
+        }
+        
+        // Close inner object and close outer object
+        sb.append("  }\n").append("}");
+        
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // 1. "a-b-c" splitBy("-")
+        List<String> split1 = split("a-b-c", "-"); // ["a", "b", "c"]
+        
+        // 2. "hello world" splitBy("")
+        String input2 = "hello world";
+        List<String> split2 = split(input2, ""); // ["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d"]
+        
+        // 3. "first,middle,last" splitBy(",")
+        List<String> split3 = split("first,middle,last", ","); // ["first", "middle", "last"]
+        
+        // 4. "no split" splitBy("NO")
+        List<String> split4 = split("no split", "NO"); // ["no split"]
+
+        // Output Assembly using standard Java Maps
+        Map<String, List<String>> splitters = new LinkedHashMap<>();
+        splitters.put("split1", split1);
+        splitters.put("split2", split2);
+        splitters.put("split3", split3);
+        splitters.put("split4", split4);
+        
+        Map<String, Object> outputObject = new LinkedHashMap<>();
+        outputObject.put("splitters", splitters);
+        
+        // 3. Output the result
+        System.out.println(formatNestedMapAsPrettyJson(outputObject));
+    }
+}
+
+output:
+
+{
+  "splitters" : {
+    "split1" : [ "a", "b", "c" ],
+    "split2" : [ "h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d" ],
+    "split3" : [ "first", "middle", "last" ],
+    "split4" : [ "no split" ]
+  }
+}
+
+------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

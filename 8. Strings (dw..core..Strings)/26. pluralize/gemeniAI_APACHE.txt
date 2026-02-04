@@ -1,0 +1,36 @@
+pluralize:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class PluralizeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:pluralize")
+            .process(exchange -> {
+                String word = "box";
+                String plural = pluralize(word);
+                exchange.getIn().setBody(java.util.Map.of("pluralize", plural));
+            })
+            .marshal().json();
+    }
+
+    private String pluralize(String word) {
+        if (word == null) return null;
+        if (word.endsWith("x") || word.endsWith("s") || word.endsWith("ch") || word.endsWith("sh")) {
+            return word + "es";
+        }
+        return word + "s";
+    }
+}
+
+
+output:
+
+{
+  "pluralize": "boxes"
+}
+
+

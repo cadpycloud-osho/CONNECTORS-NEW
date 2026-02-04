@@ -1,0 +1,47 @@
+dasherize:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String dasherize(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        String camelToKebab = input.replaceAll("([a-z])([A-Z])", "$1-$2");
+
+        String normalized = camelToKebab
+                .replace("_", "-")
+                .replace(" ", "-");
+
+        return normalized.toLowerCase();
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        result.put("a", dasherize("customer"));
+        result.put("b", dasherize("customer_first_name"));
+        result.put("c", dasherize("customer NAME"));
+        result.put("d", dasherize("customerName"));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+
+
+

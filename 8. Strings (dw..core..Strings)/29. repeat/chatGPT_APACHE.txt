@@ -1,0 +1,38 @@
+repeat:
+
+
+input:
+
+public class RepeatExample {
+
+    public static void main(String[] args) {
+        System.out.println(result());
+    }
+
+    public static java.util.Map<String, String> result() {
+        java.util.Map<String, String> map = new java.util.LinkedHashMap<>();
+        map.put("a", repeat("e", 0));
+        map.put("b", repeat("e", 3));
+        map.put("c", repeat("e", -2));
+        return map;
+    }
+
+    public static String repeat(String value, int times) {
+        if (value == null || times <= 0) {
+            return "";
+        }
+        return value.repeat(times);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "",
+  "b": "eee",
+  "c": ""
+}
+
+

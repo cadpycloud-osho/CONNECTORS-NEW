@@ -1,0 +1,39 @@
+charCodeAt:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class StringController {
+
+    @GetMapping("/charcode")
+    public Map<String, Object> getCharCode() {
+        Map<String, Object> response = new HashMap<>();
+
+        String text = "MuleSoft";
+        int index = 1;
+        int charCode = text.charAt(index); // gives Unicode value
+
+        response.put("charCodeAt", charCode);
+
+        return response;
+    }
+}
+
+
+output:
+
+
+{
+  "charCodeAt": 117
+}
+

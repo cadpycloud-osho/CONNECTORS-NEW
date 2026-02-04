@@ -1,0 +1,15 @@
+fromBase64:
+
+fromBase64(base64String: String): Binary
+
+fromBase64(base64String: String): Binary
+Transforms a Base64 string into a binary value.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Binaries
+output application/octet-stream
+---
+fromBase64(payload)

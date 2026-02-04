@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/BasicResponse",
+  "definitions": {
+    "BasicResponse": {
+      "description": "Represents a basic response structure that can be returned by APIs to indicate status and result messages for success or extended error scenarios",
+      "example": {
+        "responseStatus": "SUCCESS"
+      },
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "responseStatus"
+      ],
+      "properties": {
+        "responseStatus": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "resultMessages": {
+          "items": {
+            "$ref": "#/definitions/ResultMessage"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "ResponseStatus": {
+      "description": "Represents the overall status of the operation",
+      "enum": [
+        "SUCCESS",
+        "WARNING",
+        "ERROR"
+      ],
+      "example": "SUCCESS",
+      "type": "string"
+    },
+    "ResultMessage": {
+      "description": "Represents a single message to be included in the response",
+      "type": "object",
+      "example": {
+        "severity": "ERROR",
+        "code": "SYSGEN5000",
+        "message": "The system failed to process the request",
+        "parameters": [
+          {
+            "paramName": "ResourceName",
+            "paramValue": "/accounts"
+          },
+          {
+            "paramName": "ObjectId",
+            "paramValue": "00582245"
+          }
+        ]
+      },
+      "additionalProperties": true,
+      "required": [
+        "severity",
+        "code"
+      ],
+      "properties": {
+        "severity": {
+          "description": "Indicates the severity of this particular message item",
+          "enum": [
+            "INFO",
+            "WARNING",
+            "ERROR"
+          ],
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "parameters": {
+          "items": {
+            "$ref": "#/definitions/ResultParameter"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "ResultParameter": {
+      "description": "Represents an arbitrary name/value pair for returning extended response data",
+      "example": {
+        "paramName": "AccountId",
+        "paramValue": "123456"
+      },
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "paramName",
+        "paramValue"
+      ],
+      "properties": {
+        "paramName": {
+          "type": "string"
+        },
+        "paramValue": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+isRangeType:
+
+
+
+input:
+
+package com.example.demo.model;
+
+public class Range {
+    private int start;
+    private int end;
+
+    public Range(int start, int end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    public int getStart() { return start; }
+    public int getEnd() { return end; }
+}
+
+
+package com.example.demo.util;
+
+import com.example.demo.model.Range;
+
+public class TypeUtils {
+
+    public static boolean isRangeType(Class<?> type) {
+        return Range.class.isAssignableFrom(type);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.model.Range;
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class RangeTypeController {
+
+    @GetMapping("/isRangeType")
+    public Map<String, Boolean> checkRangeTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to: type ARange = Range
+        Class<?> ARange = Range.class;
+
+        result.put("a", TypeUtils.isRangeType(ARange));
+        result.put("b", TypeUtils.isRangeType(Range.class));
+        result.put("c", TypeUtils.isRangeType(String.class));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

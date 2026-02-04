@@ -1,0 +1,23 @@
+charCode:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        String input = "Mule";
+        int charCode = input.codePointAt(0);
+
+        System.out.println("charCode: " + charCode);
+    }
+}
+
+
+
+output:
+
+
+
+charCode: 77
+

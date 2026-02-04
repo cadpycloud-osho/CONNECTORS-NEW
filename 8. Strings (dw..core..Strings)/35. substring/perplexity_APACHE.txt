@@ -1,0 +1,31 @@
+substring:
+
+input:
+
+import java.util.*;
+
+public class SubstringConverter {
+    public static String substring(String text, int start, int end) {
+        if (text == null) return null;
+        // DataWeave substring(start, end) = Java substring(start, end-start)
+        return text.substring(start, Math.min(end, text.length()));
+    }
+    
+    public static void main(String[] args) {
+        String text = "hello world!";
+        String result = substring(text, 1, 5);
+        
+        Map<String, String> output = new LinkedHashMap<>();
+        output.put("substring", result);
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+
+"ello"
+
+

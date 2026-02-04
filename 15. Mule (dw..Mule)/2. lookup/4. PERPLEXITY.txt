@@ -1,0 +1,58 @@
+lookup:
+
+
+input:
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.Map;
+
+@RestController
+public class FlowController {
+    
+    private static final Logger logger = LoggerFactory.getLogger(FlowController.class);
+    
+    @Autowired
+    private Flow2Service flow2Service;
+    
+    // Matches flow1: /source endpoint
+    @GetMapping("/source")
+    public Map<String, String> flow1(@RequestParam(defaultValue = "hello") String test) {
+        // Matches: Mule::lookup('flow2', {test:'hello '})
+        Map<String, String> lookupParams = Map.of("test", test + " ");
+        String result = flow2Service.process(lookupParams);
+        logger.info("Flow1 result: {}", result);
+        return Map.of("result", result);
+    }
+}
+
+@Service
+class Flow2Service {
+    // Matches flow2: set-payload + logger
+    public String process(Map<String, String> payload) {
+        String testValue = payload.get("test");
+        String transformed = testValue + "world";
+        logger.info("Flow2 transformed: {}", transformed);
+        return transformed;
+    }
+}
+
+
+output:
+
+Spring Boot (GET /source):
+
+json
+{
+  "result": "hello world"
+}
+Logs:
+
+text
+Flow2 transformed: hello world
+Flow1 result: hello world
+

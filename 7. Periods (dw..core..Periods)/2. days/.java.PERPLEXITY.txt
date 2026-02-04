@@ -1,0 +1,84 @@
+days:
+
+input:
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+// Removed Spring annotations to make it runnable in a standard Java environment
+public class Main {
+
+    private static final DateTimeFormatter fmt = DateTimeFormatter.ISO_INSTANT;
+
+    // Converted the Spring method into a standard static method
+    public static Map<String, String> getValues() {
+        Instant baseZ = Instant.parse("2020-10-05T20:22:34.385Z");
+        Instant tomorrow = baseZ.plus(Duration.ofDays(1));
+        Instant yesterday = baseZ.minus(Duration.ofDays(1));
+
+        Instant baseMidnight = Instant.parse("2020-10-05T00:00:00.000Z");
+        // 86400 seconds in a day
+        Duration plusQuarter = Duration.ofSeconds((long)(0.25 * 86400)); // 6 hours
+        Duration plusHalf    = Duration.ofSeconds((long)(0.5  * 86400)); // 12 hours
+        Duration plus3Q      = Duration.ofSeconds((long)(0.75 * 86400)); // 18 hours
+        Instant decimalPlusQuarter = baseMidnight.plus(plusQuarter);
+        Instant decimalPlusHalf    = baseMidnight.plus(plusHalf);
+        Instant decimalPlus3Q      = baseMidnight.plus(plus3Q);
+
+        double decimalDays = 4.555;
+        // Calculation: 4.555 days * 86400 seconds/day = 393912 seconds (109 hours, 19 minutes, 12 seconds)
+        long secondsForDecimal = Math.round(decimalDays * 86400.0);
+        Duration decimalInputAsDuration = Duration.ofSeconds(secondsForDecimal);
+
+        Duration fourDayDuration = Duration.ofDays(4);
+        Duration negativeOneDay = Duration.ofDays(-1);
+
+        Map<String, String> m = new LinkedHashMap<>();
+        m.put("tomorrow", fmt.format(tomorrow));
+        m.put("yesterday", fmt.format(yesterday));
+        // Note: ISO_INSTANT formats seconds/milliseconds, but for the quarter/half/3Q values,
+        // it defaults to seconds precision ("Z" instead of ".000Z") if milliseconds are zero.
+        m.put("decimalDaysPlusQuarter", fmt.format(decimalPlusQuarter));
+        m.put("decimalDaysPlusHalf", fmt.format(decimalPlusHalf));
+        m.put("decimalDaysPlusThreeQuarters", fmt.format(decimalPlus3Q));
+        m.put("decimalInputAsPeriod", decimalInputAsDuration.toString()); // PT109H19M12S
+        // The output "P4D" requires custom formatting since Duration.toString() is PT96H
+        m.put("fourDayPeriod", "P" + fourDayDuration.toDays() + "D");
+        // The DataWeave `as Period` result for a negative Duration is "P-1D"
+        m.put("negativeValue", negativeOneDay.isNegative() ? "P" + negativeOneDay.toDays() + "D" : "P" + negativeOneDay.toDays() + "D");
+
+        return m;
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = getValues();
+        
+        // Format the map to the desired JSON output
+        String jsonOutput = result.entrySet().stream()
+            .map(entry -> String.format("\"%s\": \"%s\"", entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(",\n"));
+            
+        System.out.println("{\n" + jsonOutput + "\n}");
+    }
+}
+
+
+
+
+
+output:
+
+{
+"tomorrow": "2020-10-06T20:22:34.385Z",
+"yesterday": "2020-10-04T20:22:34.385Z",
+"decimalDaysPlusQuarter": "2020-10-05T06:00:00Z",
+"decimalDaysPlusHalf": "2020-10-05T12:00:00Z",
+"decimalDaysPlusThreeQuarters": "2020-10-05T18:00:00Z",
+"decimalInputAsPeriod": "PT109H19M12S",
+"fourDayPeriod": "P4D",
+"negativeValue": "P-1D"
+}

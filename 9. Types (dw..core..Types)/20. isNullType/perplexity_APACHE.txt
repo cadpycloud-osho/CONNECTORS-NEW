@@ -1,0 +1,63 @@
+isNullType:
+
+
+
+input:
+
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveNullTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processNullChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processNullChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ANull = Null (type alias)
+        result.put("a", isNullType(Null.class));
+        
+        // Built-in Null type
+        result.put("b", isNullType(Null.class));
+        
+        // String - not Null
+        result.put("c", isNullType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isNullType(Class<?> type) {
+        // DataWeave Null type check equivalent
+        // Returns true for Null and its aliases (explicit null representation)
+        return type == Null.class || 
+               "Null".equals(type.getSimpleName()) ||
+               type.getName().contains("Null");
+    }
+    
+    // Null interface equivalent for DataWeave Null type simulation
+    private interface Null {}
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+

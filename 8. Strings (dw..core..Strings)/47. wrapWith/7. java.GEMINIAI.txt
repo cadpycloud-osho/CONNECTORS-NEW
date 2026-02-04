@@ -1,0 +1,66 @@
+wrapWith:
+
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = StringWrapUtil.wrapWith(null, "'");
+        String b = StringWrapUtil.wrapWith("", "'");
+        String c = StringWrapUtil.wrapWith("ab", "x");
+        String d = StringWrapUtil.wrapWith("'ab'", "'");
+        String e = StringWrapUtil.wrapWith("ab", "'");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s,\n  \"c\": %s,\n  \"d\": %s,\n  \"e\": %s\n}",
+            formatJsonString(a), 
+            formatJsonString(b), 
+            formatJsonString(c), 
+            formatJsonString(d), 
+            formatJsonString(e)
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class StringWrapUtil {
+        public static String wrapWith(String str, String wrapper) {
+            if (str == null) {
+                return null;
+            }
+            
+            String safeWrapper = (wrapper == null) ? "" : wrapper;
+
+            // Core Rule: wrapper + str + wrapper
+            return safeWrapper + str + safeWrapper;
+        }
+    }
+
+    /**
+     * Helper to format the Java String result into a valid JSON string (with quotes)
+     * or the JSON literal 'null'.
+     */
+    private static String formatJsonString(String value) {
+        // If the Java String is null, return the JSON literal "null". Otherwise, quote the string value.
+        // Note: The value for 'b' is ' ' ', which is correctly quoted as "''".
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}

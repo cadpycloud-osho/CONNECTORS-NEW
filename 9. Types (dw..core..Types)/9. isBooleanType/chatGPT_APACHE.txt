@@ -1,0 +1,39 @@
+isBooleanType:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsBooleanTypeExample {
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isBooleanType("Boolean"));
+        result.put("b", isBooleanType("Boolean"));
+        result.put("c", isBooleanType("String"));
+
+        System.out.println(result);
+    }
+
+    public static boolean isBooleanType(String type) {
+        if (type == null) return false;
+        return type.equals("Boolean");
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+

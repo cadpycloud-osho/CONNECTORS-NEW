@@ -1,0 +1,78 @@
+divideBy:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class CamelDivideByExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave inputs
+                        List<Integer> list1to5 = List.of(1, 2, 3, 4, 5);
+                        List<Integer> list1to6 = List.of(1, 2, 3, 4, 5, 6);
+
+                        // Structure the response to match DataWeave output
+                        List<Map<String, List<List<Integer>>>> divideByResults = List.of(
+                            Map.of("divideBy2", partition(list1to5, 2)),
+                            Map.of("divideBy2", partition(list1to6, 2)),
+                            Map.of("divideBy3", partition(list1to5, 3))
+                        );
+
+                        exchange.getIn().setBody(Map.of("divideBy", divideByResults));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+
+            // Native Java implementation of divideBy / partition
+            private <T> List<List<T>> partition(List<T> list, int size) {
+                List<List<T>> partitions = new ArrayList<>();
+                for (int i = 0; i < list.size(); i += size) {
+                    partitions.add(new ArrayList<>(
+                        list.subList(i, Math.min(i + size, list.size())))
+                    );
+                }
+                return partitions;
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+from("direct:bulkProcess")
+    .process(exchange -> {
+        List<Record> allRecords = exchange.getIn().getBody(List.class);
+        // Divide into batches of 50
+        exchange.getIn().setBody(partition(allRecords, 50));
+    })
+    .split(body()) // This now iterates through each batch of 50
+        .marshal().json()
+        .to("http://api.service.com/bulk-import")
+    .end();
+
+output:
+
+{
+  "divideBy": [
+    { "divideBy2": [[1, 2], [3, 4], [5]] },
+    { "divideBy2": [[1, 2], [3, 4], [5, 6]] },
+    { "divideBy3": [[1, 2, 3], [4, 5]] }
+  ]
+}

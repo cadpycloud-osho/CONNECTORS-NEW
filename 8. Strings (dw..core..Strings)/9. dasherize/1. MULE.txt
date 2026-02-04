@@ -1,0 +1,58 @@
+dasherize:
+
+dasherize(text: String): String
+
+dasherize(text: String): String
+Replaces spaces, underscores, and camel-casing in a string with dashes (hyphens).
+
+If no spaces, underscores, and camel-casing are present, the output will match the input.
+
+
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "a" : dasherize("customer"),
+  "b" : dasherize("customer_first_name"),
+  "c" : dasherize("customer NAME"),
+  "d" : dasherize("customerName")
+}
+
+
+
+DataWeave
+Output
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

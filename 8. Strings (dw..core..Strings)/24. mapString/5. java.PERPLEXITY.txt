@@ -1,0 +1,30 @@
+mapString:
+
+
+input:
+
+
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "$234";
+        String result = input.chars()
+            .mapToObj(ch -> Character.isDigit((char) ch) ? '~' : (char) ch)
+            .map(Object::toString)
+            .collect(Collectors.joining());
+        System.out.println("{\"balance\": \"" + result + "\"}");
+    }
+}
+
+
+
+output:
+
+{
+  "balance": "$~~~"
+}[web:1][web:11]
+
+
+
+

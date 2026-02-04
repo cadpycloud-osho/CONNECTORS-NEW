@@ -1,0 +1,53 @@
+toLocalDateTimeOrNull:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class ToLocalDateTimeOrNullExample {
+
+    public static void main(String[] args) {
+
+        String input = "2003-10-01 23:57:59";
+
+        List<DateTimeFormatter> formattersA = List.of(
+                DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss"),
+                DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+        );
+
+        List<DateTimeFormatter> formattersB = List.of(
+                DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss")
+        );
+
+        Map<String, LocalDateTime> output = new LinkedHashMap<>();
+        output.put("a", parseOrNull(input, formattersA));
+        output.put("b", parseOrNull(input, formattersB));
+
+        // Print
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+
+    private static LocalDateTime parseOrNull(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                return LocalDateTime.parse(value, fmt);
+            } catch (DateTimeParseException e) {
+                // ignore and try next formatter
+            }
+        }
+        return null; // if no format succeeded
+    }
+}
+
+
+output:
+
+a: 2003-10-01T23:57:59
+b: null
+
+
+

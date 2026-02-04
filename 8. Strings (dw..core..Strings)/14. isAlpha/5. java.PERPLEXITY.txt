@@ -1,0 +1,44 @@
+isAlpha:
+
+
+input:
+
+import org.json.JSONObject;
+
+public class Main {
+    public static void main(String[] args) {
+        JSONObject result = new JSONObject();
+        result.put("a", isAlpha(null));
+        result.put("b", isAlpha(""));
+        result.put("c", isAlpha("  "));
+        result.put("d", isAlpha("abc"));
+        result.put("e", isAlpha("ab2c"));
+        result.put("f", isAlpha("ab-c"));
+        
+        System.out.println(result.toString(2));
+    }
+    
+    private static boolean isAlpha(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        return input.chars().allMatch(Character::isLetter);
+    }
+}
+
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+
+
+

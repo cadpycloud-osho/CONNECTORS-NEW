@@ -1,0 +1,114 @@
+write:
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Map;
+
+public class CamelWriteExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: write("world", "text/plain")
+                        Object data = "world";
+                        
+                        // In Camel/Java, we "write" to text by converting to String
+                        String writtenValue = exchange.getContext()
+                                              .getTypeConverter()
+                                              .convertTo(String.class, data);
+
+                        exchange.getIn().setBody(Map.of("hello", writtenValue));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "hello": "world"
+}
+
+-------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.dataformat.csv.CsvDataFormat;
+import java.util.*;
+
+public class CamelWriteCsvToXml {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        // 1. Configure the CSV DataFormat (Equivalent to the writer properties)
+        CsvDataFormat csv = new CsvDataFormat();
+        csv.setDelimiter('|');
+        csv.setHeaderDisabled(false); // We want headers
+        csv.setUseMaps(true);        // Our input is a list of Maps
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // Step A: Marshal List to CSV String
+                    .marshal(csv)
+                    .convertBodyTo(String.class)
+                    
+                    // Step B: Wrap the CSV string in a structure for XML
+                    .process(exchange -> {
+                        String csvContent = exchange.getIn().getBody(String.class);
+                        // Using a simple Map which Camel's default XML marshaller can handle
+                        exchange.getIn().setBody(Collections.singletonMap("output", csvContent));
+                    })
+                    
+                    // Step C: Marshal to XML (using Jackson XML or JAXB)
+                    .marshal().jacksonXml()
+                    .to("stream:out");
+            }
+        });
+
+        // Input Data
+        List<Map<String, String>> payload = List.of(
+            Map.of("Name", "Mr White", "Email", "white@mulesoft.com", "Id", "1234", "Title", "Chief Java Prophet"),
+            Map.of("Name", "Mr Orange", "Email", "orange@mulesoft.com", "Id", "4567", "Title", "Integration Ninja")
+        );
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", payload);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja
+</output>
+
+-------------------------------------------

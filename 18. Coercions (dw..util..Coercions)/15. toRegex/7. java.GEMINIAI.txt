@@ -1,0 +1,52 @@
+toRegex:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class Main {
+
+    /**
+     * Mimics DataWeave's toRegex() by compiling a Java Pattern and returning its string representation.
+     */
+    private String toRegex(String regexString) {
+        Pattern pattern = Pattern.compile(regexString);
+        return pattern.pattern();
+    }
+
+    public Map<String, String> getRegexConversionMap() {
+        
+        // --- Logic for Key 'toRegexEx1' ---
+        String regexString1 = "a-Z";
+        String parsedRegex1 = toRegex(regexString1); 
+
+        // --- Logic for Key 'toRegexEx2' ---
+        String regexString2 = "0-9+";
+        String parsedRegex2 = toRegex(regexString2);
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("toRegexEx1", parsedRegex1);
+        rootMap.put("toRegexEx2", parsedRegex2);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaToRegexConverter converter = new PureJavaToRegexConverter();
+        Map<String, String> result = converter.getRegexConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+{toRegexEx1=a-Z, toRegexEx2=0-9+}

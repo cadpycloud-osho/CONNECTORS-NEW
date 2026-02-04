@@ -1,0 +1,81 @@
+entrySet:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+@RestController
+public class XmlController {
+
+    @GetMapping("/entrySet")
+    public Map<String, Object> entrySetExample() throws Exception {
+
+        String xmlString = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(
+                new ByteArrayInputStream(xmlString.getBytes(StandardCharsets.UTF_8))
+        );
+
+        Element root = document.getDocumentElement();
+
+        // Extract children
+        Map<String, String> valueMap = new LinkedHashMap<>();
+        NodeList childNodes = root.getChildNodes();
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+            if (node instanceof Element) {
+                valueMap.put(node.getNodeName(), node.getTextContent());
+            }
+        }
+
+        // Extract attributes
+        Map<String, String> attributesMap = new HashMap<>();
+        NamedNodeMap attributes = root.getAttributes();
+
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Node attr = attributes.item(i);
+            attributesMap.put(attr.getNodeName(), attr.getNodeValue());
+        }
+
+        // EntrySet-like structure
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("key", root.getNodeName());
+        entry.put("value", valueMap);
+        entry.put("attributes", attributesMap);
+
+        return Map.of("entrySet", List.of(entry));
+    }
+}
+
+
+output:
+
+
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+

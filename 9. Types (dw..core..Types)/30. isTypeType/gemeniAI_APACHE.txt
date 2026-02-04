@@ -1,0 +1,52 @@
+isTypeType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MetaTypeCheckRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkTypeMeta")
+            .process(exchange -> {
+                // In Java, meta-types are represented by the Class class itself.
+                // a: Represents 'type AType = Type'
+                Object refA = Class.class;
+                // b: Represents 'Type' keyword
+                Object refB = String.class; 
+                // c: Represents a non-meta type (a literal instance)
+                Object refC = "Just a string";
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: In DataWeave, isTypeType checks if the value is a Type definition.
+                // In Java, we check if the object is an instance of Class.
+                result.put("a", isTypeType(refA));
+                result.put("b", isTypeType(refB));
+                result.put("c", isTypeType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isTypeType(Object obj) {
+        // Returns true if the object is a Class reference (a "Type" in DW terms)
+        return obj instanceof Class;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

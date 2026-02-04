@@ -1,0 +1,46 @@
+isDateTimeType:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DateTimeTypeCheckRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkDateTimeType")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Equivalent to 'type ADateTime = DateTime'
+                Class<?> aDateTime = ZonedDateTime.class; 
+                Class<?> stringType = String.class;
+
+                results.put("a", isDateTimeType(aDateTime));
+                results.put("b", isDateTimeType(ZonedDateTime.class));
+                results.put("c", isDateTimeType(stringType));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    private boolean isDateTimeType(Class<?> clazz) {
+        // ZonedDateTime is the closest Java equivalent to DataWeave's DateTime
+        return clazz != null && (clazz.equals(ZonedDateTime.class) || 
+                                 clazz.equals(java.util.Date.class));
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

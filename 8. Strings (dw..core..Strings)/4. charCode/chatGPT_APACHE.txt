@@ -1,0 +1,35 @@
+charCode:
+
+
+input:
+
+import java.util.*;
+
+public class CharCodeExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Integer> output = new LinkedHashMap<>();
+
+        output.put("charCode", charCode("Mule"));
+
+        System.out.println(output);
+    }
+
+    private static int charCode(String str) {
+        if (str == null || str.isEmpty()) {
+            throw new IllegalArgumentException("Input string cannot be null or empty");
+        }
+        return str.charAt(0); // returns ASCII / Unicode code of first character
+    }
+}
+
+
+
+
+
+output:
+
+
+{ "charCode" : 77 }
+

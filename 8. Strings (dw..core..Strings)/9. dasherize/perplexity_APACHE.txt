@@ -1,0 +1,44 @@
+dasherize:
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class DasherizeConverter {
+    public static String dasherize(String input) {
+        if (input == null) return null;
+        if (input.isEmpty()) return "";
+        
+        // Convert camelCase to words by inserting _ before uppercase
+        String withUnderscores = input.replaceAll(
+            "([a-z])([A-Z])", "$1_$2"
+        ).toLowerCase();
+        
+        // Replace underscores and spaces with dashes
+        return withUnderscores.replaceAll("[_\\s]+", "-");
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", dasherize("customer"));
+        result.put("b", dasherize("customer_first_name"));
+        result.put("c", dasherize("customer NAME"));
+        result.put("d", dasherize("customerName"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+

@@ -1,0 +1,61 @@
+partition:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class PartitioningExample {
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        // Input List
+        List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+        
+        // Predicate: Check if the item is even
+        Predicate<Integer> isEven = item -> item % 2 == 0;
+        
+        // --- DataWeave Logic: arr partition (item) -> isEven(item) ---
+        // Java Equivalent: Collectors.partitioningBy(isEven)
+        
+        Map<Boolean, List<Integer>> partitionedMap = arr.stream()
+                .collect(Collectors.partitioningBy(isEven));
+
+        // The Java Map structure is: {true=[0, 2, 4], false=[1, 3, 5]}
+        
+        // Rename keys to match DataWeave output: "success" and "failure"
+        Map<String, List<Integer>> result = Map.of(
+            "success", partitionedMap.getOrDefault(true, Collections.emptyList()),
+            "failure", partitionedMap.getOrDefault(false, Collections.emptyList())
+        );
+
+        // --- Output Generation (Simulating JSON structure) ---
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave partition Equivalent Output ---");
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+}
+output:
+
+{
+  "success": [
+    0,
+    2,
+    4
+  ],
+  "failure": [
+    1,
+    3,
+    5
+  ]
+}

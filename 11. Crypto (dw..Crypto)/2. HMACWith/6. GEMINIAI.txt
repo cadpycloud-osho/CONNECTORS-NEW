@@ -1,0 +1,102 @@
+HMACWith:
+
+
+
+input:
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class HmacService {
+
+    private static final String HMAC_ALGORITHM = "HmacSHA256";
+
+    /**
+     * Calculates the HMAC-SHA256 for a given data and key and returns the result
+     * as a lowercase hexadecimal String, matching DataWeave's HMACWith behavior.
+     *
+     * @param data The input data (e.g., "Some value to hash").
+     * @param key The secret key (e.g., "secret_key").
+     * @return The HMAC as a hexadecimal String.
+     */
+    public String calculateHmacHex(String data, String key) 
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        
+        // 1. Convert the key and data to byte arrays using UTF-8.
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+
+        // 2. Create the SecretKeySpec
+        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, HMAC_ALGORITHM);
+
+        // 3. Get the Mac instance
+        Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+
+        // 4. Initialize the Mac with the key
+        mac.init(secretKeySpec);
+
+        // 5. Calculate the HMAC (raw bytes)
+        byte[] hmacBytes = mac.doFinal(dataBytes);
+        
+        // 6. Convert the raw bytes to a lowercase hex string
+        return bytesToHex(hmacBytes);
+    }
+    
+    /**
+     * Helper method to convert a byte array to a lowercase hexadecimal string.
+     */
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder(2 * bytes.length);
+        for (byte b : bytes) {
+            // Converts the byte to an unsigned integer (0-255) and formats it as a 
+            // two-character lowercase hexadecimal string (e.g., "0a", "ff").
+            String hex = String.format("%02x", b);
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+@RestController
+public class HmacController {
+
+    private final HmacService hmacService;
+
+    public HmacController(HmacService hmacService) {
+        this.hmacService = hmacService;
+    }
+
+    @GetMapping("/calculate-hmac-sha256")
+    public Map<String, String> getHmac() {
+        try {
+            String data = "Some value to hash";
+            String key = "secret_key";
+            
+            String hmacHex = hmacService.calculateHmacHex(data, key);
+            
+            return Map.of("HMACWith", hmacHex);
+
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            // Handle exceptions appropriately
+            e.printStackTrace();
+            return Map.of("error", e.getMessage());
+        }
+    }
+}
+
+output:
+
+{ 
+  "HMACWith": "b51b4fe8c4e37304605753272b5b4321f9644a9b09cb1179d7016c25041d1747" 
+}

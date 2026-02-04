@@ -1,0 +1,216 @@
+toNumber:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class NumberCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceNumber")
+            .process(exchange -> {
+                String input = "0.005";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                // Define patterns: ".00" is a standard decimal format. 
+                // "seconds" is treated as a specialized or standard parse.
+                List<String> patterns = List.of("seconds", ".000");
+
+                // Logic for 'a'
+                response.put("a", tryParseNumber(input, patterns));
+
+                // Logic for 'b' - Failing case
+                try {
+                    tryParseNumber(input, List.of("seconds"));
+                } catch (Exception e) {
+                    response.put("b", e.getMessage());
+                }
+
+                exchange.getIn().setBody(response);
+            });
+    }
+
+    private Double tryParseNumber(String input, List<String> patterns) {
+        for (String pattern : patterns) {
+            try {
+                // If the pattern is "seconds" or a numeric mask, try parsing
+                if (pattern.equals("seconds")) {
+                    // Logic for 'seconds' usually implies a standard double parse
+                    // or a specific unit conversion. Here we simulate a failure
+                    // to match the DataWeave source logic.
+                    throw new ParseException("Custom unit not supported", 0);
+                }
+                
+                DecimalFormat df = new DecimalFormat(pattern);
+                return df.parse(input).doubleValue();
+            } catch (ParseException ignored) {}
+        }
+        throw new IllegalArgumentException("Could not find a valid formatter for '" + input + "'");
+    }
+}
+
+
+output:
+
+{
+  a: 0.005 as Number {format: ".000"},
+  b: "Could not find a valid formatter for '0.005'"
+}
+
+
+-----------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DateTimeToNumberRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:dateTimeToEpoch")
+            .process(exchange -> {
+                // Equivalent to |2015-10-01T23:57:59Z|
+                ZonedDateTime dt = ZonedDateTime.parse("2015-10-01T23:57:59Z");
+                
+                Map<String, Long> results = new LinkedHashMap<>();
+
+                // Case: seconds (default epoch)
+                results.put("epoch", dt.toEpochSecond());
+
+                // Case: milliseconds
+                results.put("millis", dt.toInstant().toEpochMilli());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+{
+  "epoch": 1443743879,
+  "millis": 1443743879000
+}
+
+-----------------------------------------------------------------
+
+
+
+
+example 3:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DurationToNumberRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertDuration")
+            .process(exchange -> {
+                Map<String, Long> results = new LinkedHashMap<>();
+
+                // Case 1: PT1H10M (1 hour, 10 minutes) to Seconds
+                // (1 * 3600) + (10 * 60) = 4200
+                Duration d1 = Duration.parse("PT1H10M");
+                results.put("toSecondsEx1", d1.toSeconds());
+
+                // Case 2: PT1M7S (1 minute, 7 seconds) to Milliseconds
+                // (60 + 7) * 1000 = 67000
+                Duration d2 = Duration.parse("PT1M7S");
+                results.put("toSecondsEx2", d2.toMillis());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "toSecondsEx1": 4200,
+  "toSecondsEx2": 67000
+}
+
+-----------------------------------------------------------------
+
+example 4:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class AdvancedNumberRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:advancedNumber")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // 1. Default (Double parse)
+                results.put("default", Double.parseDouble("1.0"));
+
+                // 2. withFormat (".00") - DecimalFormat handles the mask
+                results.put("withFormat", new DecimalFormat(".00").parse("0.005").doubleValue());
+
+                // 3. withLocal ("ES") - Spanish uses comma as decimal separator
+                NumberFormat nfSpanish = NumberFormat.getInstance(new Locale("es", "ES"));
+                results.put("withLocal", nfSpanish.parse("1,25").doubleValue());
+
+                // 4. withExtraPlaceholders
+                results.put("withExtraPlaceholders", new DecimalFormat("####.####").parse("5.55").doubleValue());
+
+                // 5. keyToNumber (Simulating keysOf logic)
+                Map<String, String> sourceMap = Map.of("123", "myValue");
+                String firstKey = sourceMap.keySet().iterator().next();
+                results.put("keyToNumber", Integer.parseInt(firstKey));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "default": 1.0,
+  "withFormat": 0.005,
+  "withLocal": 1.25,
+  "withExtraPlaceholders": 5.55,
+  "keyToNumber": 123
+}
+-----------------------------------------------------------------
+

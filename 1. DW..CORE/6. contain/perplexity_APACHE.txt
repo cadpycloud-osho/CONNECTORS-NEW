@@ -1,0 +1,98 @@
+contains:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class CheckItemsRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkItems")
+            .choice()
+                .when(xpath("//root/order/items[text()='3']"))
+                    .setBody(constant("{\"ContainsRequestedItem\": true}"))
+                .otherwise()
+                    .setBody(constant("{\"ContainsRequestedItem\": false}"))
+            .end()
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{"ContainsRequestedItem": true}
+
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class StringContainsRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:stringContains")
+            .setBody(constant("mulesoft"))
+            .choice()
+                .when(simple("${body} contains 'mule'"))
+                    .setBody(simple("{ \"result\": true }"))
+                .otherwise()
+                    .setBody(simple("{ \"result\": false }"))
+            .end()
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{ "result": true }
+
+-----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+
+public class XmlStringContainsRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:xmlContains")
+            // Extract mystring value using XPath
+            .setBody(xpath("/root/mystring/text()"))
+            .choice()
+                // Check if extracted string contains "me"
+                .when(simple("${body} contains 'me'"))
+                    .setBody(simple("{ \"ContainsString\": true }"))
+                .otherwise()
+                    .setBody(simple("{ \"ContainsString\": false }"))
+            .end()
+            .to("log:output?showAll=true");
+    }
+}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<root><mystring>some string</mystring></root>
+
+
+output:
+
+{ "ContainsString": true }
+
+-----------------------------------------------------------------

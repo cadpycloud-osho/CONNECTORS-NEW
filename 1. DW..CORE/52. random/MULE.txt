@@ -1,0 +1,16 @@
+random:
+
+random(): Number
+
+random(): Number
+Returns a pseudo-random number greater than or equal to 0.0 and less than 1.0.
+
+Source
+%dw 2.0
+output application/json
+---
+{ price: random() * 1000 }
+
+DataWeave
+Output
+{ "price": 65.02770292248383 }

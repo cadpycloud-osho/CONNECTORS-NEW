@@ -1,0 +1,83 @@
+readLinesWith:
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    /**
+     * Executes the full DataWeave transformation.
+     */
+    public static void runDataWeaveTransformation() {
+        // --- 1. DW Variable Assignment & Binary Reading ---
+        // Equivalent to: var content = read("Line 1\n...", "application/octet-stream")
+        
+        // The raw input string containing line breaks
+        String rawInput = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n";
+
+        // Convert the input string to a byte array (Binary) using UTF-8 encoding
+        // This is the Java equivalent of the 'content' variable
+        byte[] contentBinary = rawInput.getBytes(StandardCharsets.UTF_8);
+
+        // --- 2. DW readLinesWith Operation ---
+        // Equivalent to: (content readLinesWith "UTF-8")
+        
+        // Convert the byte array back to a String using UTF-8
+        String contentString = new String(contentBinary, StandardCharsets.UTF_8);
+
+        // Split the string by the newline character (\n) to get the lines List
+        // Note: The use of -1 as the limit ensures trailing empty strings are included 
+        // if the string ends with '\n', matching DW behavior more closely.
+        String[] linesArray = contentString.split("\n", -1);
+        
+        // Convert the array to a List<String>
+        // We exclude the last element if it's an empty string resulting from a trailing '\n'
+        List<String> linesList;
+        if (linesArray.length > 0 && linesArray[linesArray.length - 1].isEmpty()) {
+            linesList = Arrays.asList(Arrays.copyOf(linesArray, linesArray.length - 1));
+        } else {
+            linesList = Arrays.asList(linesArray);
+        }
+
+        // --- 3. DW Output Mapping ---
+        // Equivalent to: { lines : ..., showType: typeOf(content) }
+        
+        String showType = (contentBinary instanceof byte[]) ? "Binary" : "Unknown";
+
+        // --- 4. Output Generation (JSON Format) ---
+        System.out.println("DataWeave Output in Java (JSON):");
+        System.out.println("{");
+        System.out.print("  \"lines\": [ ");
+        
+        // Format the lines array for JSON output
+        for (int i = 0; i < linesList.size(); i++) {
+            System.out.print("\"" + linesList.get(i) + "\"");
+            if (i < linesList.size() - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println(" ],");
+        System.out.println("  \"showType\": \"" + showType + "\"");
+        System.out.println("}");
+    }
+
+    public static void main(String[] args) {
+        runDataWeaveTransformation();
+    }
+}
+
+
+output:
+
+DataWeave Output in Java (JSON):
+{
+  "lines": [ "Line 1", "Line 2", "Line 3", "Line 4", "Line 5" ],
+  "showType": "Binary"
+}
+
+
+

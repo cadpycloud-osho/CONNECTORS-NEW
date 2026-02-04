@@ -1,0 +1,76 @@
+encodeURIComponent:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class CompareEncodeFunctionsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                String v1 = encodeURI(" PATH/ TO /ENCODE ");
+                String v2 = encodeURI(" PATH/ TO /ENCODE ");
+
+                String v3 = URLEncoder.encode(";,/?:@&=", StandardCharsets.UTF_8);
+                String v4 = encodeURI(";,/?:@&=");
+
+                String v5 = URLEncoder.encode("-_.!~*'()", StandardCharsets.UTF_8)
+                        .replace("+", "%20");
+                String v6 = encodeURI("-_.!~*'()");
+
+                String body =
+                    "{ \"comparing_encode_functions_output\": {"
+                  + "\"encodeURIComponent\": \"" + v1 + "\","
+                  + "\"encodeURI\": \"" + v2 + "\","
+                  + "\"encodeURIComponent_to_hex\": \"" + v3 + "\","
+                  + "\"encodeURI_not_to_hex\": \"" + v4 + "\","
+                  + "\"encodeURIComponent_not_encoded\": \"" + v5 + "\","
+                  + "\"encodeURI_not_encoded\": \"" + v6 + "\""
+                  + "} }";
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+
+    private static String encodeURI(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8)
+                .replace("+", "%20")
+                .replace("%3A", ":")
+                .replace("%2F", "/")
+                .replace("%3F", "?")
+                .replace("%40", "@")
+                .replace("%26", "&")
+                .replace("%3D", "=")
+                .replace("%24", "$")
+                .replace("%2C", ",")
+                .replace("%3B", ";");
+    }
+}
+
+
+
+
+output:
+
+{
+  "comparing_encode_functions_output": {
+    "encodeURIComponent": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURI": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURIComponent_to_hex": "%3B%2C%2F%3F%3A%40%26%3D",
+    "encodeURI_not_to_hex": ";,/?:@&=",
+    "encodeURIComponent_not_encoded": "-_.!~*'()",
+    "encodeURI_not_encoded": "-_.!~*'()"
+  }
+}
+
+
+
+

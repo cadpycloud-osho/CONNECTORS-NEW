@@ -1,0 +1,101 @@
+entriesOf:
+
+
+
+
+input:
+
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        String xmlInput = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(
+                new ByteArrayInputStream(xmlInput.getBytes(StandardCharsets.UTF_8))
+        );
+
+        Element root = document.getDocumentElement();
+
+        // key
+        String key = root.getNodeName();
+
+        // value (child elements)
+        Map<String, String> value = new LinkedHashMap<>();
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                value.put(node.getNodeName(), node.getTextContent());
+            }
+        }
+
+        // attributes
+        Map<String, String> attributes = new LinkedHashMap<>();
+        NamedNodeMap attrs = root.getAttributes();
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            attributes.put(attr.getNodeName(), attr.getNodeValue());
+        }
+
+        // Build entriesOf-like structure
+        List<Map<String, Object>> entriesOf = new ArrayList<>();
+
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("key", key);
+        entry.put("value", value);
+        entry.put("attributes", attributes);
+
+        entriesOf.add(entry);
+
+        // Print output (JSON-style)
+        System.out.println("{");
+        System.out.println("  \"entriesOf\": [");
+        System.out.println("    {");
+        System.out.println("      \"key\": \"" + key + "\",");
+        System.out.println("      \"value\": " + value + ",");
+        System.out.println("      \"attributes\": " + attributes);
+        System.out.println("    }");
+        System.out.println("  ]");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+

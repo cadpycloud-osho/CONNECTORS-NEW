@@ -1,0 +1,79 @@
+nodeExists:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class NodeExistsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkNodeExists")
+            .process(exchange -> {
+                // 1. Setup the complex input object
+                Map<String, Object> myObject = Map.of(
+                    "user", List.of(
+                        Map.of("name", "mariano", "lastName", "achaval", 
+                               "friends", List.of(Map.of("name", "julian"), Map.of("name", "tom"))),
+                        Map.of("name", "leandro", "lastName", "shokida", 
+                               "friends", List.of(Map.of("name", "peter"), Map.of("name", "robert")))
+                    )
+                );
+
+                // 2. Perform searches mirroring the DW predicates
+                Map<String, Boolean> result = new LinkedHashMap<>();
+                result.put("mariano", nodeExists(myObject, "name", "mariano"));
+                result.put("julian", nodeExists(myObject, "name", "julian"));
+                result.put("tom", nodeExists(myObject, "name", "tom"));
+                result.put("leandro", nodeExists(myObject, "name", "leandro"));
+                result.put("peter", nodeExists(myObject, "name", "peter"));
+                result.put("wrongField", nodeExists(myObject, "wrongField", null));
+                result.put("teo", nodeExists(myObject, "name", "teo"));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Recursive search: Returns true if any node matches the selector and value
+     */
+    private boolean nodeExists(Object node, String targetSelector, Object targetValue) {
+        if (node instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) node;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                Object val = entry.getValue();
+                
+                // Check if this specific node matches
+                boolean selectorMatches = key.equals(targetSelector);
+                boolean valueMatches = (targetValue == null) || targetValue.equals(val);
+                
+                if (selectorMatches && valueMatches) return true;
+                
+                // Recurse into children
+                if (nodeExists(val, targetSelector, targetValue)) return true;
+            }
+        } else if (node instanceof List) {
+            for (Object item : (List<?>) node) {
+                if (nodeExists(item, targetSelector, targetValue)) return true;
+            }
+        }
+        return false;
+    }
+}
+
+output:
+
+{
+  "mariano": true,
+  "julian": true,
+  "tom": true,
+  "leandro": true,
+  "peter": true,
+  "wrongField": false,
+  "teo": false
+}
+

@@ -1,0 +1,52 @@
+nameOf:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class TypeNameRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:getTypeNames")
+            .process(exchange -> {
+                // In Java, types are Classes. We can use Reflection to get their names.
+                // a and b represent custom defined classes/types
+                Class<?> refA = AArray.class; 
+                Class<?> refB = AArray2.class;
+                // c represents a standard library type
+                Class<?> refC = String.class;
+
+                Map<String, String> result = new LinkedHashMap<>();
+
+                // Logic: Extract the simple name of the class
+                result.put("a", nameOf(refA));
+                result.put("b", nameOf(refB));
+                result.put("c", nameOf(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private String nameOf(Class<?> clazz) {
+        return clazz.getSimpleName();
+    }
+
+    // Mocking the custom type definitions
+    static abstract class AArray extends java.util.ArrayList<String> {}
+    static abstract class AArray2 extends java.util.ArrayList<String> {}
+}
+
+output:
+
+{
+  "a": "AArray",
+  "b": "AArray2",
+  "c": "String"
+}
+
+

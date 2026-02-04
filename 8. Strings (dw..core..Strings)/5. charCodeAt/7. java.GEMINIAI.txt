@@ -1,0 +1,44 @@
+charCodeAt:
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source inputs from the DataWeave example
+        String inputString = "MuleSoft"; 
+        int index = 1;
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        
+        // Perform the DataWeave charCodeAt logic:
+        
+        // 1. Validate the inputs to prevent IndexOutOfBoundsException
+        if (inputString != null && index >= 0 && index < inputString.length()) {
+            
+            // 2. Get the character at the specified index
+            char charAtIndex = inputString.charAt(index);
+            
+            // 3. Casting the char to an int gives its ASCII/Unicode value
+            int charCodeValue = (int) charAtIndex;
+            
+            // 4. Print the result in a format similar to the desired JSON output
+            System.out.println("{ \"charCodeAt\": " + charCodeValue + " }");
+            
+        } else {
+            System.out.println("Error: Index is out of bounds for the string.");
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "charCodeAt": 117
+}
+

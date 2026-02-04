@@ -1,0 +1,40 @@
+words:
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class WordsExample {
+
+    public static void main(String[] args) {
+        String input = "hello world\nhere\t\t\tdata-weave";
+        List<String> result = words(input);
+        System.out.println(result);
+    }
+
+    public static List<String> words(String value) {
+        List<String> result = new ArrayList<>();
+        if (value == null || value.isEmpty()) {
+            return result;
+        }
+        // Split by any whitespace (space, tab, newline, etc.)
+        for (String word : value.split("\\s+")) {
+            if (!word.isEmpty()) {
+                result.add(word);
+            }
+        }
+        return result;
+    }
+}
+
+
+
+
+output:
+
+["hello", "world", "here", "data-weave"]
+
+
+
+

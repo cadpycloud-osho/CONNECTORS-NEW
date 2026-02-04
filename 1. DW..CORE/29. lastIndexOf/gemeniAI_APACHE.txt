@@ -1,0 +1,118 @@
+lastIndexOf:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class CamelLastIndexOfExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Define our test lists
+                        List<String> list1 = Arrays.asList("a", "b", "c", "d");
+                        List<String> list2 = Arrays.asList("x", "w", "x");
+                        List<String> list3 = Arrays.asList("a", "b", "c", "c");
+
+                        // Create the response Map (Logic equivalent to DataWeave)
+                        Map<String, Integer> result = new LinkedHashMap<>();
+                        result.put("present", list1.lastIndexOf("c"));
+                        result.put("notPresent", list2.lastIndexOf("c"));
+                        result.put("presentMoreThanOnce", list3.lastIndexOf("c"));
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert the Map to the JSON format you requested
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+
+
+---------------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelStringLastIndex {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source Strings
+                        String str1 = "abcd";
+                        String str2 = "xyz";
+                        String str3 = "abcdc";
+
+                        // Mapping the logic (Equivalent to DataWeave)
+                        Map<String, Integer> result = new LinkedHashMap<>();
+                        result.put("present", str1.lastIndexOf("c"));
+                        result.put("notPresent", str2.lastIndexOf("c"));
+                        result.put("presentMoreThanOnce", str3.lastIndexOf("c"));
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert the Java Map to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}

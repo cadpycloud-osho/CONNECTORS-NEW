@@ -1,0 +1,27 @@
+substringEvery:
+
+
+
+input:
+@RestController
+@RequestMapping("/api")
+public class SubstringEveryController {
+    
+    @GetMapping("/substring-every")
+    public List<String> substringEvery() {
+        String input = "substringEvery";
+        int chunkSize = 3;
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < input.length(); i += chunkSize) {
+            result.add(input.substring(i, Math.min(i + chunkSize, input.length())));
+        }
+        return result;
+    }
+}
+
+
+output:
+
+
+["sub", "str", "ing", "Eve", "ry"]
+

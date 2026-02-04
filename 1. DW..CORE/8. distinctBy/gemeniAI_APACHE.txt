@@ -1,0 +1,183 @@
+distinctBy:
+
+
+example 1:
+
+input:
+<route id="Distinct-Simple-Array">
+    <from uri="direct:distinctArray"/>
+    
+    <setBody>
+        <constant>[0, 1, 2, 3, 3, 2, 1, 4]</constant>
+    </setBody>
+
+    <unmarshal><json library="Jackson" unmarshalTypeName="java.util.List"/></unmarshal>
+    
+    <process ref="distinctProcessorBean"/>
+    
+    <marshal><json library="Jackson"/></marshal>
+    
+    <to uri="log:output"/>
+</route>
+
+
+output:
+
+[
+  0,
+  1,
+  2,
+  3,
+  4
+]
+
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+<route id="Distinct-String-Array-In-Object">
+    <from uri="direct:distinctAuthors"/>
+    
+    <setHeader headerName="AuthorsList">
+        <jsonpath>$..author</jsonpath>
+    </setHeader>
+    
+    <setBody>
+        <simple>${header.AuthorsList}</simple>
+    </setBody>
+
+    <unmarshal><json library="Jackson" unmarshalTypeName="java.util.List"/></unmarshal>
+    
+    <process ref="distinctProcessorBean"/>
+    
+    <transform>
+        <simple>
+            { 
+              "book": {
+                "title": "XQuery Kick Start", 
+                "year": "2000", 
+                "authors": ${body} 
+              }
+            }
+        </simple>
+    </transform>
+    
+    <to uri="log:output"/>
+</route>
+
+output:
+
+{
+  "book": {
+    "title": "XQuery Kick Start",
+    "year": "2000",
+    "authors": [
+      "James McGovern",
+      "Per Bothner",
+      "Kurt Cagle",
+      "James Linn",
+      "Vaidyanathan Nagarajan"
+    ]
+  }
+}
+
+
+-----------------------------------------------------------------
+
+example 3:
+
+input:
+
+<route id="Distinct-Object">
+    <from uri="direct:distinctObject"/>
+    
+    <setBody>
+        <constant>{"a" : "b", "A" : "b", "a" : "B"}</constant>
+    </setBody>
+
+    <unmarshal><json library="Jackson" unmarshalTypeName="java.util.Map"/></unmarshal>
+    
+    <marshal><json library="Jackson"/></marshal>
+    
+    <to uri="log:output"/>
+</route>
+
+output:
+
+{
+  "a": "B", 
+  "A": "b"
+}
+
+
+-----------------------------------------------------------------
+
+example 4:
+
+input:
+
+<route id="Distinct-XML-Elements">
+    <from uri="direct:distinctXMLElements"/>
+    
+    <setHeader headerName="AuthorList">
+        <xpath resultType="java.util.List">/book/author/text()</xpath>
+    </setHeader>
+    
+    <setBody>
+        <simple>${header.AuthorList}</simple>
+    </setBody>
+    
+    <process ref="distinctProcessorBean"/> 
+    
+    <bean ref="xmlReconstructorBean" method="buildBookXml"/>
+    
+    <to uri="log:output"/>
+</route>
+
+
+public String buildBookXml(List<String> authors) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("<book>");
+    sb.append("<title> \"XQuery Kick Start\"</title>");
+    sb.append("<authors>");
+    for (String author : authors) {
+        sb.append("<author>").append(author).append("</author>");
+    }
+    sb.append("</authors>");
+    sb.append("</book>");
+    return sb.toString();
+}
+
+
+output:
+
+<book>
+  <title> "XQuery Kick Start"</title>
+  <authors>
+    <author>James Linn</author>
+    <author>Per Bothner</author>
+    <author>James McGovern</author>
+  </authors>
+</book>
+
+
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

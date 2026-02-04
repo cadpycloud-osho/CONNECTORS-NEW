@@ -1,0 +1,59 @@
+startsWith:
+
+startsWith(text: String, prefix: String): Boolean
+
+startsWith(text: String, prefix: String): Boolean
+Returns true or false depending on whether the input string starts with a matching prefix.
+
+
+Source
+%dw 2.0
+output application/json
+---
+[ "Mari" startsWith("Mar"), "Mari" startsWith("Em") ]
+
+DataWeave
+Output
+[ true, false ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

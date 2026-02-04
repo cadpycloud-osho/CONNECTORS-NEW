@@ -1,0 +1,107 @@
+readUrl:
+
+example 1:
+
+input:
+from("direct:start")
+    .to("https://jsonplaceholder.typicode.com/posts/1?httpMethod=GET")
+    .unmarshal().json()
+    .log("Output: ${body}");
+
+
+
+output:
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut ...",
+  "body": "quia et..."
+}
+
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:start")
+    .to("resource:classpath:myJsonSnippet.json")
+    .unmarshal().json()
+    .setBody(simple("${body[results]}"))
+    .split(body())
+        .setBody(simple("${body[profile]}"))
+        .marshal().csv()
+    .end()
+    .log("Output:\n${body}");
+
+
+output:
+
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+--------------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:start")
+    .to("https://mywebsite.com/data.csv")
+    .unmarshal()
+        .csv()
+    .setBody(exchange -> {
+        java.util.List<?> row = exchange.getIn().getBody(java.util.List.class);
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        for (int i = 0; i < row.size(); i++) {
+            result.put("column_" + i, row.get(i));
+        }
+        return java.util.List.of(result);
+    });
+
+
+
+output:
+
+[
+  {
+    "column_0": "Max",
+    "column_1": "the Mule",
+    "column_2": "MuleSoft"
+  }
+]
+
+
+--------------------------------------------------------
+
+
+example 4:
+
+input:
+
+from("direct:start")
+    .to("resource:classpath:name.dwl")
+    .unmarshal().json()
+    .setBody(simple("${body[firstName]}"));
+
+
+output:
+
+"Somebody"
+
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+

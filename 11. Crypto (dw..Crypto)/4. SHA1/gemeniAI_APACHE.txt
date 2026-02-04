@@ -1,0 +1,46 @@
+SHA1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat; // Java 17+
+import java.util.Map;
+
+public class Sha1HashRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateSha1")
+            .routeId("SHA1-Hash-Route")
+            .process(exchange -> {
+                // 1. Input string
+                String input = "dsasd";
+
+                // 2. Logic: Create SHA-1 MessageDigest
+                MessageDigest digest = MessageDigest.getInstance("SHA-1");
+                
+                // 3. Perform the hash to get 20 bytes
+                byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+                // 4. Convert to 40-character Hex String
+                // For Java 8/11: use Apache Commons Codec Hex.encodeHexString()
+                String hexOutput = HexFormat.of().formatHex(encodedHash);
+
+                exchange.getIn().setBody(Map.of("sha1", hexOutput));
+            })
+            .marshal().json()
+            .log("SHA1 Result: ${body}");
+    }
+}
+
+
+output:
+
+
+{
+  "sha1": "2fa183839c954e6366c206367c9be5864e4f4a65"
+}
+

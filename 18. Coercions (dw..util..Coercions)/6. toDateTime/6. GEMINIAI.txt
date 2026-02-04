@@ -1,0 +1,239 @@
+toDateTime:
+
+example 1:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveDateTimeConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceDateTimeString = "2003-10-01 23:57:59Z";
+
+    /**
+     * Mimics DataWeave's chained toDateTime() with multiple formatters.
+     * Tries each formatter. Returns the parsed ZonedDateTime upon success, or null if all fail.
+     */
+    private ZonedDateTime chainedToDateTime(String dateTimeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return ZonedDateTime.parse(dateTimeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Swallow exception and continue to the next formatter
+            }
+        }
+        return null; // Return null if none succeed
+    }
+
+    public String getDateTimeParsingJson() throws IOException {
+        // Define formatters
+        // Note: DataWeave's 'z' often maps to Java's 'z' or 'X' (for UTC/Zulu time)
+        // We use ZonedDateTime and formatters that can handle the Zone ID ('Z') at the end.
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX", Locale.US);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssX", Locale.US);
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        // Try formatter1 (fails), then formatter2 (succeeds)
+        ZonedDateTime parsedDateA = chainedToDateTime(sourceDateTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        String errorMessageB;
+        try {
+            // Only try the failing formatter (formatter1)
+            // Need to use the formatter that doesn't match the input string structure.
+            ZonedDateTime.parse(sourceDateTimeString, formatter1);
+            errorMessageB = "No error occurred.";
+        } catch (DateTimeParseException e) {
+            // Capture the DataWeave specific error message
+            errorMessageB = "Could not find a valid formatter for '" + sourceDateTimeString + "'";
+        }
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes ZonedDateTime using ISO 8601, including the zone (e.g., "2003-10-01T23:57:59Z")
+        if (parsedDateA != null) {
+             root.put("a", parsedDateA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        root.put("b", errorMessageB);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveDateTimeConverter converter = new DataWeaveDateTimeConverter();
+        try {
+            String jsonOutput = converter.getDateTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "2003-10-01T23:57:59Z",
+  "b" : "Could not find a valid formatter for '2003-10-01 23:57:59Z'"
+}
+----------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
+public class DataWeaveEpochConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Converts epoch seconds (Long) to ZonedDateTime (UTC), mimicking toDateTime().
+     */
+    private ZonedDateTime fromEpochSeconds(long epochSeconds) {
+        // Create an Instant from seconds since the epoch
+        Instant instant = Instant.ofEpochSecond(epochSeconds);
+        // Convert the Instant to ZonedDateTime in UTC (Zulu time)
+        return instant.atZone(ZoneOffset.UTC);
+    }
+    
+    /**
+     * Converts epoch milliseconds (Long) to ZonedDateTime (UTC).
+     */
+    private ZonedDateTime fromEpochMilliseconds(long epochMillis) {
+        // Create an Instant from milliseconds since the epoch
+        Instant instant = Instant.ofEpochMilli(epochMillis);
+        // Convert the Instant to ZonedDateTime in UTC (Zulu time)
+        return instant.atZone(ZoneOffset.UTC);
+    }
+
+    public String getEpochConversionJson() throws IOException {
+        
+        // --- Input values from the DataWeave script ---
+        long epochSeconds = 1443743879L;
+        long epochMillis = 1443743879000L;
+        
+        // --- Logic for Key 'fromEpoch' ---
+        ZonedDateTime convertedFromEpoch = fromEpochSeconds(epochSeconds);
+
+        // --- Logic for Key 'fromMillis' ---
+        ZonedDateTime convertedFromMillis = fromEpochMilliseconds(epochMillis);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes ZonedDateTime using the ISO 8601 string format (e.g., "2015-10-01T23:57:59Z")
+        root.put("fromEpoch", convertedFromEpoch.toString());
+        root.put("fromMillis", convertedFromMillis.toString());
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveEpochConverter converter = new DataWeaveEpochConverter();
+        try {
+            String jsonOutput = converter.getEpochConversionJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "fromEpoch" : "2015-10-01T23:57:59Z",
+  "fromMillis" : "2015-10-01T23:57:59Z"
+}
+
+----------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class DataWeaveDateTimeParsingConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getDateTimeParsingJson() throws IOException {
+        
+        // --- Logic for Key 'a' (ISO 8601 Parsing) ---
+        String dateTimeStringA = "2015-10-01T23:57:59Z";
+        // Java's ZonedDateTime.parse() recognizes ISO 8601 formats by default.
+        ZonedDateTime parsedDateA = ZonedDateTime.parse(dateTimeStringA); 
+
+        // --- Logic for Key 'b' (Custom Format Parsing) ---
+        String dateTimeStringB = "2003-10-01 23:57:59Z";
+        // Define the explicit format. DataWeave's 'z' is equivalent to Java's 'X' 
+        // or 'Z' when the input is a literal 'Z' for the zone.
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssX", Locale.US);
+        ZonedDateTime parsedDateB = ZonedDateTime.parse(dateTimeStringB, customFormatter);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes ZonedDateTime using the standard ISO 8601 string format (e.g., "2015-10-01T23:57:59Z")
+        root.put("a", parsedDateA.toString());
+        root.put("b", parsedDateB.toString());
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveDateTimeParsingConverter converter = new DataWeaveDateTimeParsingConverter();
+        try {
+            String jsonOutput = converter.getDateTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "2015-10-01T23:57:59Z",
+  "b" : "2003-10-01T23:57:59Z"
+}
+

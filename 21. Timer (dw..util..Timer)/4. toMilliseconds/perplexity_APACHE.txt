@@ -1,0 +1,41 @@
+toMilliseconds:
+
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ToMillisecondsProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // |2018-07-23T22:03:04.829Z| DataWeave datetime parsing
+        Instant instant = Instant.parse("2018-07-23T22:03:04.829Z");
+        
+        // dw::util::Timer::toMilliseconds() equivalent
+        long milliseconds = instant.toEpochMilli();
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("toMilliseconds", milliseconds);
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:toMilliseconds")
+    .process(new ToMillisecondsProcessor())
+    .log("${body}");
+
+
+
+output:
+
+
+{ "toMilliseconds": 1532383384829 }
+
+

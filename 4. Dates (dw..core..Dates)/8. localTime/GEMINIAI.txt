@@ -1,0 +1,49 @@
+localTime:
+
+
+input:
+
+
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class LocalTimeCreationExample {
+
+    /**
+     * DataWeave equivalent: localTime({ hour: ..., seconds: ...})
+     * Creates a LocalTime object from component fields.
+     * * @param hour The hour component (0 to 23).
+     * @param minute The minute component (0 to 59).
+     * @param second The second component (0 to 59).
+     * @return The resulting LocalTime object.
+     */
+    public static LocalTime createLocalTime(int hour, int minute, int second) {
+        // Use the static factory method LocalTime.of()
+        return LocalTime.of(hour, minute, second);
+    }
+
+    public static void main(String[] args) {
+        // 1. Define the input parameters from DataWeave
+        int hour = 12;
+        int minute = 30;
+        int second = 40;
+
+        System.out.println("--- LocalTime Creation Example ---");
+        
+        // 2. Call the Java function
+        LocalTime newLocalTime = createLocalTime(hour, minute, second);
+        
+        // 3. Format the output to match the DataWeave ISO 8601 format
+        // DateTimeFormatter.ISO_LOCAL_TIME gives "HH:MM:SS"
+        String formattedOutput = newLocalTime.format(DateTimeFormatter.ISO_LOCAL_TIME);
+        
+        System.out.println("Source Input (Components): {hour: " + hour + ", minutes: " + minute + ", seconds: " + second + "}");
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+output:
+
+12:30:40
+

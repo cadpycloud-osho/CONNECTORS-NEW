@@ -1,0 +1,171 @@
+groupBy:
+
+example 1:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+List<String> input = Arrays.asList("a", "b", "c");
+Map<String, List<String>> output = IntStream.range(0, input.size())
+    .boxed()
+    .collect(Collectors.toMap(
+        String::valueOf,
+        i -> Arrays.asList(input.get(i))
+    ));
+
+System.out.println(output);  // { "2": ["c"], "1": ["b"], "0": ["a"] }
+
+
+output:
+{2=[c], 1=[b], 0=[a]}
+
+
+
+-------------------------------------------------------------
+
+example 2:
+
+input:
+import java.util.*;
+import java.util.stream.Collectors;
+
+List<Map<String, String>> myArray = Arrays.asList(
+    Map.of("name", "Foo", "language", "Java"),
+    Map.of("name", "Bar", "language", "Scala"),
+    Map.of("name", "FooBar", "language", "Java")
+);
+
+Map<String, List<Map<String, String>>> output = myArray.stream()
+    .collect(Collectors.groupingBy(item -> item.get("language")));
+
+System.out.println(output);
+
+
+
+output:
+
+{Java=[{name=Foo, language=Java}, {name=FooBar, language=Java}], Scala=[{name=Bar, language=Scala}]}
+
+
+-------------------------------------------------------------
+
+
+
+example 3:
+
+input:
+import java.util.*;
+import java.util.stream.Collectors;
+
+List<Map<String, String>> items = Arrays.asList(
+    Map.of("id", "internal"),
+    Map.of("id", "left", "label", "Move Left"),
+    Map.of("id", "right", "label", "Move Right"),
+    Map.of("id", "up", "label", "Move Up"),
+    Map.of("id", "down", "label", "Move Down")
+);
+
+List<String> labels = items.stream()
+    .map(item -> item.get("label"))
+    .filter(Objects::nonNull)
+    .collect(Collectors.toList());
+
+Map<String, List<String>> output = Map.of("myLabels", labels);
+System.out.println(output);
+
+
+
+output:
+{myLabels=[Move Left, Move Right, Move Up, Move Down]}
+
+
+
+-------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+String input = "hello world!";
+Pattern vowelPattern = Pattern.compile("[aeiou]");
+Map<String, String> output = IntStream.range(0, input.length())
+    .boxed()
+    .collect(Collectors.partitioningBy(
+        i -> vowelPattern.matcher(String.valueOf(input.charAt(i))).find(),
+        Collectors.mapping(i -> String.valueOf(input.charAt(i)), Collectors.joining())
+    ));
+
+System.out.println(output);
+
+
+output:
+
+{false=hll wrld!, true=eoo}
+
+
+-------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+Map<String, String> input = Map.of("a", "b", "c", "d");
+Map<String, Map<String, String>> output = input.entrySet().stream()
+    .collect(Collectors.groupingBy(
+        entry -> entry.getKey().toUpperCase(),
+        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+    ));
+
+System.out.println(output);
+
+
+output:
+
+{B={a=b}, D={c=d}}
+
+
+-------------------------------------------------------------
+
+
+
+example 6:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+List<String> prices = Arrays.asList("9.99", "10.99");
+Map<String, Object> output = Map.of("costs", 
+    prices.stream()
+        .map(price -> Map.of("price", price))
+        .collect(Collectors.toList())
+);
+
+System.out.println(output);
+
+
+output:
+
+{costs=[{price=9.99}, {price=10.99}]}
+
+
+-------------------------------------------------------------
+
+
+
+
+

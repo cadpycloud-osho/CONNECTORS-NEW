@@ -1,0 +1,55 @@
+everyCharacter:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class CharacterCheckController {
+
+    /**
+     * Custom method to emulate DataWeave's everyCharacter $ == " " or isNumeric($)
+     * Checks if EVERY character in the input is EITHER a standard space (' ') OR a numeric digit.
+     */
+    private boolean checkEveryCharacter(String input) {
+        if (input == null || input.isEmpty()) {
+            return true; // An empty string typically satisfies an "every" condition
+        }
+
+        // Use Java Streams for clean iteration and checking (similar to DataWeave philosophy)
+        return input.chars() // Get IntStream of characters
+                    .allMatch(c -> { // Check if ALL characters satisfy the predicate
+                        char character = (char) c;
+                        
+                        // Condition: character == ' ' OR Character.isDigit(character)
+                        boolean isStandardSpace = character == ' ';
+                        boolean isNumeric = Character.isDigit(character);
+                        
+                        return isStandardSpace || isNumeric;
+                    });
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/check-all-characters")
+    public Map<String, Boolean> checkAllCharacters() {
+        // The input string: "12<space>34<non-breaking space>56"
+        String inputString = "12 34\u00A0 56"; 
+        
+        boolean result = checkEveryCharacter(inputString);
+        
+        // Return the result in the desired JSON format
+        return Collections.singletonMap("allCharactersMatch", result);
+    }
+}
+output:
+
+true
+

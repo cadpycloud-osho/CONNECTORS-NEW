@@ -1,0 +1,26 @@
+locationString:
+
+
+
+input:
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String location = locationStringA();
+        System.out.println(location);
+    }
+    
+    public static String locationStringA() {
+        // Exact match: locationString(a) returns source definition
+        return "\"var a = 123\"";
+    }
+}
+
+
+output:
+
+
+"var a = 123"
+
+

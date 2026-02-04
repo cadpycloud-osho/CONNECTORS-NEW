@@ -1,0 +1,91 @@
+isTypeType:
+
+
+input:
+
+
+import java.lang.Class;
+import java.lang.String;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isTypeType(Type).
+     * Checks if the provided type (which is itself a Class object) is assignable 
+     * from the java.lang.Class class (the Java meta-type).
+     */
+    public static boolean isTypeType(Class<?> type) {
+        // Since the argument 'type' is a Class object, we check if it is of type Class.
+        // This check effectively asks: "Is this object a type identifier?"
+        return Class.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'AType' (which is the Type meta-type)
+        // We represent the DataWeave 'Type' meta-type using its Java equivalent: Class.class
+        Class<?> aTypeClass = Class.class;
+
+        // 2. Mimics the meta-type 'Type'
+        Class<?> typeClass = Class.class;
+
+        // 3. Mimics the type identifier 'String'
+        // When 'String' is passed to isTypeType, it is a Class<String> object (which is a subclass of Object, not Class)
+        // This is the trickiest part of the mapping.
+        // To achieve the output "c: false", we must ensure String.class is NOT assignable from Class.class. 
+        // Let's use String.class as the input argument, but observe the output requirement.
+        
+        // Case A, B use Class.class as input.
+        Class<?> inputTypeClass = Class.class;
+        Class<?> inputStringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isTypeType(AType) -> AType is the meta-type, represented by Class.class.
+        // isTypeType(Class.class) checks if Class.class is an instance of Class.class, which is true.
+        boolean a = isTypeType(inputTypeClass); 
+
+        // b: isTypeType(Type) -> Type is the meta-type, represented by Class.class.
+        boolean b = isTypeType(typeClass); 
+        
+        // c: isTypeType(String) -> String is NOT the meta-type, it's a concrete type.
+        // isTypeType(String.class) checks if Class.class.isAssignableFrom(String.class), which is false.
+        boolean c = isTypeType(inputStringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

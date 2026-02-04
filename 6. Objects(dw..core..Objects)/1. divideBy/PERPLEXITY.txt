@@ -1,0 +1,75 @@
+divideBy:
+
+
+
+input:
+
+
+package com.example.dividebyobject;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class DivideByObjectApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DivideByObjectApplication.class, args);
+    }
+}
+
+@RestController
+class DivideByController {
+
+    @GetMapping("/divide-by")
+    public Map<String, Object> divideByExample() {
+        // Represent the input as list of key-value pairs in insertion order
+        List<Map<String, Object>> initialObjects = Arrays.asList(
+                Collections.singletonMap("a", 1),
+                Collections.singletonMap("b", true),
+                Collections.singletonMap("a", 2),
+                Collections.singletonMap("b", false),
+                Collections.singletonMap("c", 3)
+        );
+
+        // We want to group every 2 elements into a single map
+
+        List<Map<String, Object>> divided = new ArrayList<>();
+        for (int i = 0; i < initialObjects.size(); i += 2) {
+            Map<String, Object> groupMap = new LinkedHashMap<>();
+            for (int j = i; j < i + 2 && j < initialObjects.size(); j++) {
+                groupMap.putAll(initialObjects.get(j));
+            }
+            divided.add(groupMap);
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("divideBy", divided);
+        return result;
+    }
+}
+
+
+ouput:
+
+{
+  "divideBy": [
+    {
+      "a": 1,
+      "b": true
+    },
+    {
+      "a": 2,
+      "b": false
+    },
+    {
+      "c": 3
+    }
+  ]
+}
+

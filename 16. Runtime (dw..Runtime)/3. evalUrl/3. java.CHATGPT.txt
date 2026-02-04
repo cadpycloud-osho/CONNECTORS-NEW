@@ -1,0 +1,36 @@
+evalUrl:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        // Simulated evalUrl("example.dwl", payload)
+        Map<String, Object> executeOk = new LinkedHashMap<>();
+        executeOk.put("success", true);
+        executeOk.put("value", "Mariano");
+        executeOk.put("logs", new ArrayList<>());
+        response.put("execute_ok", executeOk);
+
+        // Simulated evalUrl("example.dwl", {}, payload)
+        Map<String, Object> executeOkWithValue = new LinkedHashMap<>();
+        executeOkWithValue.put("success", true);
+        executeOkWithValue.put("value", "Mariano");
+        executeOkWithValue.put("logs", new ArrayList<>());
+        response.put("execute_ok_withValue", executeOkWithValue);
+
+        System.out.println(response);
+    }
+}
+
+
+output:
+
+{execute_ok={success=true, value=Mariano, logs=[]}, execute_ok_withValue={success=true, value=Mariano, logs=[]}}

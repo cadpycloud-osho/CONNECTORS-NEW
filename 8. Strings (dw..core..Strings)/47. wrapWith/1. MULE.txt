@@ -1,0 +1,54 @@
+wrapWith:
+
+wrapWith(text: String, wrapper: String): String
+
+wrapWith(text: String, wrapper: String): String
+Wraps the specified text with the given wrapper.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "a": wrapWith(null, "'"),
+  "b": wrapWith("", "'"),
+  "c": wrapWith("ab", "x"),
+  "d": wrapWith("'ab'", "'"),
+  "e": wrapWith("ab", "'")
+}
+
+DataWeave
+Output
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

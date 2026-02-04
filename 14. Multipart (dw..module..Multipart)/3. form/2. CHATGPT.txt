@@ -1,0 +1,139 @@
+form:
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class MultipartController {
+
+    @GetMapping(value = "/multipart-form", produces = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> generateMultipart() throws IOException {
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
+        // ---- FILE PART ----
+        File ordersFile = new File("orders.xml"); // your ./orders.xml file
+        FileSystemResource fileResource = new FileSystemResource(ordersFile);
+
+        HttpHeaders xmlHeaders = new HttpHeaders();
+        xmlHeaders.setContentType(MediaType.APPLICATION_XML);
+        xmlHeaders.setContentDispositionFormData("file", "myorders.xml");
+
+        HttpEntity<FileSystemResource> fileEntity = new HttpEntity<>(fileResource, xmlHeaders);
+        body.add("file", fileEntity);
+
+
+        // ---- TEXT FIELD PART ----
+        HttpHeaders textHeaders = new HttpHeaders();
+        textHeaders.setContentType(MediaType.TEXT_PLAIN);
+        textHeaders.setContentDispositionFormData("userName", null);
+
+        HttpEntity<String> userEntity = new HttpEntity<>("Annie Point", textHeaders);
+        body.add("userName", userEntity);
+
+
+        // ---- JSON FIELD PART ----
+        String json = "{ \"user\": \"Annie Point\" }";
+
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+        jsonHeaders.setContentDispositionFormData("myJson", "userInfo.json");
+
+        HttpEntity<String> jsonEntity = new HttpEntity<>(json, jsonHeaders);
+        body.add("myJson", jsonEntity);
+
+        HttpHeaders outerHeaders = new HttpHeaders();
+        outerHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        return new ResponseEntity<>(body, outerHeaders, HttpStatus.OK);
+    }
+}
+
+
+
+output:
+
+------=_Part_146_143704079
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_146_143704079
+Content-Type: text/plain
+Content-Disposition: form-data; name="userName"
+
+Annie Point
+------=_Part_146_143704079
+Content-Type: application/json
+Content-Disposition: form-data; name="myJson"; filename="userInfo.json"
+
+{
+  "user": "Annie Point"
+}
+------=_Part_146_143704079--
+
+-----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+
+@RestController
+public class MultipartDemoController {
+
+    @GetMapping(value = "/generateMultipart", produces = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> generateMultipart() {
+
+        String firstPart = "content for my first part";
+        String secondPart = "content for my second part";
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
+        // Part 1 (equivalent to Multipart::field({name:"myFirstPart", value: firstPart}))
+        body.add("myFirstPart", firstPart);
+
+        // Part 2 (equivalent to Multipart::field("mySecondPart", secondPart))
+        body.add("mySecondPart", secondPart);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
+}
+
+
+output:
+
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161.1542639222352--
+
+

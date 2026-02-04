@@ -1,0 +1,21 @@
+attr:
+
+
+input:
+
+Map<String, Object> result = new LinkedHashMap<>();
+result.put("kind", "Attribute");
+result.put("namespace", "http://acme.com/foo");
+result.put("selector", "myAttr");
+
+
+
+
+output:
+
+
+{
+  "kind": "Attribute",
+  "namespace": "http://acme.com/foo",
+  "selector": "myAttr"
+}

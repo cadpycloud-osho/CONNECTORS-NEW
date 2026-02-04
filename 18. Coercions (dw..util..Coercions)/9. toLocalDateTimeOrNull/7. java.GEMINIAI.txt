@@ -1,0 +1,67 @@
+toLocalDateTimeOrNull:
+
+
+
+input:
+
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    private final String sourceDateTimeString = "2003-10-01 23:57:59";
+
+    /**
+     * Mimics DataWeave's toLocalDateTimeOrNull() behavior.
+     */
+    private LocalDateTime toLocalDateTimeOrNull(String dateTimeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDateTime.parse(dateTimeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Ignore the error and try the next formatter
+            }
+        }
+        return null;
+    }
+
+    public Map<String, Object> getLocalDateTimeParsingMap() {
+        // Define formatters
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss", Locale.US);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.US);
+        
+        // --- Logic for Key 'a' ---
+        LocalDateTime parsedDateA = toLocalDateTimeOrNull(sourceDateTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' ---
+        LocalDateTime parsedDateB = toLocalDateTimeOrNull(sourceDateTimeString, formatter1);
+
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results. Use the ISO string format or null.
+        rootMap.put("a", parsedDateA != null ? parsedDateA.toString() : null);
+        rootMap.put("b", parsedDateB != null ? parsedDateB.toString() : null);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaToLocalDateTimeOrNullConverter converter = new PureJavaToLocalDateTimeOrNullConverter();
+        Map<String, Object> result = converter.getLocalDateTimeParsingMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+{a=2003-10-01T23:57:59, b=null}
+

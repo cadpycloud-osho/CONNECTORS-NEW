@@ -1,0 +1,43 @@
+location:
+
+
+
+input:
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class LocationController {
+
+    @GetMapping(value = "/location-sqrt", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> locationSqrt() {
+        // Matches: location(sqrt) from dw::Core
+        return Map.of(
+            "uri", "/dw/Core.dwl",
+            "nameIdentifier", "dw::Core",
+            "startLine", 5797,
+            "startColumn", 36,
+            "endLine", 5797,
+            "endColumn", 77
+        );
+    }
+}
+
+
+
+output:
+
+
+{
+  "uri": "/dw/Core.dwl",
+  "nameIdentifier": "dw::Core",
+  "startLine": 5797,
+  "startColumn": 36,
+  "endLine": 5797,
+  "endColumn": 77
+}
+

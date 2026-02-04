@@ -1,0 +1,93 @@
+toDateTimeOrNull:
+
+
+
+input:
+
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private final String sourceDateTimeString = "2003-10-01 23:57:59Z";
+
+    /**
+     * Mimics DataWeave's toDateTimeOrNull() behavior.
+     * Tries multiple formatters and returns null if none succeed.
+     */
+    private ZonedDateTime toDateTimeOrNull(String dateTimeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // If parsing succeeds, return the result immediately.
+                return ZonedDateTime.parse(dateTimeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Ignore the error and try the next formatter
+            }
+        }
+        // If the loop finishes without returning, all formatters failed.
+        return null;
+    }
+
+    public Map<String, Object> getDateTimeParsingMap() {
+        // Define formatters
+        // Formatter 1: Fails (Expected slashes 'uuuu/MM/dd', found hyphens 'uuuu-MM-dd')
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX", Locale.US);
+        // Formatter 2: Succeeds (Matches 'uuuu-MM-dd HH:mm:ssX')
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssX", Locale.US);
+        
+        // --- Logic for Key 'a' (Successful Chaining) ---
+        // Fails with formatter1, succeeds with formatter2 -> returns a ZonedDateTime
+        ZonedDateTime parsedDateA = toDateTimeOrNull(sourceDateTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Failure to Parse) ---
+        // Fails with formatter1, no other options -> returns null
+        ZonedDateTime parsedDateB = toDateTimeOrNull(sourceDateTimeString, formatter1);
+
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results. Use the ISO string format or null.
+        rootMap.put("a", parsedDateA != null ? parsedDateA.toString() : null); // "2003-10-01T23:57:59Z"
+        rootMap.put("b", parsedDateB != null ? parsedDateB.toString() : null); // null
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Object> result = converter.getDateTimeParsingMap();
+        
+        // Reformat the Map output to match the requested JSON-like string exactly
+        String formattedOutput = "{" + 
+            result.entrySet().stream()
+                .map(entry -> {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    
+                    if (value == null) {
+                        return String.format("\"%s\":null", key);
+                    } else {
+                        // Quote the string values
+                        return String.format("\"%s\":\"%s\"", key, value.toString());
+                    }
+                })
+                .collect(Collectors.joining(",")) + 
+            "}";
+
+        System.out.println(formattedOutput);
+    }
+}
+
+
+output:
+
+{a=2003-10-01T23:57:59Z, b=null}
+

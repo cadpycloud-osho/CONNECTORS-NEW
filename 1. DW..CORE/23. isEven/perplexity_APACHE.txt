@@ -1,0 +1,25 @@
+isEven:
+
+
+input:
+
+import java.util.*;
+
+List<Boolean> isEvenResults = Arrays.asList(
+    0 % 2 == 0,
+    1 % 2 == 0,
+    (1 + 1) % 2 == 0
+);
+
+Map<String, List<Boolean>> output = Map.of(
+    "isEven", isEvenResults
+);
+
+System.out.println(output);
+
+
+output:
+
+{isEven=[true, false, true]}
+
+

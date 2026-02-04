@@ -1,0 +1,25 @@
+with:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class SsnMaskController {
+
+    @GetMapping("/ssnMask")
+    public Map<String, String> ssnMask() {
+        String ssn = "987-65-4321";
+        String masked = ssn.replaceAll("[0-9]", "x");
+        return Map.of("ssn", masked);
+    }
+}
+
+
+output:
+
+
+{ "ssn": "xxx-xx-xxxx" }

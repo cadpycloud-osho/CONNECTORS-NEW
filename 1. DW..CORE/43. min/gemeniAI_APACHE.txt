@@ -1,0 +1,59 @@
+min:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class CamelMinFunctionExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Data Preparation
+                        List<Integer> listA = Arrays.asList(1, 1000);
+                        List<Integer> listB = Arrays.asList(1, 2, 3);
+                        List<Double> listC = Arrays.asList(1.5, 2.5, 3.5);
+
+                        // Result Map equivalent to DataWeave object
+                        Map<String, Number> result = new LinkedHashMap<>();
+                        
+                        // Using Collections.min()
+                        result.put("a", Collections.min(listA));
+                        result.put("b", Collections.min(listB));
+                        result.put("c", Collections.min(listC));
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert the Map to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "a": 1,
+  "b": 1,
+  "c": 1.5
+}
+

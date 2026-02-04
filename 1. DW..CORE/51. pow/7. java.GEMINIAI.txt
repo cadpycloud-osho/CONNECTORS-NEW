@@ -1,0 +1,48 @@
+pow:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main { // Class name corrected to Main for better compatibility
+
+    public static void main(String[] args) {
+        // --- 1. Define the operations ---
+        
+        // Operation 1: 2 pow 3 (Math.pow(2, 3) = 8.0)
+        long result1 = (long) Math.pow(2, 3); 
+
+        // Operation 2: 3 pow 2 (Math.pow(3, 2) = 9.0)
+        long result2 = (long) Math.pow(3, 2); 
+
+        // Operation 3: 7 pow 3 (Math.pow(7, 3) = 343.0)
+        long result3 = (long) Math.pow(7, 3); 
+
+        // --- 2. Assemble the data structure (using standard List) ---
+        List<Long> outputList = Arrays.asList(result1, result2, result3);
+
+        // --- 3. Manually format the result into the required JSON array ---
+        String outputJson = formatListAsJsonArray(outputList);
+        
+        System.out.println(outputJson);
+    }
+    
+    /**
+     * Helper method to manually format a List of Longs into a compact JSON array string.
+     */
+    private static String formatListAsJsonArray(List<Long> list) {
+        return list.stream()
+            // Convert each Long to a String
+            .map(String::valueOf)
+            // Join them with commas, wrapped in brackets
+            .collect(Collectors.joining(", ", "[", "]"));
+    }
+}
+
+output:
+
+[ 8, 9, 343 ]
+

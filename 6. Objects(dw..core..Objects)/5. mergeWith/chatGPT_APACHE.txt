@@ -1,0 +1,53 @@
+mergeWith:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+
+public class MergeWithProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // First map
+        Map<String, Object> map1 = new LinkedHashMap<>();
+        map1.put("a", true);
+        map1.put("b", 1);
+
+        // Second map
+        Map<String, Object> map2 = new LinkedHashMap<>();
+        map2.put("a", false);
+        map2.put("c", "Test");
+
+        // Merge maps: values from map2 overwrite map1
+        Map<String, Object> merged = new LinkedHashMap<>(map1);
+        merged.putAll(map2);
+
+        // Set output
+        Map<String, Object> output = new HashMap<>();
+        output.put("mergeWith", merged);
+
+        exchange.getIn().setBody(output);
+    }
+}
+from("direct:start")
+    .process(new MergeWithProcessor())
+    .to("log:output");
+
+
+output:
+
+{
+  "mergeWith": {
+    "a": false,
+    "b": 1,
+    "c": "Test"
+  }
+}
+
+
+
+
+

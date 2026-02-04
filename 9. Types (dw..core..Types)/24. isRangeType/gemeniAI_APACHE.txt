@@ -1,0 +1,55 @@
+isRangeType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class RangeTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkRange")
+            .process(exchange -> {
+                // In Java, we define what a 'Range' is (e.g., a custom class or an Interval)
+                Object refA = NumberRange.class;
+                Object refB = new NumberRange(1, 10); // A Range instance
+                Object refC = "1..10";                // A String literal
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Verify if the object is an instance or the class of our Range type
+                result.put("a", isRangeType(refA));
+                result.put("b", isRangeType(refB));
+                result.put("c", isRangeType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isRangeType(Object obj) {
+        if (obj == null) return false;
+        // Check if it's the class definition or an instance of a Range structure
+        return obj instanceof NumberRange || obj.equals(NumberRange.class);
+    }
+
+    // A simple representation of the DataWeave Range type
+    public static class NumberRange {
+        private final int start, end;
+        public NumberRange(int start, int end) { this.start = start; this.end = end; }
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

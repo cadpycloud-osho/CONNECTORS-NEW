@@ -1,0 +1,79 @@
+some:
+
+
+input:
+
+import java.util.*;
+import java.util.function.Predicate;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Boolean> okResults = List.of(
+            some(List.of(1, 2, 3), n -> n % 2 == 0),
+            some(List.of(1, 2, 3), n -> n % 2 == 0),
+            some(List.of(1, 2, 3), n -> n % 2 == 1),
+            someWithLog(List.of(1,2,3,4,5,6,7,8), n -> n == 2),
+            some(List.of(1, 2, 3), n -> n == 1),
+            some(List.of(1, 1, 1), n -> n == 1),
+            some(List.of(1), n -> n == 1)
+        );
+
+        List<Boolean> errResults = List.of(
+            some(List.of(1, 2, 3), n -> n == 100),
+            some(List.of(1), n -> n == 2)
+        );
+
+        Map<String, Object> output = Map.of(
+            "results", List.of(
+                Map.of("ok", okResults),
+                Map.of("err", errResults)
+            )
+        );
+
+        System.out.println(output);
+    }
+
+    // Generic some() implementation
+    static <T> boolean some(List<T> list, Predicate<T> predicate) {
+        for (T item : list) {
+            if (predicate.test(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // some() with logging & early stop
+    static boolean someWithLog(List<Integer> list, Predicate<Integer> predicate) {
+        for (Integer n : list) {
+            System.out.println("should stop at 2 == " + n);
+            if (predicate.test(n)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+output:
+
+
+should stop at 2 == 1
+should stop at 2 == 2
+
+
+
+
+
+
+{
+  results=[
+    {ok=[true, true, true, true, true, true, true]},
+    {err=[false, false]}
+  ]
+}
+
+

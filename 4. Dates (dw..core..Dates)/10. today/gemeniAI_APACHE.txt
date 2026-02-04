@@ -1,0 +1,39 @@
+today:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class TodayDateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getToday")
+            .routeId("Today-Date-Route")
+            .process(exchange -> {
+                // 1. Logic: today()
+                // LocalDate.now() gets the current date without time or timezone
+                LocalDate today = LocalDate.now();
+
+                // 2. Format to ISO-8601 string (yyyy-MM-dd)
+                String result = today.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                // 3. Set the result as the message body
+                exchange.getIn().setBody(result);
+            })
+            // 4. Logic: output application/json
+            // Since the output is a single string value, we can wrap it or send as is
+            .marshal().json() 
+            .log("Current Date: ${body}");
+    }
+}
+
+
+
+output:
+
+"2026-01-21"

@@ -1,0 +1,32 @@
+pow:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class PowRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:pow")
+            .process(exchange -> {
+                List<Integer> result = Arrays.asList(
+                    (int) Math.pow(2, 3),   // 8
+                    (int) Math.pow(3, 2),   // 9
+                    (int) Math.pow(7, 3)    // 343
+                );
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[8, 9, 343]
+
+

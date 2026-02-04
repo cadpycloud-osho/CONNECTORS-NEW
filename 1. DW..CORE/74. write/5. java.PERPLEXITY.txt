@@ -1,0 +1,91 @@
+write:
+
+example 1:
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String hello = "world";
+        System.out.println("{\"hello\" : \"" + hello + "\"}");
+    }
+}
+
+
+
+output:
+
+{"hello":"world"}
+
+
+--------------------------------------------------
+
+
+example 2:
+
+input:
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Simulate input payload
+        List<Map<String, String>> payload = Arrays.asList(
+            Map.of("Name", "Mr White", "Email", "white@mulesoft.com", "Id", "1234", "Title", "Chief Java Prophet"),
+            Map.of("Name", "Mr Orange", "Email", "orange@mulesoft.com", "Id", "4567", "Title", "Integration Ninja")
+        );
+        
+        // Generate CSV with header and | separator
+        StringBuilder csv = new StringBuilder();
+        String[] headers = {"Name", "Email", "Id", "Title"};
+        
+        // Header row
+        for (int i = 0; i < headers.length; i++) {
+            csv.append(headers[i]);
+            if (i < headers.length - 1) csv.append("|");
+        }
+        csv.append("\n");
+        
+        // Data rows
+        for (Map<String, String> row : payload) {
+            for (int i = 0; i < headers.length; i++) {
+                String header = headers[i];
+                csv.append(row.getOrDefault(header, ""));
+                if (i < headers.length - 1) csv.append("|");
+            }
+            csv.append("\n");
+        }
+        
+        // Wrap CSV in XML <output> element
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.newDocument();
+        Element output = doc.createElement("output");
+        output.setTextContent(csv.toString().trim());
+        doc.appendChild(output);
+        
+        // Output XML
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.transform(new DOMSource(doc), new StreamResult(System.out));
+    }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja
+</output>
+
+
+--------------------------------------------------

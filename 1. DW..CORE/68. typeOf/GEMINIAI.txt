@@ -1,0 +1,92 @@
+typeOf:
+
+
+example 1:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class TypeOfExample1 {
+
+    // Helper method to map Java types to DWL type strings
+    private static String getDwType(Object obj) {
+        if (obj instanceof String) return "String";
+        if (obj instanceof List) return "Array";
+        if (obj instanceof Number) return "Number";
+        if (obj instanceof Boolean) return "Boolean";
+        if (obj instanceof Map) return "Object";
+        return "Unknown";
+    }
+
+    public static void main(String[] args) {
+        String str = "A b";
+        List<Integer> arr = Arrays.asList(1, 2);
+        Integer num = 34;
+        Boolean bool = true;
+        
+        // Map is the Java equivalent of a JSON Object
+        Map<String, Integer> obj = new LinkedHashMap<>();
+        obj.put("a", 5);
+        
+        List<String> output = Arrays.asList(
+            getDwType(str),
+            getDwType(arr),
+            getDwType(num),
+            getDwType(bool),
+            getDwType(obj)
+        );
+        
+        System.out.println("--- DWL Example 1 Output (Basic Types) ---");
+        System.out.println(output);
+    }
+}
+
+output:
+
+[String, Array, Number, Boolean, Object]
+
+----------------------------------------------------------
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class TypeOfExample2 {
+
+    // Helper method: In Java, we check the actual class of the object instance.
+    private static String getJavaType(Object obj) {
+        return obj.getClass().getSimpleName();
+    }
+
+    public static void main(String[] args) {
+        // var x: String | Number is replicated by setting the variable type to Object
+        // but initializing it with a String. The runtime type is String.
+        Object x = "clearly a string"; 
+        
+        // var y: "because" is replicated by setting the variable to a String.
+        String y = "because";
+        
+        List<String> output = Arrays.asList(
+            // The class name will be String
+            getJavaType(x), 
+            // The class name will be String
+            getJavaType(y)
+        );
+        
+        System.out.println("--- DWL Example 2 Output (Variables) ---");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+[String, String]

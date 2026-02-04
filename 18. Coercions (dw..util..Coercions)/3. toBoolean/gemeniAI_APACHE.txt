@@ -1,0 +1,42 @@
+toBoolean:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BooleanCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceToBoolean")
+            .process(exchange -> {
+                // Accessing the Camel TypeConverter
+                var converter = exchange.getContext().getTypeConverter();
+                
+                Map<String, Boolean> results = new LinkedHashMap<>();
+                results.put("a", converter.convertTo(Boolean.class, "true"));
+                results.put("b", converter.convertTo(Boolean.class, "false"));
+                results.put("c", converter.convertTo(Boolean.class, "FALSE"));
+                results.put("d", converter.convertTo(Boolean.class, "TrUe"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": false,
+  "c": false,
+  "d": true
+}
+
+

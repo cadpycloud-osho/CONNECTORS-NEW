@@ -1,0 +1,65 @@
+reverse:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class ReverseController {
+
+    @GetMapping("/reverse-conversion")
+    public Map<String, String> convertDataWeaveReverse() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = ReverseUtil.reverseString("Mariano");
+        String b = ReverseUtil.reverseString(null);
+        String c = ReverseUtil.reverseString("");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'b' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c
+        );
+    }
+}
+
+
+public class ReverseUtil {
+
+    /**
+     * Replicates the dw::core::Strings::reverse function.
+     * Reverses the input string, handling null input as required by DataWeave.
+     *
+     * @param str The input string (can be null).
+     * @return The reversed string, or null if the input string was null.
+     */
+    public static String reverseString(String str) {
+        // DataWeave Rule: If the input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+
+        // Use StringBuilder for efficient string reversal in Java.
+        return new StringBuilder(str).reverse().toString();
+    }
+}
+output:
+
+{
+  "a": "onairaM",
+  "b": null,
+  "c": ""
+}
+
+
+
+
+
+

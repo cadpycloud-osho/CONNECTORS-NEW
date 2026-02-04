@@ -1,0 +1,42 @@
+dropWhile:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class DropWhileRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:dropWhile")
+            .process(exchange -> {
+                List<Integer> arr = Arrays.asList(0, 1, 3, 2, 1);
+                
+                // dropWhile $ < 3 → drop while each element < 3
+                // [0<3✓, 1<3✓, 3<3✗] → drop [0,1], keep from 3
+                List<Integer> result = dropWhile(arr, x -> x < 3);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private <T> List<T> dropWhile(List<T> list, java.util.function.Predicate<T> predicate) {
+        int dropCount = 0;
+        while (dropCount < list.size() && predicate.test(list.get(dropCount))) {
+            dropCount++;
+        }
+        return list.subList(dropCount, list.size());
+    }
+}
+
+
+
+output:
+
+[ 3, 2, 1 ]
+
+

@@ -1,0 +1,47 @@
+isDecimal:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsDecimalController {
+
+    private boolean isDecimal(Object value) {
+        if (value == null) return false;
+
+        try {
+            Double.parseDouble(value.toString());
+            // If conversion succeeds → check decimal
+            return value.toString().contains(".");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @GetMapping("/check-decimal")
+    public List<Boolean> checkDecimal() {
+        List<Object> input = List.of(1.1, 1, "1.1");
+
+        List<Boolean> result = new ArrayList<>();
+        for (Object obj : input) {
+            result.add(isDecimal(obj));
+        }
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+[
+  true,
+  false,
+  true
+]

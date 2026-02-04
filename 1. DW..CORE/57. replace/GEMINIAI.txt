@@ -1,0 +1,66 @@
+replace:
+
+example 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveExample1 {
+
+    public static void main(String[] args) {
+        // 1. "123-456-7890" replace /.*-/ with("")
+        String str1 = "123-456-7890";
+        // .*- is a regex that matches everything up to the final hyphen.
+        String result1_str = str1.replaceAll(".*-", ""); 
+        // Convert to Integer to match DWL's type inference (7890 is a number)
+        Integer result1 = Integer.parseInt(result1_str); 
+
+        // 2. "abc123def" replace /[b13e]/ with("-")
+        String str2 = "abc123def";
+        // [b13e] is a regex character class matching 'b', '1', '3', or 'e'.
+        String result2 = str2.replaceAll("[b13e]", "-"); 
+
+        // Combine into a List (Java equivalent of a JSON Array)
+        List<Object> finalOutput = Arrays.asList(result1, result2);
+        
+        System.out.println("DWL Example 1 Output:");
+        System.out.println(finalOutput); 
+    }
+}
+
+
+output:
+
+[7890, a-c-2-d-f]
+
+
+---------------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+public class DataWeaveExample2 {
+
+    public static void main(String[] args) {
+        // "admin123" replace "123" with("ID")
+        String str = "admin123";
+        // String.replaceAll() can be used for simple string replacement globally
+        String result = str.replaceAll("123", "ID"); 
+        
+        // Output the result as a JSON-like object string
+        System.out.println("DWL Example 2 Output:");
+        System.out.println("{ \"replace\": \"" + result + "\" }"); 
+    }
+}
+
+
+output:
+
+{ "replace": "adminID" }

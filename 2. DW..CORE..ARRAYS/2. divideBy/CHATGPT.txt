@@ -1,0 +1,124 @@
+divideBy:
+
+
+
+input:
+
+package com.example.divideby;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DivideByApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DivideByApplication.class, args);
+    }
+}
+
+Controller → DivideByController.java
+
+package com.example.divideby;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class DivideByController {
+
+    // Helper method that works like DataWeave divideBy
+    private List<List<Integer>> divideBy(List<Integer> list, int size) {
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += size) {
+            result.add(list.subList(i, Math.min(i + size, list.size())));
+        }
+        return result;
+    }
+
+    // Example 1: [1,2,3,4,5] divideBy 2
+    @GetMapping("/divideBy1")
+    public Map<String, Object> divideByExample1() {
+        return Map.of(
+                "divideBy2",
+                divideBy(Arrays.asList(1, 2, 3, 4, 5), 2)
+        );
+    }
+
+    // Example 2: [1,2,3,4,5,6] divideBy 2
+    @GetMapping("/divideBy2")
+    public Map<String, Object> divideByExample2() {
+        return Map.of(
+                "divideBy2",
+                divideBy(Arrays.asList(1, 2, 3, 4, 5, 6), 2)
+        );
+    }
+
+    // Example 3: [1,2,3,4,5] divideBy 3
+    @GetMapping("/divideBy3")
+    public Map<String, Object> divideByExample3() {
+        return Map.of(
+                "divideBy3",
+                divideBy(Arrays.asList(1, 2, 3, 4, 5), 3)
+        );
+    }
+}
+
+output:
+
+Output for /divideBy1
+
+
+{
+  "divideBy2": [
+    [1, 2],
+    [3, 4],
+    [5]
+  ]
+}
+
+Output for /divideBy2
+
+{
+  "divideBy2": [
+    [1, 2],
+    [3, 4],
+    [5, 6]
+  ]
+}
+
+
+Output for /divideBy3
+
+{
+  "divideBy3": [
+    [1, 2, 3],
+    [4, 5]
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,60 @@
+capitalize:
+
+
+input:
+import java.util.*;
+
+public class CapitalizeExample {
+
+    public static void main(String[] args) {
+
+        Map<String, String> output = new LinkedHashMap<>();
+
+        output.put("a", capitalize("customer"));
+        output.put("b", capitalize("customer_first_name"));
+        output.put("c", capitalize("customer NAME"));
+        output.put("d", capitalize("customerName"));
+        output.put("e", capitalize("a*s_b’s"));
+
+        System.out.println(output);
+    }
+
+    private static String capitalize(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        // Replace underscores with spaces
+        String normalized = input.replace("_", " ");
+
+        // Split by spaces
+        String[] words = normalized.split("\\s+");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (!word.isEmpty()) {
+                // Capitalize first letter, keep the rest as-is
+                char first = Character.toUpperCase(word.charAt(0));
+                String rest = word.length() > 1 ? word.substring(1) : "";
+                result.append(first).append(rest);
+            }
+            if (i < words.length - 1) {
+                result.append(" ");
+            }
+        }
+
+        return result.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": "Customer",
+  "b": "Customer First Name",
+  "c": "Customer Name",
+  "d": "Customer Name",
+  "e": "A*S B’S"
+}
+
+

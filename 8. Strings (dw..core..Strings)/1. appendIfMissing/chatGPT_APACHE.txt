@@ -1,0 +1,47 @@
+appendIfMissing:
+
+input:
+
+import java.util.*;
+
+public class AppendIfMissingExample {
+
+    public static void main(String[] args) {
+
+        Map<String, String> output = new LinkedHashMap<>();
+
+        output.put("a", appendIfMissing(null, ""));
+        output.put("b", appendIfMissing("abc", ""));
+        output.put("c", appendIfMissing("", "xyz"));
+        output.put("d", appendIfMissing("abc", "xyz"));
+        output.put("e", appendIfMissing("abcxyz", "xyz"));
+
+        System.out.println(output);
+    }
+
+    private static String appendIfMissing(String str, String suffix) {
+        if (str == null) {
+            return null; // preserve null
+        }
+        if (str.isEmpty()) {
+            return suffix; // empty string → return suffix
+        }
+        if (!str.endsWith(suffix)) {
+            return str + suffix; // append if missing
+        }
+        return str; // already ends with suffix
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+
+

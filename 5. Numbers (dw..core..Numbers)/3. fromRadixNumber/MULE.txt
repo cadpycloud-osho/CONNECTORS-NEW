@@ -1,0 +1,27 @@
+fromRadixNumber:
+
+fromRadixNumber(numberStr: String, radix: Number): Number
+
+fromRadixNumber(numberStr: String, radix: Number): Number
+Transforms a number in the specified radix into decimal number
+
+
+
+Source
+%dw 2.0
+import fromRadixNumber from dw::core::Numbers
+output application/json
+---
+{
+    a: fromRadixNumber("10", 2),
+    b: fromRadixNumber("FF", 16)
+}
+
+DataWeave
+Output
+{
+  "a": 2,
+  "b": 255
+}
+
+

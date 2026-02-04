@@ -1,0 +1,51 @@
+toPeriod:
+
+toPeriod(str: String): Period
+
+toPeriod(str: String): Period
+Transform a String value into a Period value.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+  toPeriodEx1: toPeriod("P1D"),
+  toPeriodEx2: toPeriod("PT1H1M")
+}
+
+
+DataWeave
+Output
+{
+  toPeriodEx1: |P1D|,
+  toPeriodEx2: |PT1H1M|
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

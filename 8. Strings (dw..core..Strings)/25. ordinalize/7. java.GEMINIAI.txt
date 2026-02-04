@@ -1,0 +1,72 @@
+ordinalize:
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = OrdinalizeUtil.ordinalize(1);
+        String b = OrdinalizeUtil.ordinalize(2);
+        String c = OrdinalizeUtil.ordinalize(5);
+        String d = OrdinalizeUtil.ordinalize(103);
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": \"%s\",\n  \"b\": \"%s\",\n  \"c\": \"%s\",\n  \"d\": \"%s\"\n}",
+            a, b, c, d
+        );
+
+        System.out.println(output);
+    }
+
+    // The utility method is included here for completeness, though it would ideally be 
+    // in a separate helper class as shown in the Spring Boot example.
+    public static class OrdinalizeUtil {
+        public static String ordinalize(int n) {
+            if (n < 0) {
+                // Typically you'd handle this more gracefully, but sticking to core logic
+                throw new IllegalArgumentException("Ordinalization is typically for positive integers.");
+            }
+            
+            // Special case for 11, 12, 13
+            if (n % 100 >= 11 && n % 100 <= 13) {
+                return n + "th";
+            }
+            
+            // Determine the suffix based on the last digit
+            String suffix;
+            switch (n % 10) {
+                case 1:
+                    suffix = "st";
+                    break;
+                case 2:
+                    suffix = "nd";
+                    break;
+                case 3:
+                    suffix = "rd";
+                    break;
+                default:
+                    suffix = "th"; // 0, 4-9
+                    break;
+            }
+            
+            return n + suffix;
+        }
+    }
+}
+
+output:
+
+{
+  "a": "1st",
+  "b": "2nd",
+  "c": "5th",
+  "d": "103rd"
+}
+

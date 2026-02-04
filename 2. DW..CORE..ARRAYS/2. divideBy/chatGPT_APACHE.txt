@@ -1,0 +1,84 @@
+divideBy:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class DivideByRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Helper function similar to DataWeave divideBy
+                java.util.function.BiFunction<List<Integer>, Integer, List<List<Integer>>> divideBy =
+                    (list, size) ->
+                        IntStream.range(0, (list.size() + size - 1) / size)
+                                 .mapToObj(i -> list.subList(
+                                         i * size,
+                                         Math.min((i + 1) * size, list.size())
+                                 ))
+                                 .collect(Collectors.toList());
+
+                Map<String, Object> result = new LinkedHashMap<>();
+
+                List<Map<String, Object>> divideByList = new ArrayList<>();
+
+                divideByList.add(Map.of(
+                        "divideBy2",
+                        divideBy.apply(List.of(1, 2, 3, 4, 5), 2)
+                ));
+
+                divideByList.add(Map.of(
+                        "divideBy2",
+                        divideBy.apply(List.of(1, 2, 3, 4, 5, 6), 2)
+                ));
+
+                divideByList.add(Map.of(
+                        "divideBy3",
+                        divideBy.apply(List.of(1, 2, 3, 4, 5), 3)
+                ));
+
+                result.put("divideBy", divideByList);
+
+                exchange.getIn().setBody(result);
+            })
+            .log("${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "divideBy": [
+    {
+      "divideBy2": [
+        [1, 2],
+        [3, 4],
+        [5]
+      ]
+    },
+    {
+      "divideBy2": [
+        [1, 2],
+        [3, 4],
+        [5, 6]
+      ]
+    },
+    {
+      "divideBy3": [
+        [1, 2, 3],
+        [4, 5]
+      ]
+    }
+  ]
+}
+

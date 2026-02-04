@@ -1,0 +1,37 @@
+everyCharacter:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ValidateStringController {
+
+    @GetMapping("/validate")
+    public boolean validateString() {
+        String input = "12 34  56";
+        return isValid(input);
+    }
+
+    private boolean isValid(String input) {
+        for (char c : input.toCharArray()) {
+            if (!(c == ' ' || Character.isDigit(c))) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+output:
+
+true
+
+

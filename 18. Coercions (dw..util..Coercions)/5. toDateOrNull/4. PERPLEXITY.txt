@@ -1,0 +1,62 @@
+toDateOrNull:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+@RestController
+public class DateOrNullController {
+    
+    @GetMapping("/date-or-null")
+    public DateOrNullResponse getDateOrNull() {
+        LocalDate dateA = safeParse("2023-28-03", createMultiFormatter());
+        LocalDate dateB = safeParse("2023-28-03", DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        
+        return new DateOrNullResponse(dateA, dateB);
+    }
+    
+    private LocalDate safeParse(String input, DateTimeFormatter formatter) {
+        try {
+            return LocalDate.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+    
+    private DateTimeFormatter createMultiFormatter() {
+        return new DateTimeFormatterBuilder()
+            .appendPattern("yyyy/MM/dd")
+            .orAppendPattern("yyyy-dd-MM")
+            .toFormatter(Locale.US);
+    }
+    
+    public static class DateOrNullResponse {
+        public LocalDate a;
+        public LocalDate b;
+        
+        public DateOrNullResponse(LocalDate a, LocalDate b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2023-03-28",
+  "b": null
+}

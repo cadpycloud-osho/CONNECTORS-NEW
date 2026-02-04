@@ -1,0 +1,47 @@
+toBoolean:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class BooleanCoercionController {
+
+    @GetMapping("/boolean")
+    public Map<String, Boolean> getBooleanValues() {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        result.put("a", toBoolean("true"));
+        result.put("b", toBoolean("false"));
+        result.put("c", toBoolean("FALSE"));
+        result.put("d", toBoolean("TrUe"));
+
+        return result;
+    }
+
+    // Equivalent of DW toBoolean()
+    private Boolean toBoolean(String value) {
+        return Boolean.parseBoolean(value);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false,
+  "c": false,
+  "d": true
+}
+
+

@@ -1,0 +1,35 @@
+isLiteralType:
+
+
+
+INPUT:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isLiteralType(Class<?> type, Object value) {
+        return type == String.class && value instanceof String;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ALiteralType = String.class;
+        String literalValue = "Mariano";
+
+        result.put("a", isLiteralType(ALiteralType, literalValue));
+        result.put("b", isLiteralType(Boolean.class, true));
+
+        System.out.println(result);
+    }
+}
+
+
+OUTPUT:
+
+{a=true, b=false}
+
+

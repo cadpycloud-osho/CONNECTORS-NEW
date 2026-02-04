@@ -1,0 +1,41 @@
+ceil(number: Number): Number
+
+
+input:
+
+
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.Math;
+
+class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: [ ceil(1.5), ceil(2.1), ceil(3) ]
+
+        // 1. Define the input numbers
+        double num1 = 1.5;
+        double num2 = 2.1;
+        int num3 = 3;
+
+        // 2. Apply the ceiling function
+        long result1 = (long) Math.ceil(num1);
+        long result2 = (long) Math.ceil(num2);
+        long result3 = (long) Math.ceil(num3);
+
+        // 3. Collect the results into a List
+        List<Long> outputList = new ArrayList<>();
+        outputList.add(result1);
+        outputList.add(result2);
+        outputList.add(result3);
+
+        // Print the result
+        System.out.println(outputList);
+    }
+}
+
+
+output:
+
+[2, 3, 3]
+

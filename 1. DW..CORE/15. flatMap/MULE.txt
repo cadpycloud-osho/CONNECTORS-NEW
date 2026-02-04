@@ -1,0 +1,46 @@
+flatMap:
+
+flatMap<T, R>(@StreamCapable items: Array<T>, mapper: (item: T, index: Number) -> Array<R>): Array<R>
+
+Iterates over each item in an array and flattens the results.
+
+Instead of returning an array of arrays (as map does when you iterate over the values within an input like [ [1,2], [3,4] ]), flatMap returns a flattened array that looks like this: [1, 2, 3, 4]. flatMap is similar to flatten, but flatten only acts on the values of the arrays, while flatMap can act on values and indices of items in the array.
+
+
+
+Source:
+
+%dw 2.0
+output application/json
+---
+[ [3,5], [0.9,5.5] ] flatMap (value, index) -> value
+
+DataWeave
+Output:
+[ 3, 5, 0.9, 5.5]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

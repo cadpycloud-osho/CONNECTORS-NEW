@@ -1,0 +1,55 @@
+acos:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = executeAcosTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Double> executeAcosTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("acos0", acos(0.0));
+        result.put("acos13", acos(0.13));
+        result.put("acos-1", acos(-1.0));
+        result.put("acos1", acos(1.0));
+        result.put("acos1.1", acos(1.1));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave acos() equivalent:
+     * Returns arccosine of x, or null if x is outside [-1, 1] range
+     */
+    public static Double acos(double x) {
+        // Check domain: x must be in [-1, 1]
+        if (x < -1.0 || x > 1.0) {
+            return null;
+        }
+        return Math.acos(x);
+    }
+}
+
+
+output:
+
+
+{
+  acos0=1.5707963267948966,
+  acos13=1.440427347091751,
+  acos-1=3.141592653589793,
+  acos1=0.0,
+  acos1.1=null
+}
+
+

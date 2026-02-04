@@ -1,0 +1,54 @@
+isBinaryType:
+
+
+
+INPUT:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isBinaryType(Class<?> type) {
+        return type == byte[].class;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class BinaryTypeController {
+
+    @GetMapping("/isbinary")
+    public Map<String, Boolean> checkBinaryTypes() {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        class ABinaryAlias {}  // We simulate alias separately in Java
+
+        // But in DW alias = type itself, so ABinary = Binary → byte[].class
+
+        result.put("a", TypeUtils.isBinaryType(byte[].class));  // ABinary
+        result.put("b", TypeUtils.isBinaryType(byte[].class));  // Binary
+        result.put("c", TypeUtils.isBinaryType(String.class));   // String
+
+        return result;
+    }
+}
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+

@@ -1,0 +1,57 @@
+toNumberOrNull:
+
+
+
+input:
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String input = "0.005";
+        
+        Number resultA = parseWithMultipleFormats(input);
+        Number resultB = parseWithSecondsOnly(input);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", resultA);
+        result.put("b", resultB);
+        
+        System.out.println("Result: " + result);
+    }
+    
+    private static Number parseWithMultipleFormats(String input) {
+        try {
+            return parseSeconds(input);
+        } catch (Exception e) {
+            DecimalFormat decimalFormat = new DecimalFormat("0.###");
+            try {
+                return decimalFormat.parse(input);
+            } catch (ParseException ex) {
+                return Double.parseDouble(input);
+            }
+        }
+    }
+    
+    private static Number parseWithSecondsOnly(String input) {
+        try {
+            return parseSeconds(input);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    private static Number parseSeconds(String input) {
+        throw new IllegalArgumentException("Invalid seconds format");
+    }
+}
+
+
+output:
+
+Result: {a=0.005, b=null}
+
+

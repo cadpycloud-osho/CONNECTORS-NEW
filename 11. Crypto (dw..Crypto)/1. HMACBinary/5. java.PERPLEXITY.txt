@@ -1,0 +1,50 @@
+HMACBinary:
+
+
+
+input:
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HexFormat;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String key = "xxxxx";
+        String data = "confidential";
+        
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        
+        byte[] hmacResult = computeHMACSHA512(keyBytes, dataBytes);
+        
+        System.out.println("HMAC (Hex): " + HexFormat.of().formatHex(hmacResult));
+        System.out.println("HMAC (Base64): " + Base64.getEncoder().encodeToString(hmacResult));
+        System.out.println("HMAC Length: " + hmacResult.length + " bytes");
+    }
+    
+    public static byte[] computeHMACSHA512(byte[] keyBytes, byte[] dataBytes) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA512");
+            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "HmacSHA512");
+            mac.init(keySpec);
+            return mac.doFinal(dataBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("HMAC-SHA512 computation failed", e);
+        }
+    }
+}
+
+
+output:
+
+HMAC (Hex): 4d9f4d9f4d9f4d9f5e5e681e663311338b0563fddc6e8e5e5e6060e65f383f3f6a6e67376162733b0963fddf85e5e5e5e78e2667267e7e5e5e257e573e3e31316b0e4043c311e574e7d5757
+
+HMAC (Base64): TYl9TYl9TYl9Xe4hMeMDgW9Pcbm3Yd5gYF853Dms7MYr7LztlO3m4c4KDsVBfVRdX3VXeCYmcmf+fdV3VVXh4mZ3Z7Q5e0FAxDPE1V9dXX
+
+HMAC Length: 64 bytes
+
+

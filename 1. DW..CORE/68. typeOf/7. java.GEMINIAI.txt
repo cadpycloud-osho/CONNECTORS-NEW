@@ -1,0 +1,139 @@
+typeOf:
+
+
+
+example 1:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Maps the Java runtime type to a "DataWeave" style type string.
+     */
+    private static String getDwType(Object obj) {
+        if (obj == null) {
+            return "Null";
+        }
+        if (obj instanceof String) {
+            return "String";
+        }
+        if (obj instanceof List) {
+            return "Array"; // Maps List to DataWeave's Array
+        }
+        if (obj instanceof Number) {
+            // DW treats all standard numeric types as "Number"
+            return "Number";
+        }
+        if (obj instanceof Boolean) {
+            return "Boolean";
+        }
+        if (obj instanceof Map) {
+            return "Object"; // Maps Map to DataWeave's Object
+        }
+        // Fallback for other types
+        return obj.getClass().getSimpleName();
+    }
+
+    public static void main(String[] args) throws Exception {
+        // Inputs
+        String val1 = "A b";
+        List<Integer> val2 = Arrays.asList(1, 2);
+        Integer val3 = 34;
+        Boolean val4 = true;
+        Map<String, Integer> val5 = new HashMap<>();
+        val5.put("a", 5);
+
+        // Operations: Get DW type string for each
+        String type1 = getDwType(val1); // "String"
+        String type2 = getDwType(val2); // "Array"
+        String type3 = getDwType(val3); // "Number"
+        String type4 = getDwType(val4); // "Boolean"
+        String type5 = getDwType(val5); // "Object"
+        
+        // --- Assemble Output using simple string formatting ---
+        // This replaces the Jackson logic to print the expected JSON array string.
+        String output = String.format("[ \"%s\", \"%s\", \"%s\", \"%s\", \"%s\" ]", 
+                                        type1, type2, type3, type4, type5);
+        
+        System.out.println(output);
+    }
+}
+output:
+
+[ "String", "Array", "Number", "Boolean", "Object" ]
+
+
+------------------------------------------------
+
+
+
+
+
+example 2:
+
+
+input:
+public class Main {
+
+    /**
+     * Maps the Java runtime type to a "DataWeave" style type string.
+     */
+    private static String getDwType(Object obj) {
+        // Same type mapping function as in Example 1
+        if (obj instanceof String) return "String";
+        if (obj instanceof Number) return "Number";
+        // Only checking types relevant to this example
+        return obj.getClass().getSimpleName(); 
+    }
+
+    public static void main(String[] args) throws Exception {
+        // In Java, type constraints are handled at compile time.
+        // The runtime type is simply String for both variables.
+        
+        // var x: String | Number = "clearly a string"
+        String x = "clearly a string";
+        
+        // var y: "because" = "because" (literal type, but runtime type is String)
+        String y = "because";
+
+        // Operations: Get DW type string for each
+        String typeX = getDwType(x); // "String"
+        String typeY = getDwType(y); // "String"
+        
+        // --- Assemble Output using simple string formatting ---
+        // This replaces the complex Jackson logic to avoid compilation errors
+        String output = String.format("[ \"%s\", \"%s\" ]", typeX, typeY);
+        
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+[ "String", "String" ]
+
+------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

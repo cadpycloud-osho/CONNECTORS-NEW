@@ -1,0 +1,6 @@
+generateBoundary
+
+generateBoundary(len: Number = 70): String
+
+Copy link to clipboardgenerateBoundary(len: Number = 70): String
+Helper function for generating boundaries in Multipart data structures.

@@ -1,0 +1,189 @@
+splitWhere:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    
+    // Generic class to hold the result of the split
+    static class SplitResult<T> {
+        List<T> l; // Left part (0 up to split index - 1)
+        List<T> r; // Right part (split index onwards)
+
+        // Constructor name must match the class name (SplitResult)
+        public SplitResult(List<T> l, List<T> r) {
+            this.l = l;
+            this.r = r;
+        }
+        
+        // Custom toString to match the DataWeave output structure
+        @Override
+        public String toString() {
+            return "{\n  \"l\": " + l.toString() + ",\n  \"r\": " + r.toString() + "\n}";
+        }
+    }
+
+    /**
+     * DataWeave logic equivalent to: input splitAt 2
+     */
+    public static <T> SplitResult<T> splitArray(List<T> list, int index) {
+        if (index < 0 || index > list.size()) {
+            throw new IndexOutOfBoundsException("Split index is out of bounds.");
+        }
+        
+        // Left part: from 0 (inclusive) up to 'index' (exclusive)
+        List<T> left = list.subList(0, index);
+        
+        // Right part: from 'index' (inclusive) up to the end (size)
+        List<T> right = list.subList(index, list.size());
+        
+        return new SplitResult<>(left, right);
+    }
+
+
+    public static void main(String[] args) {
+        // Source data array (4 elements total)
+        List<String> list = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+        
+        // Logic to achieve the desired split: splitAt 2
+        int splitIndex = 2;
+        
+        SplitResult<String> result = splitArray(list, splitIndex);
+
+        // Print the final output structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+{
+  "l": [Mariano, Leandro],
+  "r": [Julian, Tomo]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Java Code (Using the Built-in List.subList() Method)
+This approach uses a single loop to find the split index and then uses the built-in subList method to create the final result lists efficiently.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class DataWeaveSplitWhereBuiltIn {
+
+    public static <T> SplitResult<T> splitWhere(List<T> list, Predicate<T> condition) {
+        int splitIndex = list.size(); // Default to splitting at the end (l=full list, r=empty)
+        
+        // 1. Find the index of the first element that satisfies the condition
+        for (int i = 0; i < list.size(); i++) {
+            if (condition.test(list.get(i))) {
+                splitIndex = i;
+                break; // Found the first match, stop searching (short-circuiting)
+            }
+        }
+        
+        // 2. Use subList with the found index
+        // Left part ('l'): from 0 up to splitIndex (exclusive)
+        List<T> left = list.subList(0, splitIndex);
+        
+        // Right part ('r'): from splitIndex up to the end (inclusive)
+        List<T> right = list.subList(splitIndex, list.size());
+        
+        return new SplitResult<>(left, right);
+    }
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+        
+        // DataWeave Logic: users splitWhere (item) -> item startsWith "Jul"
+        Predicate<String> condition = item -> item.startsWith("Jul");
+        
+        SplitResult<String> result = splitWhere(users, condition);
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result); 
+    }
+}
+2. Java Code (Using an Imperative Loop and Manual List Building)
+This approach uses a single loop and a flag to manually distribute the elements into the left or right list.
+
+Java
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class DataWeaveSplitWhereImperative {
+
+    public static <T> SplitResult<T> splitWhere(List<T> list, Predicate<T> condition) {
+        List<T> left = new ArrayList<>();
+        List<T> right = new ArrayList<>();
+        boolean splitFound = false;
+        
+        // Iterate through all elements
+        for (T item : list) {
+            
+            // Check if the split condition is met AND we haven't split yet
+            if (!splitFound && condition.test(item)) {
+                splitFound = true; 
+            }
+            
+            // Distribute based on the split state
+            if (!splitFound) {
+                // Before the split, add to the left list
+                left.add(item);
+            } else {
+                // After (or at) the split, add to the right list
+                right.add(item);
+            }
+        }
+        
+        return new SplitResult<>(left, right);
+    }
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+        
+        // DataWeave Logic: users splitWhere (item) -> item startsWith "Jul"
+        Predicate<String> condition = item -> item.startsWith("Jul");
+        
+        SplitResult<String> result = splitWhere(users, condition);
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result);
+    }
+}
+Output for Both Java Codes
+The output for both the Java built-in method and the Java imperative loop is identical and correctly matches the expected DataWeave output:
+
+JSON
+
+Output structure:
+{
+  "l": [Mariano, Leandro],
+  "r": [Julian, Tomo]
+}

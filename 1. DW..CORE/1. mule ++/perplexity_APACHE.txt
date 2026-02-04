@@ -1,0 +1,141 @@
+++:
+
+
+example 1:
+
+
+input:
+
+from("direct:array1")
+.process(exchange -> {
+    List<Object> list1 = Arrays.asList(0, 1, true, "my string");
+    List<Object> list2 = Arrays.asList(2, Arrays.asList(3, 4, 5), Map.of("a", 6));
+    List<Object> result = new ArrayList<>(list1);
+    result.addAll(list2);
+    exchange.getMessage().setBody(Map.of("a", result));
+});
+
+
+
+output:
+
+{"a": [0, 1, true, "my string", 2, [3, 4, 5], {"a": 6}]}
+
+
+-------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+from("direct:dateTime1")
+.process(exchange -> {
+    LocalDate date = LocalDate.of(2017, 10, 1);
+    LocalTime time = LocalTime.of(23, 57, 59);
+    LocalDateTime result = date.atTime(time);
+    exchange.getMessage().setBody(Map.of("LocalDateTime", result));
+});
+
+
+
+output:
+
+{"LocalDateTime": "2017-10-01T23:57:59"}
+
+
+-------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+from("direct:dateTimeMultiple")
+.process(exchange -> {
+    LocalDate date = LocalDate.of(2017, 10, 1);
+    LocalTime time1 = LocalTime.of(23, 57, 59);
+    LocalDateTime dt1 = date.atTime(time1);
+    
+    LocalTime time2 = LocalTime.parse("23:57:59Z").toLocalTime();
+    LocalDateTime dt2 = date.atTime(time2);
+    
+    LocalTime time3 = LocalTime.parse("23:57:59+02:00").toLocalTime();
+    ZonedDateTime zdt3 = date.atTime(time3).atZone(ZoneId.of("+02:00"));
+    
+    exchange.getMessage().setBody(Map.of(
+        "DateTime1", dt1,
+        "DateTime2", dt2,
+        "DateTime3", zdt3
+    ));
+});
+
+
+
+output:
+
+{
+  "DateTime1": "2017-10-01T23:57:59",
+  "DateTime2": "2017-10-01T23:57:59",
+  "DateTime3": "2017-10-01T23:57:59+02:00"
+}
+
+
+
+-------------------------------------------------------
+
+
+
+
+example 4:
+
+
+input:
+
+from("direct:timeZone1")
+.process(exchange -> {
+    LocalTime time = LocalTime.of(23, 57);
+    ZonedDateTime result = time.atDate(LocalDate.now()).atZone(ZoneId.of("-03:00"));
+    exchange.getMessage().setBody(Map.of("Time", result.toLocalTime().atOffset(ZoneOffset.of("-03:00"))));
+});
+
+
+
+output:
+
+{"Time": "23:57-03:00"}
+
+
+-------------------------------------------------------
+
+
+
+
+example 5:
+
+
+input:
+
+from("direct:timeZone2")
+.process(exchange -> {
+    ZoneId zone = ZoneId.of("-03:00");
+    LocalTime time = LocalTime.of(23, 57);
+    ZonedDateTime result = time.atDate(LocalDate.now()).atZone(zone);
+    exchange.getMessage().setBody(Map.of("Time", result.toLocalTime().atOffset(ZoneOffset.of("-03:00"))));
+});
+
+
+
+output:
+
+{"Time": "23:57-03:00"}
+
+
+-------------------------------------------------------
+
+

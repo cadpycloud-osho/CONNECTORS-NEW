@@ -1,0 +1,37 @@
+appendIfMissing:
+
+input:
+
+import java.util.*;
+
+public class AppendIfMissingConverter {
+    public static String appendIfMissing(String input, String suffix) {
+        if (input == null) return null;
+        if (suffix == null || suffix.isEmpty()) return input;
+        return input.endsWith(suffix) ? input : input + suffix;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", appendIfMissing(null, ""));
+        result.put("b", appendIfMissing("abc", ""));
+        result.put("c", appendIfMissing("", "xyz"));
+        result.put("d", appendIfMissing("abc", "xyz"));
+        result.put("e", appendIfMissing("abcxyz", "xyz"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+
+

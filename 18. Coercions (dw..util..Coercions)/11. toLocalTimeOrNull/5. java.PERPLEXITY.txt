@@ -1,0 +1,67 @@
+toLocalTimeOrNull:
+
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String input = "23:57:59";
+
+        // Equivalent to DataWeave 'a'
+        LocalTime resultA = parseWithMultipleFormats(input);
+
+        // Equivalent to DataWeave 'b'
+        LocalTime resultB = parseWithSingleFormat(input);
+
+        // Map.of() does NOT allow nulls → use HashMap
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", resultA);
+        result.put("b", resultB);
+
+        System.out.println("Result: " + result);
+    }
+
+    private static LocalTime parseWithMultipleFormats(String input) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("HH:mm:ss")
+                .optionalStart()
+                .appendLiteral('.')
+                .appendFraction(java.time.temporal.ChronoField.NANO_OF_SECOND, 1, 9, true)
+                .optionalEnd()
+                .toFormatter();
+
+        try {
+            return LocalTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    private static LocalTime parseWithSingleFormat(String input) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.n");
+            return LocalTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            // Matches DataWeave toLocalTimeOrNull behavior
+            return null;
+        }
+    }
+}
+
+
+output:
+
+Result: {a=23:57:59, b=null}
+
+
+

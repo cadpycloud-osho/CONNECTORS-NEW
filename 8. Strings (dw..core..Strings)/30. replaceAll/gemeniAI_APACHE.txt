@@ -1,0 +1,40 @@
+replaceAll:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ReplaceAllRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:applyReplace")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Using StringUtils for null-safety parity
+                results.put("a", StringUtils.replace("Mariano", "a", "A"));
+                results.put("b", StringUtils.replace("AAAA", "AAA", "B"));
+                results.put("c", StringUtils.replace(null, "aria", "A"));
+                results.put("d", StringUtils.replace("Mariano", "j", "Test"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+   "a": "MAriAno",
+   "b": "BA",
+   "c": null,
+   "d": "Mariano"
+}
+
+

@@ -1,0 +1,28 @@
+isDateType:
+
+
+isDateType(t: Type): Boolean
+Returns true if the input is the Date type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ADate = Date
+output application/json
+---
+{
+   a: isDateType(ADate),
+   b: isDateType(Date),
+   c: isDateType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

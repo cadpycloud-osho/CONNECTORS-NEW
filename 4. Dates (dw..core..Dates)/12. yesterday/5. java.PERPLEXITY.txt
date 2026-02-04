@@ -1,0 +1,26 @@
+yesterday:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: yesterday()
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        
+        // Output as JSON string matching DataWeave
+        String output = yesterday.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        System.out.println("\"" + output + "\"");
+    }
+}
+
+
+output:
+
+
+"2025-12-15"
+

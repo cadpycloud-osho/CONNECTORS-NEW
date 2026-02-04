@@ -1,0 +1,72 @@
+fromRadixNumber:
+
+
+input:
+
+import java.lang.Integer;
+
+public class Main {
+
+    /**
+     * Converts a string from a specified radix (base) to its decimal integer value.
+     * This mimics the DataWeave 'fromRadixNumber(string, radix)' function.
+     * @param numberString The string representation of the number in the given radix.
+     * @param radix The base of the number (e.g., 2 for binary, 16 for hexadecimal).
+     * @return The resulting decimal integer value.
+     */
+    public static int convertFromRadix(String numberString, int radix) {
+        // Integer.parseInt is the direct Java equivalent for base conversion
+        try {
+            return Integer.parseInt(numberString, radix);
+        } catch (NumberFormatException e) {
+            // Handle cases where the input string is invalid for the given radix
+            System.err.println("Error parsing number string '" + numberString + 
+                               "' with radix " + radix + ": " + e.getMessage());
+            // Depending on DW's exact error handling, this might throw or return a default/null. 
+            // We return a sentinel value or re-throw, but for this example, we proceed.
+            throw new RuntimeException("Invalid number format.", e);
+        }
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        
+        // a: fromRadixNumber("10", 2) -> 2
+        int a = convertFromRadix("10", 2);
+
+        // b: fromRadixNumber("FF", 16) -> 255
+        int b = convertFromRadix("FF", 16);
+        
+        // Format the final JSON output
+        String jsonOutput = String.format(
+            "{\n  \"a\": %d,\n  \"b\": %d\n}",
+            a,
+            b
+        );
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Result 'a' (Binary 10): " + a);
+        System.out.println("Result 'b' (Hex FF):    " + b);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+output:
+
+{
+  "a": 2,
+  "b": 255
+}
+
+
+

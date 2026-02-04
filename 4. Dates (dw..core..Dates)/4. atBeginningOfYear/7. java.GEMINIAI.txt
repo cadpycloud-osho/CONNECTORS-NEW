@@ -1,0 +1,155 @@
+atBeginningOfYear:
+
+
+example 1:
+
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a ZonedDateTime to the start of its year, preserving the time zone.
+     * This mimics the DataWeave 'atBeginningOfYear(DateTime)' function.
+     * @param dateTimeString The input date-time string with offset.
+     * @return The resulting date-time string at January 1st, at midnight.
+     */
+    public static String calculateBeginningOfYearZoned(String dateTimeString) {
+        // 1. Parse the input string into a ZonedDateTime object
+        // Use ISO_OFFSET_DATE_TIME for parsing a string with an offset
+        ZonedDateTime originalZdt = ZonedDateTime.parse(dateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        // 2. Adjust the date to the first day of the year and the time to midnight
+        ZonedDateTime beginningOfYearZdt = originalZdt
+            .with(TemporalAdjusters.firstDayOfYear()) // Sets the month/day to 01-01
+            .with(LocalTime.MIDNIGHT);                 // Sets the time to 00:00:00
+        
+        // 3. Format the result back to the desired output string format
+        // We use the same formatter for output to match DW's default format
+        return beginningOfYearZdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351-03:00";
+        String output = calculateBeginningOfYearZoned(input);
+        
+        System.out.println("--- Scenario 1: ZonedDateTime (with Offset) ---");
+        System.out.println("Input (DW: DateTime):   " + input);
+        System.out.println("Java Output:            " + output);
+    }
+}
+
+output:
+
+2020-01-01T00:00:00-03:00
+
+
+------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a LocalDateTime to the start of its year.
+     * This mimics the DataWeave 'atBeginningOfYear(LocalDateTime)' function.
+     * @param dateTimeString The input local date-time string.
+     * @return The resulting local date-time string at January 1st, at midnight.
+     */
+    public static String calculateBeginningOfYearLocal(String dateTimeString) {
+        // 1. Parse the input string into a LocalDateTime object
+        LocalDateTime originalLdt = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        // 2. Adjust the date to the first day of the year and the time to midnight
+        LocalDateTime beginningOfYearLdt = originalLdt
+            .with(TemporalAdjusters.firstDayOfYear()) // Sets the month/day to 01-01
+            .with(LocalTime.MIDNIGHT);                 // Sets the time to 00:00:00
+        
+        // 3. Format the result back to the desired output string format
+        return beginningOfYearLdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351";
+        String output = calculateBeginningOfYearLocal(input);
+        
+        System.out.println("\n--- Scenario 2: LocalDateTime (without Offset) ---");
+        System.out.println("Input (DW: LocalDateTime): " + input);
+        System.out.println("Java Output:               " + output);
+    }
+}
+
+output:
+
+2020-01-01T00:00:00
+
+
+------------------------------------------------------------
+
+
+
+
+example 3:
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a LocalDate to the first day of its year.
+     * This mimics the DataWeave 'atBeginningOfYear(Date)' function.
+     * @param dateString The input date string.
+     * @return The resulting date string at January 1st.
+     */
+    public static String calculateBeginningOfYearDate(String dateString) {
+        // 1. Parse the input string into a LocalDate object
+        LocalDate originalDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        // 2. Adjust the date to the first day of the year
+        LocalDate beginningOfYearDate = originalDate
+            .with(TemporalAdjusters.firstDayOfYear()); // Sets the month/day to 01-01
+        
+        // 3. Format the result back to the desired output string format
+        return beginningOfYearDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06";
+        String output = calculateBeginningOfYearDate(input);
+        
+        System.out.println("\n--- Scenario 3: Date (without Time/Offset) ---");
+        System.out.println("Input (DW: Date):          " + input);
+        System.out.println("Java Output:               " + output);
+    }
+}
+
+output:
+
+
+2020-01-01
+
+------------------------------------------------------------

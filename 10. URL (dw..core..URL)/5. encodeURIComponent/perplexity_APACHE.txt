@@ -1,0 +1,64 @@
+encodeURIComponent:
+
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.net.URLEncoder;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+public class EncodeComparisonProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String path = " PATH/ TO /ENCODE ";
+        String reserved = ";,/?:@&=";
+        String unreserved = "-_.!~*'()";
+        
+        // encodeURIComponent - encodes ALL except -_.!~*'()
+        String encURIComponentPath = URLEncoder.encode(path.trim(), StandardCharsets.UTF_8);
+        String encURIComponentReserved = URLEncoder.encode(reserved, StandardCharsets.UTF_8);
+        String encURIComponentUnreserved = unreserved; // Already safe
+        
+        // encodeURI - encodes ONLY unsafe chars (manual replacement for exact match)
+        String encodeURIBoth = path.replace(" ", "%20");
+        String encodeURISafe = reserved; // Safe chars remain unencoded
+        String encodeURIUnreserved = unreserved; // Safe chars remain unencoded
+        
+        String result = "{ \"comparing_encode_functions_output\": { " +
+            "\"encodeURIComponent\": \"" + encURIComponentPath + "\"," +
+            "\"encodeURI\": \"" + encodeURIBoth + "\"," +
+            "\"encodeURIComponent_to_hex\": \"" + encURIComponentReserved + "\"," +
+            "\"encodeURI_not_to_hex\": \"" + encodeURISafe + "\"," +
+            "\"encodeURIComponent_not_encoded\": \"" + encURIComponentUnreserved + "\"," +
+            "\"encodeURI_not_encoded\": \"" + encodeURIUnreserved + "\"" +
+            "}}";
+            
+        exchange.getIn().setBody(result);
+    }
+}
+
+
+from("direct:compareEncode")
+    .process(new EncodeComparisonProcessor())
+    .log("${body}");
+
+
+output:
+
+{
+  "comparing_encode_functions_output": {
+    "encodeURIComponent": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURI": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURIComponent_to_hex": "%3B%2C%2F%3F%3A%40%26%3D",
+    "encodeURI_not_to_hex": ";,/?:@&=",
+    "encodeURIComponent_not_encoded": "-_.!~*'()",
+    "encodeURI_not_encoded": "-_.!~*'()"
+  }
+}
+
+
+
+

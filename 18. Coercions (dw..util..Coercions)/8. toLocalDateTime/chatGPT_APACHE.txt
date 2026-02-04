@@ -1,0 +1,67 @@
+toLocalDateTime:
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class ToLocalDateTimeExample {
+
+    public static void main(String[] args) {
+
+        String input = "2003-10-01 23:57:59";
+
+        // Formatters for 'a'
+        List<DateTimeFormatter> formattersA = List.of(
+                DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss"),
+                DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+        );
+
+        // Formatter for 'b'
+        List<DateTimeFormatter> formattersB = List.of(
+                DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss")
+        );
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", parseOrError(input, formattersA));
+        output.put("b", tryParseErrorMessage(input, formattersB));
+
+        // Print
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+
+    private static LocalDateTime parseOrError(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                return LocalDateTime.parse(value, fmt);
+            } catch (DateTimeParseException e) {
+                // continue to next formatter
+            }
+        }
+        return null;
+    }
+
+    private static String tryParseErrorMessage(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                LocalDateTime.parse(value, fmt);
+                return null; // success
+            } catch (DateTimeParseException e) {
+                return "Could not find a valid formatter for '" + value + "'";
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+a: 2003-10-01T23:57:59
+b: Could not find a valid formatter for '2003-10-01 23:57:59'
+
+
+
+

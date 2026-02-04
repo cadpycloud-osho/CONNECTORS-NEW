@@ -1,0 +1,21 @@
+time:
+
+
+input:
+from("direct:newTime")
+    .process(exchange -> {
+        OffsetTime newTime = OffsetTime.of(12, 30, 40, 0, ZoneOffset.ofHours(-3));
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("newTime", newTime.format(DateTimeFormatter.ISO_OFFSET_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+
+
+{
+   "newTime": "12:30:40-03:00"
+}

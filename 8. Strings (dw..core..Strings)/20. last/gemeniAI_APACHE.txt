@@ -1,0 +1,35 @@
+last:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class LastCharactersRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getLastChars")
+            .process(exchange -> {
+                String input = "hello world!";
+                int n = 6;
+
+                // Parity logic: Use Math.min and max to stay within bounds
+                String result = "";
+                if (input != null) {
+                    int length = input.length();
+                    // Determine start index, ensuring it doesn't go below 0
+                    int start = Math.max(0, length - n);
+                    result = input.substring(start);
+                }
+
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+output:
+
+
+"world!"
+

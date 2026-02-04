@@ -1,0 +1,36 @@
+nameSet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class NameSetRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getNameSet")
+            .process(exchange -> {
+                // Equivalent to the input { "a" : true, "b" : 1 }
+                Map<String, Object> inputMap = Map.of("a", true, "b", 1);
+
+                // Extracting the keys (nameSet logic)
+                List<String> keys = new ArrayList<>(inputMap.keySet());
+
+                // Wrapping in a response map for JSON output
+                exchange.getIn().setBody(Map.of("nameSet", keys));
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "nameSet": ["a", "b"]
+}
+

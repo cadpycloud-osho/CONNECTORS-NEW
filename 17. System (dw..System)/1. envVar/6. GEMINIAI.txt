@@ -1,0 +1,68 @@
+envVar:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+
+public class EnvironmentVariableReader {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getEnvironmentVariablesJson() throws IOException {
+        // Get the values from the System Environment
+        String realVarValue = System.getenv("SHELL");
+        String fakeVarValue = System.getenv("FAKE_ENV_VAR");
+
+        // 1. Create the root object
+        ObjectNode root = objectMapper.createObjectNode();
+        
+        // 2. Create the "envVars" array
+        ArrayNode envVarsArray = objectMapper.createArrayNode();
+
+        // 3. Create the object for "real" variable
+        ObjectNode realVar = objectMapper.createObjectNode();
+        // Note: System.getenv() returns null if the variable is not set
+        realVar.put("real", realVarValue); 
+        envVarsArray.add(realVar);
+
+        // 4. Create the object for "fake" variable
+        ObjectNode fakeVar = objectMapper.createObjectNode();
+        fakeVar.put("fake", fakeVarValue); // Will be null if not set
+        envVarsArray.add(fakeVar);
+        
+        // 5. Add the array to the root
+        root.set("envVars", envVarsArray);
+
+        // Convert the root object to a pretty-printed JSON string (similar to DataWeave output)
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        // Example usage (in a Spring @RestController or main class)
+        EnvironmentVariableReader reader = new EnvironmentVariableReader();
+        try {
+            String jsonOutput = reader.getEnvironmentVariablesJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "envVars" : [ {
+    "real" : "/bin/bash"
+  }, {
+    "fake" : null
+  } ]
+}
+

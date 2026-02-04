@@ -1,0 +1,47 @@
+index:
+
+
+index:
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Equivalent to DataWeave index(0)
+        IndexRepresentation index = new IndexRepresentation(0);
+
+        // Print JSON output
+        System.out.println(index.toJson());
+    }
+}
+
+// Class representing an index (like DW index)
+class IndexRepresentation {
+    private final String kind;
+    private final String namespace;
+    private final int selector;
+
+    public IndexRepresentation(int selector) {
+        this.kind = "Array";      // as per required output
+        this.namespace = null;    // no namespace
+        this.selector = selector; // index value
+    }
+
+    // Convert to JSON string
+    public String toJson() {
+        return "{\n" +
+               "  \"kind\": \"" + kind + "\",\n" +
+               "  \"namespace\": null,\n" +
+               "  \"selector\": " + selector + "\n" +
+               "}";
+    }
+}
+
+
+output:
+
+{
+  "kind": "Array",
+  "namespace": null,
+  "selector": 0
+}
+

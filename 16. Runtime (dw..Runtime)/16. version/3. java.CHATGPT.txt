@@ -1,0 +1,27 @@
+version:
+
+
+input:
+
+import java.util.Collections;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Equivalent to DataWeave version()
+        String version = "2.5";
+
+        Map<String, String> output = Collections.singletonMap("version", version);
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+{version=2.5}
+

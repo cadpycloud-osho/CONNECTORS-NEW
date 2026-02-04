@@ -1,0 +1,30 @@
+last:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class LastController {
+    
+    @GetMapping(value = "/last", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String lastCharacters() {
+        String input = "hello world!";
+        int length = input.length();
+        return input.substring(Math.max(0, length - 6));
+    }
+}
+
+
+output:
+
+"world!"
+
+
+

@@ -1,0 +1,52 @@
+takeWhile:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class TakeWhileObjectRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:takeWhile")
+            .routeId("Take-While-Object-Route")
+            .process(exchange -> {
+                // 1. Source Object (LinkedHashMap to preserve order)
+                Map<String, Integer> obj = new LinkedHashMap<>();
+                obj.put("a", 1);
+                obj.put("b", 2);
+                obj.put("c", 5);
+                obj.put("d", 1);
+
+                // 2. Logic: takeWhile ((value, key) -> value < 3)
+                Map<String, Integer> result = obj.entrySet().stream()
+                    .takeWhile(entry -> entry.getValue() < 3)
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new // Maintain order in result
+                    ));
+
+                exchange.getIn().setBody(result);
+            })
+            // 3. Logic: output application/json
+            .marshal().json()
+            .log("TakeWhile Result: ${body}");
+    }
+}
+
+
+output:
+
+
+{
+  "a": 1,
+  "b": 2
+}
+
+

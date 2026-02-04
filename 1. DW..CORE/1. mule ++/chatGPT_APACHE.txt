@@ -1,0 +1,248 @@
+++:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.*;
+
+public class ArrayConcatRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:arrayConcat")
+            .process(exchange -> {
+
+                List<Object> list1 = new ArrayList<>(
+                        List.of(0, 1, true, "my string")
+                );
+
+                List<Object> list2 = new ArrayList<>();
+                list2.add(2);
+                list2.add(List.of(3, 4, 5));
+                list2.add(Map.of("a", 6));
+
+                list1.addAll(list2);
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("a", list1);
+
+                exchange.getMessage().setBody(result);
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "a": [0, 1, true, "my string", 2, [3,4,5], {"a":6}]
+}
+
+
+example 4:
+
+
+input:
+
+import java.time.*;
+
+from("direct:timeWithZone1")
+.process(exchange -> {
+
+    LocalTime time = LocalTime.of(23, 57);
+    ZoneOffset offset = ZoneOffset.of("-03:00");
+
+    OffsetTime result = OffsetTime.of(time, offset);
+
+    exchange.getMessage().setBody(
+        Map.of("Time", result.toString())
+    );
+});
+
+
+
+output:
+
+{
+  "Time": "23:57:00-03:00"
+}
+
+
+
+-------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+
+from("direct:dateTime1")
+.process(exchange -> {
+
+    LocalDate date = LocalDate.of(2017, 10, 1);
+    LocalTime time = LocalTime.of(23, 57, 59);
+
+    LocalDateTime dateTime = LocalDateTime.of(date, time);
+
+    exchange.getMessage().setBody(
+        Map.of("LocalDateTime", dateTime.toString())
+    );
+});
+
+
+
+output:
+
+
+{
+  "LocalDateTime": "2017-10-01T23:57:59"
+}
+
+
+-------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+import java.time.*;
+
+from("direct:dateTimeVariants")
+.process(exchange -> {
+
+    LocalDate date = LocalDate.of(2017, 10, 1);
+
+    // DateTime1
+    LocalTime time1 = LocalTime.of(23, 57, 59);
+    ZonedDateTime dateTime1 =
+            ZonedDateTime.of(date, time1, ZoneOffset.UTC);
+
+    // DateTime2
+    OffsetTime time2 = OffsetTime.of(23, 57, 59, 0, ZoneOffset.UTC);
+    OffsetDateTime dateTime2 =
+            OffsetDateTime.of(date, time2.toLocalTime(), time2.getOffset());
+
+    // DateTime3
+    OffsetTime time3 =
+            OffsetTime.of(23, 57, 59, 0, ZoneOffset.of("+02:00"));
+    OffsetDateTime dateTime3 =
+            OffsetDateTime.of(date, time3.toLocalTime(), time3.getOffset());
+
+    exchange.getMessage().setBody(
+        Map.of(
+            "DateTime1", dateTime1.toString(),
+            "DateTime2", dateTime2.toString(),
+            "DateTime3", dateTime3.toString()
+        )
+    );
+});
+
+
+output:
+
+{
+  "DateTime1": "2017-10-01T23:57:59Z",
+  "DateTime2": "2017-10-01T23:57:59Z",
+  "DateTime3": "2017-10-01T23:57:59+02:00"
+}
+
+
+
+-------------------------------------------------------
+
+
+
+
+example 4:
+
+
+input:
+
+import java.time.*;
+
+from("direct:timeWithZone1")
+.process(exchange -> {
+
+    LocalTime time = LocalTime.of(23, 57);
+    ZoneOffset offset = ZoneOffset.of("-03:00");
+
+    OffsetTime result = OffsetTime.of(time, offset);
+
+    exchange.getMessage().setBody(
+        Map.of("Time", result.toString())
+    );
+});
+
+
+
+output:
+
+{
+  "Time": "23:57:00-03:00"
+}
+
+
+
+-------------------------------------------------------
+
+
+
+
+example 5:
+
+
+input:
+
+from("direct:timeWithZone2")
+.process(exchange -> {
+
+    ZoneOffset offset = ZoneOffset.of("-03:00");
+    LocalTime time = LocalTime.of(23, 57);
+
+    OffsetTime result = OffsetTime.of(time, offset);
+
+    exchange.getMessage().setBody(
+        Map.of("Time", result.toString())
+    );
+});
+
+
+
+output:
+
+{
+  "Time": "23:57:00-03:00"
+}
+
+
+
+-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+

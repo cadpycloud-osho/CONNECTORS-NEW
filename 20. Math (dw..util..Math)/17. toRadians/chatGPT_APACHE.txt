@@ -1,0 +1,32 @@
+toRadians:
+
+input:
+
+import java.util.*;
+
+public class ToRadiansExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        output.put("toRadians10", Math.toRadians(10.0));
+        output.put("toRadians013", Math.toRadians(0.13));
+        output.put("toRadians-20", Math.toRadians(-20.0));
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+   "toRadians10": 0.17453292519943295,
+   "toRadians013": 0.0022689280275926285,
+   "toRadians-20": -0.3490658503988659
+}
+
+
+

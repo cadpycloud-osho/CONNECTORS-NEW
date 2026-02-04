@@ -1,0 +1,25 @@
+fromHex:
+
+input:
+
+
+from("direct:hexToBinary")
+    .process(exchange -> {
+        String hexInput = "4D756C65";
+        byte[] bytes = javax.xml.bind.DatatypeConverter.parseHexBinary(hexInput);
+        exchange.getIn().setBody(bytes);
+    })
+    .marshal().base64()
+    .setBody(simple("{ \"hexToBinary\": \"${body}\" }"));
+
+
+
+output:
+
+{
+  "hexToBinary": "TXVsZQ=="
+}
+
+
+
+

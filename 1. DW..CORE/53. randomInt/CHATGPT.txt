@@ -1,0 +1,40 @@
+randomInt:
+
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.Random;
+
+@SpringBootApplication
+@RestController
+public class RandomPriceController {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RandomPriceController.class, args);
+    }
+
+    @GetMapping("/random-price")
+    public Map<String, Integer> getRandomPrice() {
+        Random random = new Random();
+        int price = random.nextInt(1000); // 0 to 999
+
+        return Map.of("price", price);
+    }
+}
+
+
+output:
+
+{ "price": 442 }
+
+

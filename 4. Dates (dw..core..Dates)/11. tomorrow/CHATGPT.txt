@@ -1,0 +1,30 @@
+tomorrow:
+
+
+input:
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDate;
+import java.util.Map;
+
+@RestController
+public class DateController {
+
+    @GetMapping("/tomorrow")
+    public Map<String, String> getTomorrowDate() {
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        return Map.of("tomorrow", tomorrow.toString());
+    }
+}
+
+
+output:
+
+{
+  "tomorrow": "2021-05-16"
+}
+

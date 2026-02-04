@@ -1,0 +1,45 @@
+words:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        String inputString = "hello world\nhere\t\t\tdata-weave";
+        
+        // --- Core DataWeave Logic Equivalent ---
+        String regexSeparator = "\\s+"; 
+        
+        String[] parts = inputString.split(regexSeparator);
+        List<String> result = Arrays.asList(parts);
+        // ------------------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        
+        // 1. Format the list elements as a JSON array string: ["hello", "world", ...]
+        String arrayContent = result.stream()
+            .map(s -> "\"" + s + "\"")
+            .collect(Collectors.joining(", "));
+
+        // 2. Wrap the array content in the final JSON object structure
+        String output = String.format(
+            "{\n  \"result\": [%s]\n}",
+            arrayContent
+        );
+
+        System.out.println(output);
+    }
+}
+
+output:
+
+
+{
+  "result": ["hello", "world", "here", "data-weave"]
+}

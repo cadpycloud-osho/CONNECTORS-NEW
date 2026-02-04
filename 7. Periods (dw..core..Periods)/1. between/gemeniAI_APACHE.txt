@@ -1,0 +1,65 @@
+between:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DatePeriodRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculatePeriods")
+            .routeId("Date-Period-Route")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // 1. Logic: between(|2010-12-12|, |2010-12-10|) -> 2 days
+                results.put("a", getBetween("2010-12-12", "2010-12-10"));
+
+                // 2. Logic: between(|2011-12-11|, |2010-11-10|) -> 1y 1m 1d
+                results.put("b", getBetween("2011-12-11", "2010-11-10"));
+
+                // 3. Logic: between(|2020-02-29|, |2020-03-30|) -> negative 1m 1d
+                results.put("c", getBetween("2020-02-29", "2020-03-30"));
+
+                exchange.getIn().setBody(results);
+            })
+            // 4. Output as application/json
+            .marshal().json()
+            .log("Calculated Periods: ${body}");
+    }
+
+    /**
+     * Replicates DW between(date1, date2) 
+     * Formula: date1 - date2
+     */
+    private String getBetween(String d1, String d2) {
+        LocalDate date1 = LocalDate.parse(d1);
+        LocalDate date2 = LocalDate.parse(d2);
+        
+        // Java Period.between calculates (end - start)
+        // To match DW, we use date2 as start and date1 as end
+        Period period = Period.between(date2, date1);
+        
+        return period.toString(); // Returns ISO-8601 string (e.g., P1Y1M1D)
+    }
+}
+
+
+output:
+
+{
+   "a": "P2D",
+   "b": "P1Y1M1D",
+   "c": "P-1M-1D"
+}
+
+
+
+

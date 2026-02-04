@@ -1,0 +1,22 @@
+take:
+
+take<T>(array: Array<T>, n: Number): Array<T>
+
+take<T>(array: Array<T>, n: Number): Array<T>
+Selects the first n elements. It returns an empty array when n <= 0 and the original array when n > sizeOf(array).
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+var users = ["Mariano", "Leandro", "Julian"]
+output application/json
+---
+take(users, 2)
+
+DataWeave
+Output
+[
+  "Mariano",
+  "Leandro"
+]

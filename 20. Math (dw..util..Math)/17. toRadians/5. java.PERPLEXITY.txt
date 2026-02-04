@@ -1,0 +1,45 @@
+toRadians:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = executeToRadiansTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Double> executeToRadiansTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("toRadians10", toRadians(10.0));
+        result.put("toRadians013", toRadians(0.13));
+        result.put("toRadians-20", toRadians(-20.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave toRadians() equivalent:
+     * Converts degrees to radians: radians = degrees * (π/180)
+     */
+    public static Double toRadians(double degrees) {
+        return Math.toRadians(degrees);
+    }
+}
+
+
+output:
+
+{
+  toRadians10=0.17453292519943295,
+  toRadians013=0.0022689280275926285,
+  toRadians-20=-0.3490658503988659
+}
+
+

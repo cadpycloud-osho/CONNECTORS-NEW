@@ -1,0 +1,37 @@
+toRegex:
+
+
+input:
+
+
+@SpringBootApplication
+@RestController
+public class RegexApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RegexApp.class, args);
+    }
+
+    @GetMapping("/to-regex")
+    public Map<String, String> toRegex() {
+        // Equivalent to DataWeave toRegex("a-Z")
+        Pattern regex1 = Pattern.compile("a-Z");
+        
+        // Equivalent to DataWeave toRegex("0-9+")
+        Pattern regex2 = Pattern.compile("0-9+");
+        
+        return Map.of(
+            "toRegexEx1", regex1.pattern(),
+            "toRegexEx2", regex2.pattern()
+        );
+    }
+}
+
+output:
+
+{
+  "toRegexEx1": "a-Z",
+  "toRegexEx2": "0-9+"
+}
+
+

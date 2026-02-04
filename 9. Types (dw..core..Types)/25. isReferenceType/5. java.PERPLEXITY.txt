@@ -1,0 +1,41 @@
+isReferenceType:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isReferenceType(Object type) {
+        // DataWeave logic: simple collection=false, nested reference=true
+        return type instanceof List && ((List<?>) type).get(0) instanceof List;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AArray = Array<String> → simple → false
+        List<String> aArray = List.of("item");
+        
+        // arrayItem(AArray2=Array<AArray>) → nested AArray reference → true
+        List<List<String>> aArray2 = List.of(aArray);
+        List<String> arrayItemAArray2 = aArray2.get(0);
+        
+        String str = "test";
+        
+        result.put("a", isReferenceType(aArray));
+        result.put("b", isReferenceType(arrayItemAArray2));
+        result.put("c", isReferenceType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+{a=false, b=true, c=false}

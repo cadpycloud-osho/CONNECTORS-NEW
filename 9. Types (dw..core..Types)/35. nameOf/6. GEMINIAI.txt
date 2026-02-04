@@ -1,0 +1,66 @@
+nameOf:
+
+
+
+input:
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NameOfController {
+
+    // Proxy class to represent the type alias AArray
+    private static final class AArray {} 
+
+    // Proxy class to represent the type alias AArray2
+    private static final class AArray2 {} 
+
+    /**
+     * Helper method for conceptual equivalence to nameOf(Type).
+     */
+    private String nameOf(Class<?> type) {
+        return type.getSimpleName();
+    }
+
+    @GetMapping("/name-of-type")
+    public Map<String, String> checkNameOfTypes() {
+        
+        // 1. AArray alias
+        Class<?> aArrayType = AArray.class;
+        
+        // 2. AArray2 alias
+        Class<?> aArray2Type = AArray2.class;
+        
+        // 3. Built-in String type
+        Class<?> stringType = String.class;
+
+        // Perform the type name extraction
+        String a = nameOf(aArrayType);
+        String b = nameOf(aArray2Type);
+        String c = nameOf(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, String> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+
+output:
+
+
+{
+  "a": "AArray",
+  "b": "AArray2",
+  "c": "String"
+}
+

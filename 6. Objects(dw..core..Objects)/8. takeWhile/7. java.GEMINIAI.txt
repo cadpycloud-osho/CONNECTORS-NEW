@@ -1,0 +1,143 @@
+takeWhile:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BiPredicate;
+
+public class Main {
+
+    /**
+     * Functional Interface to represent the DW lambda (value, key) -> condition
+     */
+    @FunctionalInterface
+    public interface EntryPredicate extends BiPredicate<Object, String> {
+        // BiPredicate<T, U> represents a predicate (boolean-valued function) of two arguments.
+        // Here, T=Value (Object), U=Key (String).
+        @Override
+        boolean test(Object value, String key);
+    }
+
+    /**
+     * Simulates the DataWeave takeWhile operator.
+     * Collects entries from the map as long as the predicate is true. Stops immediately 
+     * once the predicate returns false.
+     * @param inputMap The map (DW object) to iterate over.
+     * @param predicate The condition to test (value < 3).
+     * @return A new Map containing the leading entries that satisfied the condition.
+     */
+    public static Map<String, Object> takeWhile(
+            Map<String, Object> inputMap, EntryPredicate predicate) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (inputMap == null || inputMap.isEmpty()) {
+            return result;
+        }
+
+        // Iterate over the entries in order (requires LinkedHashMap)
+        for (Map.Entry<String, Object> entry : inputMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // The predicate requires casting the value to Number for comparison
+            // In Java, this safely assumes the input values (1, 2, 5, 1) are comparable.
+            if (predicate.test(value, key)) {
+                result.put(key, value);
+            } else {
+                // Short-circuit: stop immediately when the condition fails
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        
+        // 1. Define the input object/Map, must use LinkedHashMap to guarantee order
+        Map<String, Object> inputObj = new LinkedHashMap<>();
+        inputObj.put("a", 1);
+        inputObj.put("b", 2);
+        inputObj.put("c", 5); // This is where the condition will first fail
+        inputObj.put("d", 1);
+        
+        // 2. Define the predicate (value < 3)
+        EntryPredicate valueLessThanThree = (value, key) -> {
+            if (value instanceof Number) {
+                // Test if the numeric value is less than 3
+                return ((Number) value).intValue() < 3;
+            }
+            return false; // Treat non-numeric values as failing the condition
+        };
+
+        // 3. Apply the takeWhile logic
+        Map<String, Object> result = takeWhile(inputObj, valueLessThanThree);
+
+        // --- Output Generation ---
+        
+        // Format the key-value pairs of the result map into a JSON string
+        StringBuilder contentBuilder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : result.entrySet()) {
+            if (contentBuilder.length() > 0) {
+                contentBuilder.append(",\n  ");
+            }
+            contentBuilder.append(String.format("\"%s\": %s", entry.getKey(), entry.getValue().toString()));
+        }
+
+        // Format the final JSON structure
+        String jsonOutput = String.format(
+            "{\n  \"a\": %d,\n  \"b\": %d\n}",
+            result.get("a"), 
+            result.get("b")
+        );
+
+
+        System.out.println("--- DataWeave takeWhile Simulation ---");
+        System.out.println("Input Object: " + inputObj);
+        System.out.println("Condition: value < 3");
+        System.out.println("--------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+--- DataWeave takeWhile Simulation ---
+Input Object: {a=1, b=2, c=5, d=1}
+Condition: value < 3
+--------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "a": 1,
+  "b": 2
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

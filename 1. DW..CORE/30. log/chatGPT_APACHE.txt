@@ -1,0 +1,47 @@
+log:
+
+example 1:
+
+
+input:
+
+from("direct:logExample")
+.log("WARNING - Houston, we have a problem")
+.setBody(constant("Houston, we have a problem"));
+
+
+output:
+
+WARNING - Houston, we have a problem
+
+
+----------------------------------------------------------
+example 2:
+
+
+input:
+
+from("direct:logUser")
+.setBody(constant(
+    Map.of(
+        "user", Map.of(
+            "friend", Map.of("name", "Shoki"),
+            "id", 1,
+            "name", "Tomo"
+        ),
+        "accountId", "leansh"
+    )
+))
+.log("User - ${body[user]}")
+.setBody(simple("${body[user][friend][name]}"));
+
+
+output:
+
+User - {friend={name=Shoki}, id=1, name=Tomo}
+
+
+"Shoki"
+
+
+

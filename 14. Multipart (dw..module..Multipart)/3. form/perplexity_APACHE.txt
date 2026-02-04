@@ -1,0 +1,159 @@
+form:
+
+example 1:
+
+
+input:
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+
+public class MultipartMixedProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String boundary = "------=_Part_146_143704079.1560394078604";
+        String ordersFilePath = "src/main/resources/orders.xml";
+        ObjectMapper jsonMapper = new ObjectMapper();
+        
+        StringBuilder multipartBody = new StringBuilder();
+        
+        // Part 1: Multipart::file(fileArgs) - XML file upload
+        String xmlContent = Files.readString(Paths.get(ordersFilePath));
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/xml\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"file\"; filename=\"myorders.xml\"\r\n\r\n");
+        multipartBody.append(xmlContent).append("\r\n");
+        
+        // Part 2: Multipart::field(fieldArgs) - text field
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: text/plain\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"userName\"\r\n\r\n");
+        multipartBody.append("Annie Point").append("\r\n");
+        
+        // Part 3: Multipart::field("myJson", {...}, "application/json", "userInfo.json")
+        Map<String, String> jsonData = Map.of("user", "Annie Point");
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/json\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"myJson\"; filename=\"userInfo.json\"\r\n\r\n");
+        multipartBody.append(jsonMapper.writeValueAsString(jsonData)).append("\r\n");
+        
+        // Closing boundary
+        multipartBody.append(boundary).append("--\r\n");
+        
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary.substring(6));
+        exchange.getIn().setBody(multipartBody.toString());
+    }
+}
+
+from("direct:multipartMixed")
+    .process(new MultipartMixedProcessor());
+
+output:
+
+------=_Part_146_143704079.1560394078604
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+
+------=_Part_146_143704079.1560394078604
+Content-Type: text/plain
+Content-Disposition: form-data; name="userName"
+
+Annie Point
+
+------=_Part_146_143704079.1560394078604
+Content-Type: application/json
+Content-Disposition: form-data; name="myJson"; filename="userInfo.json"
+{"user":"Annie Point"}
+
+------=_Part_146_143704079.1560394078604--
+
+
+
+
+-------------------------------------------------
+
+example 2:
+
+
+input:
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.UUID;
+
+public class MultipartFieldsProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String firstPart = "content for my first part";
+        String secondPart = "content for my second part";
+        String boundary = "------=_Part_320_1528378161.1542639222352";
+        
+        StringBuilder multipartBody = new StringBuilder();
+        
+        // Part 1: Multipart::field({name:"myFirstPart",value: firstPart})
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"myFirstPart\"\r\n\r\n");
+        multipartBody.append(firstPart).append("\r\n");
+        
+        // Part 2: Multipart::field("mySecondPart", secondPart)
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"mySecondPart\"\r\n\r\n");
+        multipartBody.append(secondPart).append("\r\n");
+        
+        // Closing boundary
+        multipartBody.append(boundary).append("--\r\n");
+        
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary.substring(6));
+        exchange.getIn().setBody(multipartBody.toString());
+    }
+}
+
+from("direct:multipartFields")
+    .process(new MultipartFieldsProcessor());
+
+output:
+
+
+
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161.1542639222352--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

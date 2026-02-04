@@ -1,0 +1,30 @@
+fromBase64:
+
+input:
+
+from("direct:fromBase64")
+.process(exchange -> {
+
+    // Example Base64 payload
+    String base64Payload = exchange.getIn().getBody(String.class);
+
+    // Decode Base64 to binary (byte[])
+    byte[] decodedBytes = java.util.Base64
+            .getDecoder()
+            .decode(base64Payload);
+
+    exchange.getIn().setBody(decodedBytes);
+    exchange.getIn().setHeader("Content-Type", "application/octet-stream");
+});
+
+
+
+
+
+
+output:
+
+
+Hello Camel
+
+

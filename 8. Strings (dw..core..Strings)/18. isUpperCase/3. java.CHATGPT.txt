@@ -1,0 +1,46 @@
+isUpperCase:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isUpperCaseDW(String input) {
+        if (input == null || input.isEmpty()) return false;
+
+        // Unicode uppercase letters only, no digits, spaces, symbols
+        if (!input.matches("^[\\p{Lu}]+$")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", isUpperCaseDW(null));
+        result.put("b", isUpperCaseDW(""));
+        result.put("c", isUpperCaseDW("  "));
+        result.put("d", isUpperCaseDW("ABC"));
+        result.put("e", isUpperCaseDW("aBC"));
+        result.put("f", isUpperCaseDW("A C"));
+        result.put("g", isUpperCaseDW("A1C"));
+        result.put("h", isUpperCaseDW("A/C"));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=false, b=false, c=false, d=true, e=false, f=false, g=false, h=false}
+
+

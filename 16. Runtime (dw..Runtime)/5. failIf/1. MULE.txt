@@ -1,0 +1,65 @@
+failIf:
+
+failIf<T>(value: T, evaluator: (value: T) -> Boolean, message: String = 'Failed'): T
+
+failIf<T>(value: T, evaluator: (value: T) -> Boolean, message: String = 'Failed'): T
+Produces an error with the specified message if the expression in the evaluator returns true. Otherwise, the function returns the value.
+
+
+
+Source
+%dw 2.0
+import failIf from dw::Runtime
+var result = {}
+output application/json
+---
+{ "result" : "SUCCESS" failIf (isEmpty(result)) }
+DataWeave
+Output
+ERROR 2018-07-29 11:56:39,988 ...
+**********************************
+Message               : "Failed
+
+
+
+-------------------------------------------------------------------
+
+Alternatively, the function outputs the value.
+
+
+
+Source
+%dw 2.0
+import failIf from dw::Runtime
+var result = {"a":"test"}
+output application/json
+---
+{ "result" : result failIf isEmpty($) }
+DataWeave
+Output
+{
+  "result": {
+    "a": "test"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

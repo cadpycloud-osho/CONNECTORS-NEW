@@ -1,0 +1,55 @@
+ordinalize:
+
+ordinalize(num: Number): String
+
+ordinalize(num: Number): String
+Returns a number as an ordinal, such as 1st or 2nd.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "a" : ordinalize(1),
+  "b": ordinalize(2),
+  "c": ordinalize(5),
+  "d": ordinalize(103)
+}
+
+
+DataWeave
+Output
+{
+   "a": "1st",
+   "b": "2nd",
+   "c": "5th",
+   "d": "103rd"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

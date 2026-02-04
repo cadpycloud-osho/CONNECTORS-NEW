@@ -1,0 +1,18 @@
+upper:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String upperName = "mulesoft".toUpperCase();
+        System.out.println("{\"name\" : \"" + upperName + "\"}");
+    }
+}
+
+
+output:
+
+{"name":"MULESOFT"}
+

@@ -1,0 +1,166 @@
+map:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MapWithIndexRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapIndex")
+            .process(exchange -> {
+                List<String> names = Arrays.asList("jose", "pedro", "mateo");
+                List<Map<String, String>> result = new ArrayList<>();
+                
+                for (int i = 0; i < names.size(); i++) {
+                    Map<String, String> obj = new LinkedHashMap<>();
+                    obj.put(String.valueOf(i), names.get(i));
+                    result.add(obj);
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[
+  { "0": "jose" },
+  { "1": "pedro" },
+  { "2": "mateo" }
+]
+
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MapIndexTransformRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapTransform")
+            .process(exchange -> {
+                List<String> input = Arrays.asList("a", "b", "c");
+                List<String> result = new ArrayList<>();
+                
+                for (int i = 0; i < input.size(); i++) {
+                    String transformed = (i + 1) + "_" + input.get(i);
+                    result.add(transformed);
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+["1_a", "2_b", "3_c"]
+
+
+-------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MapDollarDollarRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapDollarDollar")
+            .process(exchange -> {
+                List<String> names = Arrays.asList("joe", "pete", "matt");
+                List<Map<String, String>> result = new ArrayList<>();
+                
+                for (int i = 0; i < names.size(); i++) {
+                    Map<String, String> obj = new LinkedHashMap<>();
+                    obj.put(String.valueOf(i), names.get(i));  // "$$" = index, "$" = value
+                    result.add(obj);
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[
+  { "0": "joe" },
+  { "1": "pete" },
+  { "2": "matt" }
+]
+
+
+-------------------------------------------------------
+
+example 4:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MapToCsvRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapToCsv")
+            .setBody(simple("[{\"age\":14,\"name\":\"Claire\"},{\"age\":56,\"name\":\"Max\"},{\"age\":89,\"name\":\"John\"}]"))
+            .unmarshal().json(JsonLibrary.Jackson)
+            .process(exchange -> {
+                List<Map<String, Object>> input = exchange.getIn().getBody(List.class);
+                StringBuilder csv = new StringBuilder();
+                
+                // Header
+                csv.append("age,name\n");
+                
+                // Map each record (explicit field mapping)
+                for (Map<String, Object> record : input) {
+                    int age = ((Number) record.get("age")).intValue();
+                    String name = (String) record.get("name");
+                    csv.append(age).append(",").append(name).append("\n");
+                }
+                
+                exchange.getIn().setBody(csv.toString().trim());
+            })
+            .setHeader("Content-Type", constant("text/csv"))
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+age,name
+14,Claire
+56,Max
+89,John
+
+
+-------------------------------------------------------
+

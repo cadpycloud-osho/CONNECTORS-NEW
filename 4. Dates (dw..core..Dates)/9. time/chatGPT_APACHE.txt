@@ -1,0 +1,25 @@
+time:
+
+
+input:
+from("direct:createTime")
+.process(exchange -> {
+
+    // Create a ZonedTime with hour, minute, second and timezone
+    java.time.OffsetTime newTime = java.time.OffsetTime.of(12, 30, 40, 0, java.time.ZoneOffset.of("-03:00"));
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("newTime", newTime.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+
+{
+  "newTime": "12:30:40-03:00"
+}
+

@@ -1,0 +1,80 @@
+isBinaryType:
+
+
+
+INPUT:
+
+package com.example.typecheck.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class BinaryTypeCheckService {
+
+    // Define the constant for the DataWeave 'Binary' type representation
+    private static final String DW_BINARY_TYPE = "Binary";
+
+    /**
+     * Helper method to simulate DataWeave's isBinaryType() function.
+     * Checks if the given type name is equivalent to the 'Binary' type.
+     */
+    private boolean isBinaryType(String typeName) {
+        // Checks if the type name matches the expected "Binary" type string.
+        return typeName.equals(DW_BINARY_TYPE);
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, Boolean> checkTypes() {
+        
+        // Emulating the type definitions and uses from the DW script:
+        final String ABinary_Type = "Binary"; // Emulates type ABinary = Binary
+        final String Builtin_Binary = "Binary";
+        final String Builtin_String = "String";
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: isBinaryType(ABinary), b: isBinaryType(Binary), c: isBinaryType(String) }
+        return Map.of(
+            "a", isBinaryType(ABinary_Type),
+            "b", isBinaryType(Builtin_Binary),
+            "c", isBinaryType(Builtin_String)
+        );
+    }
+}
+
+
+package com.example.typecheck.controller;
+
+import com.example.typecheck.service.BinaryTypeCheckService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final BinaryTypeCheckService binaryTypeCheckService;
+
+    public DataWeaveController(BinaryTypeCheckService binaryTypeCheckService) {
+        this.binaryTypeCheckService = binaryTypeCheckService;
+    }
+
+    // Maps to http://localhost:8080/check-binary-type
+    @GetMapping("/check-binary-type")
+    public Map<String, Boolean> checkBinaryType() {
+        // Calls the service method that holds the transformation logic
+        return binaryTypeCheckService.checkTypes();
+    }
+}
+OUTPUT:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

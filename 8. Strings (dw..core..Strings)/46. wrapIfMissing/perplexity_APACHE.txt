@@ -1,0 +1,58 @@
+wrapIfMissing:
+
+
+input:
+
+
+import java.util.*;
+
+public class WrapIfMissingConverter {
+    public static String wrapIfMissing(String text, char wrapper) {
+        if (text == null) return null;
+        
+        boolean startsWith = text.length() > 0 && text.charAt(0) == wrapper;
+        boolean endsWith = text.length() > 0 && text.charAt(text.length() - 1) == wrapper;
+        
+        if (startsWith && endsWith) {
+            return text; // Already fully wrapped
+        }
+        
+        StringBuilder result = new StringBuilder(text);
+        if (!startsWith) result.insert(0, wrapper);
+        if (!endsWith) result.append(wrapper);
+        
+        return result.toString();
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", wrapIfMissing(null, '\''));
+        result.put("b", wrapIfMissing("", '\''));
+        result.put("c", wrapIfMissing("ab", 'x'));
+        result.put("d", wrapIfMissing("'ab'", '\''));
+        result.put("e", wrapIfMissing("/", '/'));
+        result.put("f", wrapIfMissing("a/b/c", '/'));
+        result.put("g", wrapIfMissing("/a/b/c", '/'));
+        result.put("h", wrapIfMissing("a/b/c/", '/'));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+   "a": null,
+   "b": "'",
+   "c": "xabx",
+   "d": "'ab'",
+   "e": "/",
+   "f": "/a/b/c/",
+   "g": "/a/b/c/",
+   "h": "/a/b/c/"
+}
+
+
+

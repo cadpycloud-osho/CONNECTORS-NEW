@@ -1,0 +1,40 @@
+unwrap:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String unwrapDW(String input, char ch) {
+        if (input == null) return null;
+
+        if (input.length() >= 2 && input.charAt(0) == ch && input.charAt(input.length() - 1) == ch) {
+            return input.substring(1, input.length() - 1);
+        }
+
+        return input;
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", unwrapDW(null, '\0'));
+        result.put("b", unwrapDW(null, '\0'));
+        result.put("c", unwrapDW("'abc'", '\''));
+        result.put("d", unwrapDW("AABabcBAA", 'A'));
+        result.put("e", unwrapDW("A", '#'));
+        result.put("f", unwrapDW("#A", '#'));
+        result.put("g", unwrapDW("A#", '#'));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+{a=null, b=null, c=abc, d=ABabcBA, e=A, f=#A, g=A#}
+
+

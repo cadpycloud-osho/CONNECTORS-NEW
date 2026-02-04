@@ -1,0 +1,47 @@
+readLinesWith:
+
+
+
+input:
+
+from("direct:readBinaryLines")
+.process(exchange -> {
+
+    // Simulate Binary content (octet-stream)
+    byte[] content = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n"
+            .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+    // Convert binary → String (UTF-8)
+    String text = new String(content, java.nio.charset.StandardCharsets.UTF_8);
+
+    // Read lines
+    java.util.List<String> lines = java.util.Arrays.asList(text.split("\\R"));
+
+    // Prepare output (same as DataWeave)
+    java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+    result.put("lines", lines);
+    result.put("showType", "Binary");
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+
+output:
+
+
+{
+  "lines": [
+    "Line 1",
+    "Line 2",
+    "Line 3",
+    "Line 4",
+    "Line 5"
+  ],
+  "showType": "Binary"
+}
+
+
+
+

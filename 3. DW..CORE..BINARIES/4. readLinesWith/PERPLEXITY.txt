@@ -1,0 +1,58 @@
+readLinesWith:
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.io.*;
+
+@SpringBootApplication
+public class ReadLinesDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ReadLinesDemoApplication.class, args);
+    }
+}
+
+@RestController
+class ReadLinesController {
+    
+    @GetMapping("/readLines")
+    public Map<String, Object> readLinesExample() {
+        // Simulate binary content: "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n"
+        String content = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n";
+        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
+        
+        // Split into lines
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(contentBytes), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            // Handle exception
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("lines", lines);
+        result.put("showType", "Binary");
+        
+        return result;
+    }
+}
+
+
+
+OUTPUT:
+
+
+{
+  "lines": ["Line 1", "Line 2", "Line 3", "Line 4", "Line 5"],
+  "showType": "Binary"
+}

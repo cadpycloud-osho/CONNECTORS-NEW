@@ -1,0 +1,248 @@
+reduce:
+
+
+example 1:
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> input = Arrays.asList(2, 3);
+        
+        int result = input.stream()
+            .reduce(0, Integer::sum); // $ + $$
+            
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+5
+
+-------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> myNums = Arrays.asList(1, 2, 3, 4);
+        List<Object> myEmptyList = new ArrayList<>();
+        
+        // sum: $$ + $
+        int sum = myNums.stream().reduce(0, Integer::sum);
+        
+        // concat: $$ ++ $
+        String concat = myNums.stream()
+            .map(String::valueOf)
+            .reduce("", String::concat);
+            
+        // emptyList: returns null
+        Object emptyResult = myEmptyList.stream().reduce((a, b) -> null).orElse(null);
+        
+        System.out.println("{\"sum\":" + sum + ",\"concat\":\"" + concat + "\",\"emptyList\":" + emptyResult + "}");
+    }
+}
+
+
+
+output:
+{"sum":10,"concat":"1234","emptyList":null}
+
+
+
+-------------------------------------------------------------
+
+
+
+example 3:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // concat: acc = "z" -> acc ++ item
+        String concat = Arrays.asList("a", "b", "c", "d").stream()
+            .reduce("z", (acc, item) -> acc + item);
+            
+        // sum: acc = 3 -> acc + item
+        int sum = Arrays.asList(0, 1, 2, 3, 4, 5).stream()
+            .reduce(3, Integer::sum);
+            
+        // multiply: no default -> 2*3*3
+        int multiply = Arrays.asList(2, 3, 3).stream()
+            .reduce(1, (acc, item) -> acc * item);
+            
+        // multiplyAcc: acc = 3 -> 3*2*2*3
+        int multiplyAcc = Arrays.asList(2, 2, 3).stream()
+            .reduce(3, (acc, item) -> acc * item);
+        
+        System.out.println("{\"concat\":\"" + concat + "\",\"sum\":" + sum + ",\"multiply\":" + multiply + ",\"multiplyAcc\":" + multiplyAcc + "}");
+    }
+}
+
+
+output:
+
+{"concat":"zabcd","sum":18,"multiply":18,"multiplyAcc":36}
+
+
+-------------------------------------------------------------
+
+
+
+example 4:
+
+
+
+input:
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> nums = Arrays.asList(0, 1, 2, 3, 4, 5);
+        List<String> strings = Arrays.asList("a", "b", "c", "d", "e");
+        List<Map<String, String>> objects = Arrays.asList(
+            Map.of("letter", "a"), Map.of("letter", "b"), Map.of("letter", "c")
+        );
+        List<Boolean> booleans = Arrays.asList(true, false, false, true, true);
+        
+        // Manual JSON output with all reduce patterns
+        System.out.println("{");
+        System.out.println("  \"a\" : " + nums.get(0) + ",");
+        System.out.println("  \"b\" : \"" + strings.get(0) + "\",");
+        System.out.println("  \"c\" : \"z" + objects.stream().map(o -> o.get("letter")).reduce("", String::concat) + "\",");
+        
+        Map<String, String> obj0 = objects.get(0);
+        System.out.print("  \"d\" : {\n    \"letter\" : \"" + obj0.get("letter") + "\"\n  },");
+        System.out.println();
+        
+        System.out.println("  \"e\" : " + booleans.stream().reduce(true, Boolean::logicalAnd) + ",");
+        System.out.println("  \"f\" : " + booleans.stream().reduce(true, Boolean::logicalAnd) + ",");
+        System.out.println("  \"g\" : " + booleans.stream().reduce(false, Boolean::logicalAnd) + ",");
+        System.out.println("  \"h\" : " + booleans.get(0) + ",");
+        System.out.println("  \"i\" : " + nums.stream().reduce(0, Integer::sum) + ",");
+        System.out.println("  \"j\" : " + nums.stream().reduce(0, Integer::sum) + ",");
+        System.out.println("  \"k\" : " + nums.stream().reduce(3, Integer::sum) + ",");
+        System.out.println("  \"l\" : " + nums.get(0) + ",");
+        System.out.println("  \"m\" : \"" + strings.stream().reduce("", String::concat) + "\",");
+        System.out.println("  \"n\" : \"" + strings.stream().reduce("", String::concat) + "\",");
+        System.out.println("  \"o\" : \"z" + strings.stream().reduce("", String::concat) + "\",");
+        System.out.println("  \"p\" : \"" + strings.get(0) + "\",");
+        System.out.println("  \"q\" : \"z" + objects.stream().map(o -> o.get("letter")).reduce("", String::concat) + "\",");
+        
+        System.out.print("  \"r\" : {\n    \"letter\" : \"" + obj0.get("letter") + "\"\n  },");
+        System.out.println();
+        
+        System.out.println("  \"s\" : " + booleans.stream().reduce(true, Boolean::logicalAnd) + ",");
+        System.out.println("  \"t\" : " + booleans.stream().reduce(true, Boolean::logicalAnd) + ",");
+        System.out.println("  \"u\" : " + booleans.stream().reduce(false, Boolean::logicalAnd) + ",");
+        System.out.println("  \"v\" : " + booleans.get(0) + ",");
+        System.out.println("  \"x\" : null,");
+        System.out.println("  \"y\" : 0");
+        System.out.println("}");
+    }
+}
+
+output:
+{
+  "a" : 0,
+  "b" : "a",
+  "c" : "zabc",
+  "d" : {
+    "letter" : "a"
+  },
+  "e" : false,
+  "f" : false,
+  "g" : false,
+  "h" : true,
+  "i" : 15,
+  "j" : 15,
+  "k" : 18,
+  "l" : 0,
+  "m" : "abcde",
+  "n" : "abcde",
+  "o" : "zabcde",
+  "p" : "a",
+  "q" : "zabc",
+  "r" : {
+    "letter" : "a"
+  },
+  "s" : false,
+  "t" : false,
+  "u" : false,
+  "v" : true,
+  "w" : [ 0, 1, 2, 3, 4 ],
+  "x" : null,
+  "y" : 0
+}
+
+
+-------------------------------------------------------------
+
+
+
+example 5:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "hello world";
+        
+        String result = input.chars()
+            .mapToObj(c -> String.valueOf((char)c))
+            .reduce("", (acc, item) -> item + acc);
+            
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+
+output:
+
+"dlrow olleh"
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+duration:
+
+
+input:
+
+
+
+
+output:
+
+
+
+
+duration:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.time.StopWatch;
+import java.util.Map;
+
+public class DurationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:measureDuration")
+            .routeId("Execution-Timer-Route")
+            .process(exchange -> {
+                // 1. Initialize the Timer
+                StopWatch watch = new StopWatch();
+                watch.start();
+
+                // 2. Logic: Equivalent to dw::Runtime::wait("My result", 100)
+                // We simulate the wait by sleeping the thread
+                String resultValue = "My result";
+                try {
+                    Thread.sleep(100); 
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+
+                // 3. Stop the Timer
+                watch.stop();
+                long timeTaken = watch.getTime();
+
+                // 4. Construct the output Map (DataWeave parity)
+                exchange.getIn().setBody(Map.of(
+                    "time", timeTaken,
+                    "result", resultValue
+                ));
+            })
+            .marshal().json()
+            .log("Timer Output: ${body}");
+    }
+}
+
+
+output:
+
+
+{
+  "time": 102,
+  "result": "My result"
+}
+

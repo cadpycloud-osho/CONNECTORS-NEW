@@ -1,0 +1,26 @@
+currentMilliseconds:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+
+public class TimerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                long currentMillis = System.currentTimeMillis();
+                Map<String, Object> body = Map.of("currentMilliseconds", currentMillis);
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+output:
+
+{ "currentMilliseconds": 1764168523000 }

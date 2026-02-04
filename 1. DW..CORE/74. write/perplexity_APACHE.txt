@@ -1,0 +1,91 @@
+write:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class WriteTextPlainRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:writeTextPlain")
+            .process(exchange -> {
+                // write("world", "text/plain") → identity for strings
+                String result = "world";
+                
+                exchange.getIn().setBody(Map.of("hello", result));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "hello": "world" }
+
+
+-------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.dataformat.csv.CsvDataFormat;
+import java.util.*;
+
+public class CsvWriteXmlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:csvWriteXml")
+            .process(exchange -> {
+                // Simulate input payload
+                List<Map<String, String>> input = Arrays.asList(
+                    Map.of("Name", "Mr White", "Email", "white@mulesoft.com", 
+                           "Id", "1234", "Title", "Chief Java Prophet"),
+                    Map.of("Name", "Mr Orange", "Email", "orange@mulesoft.com", 
+                           "Id", "4567", "Title", "Integration Ninja")
+                );
+                
+                // CSV configuration matching DataWeave
+                StringBuilder csv = new StringBuilder();
+                String[] headers = {"Name", "Email", "Id", "Title"};
+                
+                // Header row (header: true)
+                csv.append(String.join("|", headers)).append("\n");
+                
+                // Data rows (separator: "|")
+                for (Map<String, String> row : input) {
+                    String[] values = {row.get("Name"), row.get("Email"), 
+                                     row.get("Id"), row.get("Title")};
+                    csv.append(String.join("|", values)).append("\n");
+                }
+                
+                // Wrap CSV in XML <output> element
+                String xmlOutput = String.format(
+                    "<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n<output>%s</output>", 
+                    csv.toString().trim()
+                );
+                
+                exchange.getIn().setBody(Map.of("output", xmlOutput));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="US-ASCII"?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja
+</output>
+
+
+
+-------------------------------------------

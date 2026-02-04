@@ -1,0 +1,77 @@
+period:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class PeriodProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        ZonedDateTime dateTime =
+                ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        LocalDate date =
+                LocalDate.parse("2020-10-05");
+
+        // dayBeforeDateTime
+        result.put(
+                "dayBeforeDateTime",
+                dateTime.minus(Period.ofDays(1)).toString()
+        );
+
+        // dayAfterDate
+        result.put(
+                "dayAfterDate",
+                date.plus(Period.ofDays(1)).toString()
+        );
+
+        // yearMonthDayAfterDate
+        Period ymdPeriod = Period.of(1, 1, 1);
+        result.put(
+                "yearMonthDayAfterDate",
+                date.plus(ymdPeriod).toString()
+        );
+
+        // emptyPeriod
+        result.put("emptyPeriod", Period.ZERO.toString());
+
+        // constructPeriod
+        Period constructed = Period.of(4, 11, 28);
+        result.put("constructPeriod", constructed.toString());
+
+        // selectMonthsFromPeriod
+        result.put("selectMonthsFromPeriod", constructed.getMonths());
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:start")
+    .process(new PeriodProcessor())
+    .to("log:period-example");
+
+
+
+output:
+
+{
+  "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+  "dayAfterDate": "2020-10-06",
+  "yearMonthDayAfterDate": "2021-11-06",
+  "emptyPeriod": "P0D",
+  "constructPeriod": "P4Y11M28D",
+  "selectMonthsFromPeriod": 11
+}
+
+

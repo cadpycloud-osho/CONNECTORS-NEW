@@ -1,0 +1,107 @@
+indexWhere:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
+
+public class Main {
+
+    /**
+     * Mimics DataWeave's 'indexWhere' using Streams (by iterating over indices).
+     * Returns the index of the first element that satisfies the condition, or -1 if none.
+     */
+    public static <T> int indexWhere(List<T> list, Predicate<T> condition) {
+        // Create a stream of indices (0, 1, 2, ...)
+        return IntStream.range(0, list.size())
+            // Filter to keep only the indices where the element satisfies the condition
+            .filter(i -> condition.test(list.get(i)))
+            // Find the first index that passed the filter
+            .findFirst()
+            // Return the index, or -1 if the Optional is empty (no match found)
+            .orElse(-1);
+    }
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: users indexWhere (item) -> item startsWith "Jul"
+        Predicate<String> condition = item -> item.startsWith("Jul");
+
+        int result = indexWhere(users, condition);
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result); 
+    }
+}
+
+
+
+output:
+2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Java Code (Using an Imperative Loop)
+This approach uses a standard for loop, which naturally implements the short-circuiting logic by returning immediately upon finding the first match's index.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveIndexWhereImperative {
+
+    /**
+     * Helper method to manually find the index where the condition is met.
+     * Returns the index (0-based) or -1 if not found.
+     */
+    public static int indexWhere(List<String> list, String prefix) {
+        for (int i = 0; i < list.size(); i++) {
+            String item = list.get(i);
+            
+            // DataWeave condition: item startsWith "Jul"
+            if (item.startsWith(prefix)) {
+                return i; // Found it, return the index and stop (short-circuiting)
+            }
+        }
+        return -1; // Not found after checking all elements
+    }
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'users' variable)
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // DataWeave Logic: users indexWhere (item) -> item startsWith "Jul"
+        int result = indexWhere(users, "Jul");
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result);
+    }
+}
+
+Output for Both Java Codes
+The output for both the Java Stream and the Java Imperative loop is identical and correctly matches the expected DataWeave output:
+
+JSON
+
+2

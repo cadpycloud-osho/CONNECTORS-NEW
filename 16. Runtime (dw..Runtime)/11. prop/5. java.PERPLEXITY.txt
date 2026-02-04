@@ -1,0 +1,26 @@
+prop:
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        // Simulate prop("user.timezone") - system property or default
+        String userTimezone = System.getProperty("user.timezone", "America/Los_Angeles");
+        
+        // Matches: { "props" : prop("user.timezone") }
+        Map<String, String> result = Map.of("props", userTimezone);
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+java -Duser.timezone=Europe/London PureJavaProp
+
+
+{props=America/Los_Angeles}

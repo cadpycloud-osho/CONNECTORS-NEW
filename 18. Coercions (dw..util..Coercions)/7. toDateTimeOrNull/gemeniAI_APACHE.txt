@@ -1,0 +1,58 @@
+toDateTimeOrNull:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+public class DateTimeOrNullRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceDateTimeOrNull")
+            .process(exchange -> {
+                String input = "2003-10-01 23:57:59Z";
+
+                // Formatters matching the DW source patterns
+                // Note: 'X' is used for the 'Z' (ISO 8601) offset in Java
+                List<DateTimeFormatter> listA = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX"),
+                    DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssX")
+                );
+
+                List<DateTimeFormatter> listB = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX")
+                );
+
+                exchange.getIn().setBody(Map.of(
+                    "a", parseZonedOrNull(input, listA),
+                    "b", parseZonedOrNull(input, listB)
+                ));
+            });
+    }
+
+    private ZonedDateTime parseZonedOrNull(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return ZonedDateTime.parse(input, formatter);
+            } catch (Exception ignored) {
+                // Silently try the next format
+            }
+        }
+        return null; // Equivalent to toDateTimeOrNull
+    }
+}
+
+
+
+output:
+
+{
+  a: |2003-10-01T23:57:59Z| as DateTime {format: "uuuu-MM-dd HH:mm:ssz"},
+  b: null
+}
+
+

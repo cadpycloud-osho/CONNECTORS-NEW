@@ -1,0 +1,29 @@
+isDecimal:
+
+
+input:
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+List<Object> input = Arrays.asList(1.1, 1, "1.1");
+List<Boolean> output = input.stream()
+    .map(value -> {
+        try {
+            BigDecimal bd = new BigDecimal(value.toString());
+            return !bd.scale() == 0 && bd.precision() > bd.scale();
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    })
+    .collect(Collectors.toList());
+
+System.out.println(output);  // [true, false, true]
+
+
+output:
+
+[true, false, true]
+

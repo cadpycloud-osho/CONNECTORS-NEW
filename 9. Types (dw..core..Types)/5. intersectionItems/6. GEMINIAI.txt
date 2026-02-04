@@ -1,0 +1,82 @@
+intersectionItems:
+
+
+
+input:
+
+package com.example.intersection.service;
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class IntersectionService {
+
+    // 1. Emulate the type structure for AType
+    private static final List<String> ATYPE_INTERSECTION_ITEMS = List.of(
+        "Object", // Base type of {name: String}
+        "Object"  // Base type of {age: Number}
+    );
+
+    /**
+     * Helper method to simulate DataWeave's intersectionItems(AType) introspection.
+     */
+    private List<String> intersectionItems(String typeName) {
+        // This explicitly maps the custom type name to its intersection components
+        return switch (typeName) {
+            case "AType" -> ATYPE_INTERSECTION_ITEMS;
+            default -> List.of();
+        };
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, List<String>> getIntersectionItems() {
+        
+        // Define the type name corresponding to the DW script
+        final String AType = "AType";
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: intersectionItems(AType) }
+        return Map.of(
+            "a", intersectionItems(AType)
+        );
+    }
+}
+
+package com.example.intersection.controller;
+
+import com.example.intersection.service.IntersectionService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final IntersectionService intersectionService;
+
+    public DataWeaveController(IntersectionService intersectionService) {
+        this.intersectionService = intersectionService;
+    }
+
+    // Maps to http://localhost:8080/get-intersection-items
+    @GetMapping("/get-intersection-items")
+    public Map<String, List<String>> getIntersectionItems() {
+        // Calls the service method that holds the transformation logic
+        return intersectionService.getIntersectionItems();
+    }
+}
+
+output:
+
+{
+  "a": [
+    "Object",
+    "Object"
+  ]
+}
+

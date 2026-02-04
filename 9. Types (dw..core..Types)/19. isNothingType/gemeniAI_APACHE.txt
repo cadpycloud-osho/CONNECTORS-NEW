@@ -1,0 +1,47 @@
+isNothingType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class NothingTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkNothing")
+            .process(exchange -> {
+                // In Java, Void.class is the standard representation for 'Nothing'
+                Object refA = Void.class;
+                Object refB = Void.class;
+                Object refC = String.class;
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Checking if the reference is essentially the 'Void' type
+                result.put("a", isNothingType(refA));
+                result.put("b", isNothingType(refB));
+                result.put("c", isNothingType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isNothingType(Object obj) {
+        // We compare against Void.class or the keyword 'void'
+        return Void.class.equals(obj) || void.class.equals(obj);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

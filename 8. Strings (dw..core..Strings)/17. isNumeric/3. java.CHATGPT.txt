@@ -1,0 +1,63 @@
+isNumeric:
+
+
+
+input:
+
+public class Main {
+
+    /**
+     * Emulates DataWeave's isNumeric(text)
+     * Returns true only if input is non-null, non-empty,
+     * and contains only numeric digits.
+     */
+    public static boolean isNumericString(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        for (char c : input.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        boolean a = isNumericString(null);
+        boolean b = isNumericString("");
+        boolean c = isNumericString("  ");
+        boolean d = isNumericString("123");
+        boolean e = isNumericString("१२३"); // Devanagari digits
+        boolean f = isNumericString("12 3");
+        boolean g = isNumericString("ab2c");
+        boolean h = isNumericString("12-3");
+        boolean i = isNumericString("12.3");
+        boolean j = isNumericString("-123");
+        boolean k = isNumericString("+123");
+
+        System.out.println(
+            "{a=" + a +
+            ", b=" + b +
+            ", c=" + c +
+            ", d=" + d +
+            ", e=" + e +
+            ", f=" + f +
+            ", g=" + g +
+            ", h=" + h +
+            ", i=" + i +
+            ", j=" + j +
+            ", k=" + k + "}"
+        );
+    }
+}
+
+
+output:
+
+
+{a=false, b=false, c=false, d=true, e=true, f=false, g=false, h=false, i=false, j=false, k=false}
+
+

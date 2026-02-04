@@ -1,0 +1,37 @@
+substringAfterLast:
+
+substringAfterLast(text: String, separator: String): String
+
+substringAfterLast(text: String, separator: String): String
+Gets the substring after the last occurrence of a separator. The separator is not returned.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "a": substringAfterLast(null, "'"),
+  "b": substringAfterLast("", "-"),
+  "c": substringAfterLast("abc", "b"),
+  "d": substringAfterLast("abcba", "b"),
+  "e": substringAfterLast("abc", "d"),
+  "f": substringAfterLast("abc", "")
+}
+
+DataWeave
+Output
+{
+ "a": null,
+ "b": "",
+ "c": "c",
+ "d": "a",
+ "e": "",
+ "f": null
+}
+
+
+
+

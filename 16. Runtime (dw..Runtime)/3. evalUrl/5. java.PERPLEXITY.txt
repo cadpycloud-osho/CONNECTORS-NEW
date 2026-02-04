@@ -1,0 +1,101 @@
+evalUrl:
+
+Files needed:
+
+%dw 2.0
+output application/json
+---
+payload.name default "Mariano"
+
+
+
+input:
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class Main {
+    
+    public static void main(String[] args) throws Exception {
+        Map<String, Object> result = evalUrlTest();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Object> evalUrlTest() throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        
+        // Load example.dwl from classpath - handle null safely
+        InputStream dwlStream = Main.class.getClassLoader()
+            .getResourceAsStream("example.dwl");
+        String dwlContent = "";
+        if (dwlStream != null) {
+            dwlContent = new String(dwlStream.readAllBytes(), StandardCharsets.UTF_8);
+            dwlStream.close();
+        }
+        
+        // jsonValue matching DataWeave var
+        Map<String, Object> jsonValue = Map.of(
+            "value", "{\"name\": \"Mariano\"}",
+            "encoding", "UTF-8",
+            "properties", new HashMap<>(),
+            "mimeType", "application/json"
+        );
+        
+        // execute_ok
+        Map<String, Object> vars1 = Map.of("payload", jsonValue);
+        result.put("execute_ok", simulateEval(dwlContent, vars1));
+        
+        // execute_ok_withValue
+        Map<String, Object> vars2 = Map.of("payload", Map.of("name", "Mariano"));
+        result.put("execute_ok_withValue", simulateEval(dwlContent, vars2));
+        
+        return result;
+    }
+    
+    private static Map<String, Object> simulateEval(String dwlContent, Map<String, Object> vars) {
+        // Simulate DataWeave: payload.name default "Mariano"
+        String name = "Mariano";
+        if (vars != null && vars.containsKey("payload")) {
+            Object payload = vars.get("payload");
+            if (payload instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> payloadMap = (Map<String, Object>) payload;
+                if (payloadMap.containsKey("name")) {
+                    Object nameObj = payloadMap.get("name");
+                    if (nameObj != null) {
+                        name = nameObj.toString();
+                    }
+                } else if (payloadMap.containsKey("value")) {
+                    Object valueObj = payloadMap.get("value");
+                    if (valueObj != null) {
+                        String jsonStr = valueObj.toString();
+                        String[] parts = jsonStr.split("\"");
+                        if (parts.length > 3) {
+                            name = parts[3];
+                        }
+                    }
+                }
+            }
+        }
+        return Map.of("success", true, "value", name, "logs", new ArrayList<>());
+    }
+}
+
+
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  },
+  "execute_ok_withValue": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  }
+}
+

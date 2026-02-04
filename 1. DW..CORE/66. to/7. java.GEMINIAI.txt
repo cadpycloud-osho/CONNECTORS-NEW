@@ -1,0 +1,179 @@
+to:
+
+example 1:
+
+input:
+
+import java.util.stream.IntStream;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the nested Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Object> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Key: "myRange"
+        sb.append("  \"myRange\" : ");
+        
+        // Get the list and format as a single-line array
+        @SuppressWarnings("unchecked")
+        List<Integer> list = (List<Integer>) output.get("myRange");
+        
+        // Collect integers and join with ", "
+        String elements = list.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(", "));
+        
+        // Append the array structure
+        sb.append("[ ").append(elements).append(" ]\n");
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Generate the Range (1 to 10 inclusive)
+        // Java's IntStream.rangeClosed(start, end) matches DW's 'to' operator.
+        List<Integer> rangeList = IntStream.rangeClosed(1, 10)
+                                           .boxed() // Convert int stream to Integer stream
+                                           .collect(Collectors.toList());
+
+        // 2. Assemble the final Java Map
+        Map<String, Object> outputObject = new LinkedHashMap<>();
+        outputObject.put("myRange", rangeList);
+        
+        // 3. Output the result
+        System.out.println(formatMapAsPrettyJson(outputObject));
+    }
+}
+
+
+output:
+{
+  "myRange" : [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+}
+
+-------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, String> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // indices2to6
+        sb.append("  \"indices2to6\" : \"").append(map.get("indices2to6")).append("\",\n");
+        
+        // indicesFromEnd
+        sb.append("  \"indicesFromEnd\" : \"").append(map.get("indicesFromEnd")).append("\",\n");
+        
+        // reversal (no trailing comma)
+        sb.append("  \"reversal\" : \"").append(map.get("reversal")).append("\"\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+    
+    /**
+     * Simulates DataWeave's string slicing behavior, including inclusive indices, 
+     * negative indexing, and reversal (when start > end).
+     */
+    private static String slice(String text, int startDw, int endDw) {
+        int length = text.length();
+        
+        // --- Forward Slicing (startDw <= endDw) ---
+        if (startDw <= endDw) {
+            // Normalize Start Index
+            int start = (startDw >= 0) ? startDw : length + startDw;
+            if (start < 0) start = 0;
+            if (start > length) start = length; // Cap at length for Java's substring
+
+            // Normalize End Index (inclusive in DW, exclusive in Java substring)
+            int end = (endDw >= 0) ? endDw : length + endDw; 
+            if (end >= length) end = length - 1; 
+
+            // Handle start > end scenario due to normalization
+            if (start > end + 1) { 
+                return "";
+            }
+            
+            // Java's substring is exclusive end, so use end + 1
+            return text.substring(start, end + 1);
+        }
+        
+        // --- Reversal (startDw > endDw) ---
+        
+        // Normalize the reversal start index
+        int actualStart = (startDw >= 0) ? startDw : length + startDw;
+        if (actualStart >= length) actualStart = length - 1; 
+        if (actualStart < 0) actualStart = 0; 
+        
+        // Normalize the reversal end index (DataWeave inclusive end)
+        int actualEnd = (endDw >= 0) ? endDw : length + endDw;
+        if (actualEnd < 0) actualEnd = 0;
+        if (actualEnd >= length) actualEnd = length - 1;
+
+        // If normalized start is less than normalized end, there's no reversal path
+        if (actualStart < actualEnd) {
+             return "";
+        }
+        
+        StringBuilder reversedSlice = new StringBuilder();
+        // Iterate backwards from actualStart down to actualEnd (inclusive)
+        for (int i = actualStart; i >= actualEnd; i--) {
+            reversedSlice.append(text.charAt(i));
+        }
+        return reversedSlice.toString();
+    }
+
+    public static void main(String[] args) {
+        String myVar = "Hello World!"; // Length 12 (0 to 11)
+        
+        // 1. indices2to6 : myVar[2 to 6] -> "llo W"
+        String indices2to6 = slice(myVar, 2, 6);
+
+        // 2. indicesFromEnd : myVar[6 to -1] -> "World!" (6 to 11)
+        String indicesFromEnd = slice(myVar, 6, -1);
+
+        // 3. reversal : myVar[11 to 0] -> "!dlroW olleH"
+        String reversal = slice(myVar, 11, 0);
+
+        // --- Assemble Output ---
+        Map<String, String> outputObject = new LinkedHashMap<>();
+        outputObject.put("indices2to6", indices2to6);
+        outputObject.put("indicesFromEnd", indicesFromEnd);
+        outputObject.put("reversal", reversal);
+        
+        System.out.println(formatMapAsPrettyJson(outputObject));
+    }
+}
+
+
+output:
+{
+  "indices2to6" : "llo W",
+  "indicesFromEnd" : "World!",
+  "reversal" : "!dlroW olleH"
+}
+
+-------------------------------------------------

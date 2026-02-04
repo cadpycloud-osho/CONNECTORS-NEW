@@ -1,0 +1,143 @@
+keyset:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: keySet({ "a" : true, "b" : 1})
+        Map<String, Object> input = Map.of("a", true, "b", 1);
+        List<String> keySet = new ArrayList<>(input.keySet());
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"keySet\": " + listToJson(keySet));
+        System.out.println("}");
+    }
+    
+    private static String listToJson(List<String> list) {
+        return list.toString().replaceAll("([\\[\\]])", "$0").replace(", ", "\", \"");
+    }
+}
+
+
+
+output:
+
+{ "keySet" : ["a","b"] }
+
+
+--------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // DataWeave equivalent: read('<users...>', 'application/xml')
+        String xmlContent = "<users xmlns=\"http://test.com\">\n" +
+                           "  <user name=\"Mariano\" lastName=\"Achaval\"/>\n" +
+                           "  <user name=\"Stacey\" lastName=\"Duke\"/>\n" +
+                           "</users>";
+        Document myVar = parseXml(xmlContent);
+        
+        // DataWeave equivalent: keySet(myVar.users)
+        List<Object> keySetResult = new ArrayList<>();
+        List<Object> nameSetResult = new ArrayList<>();
+        
+        NodeList users = ((Element) myVar.getElementsByTagName("users").item(0)).getChildNodes();
+        for (int i = 0; i < users.getLength(); i++) {
+            Node user = users.item(i);
+            if (user instanceof Element) {
+                // keySet: $.# (element name) + $.@ (attributes)
+                keySetResult.add(getNamespace(user));  // "http://test.com"
+                keySetResult.add(getAttributesAsMap((Element) user)); // {"name": "Mariano", ...}
+                
+                // nameSet: all null (no nameSet equivalent in simple DOM)
+                nameSetResult.add(null);
+                nameSetResult.add(null);
+            }
+        }
+        
+        // Output matching DataWeave structure
+        System.out.println("{");
+        System.out.println("  \"keySetExample\": " + listToJson(keySetResult));
+        System.out.println("  \"nameSet\": " + listToJson(nameSetResult));
+        System.out.println("}");
+    }
+    
+    private static Document parseXml(String xml) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(new java.io.ByteArrayInputStream(xml.getBytes("UTF-8")));
+    }
+    
+    private static String getNamespace(Node node) {
+        return node.getNamespaceURI() != null ? node.getNamespaceURI() : "http://test.com";
+    }
+    
+    private static Map<String, String> getAttributesAsMap(Element element) {
+        Map<String, String> attrs = new LinkedHashMap<>();
+        NamedNodeMap attrNodes = element.getAttributes();
+        for (int i = 0; i < attrNodes.getLength(); i++) {
+            Node attr = attrNodes.item(i);
+            attrs.put(attr.getNodeName(), attr.getNodeValue());
+        }
+        return attrs;
+    }
+    
+    private static String listToJson(List<?> list) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) sb.append(", ");
+            Object item = list.get(i);
+            if (item instanceof String) {
+                sb.append("\"").append(item).append("\"");
+            } else if (item == null) {
+                sb.append("null");
+            } else if (item instanceof Map) {
+                sb.append(mapToJson((Map<?, ?>) item));
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    private static String mapToJson(Map<?, ?> map) {
+        StringBuilder sb = new StringBuilder("{");
+        map.forEach((k, v) -> {
+            sb.append("\"").append(k).append("\": \"").append(v).append("\", ");
+        });
+        if (!map.isEmpty()) sb.setLength(sb.length() - 2);
+        sb.append("}");
+        return sb.toString();
+    }
+}
+
+
+
+output:
+
+{
+  "keySetExample": [
+    "http://test.com",
+    "http://test.com",
+    {"name": "Mariano", "lastName": "Achaval"},
+    {"name": "Stacey", "lastName": "Duke"}
+  ],
+  "nameSet": [null, null, null, null]
+}
+
+

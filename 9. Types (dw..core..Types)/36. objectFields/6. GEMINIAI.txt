@@ -1,0 +1,188 @@
+objectFields:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class ObjectFieldsController {
+
+    public static class Name {
+        private String localName;
+        private String namespace;
+
+        public Name(String localName, String namespace) {
+            this.localName = localName;
+            this.namespace = namespace;
+        }
+        // getters, setters, constructors omitted for brevity
+        public String getLocalName() { return localName; }
+        public void setLocalName(String localName) { this.localName = localName; }
+        public String getNamespace() { return namespace; }
+        public void setNamespace(String namespace) { this.namespace = namespace; }
+    }
+
+    public static class Attribute {
+        private Name name;
+        private String value;
+        private boolean required;
+
+        public Attribute(Name name, String value, boolean required) {
+            this.name = name;
+            this.value = value;
+            this.required = required;
+        }
+        // getters, setters omitted
+        public Name getName() { return name; }
+        public void setName(Name name) { this.name = name; }
+        public String getValue() { return value; }
+        public void setValue(String value) { this.value = value; }
+        public boolean isRequired() { return required; }
+        public void setRequired(boolean required) { this.required = required; }
+    }
+
+    public static class Field {
+        private Name key;
+        private List<Attribute> attributes;
+        private boolean required;
+        private boolean repeated;
+        private String value;
+
+        public Field(Name key, List<Attribute> attributes, boolean required, boolean repeated, String value) {
+            this.key = key;
+            this.attributes = attributes;
+            this.required = required;
+            this.repeated = repeated;
+            this.value = value;
+        }
+        // getters, setters omitted
+    }
+
+    @GetMapping("/object-fields")
+    public Map<String, List<Field>> objectFields() {
+        Map<String, List<Field>> result = new HashMap<>();
+
+        // a: ADictionary = {_ : String}
+        List<Field> aFields = Arrays.asList(
+            new Field(new Name("_", null), new ArrayList<>(), true, false, "String")
+        );
+        result.put("a", aFields);
+
+        // b: ASchema with namespace and attribute
+        List<Attribute> bAttrs = Arrays.asList(
+            new Attribute(new Name("foo", "http://acme.com"), "String", true)
+        );
+        List<Field> bFields = Arrays.asList(
+            new Field(new Name("name", "http://acme.com"), bAttrs, true, false, "Object")
+        );
+        result.put("b", bFields);
+
+        // c: Object - empty
+        result.put("c", new ArrayList<>());
+
+        // d: AUser with optional/required attributes and repeated field
+        List<Attribute> nameAttrs = Arrays.asList(
+            new Attribute(new Name("foo", null), "String", false),
+            new Attribute(new Name("l", null), "Number", true)
+        );
+        List<Field> dFields = Arrays.asList(
+            new Field(new Name("name", null), nameAttrs, false, false, "String"),
+            new Field(new Name("lastName", null), new ArrayList<>(), true, true, "Number")
+        );
+        result.put("d", dFields);
+
+        return result;
+    }
+}
+
+
+output:
+
+
+
+{
+  "a": [
+    {
+      "key": {
+        "name": {
+          "localName": "_",
+          "namespace": null
+        },
+        "attributes": []
+      },
+      "required": true,
+      "repeated": false,
+      "value": "String"
+    }
+  ],
+  "b": [
+    {
+      "key": {
+        "name": {
+          "localName": "name",
+          "namespace": "http://acme.com"
+        },
+        "attributes": [
+          {
+            "name": {
+              "localName": "foo",
+              "namespace": "http://acme.com"
+            },
+            "value": "String",
+            "required": true
+          }
+        ]
+      },
+      "required": true,
+      "repeated": false,
+      "value": "Object"
+    }
+  ],
+  "c": [],
+  "d": [
+    {
+      "key": {
+        "name": {
+          "localName": "name",
+          "namespace": null
+        },
+        "attributes": [
+          {
+            "name": {
+              "localName": "foo",
+              "namespace": null
+            },
+            "value": "String",
+            "required": false
+          },
+          {
+            "name": {
+              "localName": "l",
+              "namespace": null
+            },
+            "value": "Number",
+            "required": true
+          }
+        ]
+      },
+      "required": false,
+      "repeated": false,
+      "value": "String"
+    },
+    {
+      "key": {
+        "name": {
+          "localName": "lastName",
+          "namespace": null
+        },
+        "attributes": []
+      },
+      "required": true,
+      "repeated": true,
+      "value": "Number"
+    }
+  ]
+}

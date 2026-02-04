@@ -1,0 +1,70 @@
+isTypeType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelTypeTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type AType = Type (alias simulation)
+                        Class<?> AType = Type.class;
+
+                        // Simulating DataWeave isTypeType
+                        boolean a = isTypeType(AType);
+                        boolean b = isTypeType(Type.class);
+                        boolean c = isTypeType(String.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + ",\n" +
+                                "  \"c\": " + c + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave isTypeType
+    private static boolean isTypeType(Class<?> clazz) {
+        return clazz == Type.class;
+    }
+
+    // Simulating DataWeave Type
+    interface Type {
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

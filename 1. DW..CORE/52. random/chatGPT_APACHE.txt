@@ -1,0 +1,22 @@
+random:
+
+input:
+
+from("direct:start")
+    .setBody(exchange -> {
+        double price = Math.random() * 1000;
+        return java.util.Collections.singletonMap("price", price);
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+{
+  "price": 65.02770292248383
+}
+
+
+
+

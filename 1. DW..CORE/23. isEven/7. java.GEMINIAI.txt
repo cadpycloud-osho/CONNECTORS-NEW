@@ -1,0 +1,49 @@
+isEven:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // --- Utility method to replicate DataWeave's isEven() behavior ---
+    /**
+     * Checks if an integer is even using the modulo operator.
+     */
+    public static boolean isEven(int number) {
+        // A number is even if its remainder when divided by 2 is 0.
+        return number % 2 == 0;
+    }
+
+    public static void main(String[] args) {
+        
+        // --- DataWeave Expressions to be evaluated ---
+        
+        // isEven(0)
+        boolean result1 = isEven(0);
+        
+        // isEven(1)
+        boolean result2 = isEven(1);
+        
+        // isEven(1+1) -> isEven(2)
+        boolean result3 = isEven(1 + 1);
+
+        // Collect the results into a List (equivalent to the JSON array output)
+        List<Boolean> isEvenResults = Arrays.asList(result1, result2, result3);
+
+        // --- Output Generation (Replicating the JSON structure) ---
+        System.out.println("--- DataWeave isEven() Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{ \"isEven\" : " + isEvenResults + " }");
+    }
+}
+
+output:
+
+{ "isEven" : [true, false, true] }
+
+
+

@@ -1,0 +1,32 @@
+first:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class FirstCharactersRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getFirstChars")
+            .process(exchange -> {
+                String input = "hello world!";
+                int n = 5;
+
+                // Parity logic: Use Math.min to prevent StringIndexOutOfBoundsException
+                String result = (input != null) 
+                    ? input.substring(0, Math.min(input.length(), n)) 
+                    : null;
+
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+output:
+
+"hello"
+
+
+

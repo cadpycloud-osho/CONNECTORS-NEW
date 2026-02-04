@@ -1,0 +1,19 @@
+concatWith:
+
+concatWith(source: Binary, with: Binary): Binary
+
+concatWith(source: Binary, with: Binary): Binary
+Concatenates the content of two binaries.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Binaries
+output application/dw
+---
+"CAFE" as Binary {base: "16"} concatWith "ABCD" as Binary {base: "16"}
+
+DataWeave
+Output
+"yv6rzQ==" as Binary {base: "64"}

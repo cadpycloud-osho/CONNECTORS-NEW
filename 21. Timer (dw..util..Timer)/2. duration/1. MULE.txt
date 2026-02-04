@@ -1,0 +1,24 @@
+duration:
+
+duration<T>(valueToMeasure: () -> T): DurationMeasurement<T>
+
+duration<T>(valueToMeasure: () -> T): DurationMeasurement<T>
+Executes the input function and returns an object with execution time in milliseconds and result of that function.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+fun myFunction() = dw::Runtime::wait("My result",100)
+---
+dw::util::Timer::duration(() -> myFunction())
+
+
+Dataweave
+Output
+{
+  "time": 101,
+  "result": "My result"
+}

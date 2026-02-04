@@ -1,0 +1,23 @@
+fromRadixNumber:
+
+input:
+
+from("direct:fromRadixNumber")
+    .process(exchange -> {
+        Map<String, Object> result = new HashMap<>();
+        
+        result.put("a", new BigInteger("10", 2).intValue());   // binary 10 = 2
+        result.put("b", new BigInteger("FF", 16).intValue());  // hex FF = 255
+        
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "a": 2,
+  "b": 255
+}
+
+

@@ -1,0 +1,38 @@
+metadataOf:
+
+metadataOf(t: Type): Object
+
+metadataOf(t: Type): Object
+Returns metadata that is attached to the given type.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = String {format: "YYYY-MM-dd"}
+output application/json
+---
+{
+   a: metadataOf(AType)
+}
+
+
+
+
+DataWeave
+Output
+{
+  "a": {"format": "YYYY-MM-dd"}
+}
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,41 @@
+concatWith:
+
+
+input:
+
+from("direct:binaryConcat")
+.process(exchange -> {
+
+    // Hex strings
+    String hex1 = "CAFE";
+    String hex2 = "ABCD";
+
+    // Convert hex to byte[]
+    byte[] bytes1 = javax.xml.bind.DatatypeConverter.parseHexBinary(hex1);
+    byte[] bytes2 = javax.xml.bind.DatatypeConverter.parseHexBinary(hex2);
+
+    // Concatenate byte arrays
+    byte[] combined = new byte[bytes1.length + bytes2.length];
+    System.arraycopy(bytes1, 0, combined, 0, bytes1.length);
+    System.arraycopy(bytes2, 0, combined, bytes1.length, bytes2.length);
+
+    // Convert to Base64
+    String base64Result = java.util.Base64.getEncoder().encodeToString(combined);
+
+    exchange.getIn().setBody(base64Result);
+});
+
+
+
+
+
+
+
+
+
+output:
+
+yv6rzQ==
+
+
+

@@ -1,0 +1,55 @@
+namesOf:
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+
+public class CamelNamesOfExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Input Object: { "a" : true, "b" : 1 }
+                        Map<String, Object> input = new LinkedHashMap<>();
+                        input.put("a", true);
+                        input.put("b", 1);
+
+                        // Equivalent to namesOf(input)
+                        // We extract the keys from the map
+                        List<String> keys = new ArrayList<>(input.keySet());
+
+                        // Wrap in the final structure: { "namesOf": ["a", "b"] }
+                        exchange.getIn().setBody(Map.of("namesOf", keys));
+                    })
+                    // Marshal to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+
+output:
+
+{
+  "namesOf": ["a", "b"]
+}
+
+

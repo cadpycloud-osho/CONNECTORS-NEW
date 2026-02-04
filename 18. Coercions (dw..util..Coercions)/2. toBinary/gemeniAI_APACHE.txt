@@ -1,0 +1,52 @@
+
+
+toBinary:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BinaryCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertToBinary")
+            .process(exchange -> {
+                String input = "DW";
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Helper to mimic toBinary and Base64 wrap
+                results.put("UTF-16Ex", encodeBase64(input, "UTF-16"));
+                results.put("utf16Ex", encodeBase64(input, "UTF-16")); // Java handles 'utf16' as 'UTF-16'
+                results.put("UnicodeBigEx", encodeBase64(input, "UnicodeBig"));
+                results.put("UTF-32Ex", encodeBase64(input, "UTF-32"));
+                results.put("UTF_32Ex", encodeBase64(input, "UTF-32"));
+
+                exchange.getIn().setBody(results);
+            });
+    }
+
+    private String encodeBase64(String value, String charsetName) {
+        byte[] bytes = value.getBytes(Charset.forName(charsetName));
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+}
+
+
+output:
+
+{
+  "UTF-16Ex": "/v8ARABX",
+  "utf16Ex": "/v8ARABX",
+  "UnicodeBigEx": "/v8ARABX",
+  "UTF-32Ex": "AAAARAAAAFc=",
+  "UTF_32Ex": "AAAARAAAAFc="
+}
+
+
+

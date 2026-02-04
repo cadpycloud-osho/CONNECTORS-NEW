@@ -1,0 +1,84 @@
+atBeginningOfMonth:
+
+
+example 1:
+
+
+input:
+
+@GetMapping("/atBeginningOfMonth1")
+public Map<String, String> atBeginningOfMonth1() {
+    OffsetDateTime dateTime = OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+    OffsetDateTime result = dateTime
+            .withDayOfMonth(1)
+            .toLocalDate()
+            .atStartOfDay()
+            .atOffset(dateTime.getOffset());
+
+    return Map.of("atBeginningOfMonthDateTime", result.toString());
+}
+
+
+
+output:
+
+{
+  "atBeginningOfMonthDateTime": "2020-10-01T00:00:00-03:00"
+}
+
+
+-------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+@GetMapping("/atBeginningOfMonth2")
+public Map<String, String> atBeginningOfMonth2() {
+    LocalDateTime dateTime = LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+    LocalDateTime result = dateTime.withDayOfMonth(1).toLocalDate().atStartOfDay();
+
+    return Map.of("atBeginningOfMonthLocalDateTime", result.toString());
+}
+
+
+
+output:
+
+{
+  "atBeginningOfMonthLocalDateTime": "2020-10-01T00:00:00"
+}
+
+
+-------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+
+@GetMapping("/atBeginningOfMonth3")
+public Map<String, String> atBeginningOfMonth3() {
+    LocalDate date = LocalDate.parse("2020-10-06");
+
+    LocalDate result = date.withDayOfMonth(1);
+
+    return Map.of("atBeginningOfMonthDate", result.toString());
+}
+
+
+output:
+
+
+{
+  "atBeginningOfMonthDate": "2020-10-01"
+}
+
+-------------------------------------------------------------------
+

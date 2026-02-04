@@ -1,0 +1,65 @@
+seconds:
+
+
+input:
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Define the input ZonedDateTime (UTC)
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        
+        // Formatter for ZonedDateTime output
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        // --- 1. DateTime Arithmetic ---
+
+        // nextSecond: |2020-10-05T20:22:34.385Z| + seconds(1)
+        ZonedDateTime nextSecond = baseDateTime.plusSeconds(1);
+        String nextSecondOutput = nextSecond.format(formatter).replace(".000Z", "Z");
+
+        // previousSecond: |2020-10-05T20:22:34.385Z| - seconds(1)
+        ZonedDateTime previousSecond = baseDateTime.minusSeconds(1);
+        String previousSecondOutput = previousSecond.format(formatter).replace(".000Z", "Z");
+
+        // --- 2. Duration Construction and Arithmetic ---
+
+        // decimalInputPeriod: seconds(4.555)
+        // 4.555 seconds = 4555 milliseconds
+        Duration decimalInputPeriod = Duration.ofMillis(4555);
+        String decimalInputPeriodOutput = decimalInputPeriod.toString(); // PT4.555S
+
+        // wholeNumberInputPeriod: seconds(4)
+        Duration wholeNumberInputPeriod = Duration.ofSeconds(4);
+        String wholeNumberInputPeriodOutput = wholeNumberInputPeriod.toString(); // PT4S
+
+        // addNegativeValue: seconds(-1) + seconds(2)
+        // 1 second = 1 (DW outputs total seconds)
+        Duration combinedDuration = Duration.ofSeconds(-1).plusSeconds(2);
+        long addNegativeValue = combinedDuration.getSeconds(); // 1
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        System.out.println("  \"nextSecond\": \"" + nextSecondOutput + "\",");
+        System.out.println("  \"previousSecond\": \"" + previousSecondOutput + "\",");
+        System.out.println("  \"decimalInputPeriod\": \"" + decimalInputPeriodOutput + "\",");
+        System.out.println("  \"wholeNumberInputPeriod\": \"" + wholeNumberInputPeriodOutput + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "nextSecond": "2020-10-05T20:22:35.385Z",
+  "previousSecond": "2020-10-05T20:22:33.385Z",
+  "decimalInputPeriod": "PT4.555S",
+  "wholeNumberInputPeriod": "PT4S",
+  "addNegativeValue": 1
+}
+

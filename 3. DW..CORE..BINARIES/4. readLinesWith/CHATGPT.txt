@@ -1,0 +1,42 @@
+readLinesWith:
+
+
+INPUT:
+
+
+@GetMapping("/readBinary")
+public Map<String, Object> readBinaryContentExample() {
+
+    // Same content as DataWeave "read()"
+    byte[] content = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n".getBytes();
+
+    // Convert binary to string and split into lines (UTF-8 default)
+    List<String> lines = Arrays.asList(new String(content).split("\\R"));
+
+    // "typeOf" equivalent → byte array type name
+    String showType = content.getClass().getSimpleName();
+
+    return Map.of(
+        "lines", lines,
+        "showType", showType
+    );
+}
+
+
+OUTPUT:
+
+
+{
+  "lines": [
+    "Line 1",
+    "Line 2",
+    "Line 3",
+    "Line 4",
+    "Line 5"
+  ],
+  "showType": "byte[]"
+}
+
+
+
+

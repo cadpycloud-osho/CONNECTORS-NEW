@@ -1,0 +1,58 @@
+encodeURI:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class EncodeUriRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:encodeUri")
+            .routeId("URL-Encode-Route")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // 1. Logic for encodeURI
+                // We use Java's URI class which identifies unsafe characters 
+                // but keeps reserved characters (/, :, ?) intact.
+                String input1 = "http://asd/ text to decode /%/\"\\/text";
+                results.put("encodeURI", encodeSafeUri(input1));
+
+                // 2. Logic for not_encoded 
+                // These are "reserved" or "unreserved" characters that encodeURI skips.
+                String input2 = "http://:;,/?:@&=$_-_.!~*'()";
+                results.put("not_encoded", encodeSafeUri(input2));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Encoded URI Result: ${body}");
+    }
+
+    /**
+     * Replicates DW encodeURI() logic.
+     * Uses URI constructor to auto-encode unsafe chars while preserving delimiters.
+     */
+    private String encodeSafeUri(String raw) throws Exception {
+        // Multi-argument URI constructor encodes only the "illegal" characters
+        // We split the string to handle the scheme/path/query properly if needed,
+        // but for a general string, URI.toASCIIString() is the closest match.
+        URI uri = new URI(raw);
+        return uri.toASCIIString();
+    }
+}
+
+output:
+
+{
+  "encodeURI": "http://asd/%20text%20to%20decode%20/%25/%22%5C/text",
+  "not_encoded": "http://:;,/?:@&=$_-_.!~*'()"
+}
+
+
+

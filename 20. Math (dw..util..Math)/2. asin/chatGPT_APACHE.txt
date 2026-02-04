@@ -1,0 +1,46 @@
+asin:
+
+
+input:
+
+import java.util.*;
+
+public class AsinExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        output.put("asin0", safeAsin(0.0));
+        output.put("asin13", safeAsin(0.13));
+        output.put("asin-1", safeAsin(-1.0));
+        output.put("asin1.1", safeAsin(1.1)); // outside valid range [-1,1]
+
+        System.out.println(output);
+    }
+
+    private static Double safeAsin(double value) {
+        // Math.asin returns NaN for invalid values, convert to null
+        double result = Math.asin(value);
+        if (Double.isNaN(result)) {
+            return null;
+        }
+        return result;
+    }
+}
+
+
+
+
+output:
+
+{
+   "asin0": 0.0,
+   "asin13": 0.1303689797031455,
+   "asin-1": -1.5707963267948966,
+   "asin1.1": null
+}
+
+
+
+

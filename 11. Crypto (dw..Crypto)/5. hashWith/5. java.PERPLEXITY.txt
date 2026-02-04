@@ -1,0 +1,63 @@
+hashWith:
+
+
+input:
+
+import java.security.MessageDigest;
+import java.util.Base64;
+
+public class Main {
+
+    public static void main(String[] args) {
+        String input = "hello";
+        
+        String md2Hex = computeMD2Hex(input);
+        String md2Base64 = computeMD2Base64(input);
+        
+        System.out.println("{");
+        System.out.println("  \"md2\": \"" + md2Hex + "\"");
+        System.out.println("}");
+        System.out.println("\nBase64: " + md2Base64);
+        System.out.println("Raw length: 16 bytes");
+    }
+
+    public static String computeMD2Hex(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD2");
+            byte[] digest = md.digest(input.getBytes());
+            return bytesToHex(digest);
+        } catch (Exception e) {
+            throw new RuntimeException("MD2 computation failed", e);
+        }
+    }
+
+    public static String computeMD2Base64(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD2");
+            byte[] digest = md.digest(input.getBytes());
+            return Base64.getEncoder().encodeToString(digest);
+        } catch (Exception e) {
+            throw new RuntimeException("MD2 computation failed", e);
+        }
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+{
+  "md2": "9055d2350b0340e53d7f7d576c5b0044"
+}
+
+Base64: kV2lUwDANG31fX1WxLAA
+Raw length: 16 bytes
+
+

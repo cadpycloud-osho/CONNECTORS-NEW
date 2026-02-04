@@ -1,0 +1,39 @@
+pow:
+
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class PowerOperationController {
+
+    public static void main(String[] args) {
+        SpringApplication.run(PowerOperationController.class, args);
+    }
+
+    @GetMapping("/power-operation")
+    public int[] powerOperation() {
+        int a = (int) Math.pow(2, 3); // 2 pow 3
+        int b = (int) Math.pow(3, 2); // 3 pow 2
+        int c = (int) Math.pow(7, 3); // 7 pow 3
+
+        return new int[] { a, b, c };
+    }
+}
+
+
+output:
+
+[8, 9, 343]
+
+
+

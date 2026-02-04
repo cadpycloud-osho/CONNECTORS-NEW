@@ -1,0 +1,20 @@
+index:
+
+input:
+
+Map<String, Object> result = new LinkedHashMap<>();
+result.put("kind", "Array");
+result.put("namespace", null);
+result.put("selector", 0);
+
+
+output:
+
+
+{
+  "kind": "Array",
+  "namespace": null,
+  "selector": 0
+}
+
+

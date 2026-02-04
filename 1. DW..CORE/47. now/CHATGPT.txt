@@ -1,0 +1,113 @@
+now:
+
+example 1:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Map;
+
+@SpringBootApplication
+@RestController
+public class TimeController {
+
+    public static void main(String[] args) {
+        SpringApplication.run(TimeController.class, args);
+    }
+
+    @GetMapping("/time")
+    public Map<String, String> getTime() {
+        ZonedDateTime nowDefault = ZonedDateTime.now();
+        ZonedDateTime nowNY = nowDefault.withZoneSameInstant(ZoneId.of("America/New_York"));
+
+        return Map.of(
+            "nowCalled", nowDefault.toString(),
+            "nowCalledSpecificTimeZone", nowNY.toString()
+        );
+    }
+}
+
+
+
+output:
+
+{
+  "nowCalled": "2025-12-09T14:06:30.123+05:30",
+  "nowCalledSpecificTimeZone": "2025-12-09T03:36:30.123-05:00"
+}
+
+
+-----------------------------------------------------------------------
+example 2:
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.*;
+import java.util.Map;
+
+@RestController
+public class FullTimeInfoController {
+
+    @GetMapping("/time-details")
+    public Map<String, Object> getTimeDetails() {
+        ZonedDateTime now = ZonedDateTime.now();
+
+        return Map.of(
+            "now", now.toString(),
+            "epochTime", now.toEpochSecond(),
+            "nanoseconds", now.getNano(),
+            "milliseconds", now.getNano() / 1_000_000,
+            "seconds", now.getSecond(),
+            "minutes", now.getMinute(),
+            "hour", now.getHour(),
+            "day", now.getDayOfMonth(),
+            "month", now.getMonthValue(),
+            "year", now.getYear(),
+            "quarter", ((now.getMonthValue() - 1) / 3) + 1,
+            "dayOfWeek", now.getDayOfWeek().getValue(),
+            "dayOfYear", now.getDayOfYear(),
+            "offsetSeconds", now.getOffset().getTotalSeconds(),
+            "formattedDate", now.toLocalDate().toString(),
+            "formattedTime", now.toLocalTime().withNano(0).toString()
+        );
+    }
+}
+
+
+
+output:
+
+
+{
+  "now": "2025-12-09T14:06:31.345+05:30",
+  "epochTime": 1765278991,
+  "nanoseconds": 345000000,
+  "milliseconds": 345,
+  "seconds": 31,
+  "minutes": 06,
+  "hour": 14,
+  "day": 9,
+  "month": 12,
+  "year": 2025,
+  "quarter": 4,
+  "dayOfWeek": 2,
+  "dayOfYear": 343,
+  "offsetSeconds": 19800,
+  "formattedDate": "2025-12-09",
+  "formattedTime": "14:06:31"
+}
+

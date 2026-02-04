@@ -1,0 +1,121 @@
+flatten:
+
+flatten<T, Q>(@StreamCapable items: Array<Array<T> | Q>): Array<T | Q>
+
+Turns a set of subarrays (such as [ [1,2,3], [4,5,[6]], [], [null] ]) into a single, flattened array (such as [ 1, 2, 3, 4, 5, [6], null ]).
+
+Note that it flattens only the first level of subarrays and omits empty subarrays.
+
+
+
+Source
+%dw 2.0
+output application/json
+var array1 = [1,2,3]
+var array2 = [4,5,6]
+var array3 = [7,8,9]
+var arrayOfArrays = [array1, array2, array3]
+---
+flatten(arrayOfArrays)
+DataWeave
+
+
+Output
+[ 1,2,3,4,5,6,7,8,9 ]
+JSON
+Example
+This example returns a single array from nested arrays of objects.
+____________________________________________________________________
+
+Source
+%dw 2.0
+var myData =
+{ user : [
+   {
+     group : "dev",
+     myarray : [
+       { name : "Shoki", id : 5678 },
+       { name : "Mariano", id : 9123 }
+     ]
+   },
+   {
+     group : "test",
+     myarray : [
+       { name : "Sai", id : 2001 },
+       { name : "Peter", id : 2002 }
+     ]
+   }
+ ]
+}
+
+output:
+flatten(myData.user.myarray)
+DataWeave
+Output
+[
+  {
+    "name": "Shoki",
+    "id": 5678
+  },
+  {
+    "name": "Mariano",
+    "id": 9123
+  },
+  {
+    "name": "Sai",
+    "id": 2001
+  },
+  {
+    "name": "Peter",
+    "id": 2002
+  }
+]
+JSON
+
+Note that if you use myData.user.myarray to select the array of objects in myarray, instead of using flatten(myData.user.myarray), the output is a nested array of objects:
+
+[
+  [
+    {
+      "name": "Shoki",
+      "id": 5678
+    },
+    {
+      "name": "Mariano",
+      "id": 9123
+    }
+  ]
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

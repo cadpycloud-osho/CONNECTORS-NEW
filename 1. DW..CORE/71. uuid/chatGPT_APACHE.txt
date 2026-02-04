@@ -1,0 +1,16 @@
+uuid:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        String uuid = java.util.UUID.randomUUID().toString();
+        exchange.getIn().setBody(uuid);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+"7cc64d24-f2ad-4d43-8893-fa24a0789a99"
+

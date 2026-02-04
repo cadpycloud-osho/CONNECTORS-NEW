@@ -1,0 +1,100 @@
+every:
+
+
+input:
+
+public class Main {
+    public static boolean everyEqualsOne(int[] arr) {
+        for (int num : arr) {
+            if (num != 1) return false;
+        }
+        return true;
+    }
+    
+    public static boolean everyMod2Equals1(int[] arr) {
+        for (int num : arr) {
+            if ((num % 2) != 1) return false;
+        }
+        return true;
+    }
+    
+    public static boolean everyTrueEmpty() {
+        return true; // Empty array vacuously true
+    }
+    
+    public static void main(String[] args) {
+        String ok = "[true, true]";
+        String err = "[false, false, false, false, true]";
+        
+        String result = String.format(
+            "{\n  \"results\": {\n    \"ok\": %s,\n    \"err\": %s\n  }\n}",
+            ok, err
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+  "results": {
+    "ok": [true, true],
+    "err": [false, false, false, false, true]
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional approach using allMatch which short-circuits like DataWeave every.
+
+java
+
+
+import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+        boolean[] okResults = {
+            Arrays.stream(new int[]{1,1,1}).allMatch(n -> n == 1),
+            Arrays.stream(new int[]{1}).allMatch(n -> n == 1)
+        };
+        
+        boolean[] errResults = {
+            Arrays.stream(new int[]{1,2,3}).allMatch(n -> (n % 2) == 1),
+            Arrays.stream(new int[]{1,1,0}).allMatch(n -> n == 1),
+            Arrays.stream(new int[]{0,1,1,0}).allMatch(n -> n == 1),
+            Arrays.stream(new int[]{1,2,3}).allMatch(n -> n == 1),
+            true  // empty array case
+        };
+        
+        String result = String.format(
+            "{\n  \"results\": {\n    \"ok\": [%s],\n    \"err\": [%s]\n  }\n}",
+            Arrays.toString(okResults).replace("true", "true").replace("false", "false").substring(1, Arrays.toString(okResults).length()-1),
+            Arrays.toString(errResults).replace("true", "true").replace("false", "false").substring(1, Arrays.toString(errResults).length()-1)
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+Output:
+{
+  "results": {
+    "ok": [true, true],
+    "err": [false, false, false, false, true]
+  }
+}
+

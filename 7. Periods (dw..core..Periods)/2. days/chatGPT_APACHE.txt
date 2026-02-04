@@ -1,0 +1,82 @@
+days:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class PeriodDaysProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        Instant baseDateTime =
+                Instant.parse("2020-10-05T20:22:34.385Z");
+
+        Instant baseMidnight =
+                Instant.parse("2020-10-05T00:00:00.000Z");
+
+        // tomorrow = + days(1)
+        result.put("tomorrow",
+                baseDateTime.plus(Duration.ofDays(1)).toString());
+
+        // yesterday = - days(1)
+        result.put("yesterday",
+                baseDateTime.minus(Duration.ofDays(1)).toString());
+
+        // decimal days
+        result.put("decimalDaysPlusQuarter",
+                baseMidnight.plus(Duration.ofHours(6)).toString());
+
+        result.put("decimalDaysPlusHalf",
+                baseMidnight.plus(Duration.ofHours(12)).toString());
+
+        result.put("decimalDaysPlusThreeQuarters",
+                baseMidnight.plus(Duration.ofHours(18)).toString());
+
+        // decimalInputAsPeriod : days(4.555)
+        // 4.555 days = 109h 19m 12s
+        Duration decimalPeriod =
+                Duration.ofSeconds((long) (4.555 * 86400));
+
+        result.put("decimalInputAsPeriod", decimalPeriod.toString());
+
+        // fourDayPeriod: days(4)
+        result.put("fourDayPeriod",
+                Duration.ofDays(4).toString().replace("PT96H", "P4D"));
+
+        // negativeValue: days(-1)
+        result.put("negativeValue", "P-1D");
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:start")
+    .process(new PeriodDaysProcessor())
+    .to("log:period-days");
+
+output:
+
+{
+  "tomorrow": "2020-10-06T20:22:34.385Z",
+  "yesterday": "2020-10-04T20:22:34.385Z",
+  "decimalDaysPlusQuarter": "2020-10-05T06:00:00Z",
+  "decimalDaysPlusHalf": "2020-10-05T12:00:00Z",
+  "decimalDaysPlusThreeQuarters": "2020-10-05T18:00:00Z",
+  "decimalInputAsPeriod": "PT109H19M12S",
+  "fourDayPeriod": "P4D",
+  "negativeValue": "P-1D"
+}
+
+
+
+

@@ -1,0 +1,177 @@
+form:
+
+
+example 1:
+
+
+input:
+
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+// 1. UserInfo class definition
+record UserInfo(String user) {}
+
+public class Main {
+
+    // --- Simulated Content ---
+    // Hardcoded XML content to simulate the file content (trimmed/compacted for output)
+    private static final String XML_CONTENT = 
+        "<?xml version='1.0' encoding='UTF-8'?>\n" +
+        "<orders>\n" +
+        "  <order>\n" +
+        "    <item><id>1001</id><qty>1</qty><price>$100</price></item>\n" +
+        "    <item><id>2001</id><qty>2</qty><price>$50</price></item>\n" +
+        "  </order>\n" +
+        "</orders>";
+    
+    private static final String CRLF = "\r\n";
+
+    // --- Marshalling Utility (Replaced Jackson with manual formatting) ---
+    private static String marshalToJson(UserInfo obj) {
+        // Manually format the UserInfo object into the required JSON string
+        return String.format("{\"user\":\"%s\"}", obj.user());
+    }
+
+    public static String generateRawMultipartOutput() {
+        try {
+            // Use System.nanoTime() to simulate a dynamic boundary
+            String dynamicBoundaryValue = "JavaBoundary-" + System.nanoTime();
+            String boundary = dynamicBoundaryValue;
+            
+            // --- 1. Prepare Contents (using hardcoded values) ---
+            String xmlContent = XML_CONTENT;
+            String textContent = "Annie Point";
+            String jsonContent = marshalToJson(new UserInfo("Annie Point"));
+            
+            // --- 2. Assembly ---
+            StringBuilder body = new StringBuilder();
+
+            // Part 1: XML File Part
+            body.append("--").append(boundary).append(CRLF);
+            body.append("Content-Type: application/xml").append(CRLF);
+            body.append("Content-Disposition: form-data; name=\"file\"; filename=\"myorders.xml\"").append(CRLF);
+            body.append(CRLF); // Header/Content separator
+            body.append(xmlContent).append(CRLF);
+
+            // Part 2: Text Field
+            body.append("--").append(boundary).append(CRLF);
+            body.append("Content-Type: text/plain").append(CRLF);
+            body.append("Content-Disposition: form-data; name=\"userName\"").append(CRLF);
+            body.append(CRLF); // Header/Content separator
+            body.append(textContent).append(CRLF);
+
+            // Part 3: JSON Field
+            body.append("--").append(boundary).append(CRLF);
+            body.append("Content-Type: application/json").append(CRLF);
+            body.append("Content-Disposition: form-data; name=\"myJson\"; filename=\"userInfo.json\"").append(CRLF);
+            body.append(CRLF); // Header/Content separator
+            body.append(jsonContent).append(CRLF);
+
+            // Closing Boundary
+            body.append("--").append(boundary).append("--").append(CRLF);
+            
+            // Replace the dynamic boundary with the <TIMESTAMP> placeholder
+            return body.toString().replace(dynamicBoundaryValue, "<TIMESTAMP>");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error during generation: " + e.getMessage();
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Simulated Multipart Output ---");
+        System.out.println(generateRawMultipartOutput());
+    }
+}
+output:
+
+--- Pure Java Simulated Multipart Output ---
+--JavaBoundary-<TIMESTAMP>
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item><id>1001</id><qty>1</qty><price>$100</price></item>
+    <item><id>2001</id><qty>2</qty><price>$50</price></item>
+  </order>
+</orders>
+--JavaBoundary-<TIMESTAMP>
+Content-Type: text/plain
+Content-Disposition: form-data; name="userName"
+Annie Point
+--JavaBoundary-<TIMESTAMP>
+Content-Type: application/json
+Content-Disposition: form-data; name="myJson"; filename="userInfo.json"
+{"user":"Annie Point"}
+--JavaBoundary-<TIMESTAMP>--
+-----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+public class Main {
+
+    /**
+     * Manually generates the raw multipart/form-data string structure.
+     * @return The raw string representation of the multipart body.
+     */
+    public static String generateRawMultipartOutput() {
+        // Must be unique and not appear in the content
+        String boundary = "JavaBoundary-" + System.nanoTime(); 
+        String CRLF = "\r\n"; // Standard line ending for HTTP protocols
+        
+        String firstPart = "content for my first part";
+        String secondPart = "content for my second part";
+        
+        StringBuilder body = new StringBuilder();
+
+        // --- Part 1 ---
+        body.append("--").append(boundary).append(CRLF);
+        body.append("Content-Disposition: form-data; name=\"myFirstPart\"").append(CRLF);
+        body.append(CRLF); // Empty line separating headers from content
+        body.append(firstPart).append(CRLF);
+
+        // --- Part 2 ---
+        body.append("--").append(boundary).append(CRLF);
+        body.append("Content-Disposition: form-data; name=\"mySecondPart\"").append(CRLF);
+        body.append(CRLF); // Empty line separating headers from content
+        body.append(secondPart).append(CRLF);
+
+        // --- Closing Boundary ---
+        body.append("--").append(boundary).append("--").append(CRLF);
+        
+        return body.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Simulated Multipart Output ---");
+        System.out.println(generateRawMultipartOutput());
+    }
+}
+
+
+output:
+
+
+--- Pure Java Simulated Multipart Output ---
+--JavaBoundary-<TIMESTAMP>
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+--JavaBoundary-<TIMESTAMP>
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+--JavaBoundary-<TIMESTAMP>--

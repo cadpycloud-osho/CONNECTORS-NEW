@@ -1,0 +1,107 @@
+slice:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+        
+        // DataWeave Logic: slice(arr, 1, 4)
+        // Java's List.subList(fromIndex, toIndex) provides the exact same functionality.
+        int startIndex = 1;
+        int endIndex = 4; // Exclusive
+        
+        List<Integer> result = arr.subList(startIndex, endIndex);
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result); 
+    }
+}
+
+
+output:
+
+[1, 2, 3]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Java Code (Using an Imperative Loop)
+This approach manually implements the slice logic using a standard for loop and adds elements to a new list.
+
+Java
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveSliceImperative {
+
+    /**
+     * Helper method to manually slice a list.
+     * Extracts elements from the inclusive start index up to the exclusive end index.
+     */
+    public static <T> List<T> sliceList(List<T> list, int start, int end) {
+        // Handle invalid indices (DataWeave is forgiving, but Java often requires validation)
+        if (start < 0 || end > list.size() || start > end) {
+             // In a real-world scenario, you might throw an exception or handle boundaries.
+             // We cap the indices here for simplicity, similar to robust slice implementations.
+             start = Math.max(0, start);
+             end = Math.min(list.size(), end);
+        }
+
+        List<T> slicedList = new ArrayList<>();
+        
+        // Loop from the start index (inclusive) up to the end index (exclusive)
+        for (int i = start; i < end; i++) {
+            slicedList.add(list.get(i));
+        }
+        return slicedList;
+    }
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+        
+        // DataWeave Logic: slice(arr, 1, 4)
+        int startIndex = 1;
+        int endIndex = 4;
+        
+        List<Integer> result = sliceList(arr, startIndex, endIndex);
+
+        // Output the result
+        System.out.println("Output structure:");
+        System.out.println(result);
+    }
+}
+✅ Output for Both Java Codes
+The output for both the Java built-in method and the Java imperative loop is identical and correctly matches the expected DataWeave output:
+
+JSON
+
+[1, 2, 3]

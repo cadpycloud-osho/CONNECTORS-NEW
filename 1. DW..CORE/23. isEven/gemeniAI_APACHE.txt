@@ -1,0 +1,38 @@
+isEven:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class IsEvenRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkEven")
+            // 1. The Pure Camel equivalent of { "isEven" : [ isEven(0), isEven(1), isEven(1+1) ] }
+            // We use the modulo operator (%) where n % 2 == 0 determines if a number is even
+            .transform().groovy("""
+                def check = { n -> n % 2 == 0 }
+                return [ "isEven": [ check(0), check(1), check(1+1) ] ]
+            """)
+
+            // 2. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+{
+  "isEven": [
+    true,
+    false,
+    true
+  ]
+}
+

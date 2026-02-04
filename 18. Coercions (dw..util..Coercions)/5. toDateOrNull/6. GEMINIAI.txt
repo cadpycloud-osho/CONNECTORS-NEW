@@ -1,0 +1,88 @@
+toDateOrNull:
+
+
+
+input:
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveToDateOrNullConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceDateString = "2023-28-03";
+
+    /**
+     * Mimics DataWeave's toDateOrNull() behavior with chained formatters.
+     * Tries each formatter. Returns the parsed date upon success, or null if all fail.
+     */
+    private LocalDate toDateOrNull(String dateString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return LocalDate.parse(dateString, formatter);
+            } catch (DateTimeParseException e) {
+                // DateWeave's behavior: swallow the exception and continue to the next formatter
+            }
+        }
+        // If the loop completes without a successful parse, return null
+        return null; 
+    }
+
+    public String getDateParsingJson() throws IOException {
+        // Define formatters
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.US);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-dd-MM", Locale.US);
+        
+        // --- Logic for Key 'a' (Success after chain) ---
+        // Try formatter1 (fails), then formatter2 (succeeds)
+        LocalDate parsedDateA = toDateOrNull(sourceDateString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Failure) ---
+        // Only try formatter1 (fails), resulting in null
+        LocalDate parsedDateB = toDateOrNull(sourceDateString, formatter1);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson will correctly serialize LocalDate as a standard ISO string or null.
+        if (parsedDateA != null) {
+             root.put("a", parsedDateA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        if (parsedDateB != null) {
+             root.put("b", parsedDateB.toString());
+        } else {
+             root.putNull("b");
+        }
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToDateOrNullConverter converter = new DataWeaveToDateOrNullConverter();
+        try {
+            String jsonOutput = converter.getDateParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "2023-03-28",
+  "b" : null
+}

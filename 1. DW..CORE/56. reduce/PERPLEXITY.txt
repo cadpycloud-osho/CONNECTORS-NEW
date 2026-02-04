@@ -1,0 +1,205 @@
+reduce:
+
+
+example 1:
+
+
+input:
+
+
+@GetMapping("/reduce-sum")
+public Integer reduceSum() {
+    List<Integer> numbers = Arrays.asList(2, 3);
+    return numbers.stream().reduce(0, Integer::sum);
+}
+
+output:
+
+5
+
+
+------------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+@GetMapping("/multi-reduce")
+public Map<String, Object> multiReduce() {
+    List<Integer> myNums = Arrays.asList(1, 2, 3, 4);
+    List<Object> myEmptyList = new ArrayList<>();
+    
+    Map<String, Object> response = new HashMap<>();
+    response.put("sum", myNums.stream().reduce(0, Integer::sum));
+    response.put("concat", myNums.stream().reduce("", (acc, item) -> acc + item));
+    response.put("emptyList", myEmptyList.stream().reduce((acc, item) -> acc));
+    
+    return response;
+}
+
+
+output:
+
+{
+  "sum": 10,
+  "concat": "1234",
+  "emptyList": null
+}
+
+
+------------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+@GetMapping("/reduce-default")
+public Map<String, Object> reduceDefault() {
+    Map<String, Object> response = new HashMap<>();
+    
+    // concat with default "z"
+    response.put("concat", Arrays.asList("a", "b", "c", "d").stream()
+        .reduce("z", (acc, item) -> acc + item));
+    
+    // sum with default 3
+    response.put("sum", Arrays.asList(0, 1, 2, 3, 4, 5).stream()
+        .reduce(3, Integer::sum));
+    
+    // multiply
+    response.put("multiply", Arrays.asList(2, 3, 3).stream()
+        .reduce(1, (acc, item) -> acc * item));
+    
+    // multiply with default 3
+    response.put("multiplyAcc", Arrays.asList(2, 2, 3).stream()
+        .reduce(3, (acc, item) -> acc * item));
+    
+    return response;
+}
+
+
+output:
+
+{
+  "concat": "zabcd",
+  "sum": 18,
+  "multiply": 18,
+  "multiplyAcc": 36
+}
+
+
+------------------------------------------------------------------------
+
+
+
+
+example 4:
+
+
+input:
+
+@GetMapping("/comprehensive-reduce")
+public Map<String, Object> comprehensiveReduce() {
+    List<Integer> nums = Arrays.asList(0, 1, 2, 3, 4, 5);
+    List<String> strings = Arrays.asList("a", "b", "c", "d", "e");
+    List<Map<String, String>> objects = Arrays.asList(
+        Map.of("letter", "a"), Map.of("letter", "b"), Map.of("letter", "c"));
+    List<Boolean> booleans = Arrays.asList(true, false, false, true, true);
+    
+    Map<String, Object> result = new HashMap<>();
+    
+    // a: first element
+    result.put("a", nums.get(0));
+    // b: first element
+    result.put("b", strings.get(0));
+    // c: reduce with default
+    result.put("c", objects.stream().reduce("z", (acc, item) -> acc + item.get("letter"), String::concat));
+    // d: first element
+    result.put("d", objects.get(0));
+    // e: logical AND (short-circuit)
+    result.put("e", booleans.stream().reduce(true, Boolean::logicalAnd));
+    // f: logical AND
+    result.put("f", booleans.stream().reduce(true, (acc, item) -> acc && item));
+    // g: logical AND with default false
+    result.put("g", booleans.stream().reduce(false, (acc, item) -> acc && item));
+    // h: first element
+    result.put("h", booleans.get(0));
+    // i: sum
+    result.put("i", nums.stream().reduce(0, Integer::sum));
+    // j: sum
+    result.put("j", nums.stream().reduce(0, (acc, item) -> acc + item));
+    // k: sum with default 3
+    result.put("k", nums.stream().reduce(3, Integer::sum));
+    // l: first element
+    result.put("l", nums.get(0));
+    // m: concat
+    result.put("m", strings.stream().reduce("", String::concat));
+    // n: concat
+    result.put("n", strings.stream().reduce("", (acc, item) -> acc + item));
+    // o: concat with default "z"
+    result.put("o", strings.stream().reduce("z", String::concat));
+    // p: first element
+    result.put("p", strings.get(0));
+    // q: concat letters
+    result.put("q", objects.stream().reduce("z", (acc, item) -> acc + item.get("letter"), String::concat));
+    // r: first element
+    result.put("r", objects.get(0));
+    // s: logical AND
+    result.put("s", booleans.stream().reduce(true, Boolean::logicalAnd));
+    // t: logical AND
+    result.put("t", booleans.stream().reduce(true, (acc, item) -> acc && item));
+    // u: logical AND with default false
+    result.put("u", booleans.stream().reduce(false, (acc, item) -> acc && item));
+    // v: first element
+    result.put("v", booleans.get(0));
+    // w: build object then pluck values
+    List<Integer> wResult = Arrays.asList(0, 1, 2, 3, 4).stream()
+        .reduce(new ArrayList<>(), (acc, item) -> { acc.add(item); return acc; }, (a, b) -> a);
+    result.put("w", wResult);
+    // x: empty reduce -> null
+    result.put("x", new ArrayList<>().stream().reduce((acc, item) -> acc));
+    // y: empty reduce with default 0
+    result.put("y", new ArrayList<>().stream().reduce(0, (acc, item) -> acc + item));
+    
+    return result;
+}
+
+
+output:
+
+{
+  "a": 0, "b": "a", "c": "zabc", "d": {"letter": "a"},
+  "e": false, "f": false, "g": false, "h": true,
+  "i": 15, "j": 15, "k": 18, "l": 0,
+  "m": "abcde", "n": "abcde", "o": "zabcde", "p": "a",
+  "q": "zabc", "r": {"letter": "a"},
+  "s": false, "t": false, "u": false, "v": true,
+  "w": [0,1,2,3,4], "x": null, "y": 0
+}
+
+
+
+------------------------------------------------------------------------
+
+
+
+example 5:
+
+
+input:
+
+@GetMapping("/string-reduce")
+public String stringReduce() {
+    return "hello world".chars()
+        .mapToObj(c -> String.valueOf((char)c))
+        .reduce("", (acc, item) -> item + acc);
+}
+
+
+output:
+
+"dlrow olleh"

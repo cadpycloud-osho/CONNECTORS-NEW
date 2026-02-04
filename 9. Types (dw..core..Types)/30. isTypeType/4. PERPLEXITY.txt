@@ -1,0 +1,63 @@
+isTypeType:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TypeTypeController {
+
+    private boolean isTypeType(Object value) {
+        return value instanceof Class;
+    }
+
+    @GetMapping("/type-type-check")
+    public Map<String, Boolean> checkTypeTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Class<?> aType = String.class;   // AType alias (metatype)
+        Class<?> typeType = Integer.class; // Type (metatype)
+        String str = "test";             // String
+        
+        result.put("a", isTypeType(aType));
+        result.put("b", isTypeType(typeType));
+        result.put("c", isTypeType(str));
+        
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+slice:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> arr = List.of(0, 1, 2, 3, 4, 5);
+
+        // Equivalent of DataWeave slice(arr, 1, 4)
+        List<Integer> sliced = arr.subList(1, 4);
+
+        System.out.println(sliced);
+    }
+}
+
+
+
+output:
+
+
+[1, 2, 3]
+

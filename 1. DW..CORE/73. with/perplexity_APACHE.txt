@@ -1,0 +1,30 @@
+with:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SsnMaskRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:ssnMask")
+            .process(exchange -> {
+                String ssn = "987-65-4321";
+                
+                // replace /[0-9]/ → replace all digits with "x"
+                String masked = ssn.replaceAll("[0-9]", "x");
+                
+                exchange.getIn().setBody(Map.of("ssn", masked));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "ssn": "xxx-xx-xxxx" }
+
+

@@ -1,0 +1,65 @@
+isFunctionType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelFunctionTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // Simulating DataWeave isFunctionType
+                        boolean a = isFunctionType(FunctionType.class);
+                        boolean b = isFunctionType(Boolean.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate function type checking
+    private static boolean isFunctionType(Class<?> clazz) {
+        return clazz.isInterface() && clazz.getMethods().length > 0;
+    }
+
+    // Dummy functional type to represent (String) -> String
+    @FunctionalInterface
+    interface FunctionType {
+        String apply(String input);
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": true,
+  "b": false
+}
+

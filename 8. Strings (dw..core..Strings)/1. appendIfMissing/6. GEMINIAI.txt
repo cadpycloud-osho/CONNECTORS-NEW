@@ -1,0 +1,99 @@
+appendIfMissing:
+
+
+input:
+
+A. The Helper Method (Core Logic)
+We'll create a static utility method to encapsulate the appendIfMissing logic.
+
+Java
+
+public class StringUtils {
+    /**
+     * Implements DataWeave's appendIfMissing.
+     * Appends the suffix to the base string only if the base string does not already end with the suffix.
+     * Handles null input by returning null.
+     */
+    public static String appendIfMissing(String base, String suffix) {
+        if (base == null) {
+            return null; // Case 'a': DataWeave returns null for null input
+        }
+        if (base.endsWith(suffix)) {
+            return base; // Case 'e': If already ending with suffix
+        }
+        return base + suffix; // Case 'd': Append suffix
+    }
+}
+B. The Model (POJO)
+Java
+
+import lombok.Data; 
+
+@Data
+public class AppendResult {
+    private String a;
+    private String b;
+    private String c;
+    private String d;
+    private String e;
+}
+C. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class StringService {
+
+    public AppendResult calculateAppendIfMissing() {
+        AppendResult result = new AppendResult();
+        
+        // Case "a": appendIfMissing(null, "") -> null
+        result.setA(StringUtils.appendIfMissing(null, "")); 
+        
+        // Case "b": appendIfMissing("abc", "") -> "abc" (suffix "" is always present, so nothing is added)
+        result.setB(StringUtils.appendIfMissing("abc", "")); 
+        
+        // Case "c": appendIfMissing("", "xyz") -> "xyz" (base "" does not end with "xyz", so "xyz" is appended)
+        result.setC(StringUtils.appendIfMissing("", "xyz")); 
+        
+        // Case "d": appendIfMissing("abc", "xyz") -> "abcxyz" 
+        result.setD(StringUtils.appendIfMissing("abc", "xyz"));
+        
+        // Case "e": appendIfMissing("abcxyz", "xyz") -> "abcxyz" 
+        result.setE(StringUtils.appendIfMissing("abcxyz", "xyz"));
+
+        return result;
+    }
+}
+D. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class StringController {
+
+    private final StringService stringService;
+
+    public StringController(StringService stringService) {
+        this.stringService = stringService;
+    }
+
+    @GetMapping("/api/string-append")
+    public AppendResult getStringAppendResults() {
+        // Spring Boot automatically converts the AppendResult object to JSON
+        return stringService.calculateAppendIfMissing();
+    }
+}
+Spring Boot Output (When accessing /api/string-append)
+JSON
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}

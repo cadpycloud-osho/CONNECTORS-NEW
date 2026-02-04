@@ -1,0 +1,54 @@
+xsiType:
+
+xsiType(name: String, namespace: Namespace)
+
+xsiType(name: String, namespace: Namespace)
+Creates a xsi:type type attribute. This method returns an object, so it must be used with dynamic attributes.
+
+
+
+
+
+
+Source
+%dw 2.0
+output application/xml
+ns acme http://acme.com
+---
+  {
+      user @((xsiType("user", acme))): {
+          name: "Peter",
+          lastName: "Parker"
+      }
+  }
+DataWeave
+Output
+<?xml version='1.0' encoding='UTF-8'?>
+ <user xsi:type="acme:user" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:acme="http://acme.com">
+     <name>Peter</name>
+     <lastName>Parker</lastName>
+ </user>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

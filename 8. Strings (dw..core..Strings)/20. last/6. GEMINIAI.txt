@@ -1,0 +1,57 @@
+last:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class LastSubstringController {
+
+    /**
+     * Custom method to emulate DataWeave's last(text, length) function.
+     * Extracts the last 'length' characters of the input string.
+     */
+    private String getLastCharacters(String input, int length) {
+        if (input == null || input.isEmpty() || length <= 0) {
+            return "";
+        }
+        
+        // Ensure the length does not exceed the string's actual length
+        int actualLength = input.length();
+        int effectiveLength = Math.min(actualLength, length);
+        
+        // Calculate the starting index: Total Length - Desired Length
+        int beginIndex = actualLength - effectiveLength;
+        
+        // Java's substring(beginIndex) extracts characters from the calculated index to the end
+        return input.substring(beginIndex);
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression: "hello world!" last 6
+     */
+    @GetMapping("/get-last-six")
+    public Map<String, String> getLastSix() {
+        String inputString = "hello world!"; // The hardcoded input string
+        int length = 6;                        // The hardcoded length
+        
+        String result = getLastCharacters(inputString, length);
+        
+        // Return the result in the desired JSON format
+        return Collections.singletonMap("last", result);
+    }
+}
+
+output:
+
+{
+  "last": "world!"
+}
+
+
+

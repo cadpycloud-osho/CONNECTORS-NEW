@@ -1,0 +1,41 @@
+currentMilliseconds:
+
+currentMilliseconds(): Number
+
+currentMilliseconds(): Number
+Returns the current time in milliseconds.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Timer
+output application/json
+---
+{ "currentMilliseconds" : currentMilliseconds() }
+
+
+Dataweave
+Output
+{ "currentMilliseconds": 1532923168900 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

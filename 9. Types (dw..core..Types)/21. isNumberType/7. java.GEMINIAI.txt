@@ -1,0 +1,59 @@
+isNumberType:
+
+
+input:
+
+import java.lang.Number;
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isNumberType(Type).
+     * Checks if the provided type is java.lang.Number or a subclass (e.g., Integer, Double).
+     */
+    public static boolean isNumberType(Class<?> type) {
+        return Number.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ANumber' (which is Number)
+        Class<?> aNumberClass = Number.class;
+
+        // 2. Mimics the type 'Number'
+        Class<?> numberClass = Number.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isNumberType(ANumber)
+        boolean a = isNumberType(aNumberClass); 
+
+        // b: isNumberType(Number)
+        boolean b = isNumberType(numberClass); 
+        
+        // c: isNumberType(String)
+        boolean c = isNumberType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

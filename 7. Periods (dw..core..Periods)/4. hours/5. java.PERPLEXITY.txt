@@ -1,0 +1,69 @@
+hours:
+
+
+input:
+
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter instantFmt = DateTimeFormatter.ISO_INSTANT;
+        Instant baseInstant = Instant.parse("2020-10-05T20:22:34.385Z");
+
+        // nextHour: +1 hour
+        Instant nextHour = baseInstant.plus(Duration.ofHours(1));
+
+        // previousHour: -1 hour
+        Instant previousHour = baseInstant.minus(Duration.ofHours(1));
+
+        // threeHoursLater: add 3 hours to a time-of-day "20:22" (no date)
+        LocalTime baseTime = LocalTime.parse("20:22");
+        LocalTime threeHoursLater = baseTime.plusHours(3).withSecond(0).withNano(0);
+
+        // addDecimalInput: add 3.5 hours -> 3 hours + 30 minutes
+        double addHoursDecimal = 3.5;
+        long secondsToAdd = (long) (addHoursDecimal * 3600.0);
+        LocalTime addDecimalInput = baseTime.plusSeconds(secondsToAdd).withSecond(0).withNano(0);
+
+        // decimalInputAsPeriod: 4.555 hours -> build Duration (hours to seconds)
+        double decimalHours = 4.555;
+        long decimalSeconds = Math.round(decimalHours * 3600.0);
+        Duration decimalInputAsDuration = Duration.ofSeconds(decimalSeconds);
+
+        // fourHourPeriod
+        Duration fourHourPeriod = Duration.ofHours(4);
+
+        // addNegativeValue: hours(-1) + hours(2) => net 1 hour -> return seconds (3600)
+        Duration addNegativeValueDuration = Duration.ofHours(-1).plus(Duration.ofHours(2));
+        long addNegativeValueSeconds = addNegativeValueDuration.getSeconds();
+
+        // Print JSON-like output
+        System.out.println("{");
+        System.out.println("  \"nextHour\": \"" + instantFmt.format(nextHour) + "\",");
+        System.out.println("  \"previousHour\": \"" + instantFmt.format(previousHour) + "\",");
+        System.out.println("  \"threeHoursLater\": \"" + threeHoursLater.toString() + "\",");
+        System.out.println("  \"addDecimalInput\": \"" + addDecimalInput.toString() + "\",");
+        System.out.println("  \"decimalInputAsPeriod\": \"" + decimalInputAsDuration.toString() + "\",");
+        System.out.println("  \"fourHourPeriod\": \"" + fourHourPeriod.toString() + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValueSeconds);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+"nextHour": "2020-10-05T21:22:34.385Z",
+"previousHour": "2020-10-05T19:22:34.385Z",
+"threeHoursLater": "23:22:00",
+"addDecimalInput": "23:52:00",
+"decimalInputAsPeriod": "PT4H33M18S",
+"fourHourPeriod": "PT4H",
+"addNegativeValue": 3600
+}

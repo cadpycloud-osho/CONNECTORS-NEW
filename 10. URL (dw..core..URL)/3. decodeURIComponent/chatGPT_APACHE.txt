@@ -1,0 +1,49 @@
+decodeURIComponent:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+public class DecodeUriComponentRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                String v1 = URLDecoder.decode("%20PATH/%20TO%20/DECODE%20", StandardCharsets.UTF_8);
+                String v2 = URLDecoder.decode("%3B%2C%2F%3F%3A%40%26%3D", StandardCharsets.UTF_8);
+                String v3 = URLDecoder.decode("%2D%5F%2E%21%7E%2A%27%28%29%24", StandardCharsets.UTF_8);
+
+                String body =
+                    "{ \"decodeURIComponent\": {"
+                  + "  \"decodeURIComponent\": \"" + v1 + "\","
+                  + "  \"decodeURIComponent\": \"" + v2 + "\","
+                  + "  \"decodeURIComponent\": \"" + v3 + "\""
+                  + "} }";
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+
+
+output:
+
+{
+  "decodeURIComponent": {
+    "decodeURIComponent": " PATH/ TO /DECODE ",
+    "decodeURIComponent": ";,/?:@&=",
+    "decodeURIComponent": "-_.!~*'()$"
+  }
+}
+
+
+
+

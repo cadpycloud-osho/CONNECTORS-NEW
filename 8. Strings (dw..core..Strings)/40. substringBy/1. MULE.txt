@@ -1,0 +1,45 @@
+substringBy:
+
+substringBy(text: String, predicate: (character: String, index: Number) -> Boolean): Array<String>
+
+substringBy(text: String, predicate: (character: String, index: Number) -> Boolean): Array<String>
+Splits a string at each character where the predicate expression returns true.
+
+
+
+Source
+%dw 2.0
+import substringBy from dw::core::Strings
+output application/json
+---
+"hello~world=here_data-weave" substringBy $ == "~" or $ == "=" or $ == "_"
+
+
+
+DataWeave
+Output
+["hello", "world", "here", "data-weave"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,106 @@
+
+
+outerJoin:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@SpringBootApplication
+@RestController
+public class OuterJoinApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(OuterJoinApplication.class, args);
+    }
+
+    @GetMapping("/outerJoin")
+    public List<Map<String, Object>> outerJoinExample() {
+
+        List<Map<String, String>> users = Arrays.asList(
+                Map.of("id", "1", "name", "Mariano"),
+                Map.of("id", "2", "name", "Leandro"),
+                Map.of("id", "3", "name", "Julian"),
+                Map.of("id", "5", "name", "Julian")
+        );
+
+        List<Map<String, String>> products = new ArrayList<>(Arrays.asList(
+                Map.of("ownerId", "1", "name", "DataWeave"),
+                Map.of("ownerId", "1", "name", "BAT"),
+                Map.of("ownerId", "3", "name", "DataSense"),
+                Map.of("ownerId", "4", "name", "SmartConnectors")
+        ));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        Set<Integer> matchedProducts = new HashSet<>();
+
+        for (Map<String, String> u : users) {
+            boolean isMatch = false;
+            for (int i = 0; i < products.size(); i++) {
+                Map<String, String> p = products.get(i);
+                if (u.get("id").equals(p.get("ownerId"))) {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("l", u);
+                    row.put("r", p);
+                    result.add(row);
+                    matchedProducts.add(i);
+                    isMatch = true;
+                }
+            }
+            if (!isMatch) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("l", u);
+                result.add(row);
+            }
+        }
+
+        for (int i = 0; i < products.size(); i++) {
+            if (!matchedProducts.contains(i)) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("r", products.get(i));
+                result.add(row);
+            }
+        }
+
+        return result;
+    }
+}
+
+
+
+output:
+
+
+
+[
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "DataWeave" }
+  },
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "BAT" }
+  },
+  {
+    "l": { "id": "2", "name": "Leandro" }
+  },
+  {
+    "l": { "id": "3", "name": "Julian" },
+    "r": { "ownerId": "3", "name": "DataSense" }
+  },
+  {
+    "l": { "id": "5", "name": "Julian" }
+  },
+  {
+    "r": { "ownerId": "4", "name": "SmartConnectors" }
+  }
+]
+

@@ -1,0 +1,59 @@
+camelize:
+
+
+input:
+
+import java.util.*;
+
+public class CamelizeExample {
+
+    public static void main(String[] args) {
+
+        Map<String, String> output = new LinkedHashMap<>();
+
+        output.put("a", camelize("customer_first_name"));
+        output.put("b", camelize("_name_starts_with_underscore"));
+
+        System.out.println(output);
+    }
+
+    private static String camelize(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = false;
+
+        for (char c : input.toCharArray()) {
+            if (c == '_') {
+                capitalizeNext = true; // next character should be uppercase
+            } else {
+                if (capitalizeNext) {
+                    result.append(Character.toUpperCase(c));
+                    capitalizeNext = false;
+                } else {
+                    result.append(result.length() == 0 ? Character.toLowerCase(c) : c);
+                }
+            }
+        }
+
+        return result.toString();
+    }
+}
+
+
+
+
+
+
+
+output:
+
+
+{
+   "a": "customerFirstName",
+   "b": "nameStartsWithUnderscore"
+}
+
+
+
+

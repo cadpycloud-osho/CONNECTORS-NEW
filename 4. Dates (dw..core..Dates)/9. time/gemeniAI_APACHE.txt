@@ -1,0 +1,48 @@
+time:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ConstructTimeWithOffsetRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:constructTime")
+            .routeId("Construct-Time-With-Offset-Route")
+            .process(exchange -> {
+                // 1. Logic: time({ hour: 12, minutes: 30, seconds: 40, timeZone: |-03:00| })
+                // Java's OffsetTime.of takes (hour, minute, second, nano, offset)
+                OffsetTime newTime = OffsetTime.of(
+                    12, 30, 40, 0,           // Time components
+                    ZoneOffset.of("-03:00")  // TimeZone Offset
+                );
+
+                // 2. Format to match DW output style (HH:mm:ssZZZZZ)
+                // ISO_OFFSET_TIME typically follows HH:mm:ss-03:00
+                String result = newTime.format(DateTimeFormatter.ISO_OFFSET_TIME);
+
+                // 3. Construct the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("newTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+output:
+
+{
+   "newTime": "12:30:40-03:00"
+}
+

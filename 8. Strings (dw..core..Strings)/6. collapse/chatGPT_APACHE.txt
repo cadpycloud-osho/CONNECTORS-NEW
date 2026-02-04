@@ -1,0 +1,49 @@
+collapse:
+
+
+input:
+
+import java.util.*;
+
+public class CollapseExample {
+
+    public static void main(String[] args) {
+
+        String input = "a  b babb a";
+
+        List<String> output = collapse(input);
+
+        System.out.println(output);
+    }
+
+    private static List<String> collapse(String input) {
+        List<String> result = new ArrayList<>();
+        if (input == null || input.isEmpty()) return result;
+
+        StringBuilder buffer = new StringBuilder();
+        boolean lastIsSpace = Character.isWhitespace(input.charAt(0));
+
+        for (char c : input.toCharArray()) {
+            boolean currentIsSpace = Character.isWhitespace(c);
+
+            if (currentIsSpace == lastIsSpace) {
+                buffer.append(c);
+            } else {
+                result.add(buffer.toString());
+                buffer.setLength(0);
+                buffer.append(c);
+            }
+            lastIsSpace = currentIsSpace;
+        }
+        result.add(buffer.toString());
+
+        return result;
+    }
+}
+
+
+output:
+["a", "  ", "b", " ", "b", "a", "bb", " ", "a"]
+
+
+

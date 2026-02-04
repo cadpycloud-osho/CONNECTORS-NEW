@@ -1,0 +1,191 @@
+entrySet:
+
+
+input:
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    // --- Helper Methods to Simulate DW XML Parsing and entrySet ---
+
+    /**
+     * Parses an XML string into a W3C Document object.
+     */
+    private static Document parseXml(String xmlString) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // Ignore whitespace and comments for cleaner parsing, closer to DW's interpretation
+        factory.setIgnoringComments(true);
+        factory.setIgnoringElementContentWhitespace(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(new ByteArrayInputStream(xmlString.getBytes("UTF-8")));
+    }
+    
+    /**
+     * Extracts the attributes of an XML node into a Map.
+     */
+    private static Map<String, Object> getAttributes(NamedNodeMap attributes) {
+        Map<String, Object> attrMap = new LinkedHashMap<>();
+        if (attributes != null) {
+            for (int i = 0; i < attributes.getLength(); i++) {
+                Node attr = attributes.item(i);
+                attrMap.put(attr.getNodeName(), attr.getNodeValue());
+            }
+        }
+        return attrMap;
+    }
+
+    /**
+     * Extracts the child elements of an XML node into a Map (simulating the DW value structure).
+     */
+    private static Map<String, Object> getChildren(Node parentNode) {
+        Map<String, Object> childrenMap = new LinkedHashMap<>();
+        NodeList children = parentNode.getChildNodes();
+        
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            // We only care about element nodes (child tags)
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                // In DW, simple children content is interpreted as a string value
+                childrenMap.put(child.getNodeName(), child.getTextContent());
+            }
+        }
+        return childrenMap;
+    }
+
+    /**
+     * Simulates the DataWeave entrySet() on the top-level XML node.
+     */
+    public static List<Map<String, Object>> entrySetFromXml(Element rootElement) {
+        List<Map<String, Object>> entryList = new ArrayList<>();
+        
+        // 1. Create the single entry map structure
+        Map<String, Object> entry = new LinkedHashMap<>();
+        
+        // 2. Extract Key (Node Name)
+        entry.put("key", rootElement.getNodeName());
+        
+        // 3. Extract Value (Children as an object)
+        entry.put("value", getChildren(rootElement));
+        
+        // 4. Extract Attributes
+        entry.put("attributes", getAttributes(rootElement.getAttributes()));
+        
+        entryList.add(entry);
+        return entryList;
+    }
+
+    // --- Main Execution ---
+
+    public static void runDataWeaveTransformation() {
+        String xmlSource = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+        List<Map<String, Object>> entrySetResult = null;
+        
+        try {
+            // 1. Simulate DW 'read()'
+            Document doc = parseXml(xmlSource);
+            Element rootElement = doc.getDocumentElement(); // Get the <xml> node
+            
+            // 2. Simulate DW 'entrySet()'
+            entrySetResult = entrySetFromXml(rootElement);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error processing XML: " + e.getMessage());
+            return;
+        }
+
+        // 3. Format the final JSON output
+        String jsonOutput = formatToJson(entrySetResult);
+        
+        System.out.println("--- DataWeave XML EntrySet Simulation ---");
+        System.out.println("Input XML: " + xmlSource);
+        System.out.println("-----------------------------------------");
+        
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(jsonOutput);
+    }
+    
+    // Simple JSON formatter helper to match the DW output structure
+    private static String formatToJson(List<Map<String, Object>> entrySet) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n  \"entrySet\": [\n");
+        
+        for (Map<String, Object> entry : entrySet) {
+            sb.append("    {\n");
+            
+            // Key
+            sb.append(String.format("      \"key\": \"%s\",\n", entry.get("key")));
+            
+            // Value
+            sb.append("      \"value\": {\n");
+            Map<?, ?> valueMap = (Map<?, ?>) entry.get("value");
+            int valCount = 0;
+            for (Map.Entry<?, ?> valEntry : valueMap.entrySet()) {
+                String value = valEntry.getValue().toString();
+                // DW output treats boolean-like and number-like content as strings inside the value
+                sb.append(String.format("        \"%s\": \"%s\"", valEntry.getKey(), value));
+                if (valCount < valueMap.size() - 1) sb.append(",\n");
+                else sb.append("\n");
+                valCount++;
+            }
+            sb.append("      },\n");
+            
+            // Attributes
+            sb.append("      \"attributes\": {\n");
+            Map<?, ?> attrMap = (Map<?, ?>) entry.get("attributes");
+            int attrCount = 0;
+            for (Map.Entry<?, ?> attrEntry : attrMap.entrySet()) {
+                sb.append(String.format("        \"%s\": \"%s\"", attrEntry.getKey(), attrEntry.getValue()));
+                if (attrCount < attrMap.size() - 1) sb.append(",\n");
+                else sb.append("\n");
+                attrCount++;
+            }
+            sb.append("      }\n");
+            
+            sb.append("    }\n"); // End of entry object
+        }
+        sb.append("  ]\n}");
+        return sb.toString();
+    }
+
+
+    public static void main(String[] args) {
+        runDataWeaveTransformation();
+    }
+}
+
+
+output:
+
+
+--- DataWeave XML EntrySet Simulation ---
+Input XML: <xml attr="x"><a>true</a><b>1</b></xml>
+-----------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}

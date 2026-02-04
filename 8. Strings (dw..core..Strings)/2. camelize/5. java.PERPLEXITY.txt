@@ -1,0 +1,44 @@
+camelize:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + camelize("customer_first_name") + "\",");
+        System.out.println("  \"b\": \"" + camelize("_name_starts_with_underscore") + "\"");
+        System.out.println("}");
+    }
+    
+    private static String camelize(String input) {
+        if (input == null || input.isEmpty()) return input;
+        
+        StringBuilder result = new StringBuilder();
+        boolean nextIsUpper = false;
+        
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '_') {
+                nextIsUpper = true;
+            } else if (nextIsUpper) {
+                result.append(Character.toUpperCase(c));
+                nextIsUpper = false;
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+}
+
+
+output:
+
+
+{
+  "a": "customerFirstName",
+  "b": "nameStartsWithUnderscore"
+}
+

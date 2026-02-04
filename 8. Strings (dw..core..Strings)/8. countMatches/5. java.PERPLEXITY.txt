@@ -1,0 +1,53 @@
+countMatches:
+
+
+example 1:
+
+
+
+input: 
+
+public class Main {
+    public static void main(String[] args) {
+        String text = "hello worlo!";
+        String pattern = "lo";
+        int count = 0;
+        int index = 0;
+        while ((index = text.indexOf(pattern, index)) != -1) {
+            count++;
+            index += pattern.length();
+        }
+        System.out.println(count);
+    }
+}
+
+
+
+output:
+
+2
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+
+input: 
+
+import java.util.regex.Pattern;
+
+public class Main {
+    public static void main(String[] args) {
+        String text = "hello, ciao!";
+        Pattern regex = Pattern.compile("[aeiou]");
+        int count = (int) regex.matcher(text).results().count();
+        System.out.println(count);
+    }
+}
+
+
+output:
+
+5

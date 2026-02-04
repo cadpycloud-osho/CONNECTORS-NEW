@@ -1,0 +1,27 @@
+date:
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/create-local-date")
+    public Map<String, String> createNewDate() {
+        LocalDate newDate = LocalDate.of(2012, 10, 11);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("newDate", newDate.toString());
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "newDate": "2012-10-11"
+}
+

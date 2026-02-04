@@ -1,0 +1,47 @@
+collapse:
+
+collapse(text: String): Array<String>
+
+collapse(text: String): Array<String>
+Collapses the string into substrings of equal characters.
+
+Each substring contains a single character or identical characters that are adjacent to one another in the input string. Empty spaces are treated as characters.
+
+
+
+
+
+Source
+%dw 2.0
+import collapse from dw::core::Strings
+output application/json
+---
+collapse("a  b babb a")
+
+
+DataWeave
+Output
+["a", "  ", "b", " ", "b", "a", "bb", " ", "a"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

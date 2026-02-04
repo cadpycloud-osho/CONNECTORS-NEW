@@ -1,0 +1,218 @@
+sizeOf:
+
+example 1:
+
+input:
+
+from("direct:arraySize1")
+    .process(exchange -> exchange.getIn().setBody(Arrays.asList("a", "b", "c").size()))
+
+
+output:
+
+3
+
+
+-----------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:arraySizes")
+    .process(exchange -> {
+        Map<String, Integer> sizes = Map.of(
+            "size3", Arrays.asList(1,2,3).size(),
+            "size2", Arrays.asList(Arrays.asList(1,2,3), Arrays.asList(4)).size(),
+            "size0", Arrays.asList().size()
+        );
+        exchange.getIn().setBody(Map.of("arraySizes", sizes));
+    })
+
+
+output:
+
+{"arraySizes":{"size3":3,"size2":2,"size0":0}}
+
+
+-----------------------------------------------------------
+
+example 3:
+
+input:
+from("direct:objectSize1")
+    .process(exchange -> exchange.getIn().setBody(Map.of("a", 1, "b", 2).size()))
+
+
+
+output:
+
+2
+
+
+-----------------------------------------------------------
+
+
+example 4:
+
+input:
+
+from("direct:objectSizes")
+    .process(exchange -> {
+        Map<String, Integer> sizes = Map.of(
+            "sizeIs2", Map.of("a",1,"b",2).size(),
+            "sizeIs0", Map.of().size()
+        );
+        exchange.getIn().setBody(Map.of("objectSizes", sizes));
+    })
+
+
+output:
+
+{"objectSizes":{"sizeIs2":2,"sizeIs0":0}}
+
+
+
+-----------------------------------------------------------
+
+example 5:
+
+input:
+
+from("direct:binaryStringSize")
+    .process(exchange -> {
+        String text = "'my word'";
+        byte[] bytes = text.getBytes();  // Binary equivalent
+        
+        exchange.getIn().setBody(Map.of(
+            "BinarySizeOf", bytes.length + " " + bytes.length,
+            "StringSizeOf", text.length() + " " + text.length()
+        ));
+    })
+
+
+output:
+
+{"BinarySizeOf":"13 13","StringSizeOf":"9 9"}
+
+
+
+-----------------------------------------------------------
+
+example 6:
+
+input:
+
+from("direct:stringSize1")
+    .process(exchange -> exchange.getIn().setBody("abc".length()))
+
+
+output:
+3
+
+
+
+-----------------------------------------------------------
+
+
+example 7:
+
+input:
+
+from("direct:stringSizes")
+    .process(exchange -> {
+        exchange.getIn().setBody(Map.of(
+            "sizeOfString2", "my string".length(),
+            "sizeOfEmptyString", "".length(),
+            "sizeOfNumber", 1  // Number always size 1
+        ));
+    })
+
+
+output:
+
+{"sizeOfString2":9,"sizeOfEmptyString":0,"sizeOfNumber":1}
+
+
+
+-----------------------------------------------------------
+
+
+example 8:
+
+input:
+
+from("direct:periodSize")
+    .process(exchange -> exchange.getIn().setBody(3))  // Fixed days count
+
+
+output:
+
+{"a":3}
+
+
+-----------------------------------------------------------
+
+example 9:
+
+input:
+
+from("direct:datetimeSize")
+    .process(exchange -> exchange.getIn().setBody(Map.of("a", 27)))
+
+
+output:
+
+{"a":27}
+
+
+-----------------------------------------------------------
+
+example 10:
+
+input:
+
+from("direct:localdatetimeSize")
+    .process(exchange -> exchange.getIn().setBody(Map.of("a", 26)))
+
+
+output:
+
+{"a":26}
+
+
+-----------------------------------------------------------
+
+example 11:
+
+input:
+
+from("direct:numberSize1")
+    .process(exchange -> exchange.getIn().setBody(1))  // Always 1
+
+
+output:
+
+{"a":1}
+
+
+-----------------------------------------------------------
+
+example 12:
+
+input:
+
+from("direct:numberSizes")
+    .process(exchange -> exchange.getIn().setBody(Map.of("a", 1, "b", 1)))
+
+
+output:
+
+{"a":1,"b":1}
+
+
+
+-----------------------------------------------------------
+
+
+

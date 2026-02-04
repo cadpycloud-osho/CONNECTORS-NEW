@@ -1,0 +1,52 @@
+orElse:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> user = new HashMap<>();
+        Map<String, Object> otherUser = Map.of("name", "DW");
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // a: try(() -> user.name!) orElse "No User Name"
+        try {
+            Object name = user.get("name");
+            if (name == null) {
+                throw new RuntimeException("Missing field");
+            }
+            output.put("a", name);
+        } catch (Exception e) {
+            output.put("a", "No User Name");
+        }
+
+        // b: try(() -> otherUser.name) orElse "No User Name"
+        try {
+            output.put(
+                    "b",
+                    otherUser.getOrDefault("name", "No User Name")
+            );
+        } catch (Exception e) {
+            output.put("b", "No User Name");
+        }
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "No User Name",
+  "b": "DW"
+}
+
+
+

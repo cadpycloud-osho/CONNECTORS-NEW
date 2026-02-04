@@ -1,0 +1,86 @@
+find:
+
+
+example 1:
+
+input:
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+List<String> input = Arrays.asList("Bond", "James", "Bond");
+List<Integer> indices = new ArrayList<>();
+
+AtomicInteger index = new AtomicInteger(0);
+IntStream.range(0, input.size())
+    .filter(i -> input.get(i).equals("Bond"))
+    .forEach(i -> indices.add(i));
+
+System.out.println(indices);  // [0, 2]
+
+
+
+output:
+
+[0, 2]
+
+
+-----------------------------------------------------
+
+example 2:
+
+input:
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+String input = "I heart DataWeave";
+Pattern pattern = Pattern.compile("\\w*ea\\w*\\b");
+Matcher matcher = pattern.matcher(input);
+
+List<List<Integer>> matches = new ArrayList<>();
+while (matcher.find()) {
+    matches.add(Arrays.asList(matcher.start(), matcher.end()));
+}
+
+System.out.println(matches);  // [[2, 7], [8, 17]]
+
+
+
+output:
+
+[[2, 7], [8, 17]]
+
+
+-----------------------------------------------------
+
+example 3:
+
+input:
+
+import java.util.*;
+
+String input = "aabccdbce";
+List<Integer> indices = new ArrayList<>();
+int pos = 0;
+
+while ((pos = input.indexOf("a", pos)) != -1) {
+    indices.add(pos);
+    pos++;
+}
+
+System.out.println(indices.subList(0, 2));  // [0, 1] (first two matches)
+
+
+
+
+output:
+
+[0, 1]
+
+
+-----------------------------------------------------
+
+

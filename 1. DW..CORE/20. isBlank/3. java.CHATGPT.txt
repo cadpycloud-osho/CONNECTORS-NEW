@@ -1,0 +1,54 @@
+isBlank:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Equivalent of DataWeave isBlank()
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    public static void main(String[] args) {
+
+        String someString = "something";
+        String nullString = null;
+
+        // Simulating payload.nonExistingValue → null
+        String payloadNonExistingValue = null;
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        // checking if the string is blank
+        result.put("emptyString", isBlank(""));
+        result.put("stringWithSpaces", isBlank("      "));
+        result.put("textString", isBlank(someString));
+        result.put("somePayloadValue", isBlank(payloadNonExistingValue));
+        result.put("nullString", isBlank(nullString));
+
+        // checking if the string is not blank
+        result.put("notEmptyTextString", !isBlank(" 1234"));
+        result.put("notEmptyTextStringTwo", !isBlank(""));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+ emptyString=true,
+ stringWithSpaces=true,
+ textString=false,
+ somePayloadValue=true,
+ nullString=true,
+ notEmptyTextString=true,
+ notEmptyTextStringTwo=false
+}
+

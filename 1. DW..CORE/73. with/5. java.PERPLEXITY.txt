@@ -1,0 +1,19 @@
+with:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String maskedSsn = "987-65-4321".replaceAll("[0-9]", "x");
+        System.out.println("{\"ssn\" : \"" + maskedSsn + "\"}");
+    }
+}
+
+output:
+
+
+{"ssn":"xxx-xx-xxxx"}
+
+

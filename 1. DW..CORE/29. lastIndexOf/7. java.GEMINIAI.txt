@@ -1,0 +1,97 @@
+lastIndexOf:
+
+
+example 1:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave arrays are represented as Java Lists
+        List<String> list1 = Arrays.asList("a", "b", "c", "d");
+        List<String> list2 = Arrays.asList("x", "w", "x");
+        List<String> list3 = Arrays.asList("a", "b", "c", "c");
+
+        // The lastIndexOf method finds the index of the last occurrence, or -1 if not found.
+        
+        // present: ["a","b","c","d"] lastIndexOf "c" -> 'c' is at index 2
+        int presentIndex = list1.lastIndexOf("c");
+        
+        // notPresent: ["x","w","x"] lastIndexOf "c"
+        int notPresentIndex = list2.lastIndexOf("c"); // Returns -1
+        
+        // presentMoreThanOnce: ["a","b","c","c"] lastIndexOf "c" 
+        // Finds the last 'c' at index 3
+        int presentMoreThanOnceIndex = list3.lastIndexOf("c");
+
+        System.out.println("--- DataWeave lastIndexOf (Array/List) Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{");
+        System.out.println("  \"present\": " + presentIndex + ",");
+        System.out.println("  \"notPresent\": " + notPresentIndex + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnceIndex);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+--------------------------------------------------
+
+
+example 2:
+
+
+input:
+public class Main {
+
+    public static void main(String[] args) {
+        String str1 = "abcd";
+        String str2 = "xyz";
+        String str3 = "abcdc";
+
+        // The lastIndexOf method finds the index of the last character or substring, or -1 if not found.
+        
+        // present: "abcd" lastIndexOf "c" -> 'c' is at index 2
+        int presentIndex = str1.lastIndexOf("c"); 
+        
+        // notPresent: "xyz" lastIndexOf "c"
+        int notPresentIndex = str2.lastIndexOf("c");
+        
+        // presentMoreThanOnce: "abcdc" lastIndexOf "c"
+        // Finds the last 'c' at index 4
+        // Index starts at 0: a(0), b(1), c(2), d(3), c(4)
+        int presentMoreThanOnceIndex = str3.lastIndexOf("c");
+
+        System.out.println("--- DataWeave lastIndexOf (String) Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{");
+        System.out.println("  \"present\": " + presentIndex + ",");
+        System.out.println("  \"notPresent\": " + notPresentIndex + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnceIndex);
+        System.out.println("}");
+    }
+}
+
+
+output:
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}
+
+
+--------------------------------------------------

@@ -1,0 +1,123 @@
+atBeginningOfMonth:
+
+
+example 1:
+
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351-03:00|
+        OffsetDateTime input = OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        
+        // DataWeave: atBeginningOfMonth(...)
+        OffsetDateTime result = input.with(TemporalAdjusters.firstDayOfMonth())
+                                    .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        
+        String output = result.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfMonthDateTime\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfMonthDateTime": "2020-10-01T00:00:00-03:00"
+}
+
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351|
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        
+        // DataWeave: atBeginningOfMonth(...)
+        LocalDateTime result = input.with(TemporalAdjusters.firstDayOfMonth())
+                                   .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        
+        String output = result.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfMonthLocalDateTime\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfMonthLocalDateTime": "2020-10-01T00:00:00"
+}
+
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06|
+        LocalDate input = LocalDate.parse("2020-10-06");
+        
+        // DataWeave: atBeginningOfMonth(...)
+        LocalDate result = input.with(TemporalAdjusters.firstDayOfMonth());
+        
+        String output = result.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfMonthDate\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfMonthDate": "2020-10-01"
+}
+
+
+
+---------------------------------------------------------------
+
+
+
+
+
+

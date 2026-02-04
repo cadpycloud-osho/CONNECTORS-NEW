@@ -1,0 +1,26 @@
+sqrt:
+
+
+input:
+
+
+from("direct:start")
+    .setBody(constant(java.util.Arrays.asList(4, 25, 100)))
+    .process(exchange -> {
+        java.util.List<Integer> numbers = exchange.getIn().getBody(java.util.List.class);
+        java.util.List<Double> roots = new java.util.ArrayList<>();
+        for (Integer num : numbers) {
+            roots.add(Math.sqrt(num));
+        }
+        exchange.getIn().setBody(roots);
+    })
+    .log("Output: ${body}");
+
+
+
+
+output:
+
+[2.0, 5.0, 10.0]
+
+

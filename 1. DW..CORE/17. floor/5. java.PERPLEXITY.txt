@@ -1,0 +1,31 @@
+floor:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        // Equivalent to DataWeave: [ floor(1.5), floor(2.2), floor(3) ]
+        List<Double> numbers = Arrays.asList(1.5, 2.2, 3.0);
+        
+        List<Integer> result = numbers.stream()
+                .map(Math::floor)  // Math.floor returns double, so cast to int
+                .map(Double::intValue)
+                .collect(Collectors.toList());
+        
+        // Output: [1, 2, 3]
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+
+[1, 2, 3]

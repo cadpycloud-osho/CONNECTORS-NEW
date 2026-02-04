@@ -1,0 +1,167 @@
+toDateTime:
+
+example 1:
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class ToDateTimeOrError {
+
+    public static void main(String[] args) {
+        String input = "2003-10-01 23:57:59Z";
+
+        // Formatters to try
+        List<DateTimeFormatter> formattersA = List.of(
+                DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssz").withLocale(Locale.US),
+                DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssz").withLocale(Locale.US)
+        );
+
+        List<DateTimeFormatter> formattersB = List.of(
+                DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssz").withLocale(Locale.US)
+        );
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        output.put("a", parseOrError(input, formattersA));
+        output.put("b", tryParseErrorMessage(input, formattersB));
+
+        System.out.println(output);
+    }
+
+    private static String parseOrError(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                ZonedDateTime zdt = ZonedDateTime.parse(value, fmt);
+                return zdt.toString(); // ISO-8601 format
+            } catch (DateTimeParseException e) {
+                // continue trying next formatter
+            }
+        }
+        return null;
+    }
+
+    private static String tryParseErrorMessage(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                ZonedDateTime.parse(value, fmt);
+                return null; // success
+            } catch (DateTimeParseException e) {
+                return "Could not find a valid formatter for '" + value + "'";
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+{
+  "a": "2003-10-01T23:57:59Z",
+  "b": "Could not find a valid formatter for '2003-10-01 23:57:59Z'"
+}
+
+
+--------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToDateTimeFromEpoch {
+
+    public static void main(String[] args) {
+        Map<String, ZonedDateTime> output = new LinkedHashMap<>();
+
+        // Epoch seconds
+        long epochSeconds = 1443743879L;
+        ZonedDateTime fromEpoch = Instant.ofEpochSecond(epochSeconds).atZone(ZoneOffset.UTC);
+        output.put("fromEpoch", fromEpoch);
+
+        // Epoch milliseconds
+        long epochMillis = 1443743879000L;
+        ZonedDateTime fromMillis = Instant.ofEpochMilli(epochMillis).atZone(ZoneOffset.UTC);
+        output.put("fromMillis", fromMillis);
+
+        // Print
+        output.forEach((k,v) -> System.out.println(k + ": " + v));
+    }
+}
+
+
+output:
+
+fromEpoch: 2015-10-01T23:57:59Z
+fromMillis: 2015-10-01T23:57:59Z
+
+
+--------------------------------------------------------
+
+example 3:
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class ToDateTimeExample {
+
+    public static void main(String[] args) {
+
+        Map<String, ZonedDateTime> output = new LinkedHashMap<>();
+
+        // a -> ISO-8601 parsing
+        ZonedDateTime a = ZonedDateTime.parse("2015-10-01T23:57:59Z");
+        output.put("a", a);
+
+        // b -> custom format parsing
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssz").withLocale(Locale.US);
+        ZonedDateTime b = null;
+        try {
+            b = ZonedDateTime.parse("2003-10-01 23:57:59Z", formatterB);
+        } catch (DateTimeParseException e) {
+            System.err.println("Failed to parse 'b': " + e.getMessage());
+        }
+        output.put("b", b);
+
+        // Print results
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+}
+
+
+output:
+
+a: 2015-10-01T23:57:59Z
+b: 2003-10-01T23:57:59Z
+
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+mod:
+
+INPUT:
+
+// ModuloApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class ModuloApp {
+    public static void main(String[] args) {
+        SpringApplication.run(ModuloApp.class, args);
+
+        double mod1 = 3.0 % 2.0;  // 3 mod 2
+        double mod2 = 4.0 % 2.0;  // 4 mod 2
+        double mod3 = 2.2 % 2.0;  // 2.2 mod 2
+
+        List<Double> result = Arrays.asList(mod1, mod2, mod3);
+        System.out.println(result);  // Output: [1.0, 0.0, 0.20000000000000004]
+    }
+}
+
+
+OUTPUT:
+
+[1.0, 0.0, 0.20000000000000004]
+
+

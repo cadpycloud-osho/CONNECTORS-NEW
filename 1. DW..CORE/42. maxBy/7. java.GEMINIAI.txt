@@ -1,0 +1,199 @@
+maxBy:
+
+
+example 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Optional;
+
+// Simple internal class to represent the JSON structure { "a" : value }
+class Item {
+    public int a;
+
+    public Item(int a) {
+        this.a = a;
+    }
+    
+    // Getter required for Comparator.comparingInt (used by stream().max)
+    public int getA() {
+        return a;
+    }
+}
+
+public class Main {
+
+    /**
+     * DataWeave equivalent logic: 
+     * [ {a: 1}, {a: 3}, {a: 2} ] maxBy $.a
+     * Output: { "a" : 3 }
+     */
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input array of objects (List in Java)
+        List<Item> inputList = Arrays.asList(
+            new Item(1),
+            new Item(3), // The maximum element
+            new Item(2)
+        );
+
+        // 2. Apply the 'maxBy' function (Java equivalent: stream().max(Comparator))
+        // The comparator finds the Item with the largest 'a'.
+        Optional<Item> maxItemOptional = inputList.stream()
+            .max(Comparator.comparingInt(Item::getA));
+            
+        // 3. Extract the value and construct the resulting JSON object
+        String outputJson;
+        
+        if (maxItemOptional.isPresent()) {
+            Item maxItem = maxItemOptional.get();
+            // Manually construct the JSON string: { "a" : value }
+            outputJson = String.format("{\n  \"a\" : %d\n}", maxItem.getA());
+        } else {
+            // If the list was empty, DataWeave returns null
+            outputJson = "null";
+        }
+        
+        System.out.println(outputJson);
+    }
+}
+
+
+
+output:
+
+{
+  "a" : 3
+}
+----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // DataWeave uses OffsetDateTime concept, ZonedDateTime is the closest equivalent
+        ZonedDateTime myDateTime1 = ZonedDateTime.parse("2017-10-01T22:57:59-03:00");
+        ZonedDateTime myDateTime2 = ZonedDateTime.parse("2018-10-01T23:57:59-03:00");
+        
+        List<ZonedDateTime> dateTimeList = List.of(myDateTime1, myDateTime2);
+        List<LocalDate> dateList = List.of(myDateTime1.toLocalDate(), myDateTime2.toLocalDate());
+        // The time part preserves the offset for comparison
+        List<OffsetTime> timeList = List.of(myDateTime1.toOffsetDateTime().toOffsetTime(), 
+                                             myDateTime2.toOffsetDateTime().toOffsetTime());
+        List<String> emptyList = Collections.emptyList();
+
+        // DataWeave maxBy(item -> item) is Java's stream().max(Comparator.naturalOrder())
+        
+        // 1. byDateTime
+        // max() finds the latest DateTime
+        Optional<ZonedDateTime> maxDateTime = dateTimeList.stream().max(Comparator.naturalOrder());
+
+        // 2. byDate
+        // max() finds the latest Date
+        Optional<LocalDate> maxDate = dateList.stream().max(Comparator.naturalOrder());
+
+        // 3. byTime
+        // max() finds the latest Time (23:57:59 is later than 22:57:59)
+        Optional<OffsetTime> maxTime = timeList.stream().max(Comparator.naturalOrder());
+
+        // 4. emptyArray: max() returns Optional.empty() for empty list.
+        Optional<?> maxEmpty = emptyList.stream().max(Comparator.naturalOrder()); // Fix for generic type issue
+
+        // --- Assemble the final JSON object structure (using standard Map) ---
+        Map<String, String> myMaxByMap = new LinkedHashMap<>();
+        
+        // DataWeave formats time objects to ISO 8601 strings:
+        myMaxByMap.put("byDateTime", maxDateTime.map(ZonedDateTime::toString).orElse(null));
+        myMaxByMap.put("byDate", maxDate.map(LocalDate::toString).orElse(null));
+        // OffsetTime needs a specific formatter to ensure "HH:mm:ss±hh:mm" format
+        myMaxByMap.put("byTime", maxTime.map(t -> t.format(DateTimeFormatter.ISO_OFFSET_TIME)).orElse(null));
+        myMaxByMap.put("emptyArray", maxEmpty.isPresent() ? maxEmpty.get().toString() : "null"); 
+        
+        // The final JSON structure: { "myMaxBy" : { ... } }
+        String innerJson = myMaxByMap.entrySet().stream()
+            .map(e -> String.format("    \"%s\" : %s", e.getKey(), 
+                     e.getValue() != null && !e.getValue().equals("null") ? "\"" + e.getValue() + "\"" : "null"))
+            .collect(Collectors.joining(",\n"));
+
+        String outputJson = String.format("{\n  \"myMaxBy\" : {\n%s\n  }\n}", innerJson);
+        
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+
+{
+  "myMaxBy" : {
+    "byDateTime" : "2018-10-01T23:57:59-03:00",
+    "byDate" : "2018-10-01",
+    "byTime" : "23:57:59-03:00",
+    "emptyArray" : null
+  }
+}
+
+----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Optional;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // 1. Define the input array of strings
+        List<String> inputList = Arrays.asList("A", "B", "C");
+
+        // 2. Apply the 'maxBy' function (Java equivalent: stream().max(Comparator))
+        // Comparator.naturalOrder() provides alphabetical comparison for Strings.
+        Optional<String> maxString = inputList.stream()
+            .max(Comparator.naturalOrder());
+
+        // 3. Print the result (C) or null if the list was empty
+        String output = maxString.orElse(null);
+        
+        // Since the DataWeave output is just the string "C" (wrapped in JSON),
+        // we'll just print the resulting string for simplicity.
+        System.out.println("\"" + output + "\"");
+    }
+}
+
+
+
+output:
+
+"C"
+
+
+
+

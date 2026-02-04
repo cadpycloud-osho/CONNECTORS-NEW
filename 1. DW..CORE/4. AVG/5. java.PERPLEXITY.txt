@@ -1,0 +1,53 @@
+avg(values: Array<Number>): Number
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> arr1 = Arrays.asList(1, 1000);
+        List<Integer> arr2 = Arrays.asList(1, 2, 3);
+        
+        double avg1 = arr1.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        double avg2 = arr2.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        
+        Map<String, Double> result = Map.of(
+            "a", avg1,
+            "b", avg2
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{"a": 500.5, "b": 2.0}
+
+
+
+
+
+
+
+
+
+List<Number> list1 = Arrays.asList(1, 1000);
+List<Number> list2 = Arrays.asList(1, 2, 3);
+
+Map<String, Double> result = Map.of(
+    "a", list1.stream().mapToDouble(Number::doubleValue).average().orElse(0.0),
+    "b", list2.stream().mapToDouble(Number::doubleValue).average().orElse(0.0)
+);
+
+System.out.println(result);
+
+{"a"=500.5, "b"=2.0}

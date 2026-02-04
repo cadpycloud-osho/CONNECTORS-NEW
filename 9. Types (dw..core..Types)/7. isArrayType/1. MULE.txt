@@ -1,0 +1,25 @@
+
+isArrayType(t: Type): Boolean
+
+isArrayType(t: Type): Boolean
+Returns true if the input type is the Array type.
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = Array<String>
+output application/json
+---
+{
+   a: isArrayType(AType),
+   b: isArrayType(Boolean),
+}
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": false
+}
+

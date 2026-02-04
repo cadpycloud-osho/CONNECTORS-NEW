@@ -1,0 +1,56 @@
+years:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.ZonedDateTime;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class YearsArithmeticRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateYears")
+            .routeId("Years-Arithmetic-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // 1. Next Year Logic
+                // ZonedDateTime handles the 'Z' (UTC) and preserves time precision
+                ZonedDateTime baseDate = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                ZonedDateTime resultDate = baseDate.plusYears(1);
+                
+                results.put("nextYear", resultDate.toInstant().toString());
+
+                // 2. Period Representation: years(4)
+                // Period.toString() natively returns the "P4Y" format
+                results.put("fourYearPeriod", Period.ofYears(4).toString());
+
+                // 3. Negative Arithmetic: years(-1) + years(2)
+                // To match DW output (12), we calculate the total months
+                Period y1 = Period.ofYears(-1);
+                Period y2 = Period.ofYears(2);
+                long totalMonths = y1.plus(y2).toTotalMonths();
+                
+                results.put("addNegativeValue", totalMonths);
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Years Result: ${body}");
+    }
+}
+
+
+output:
+
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 12
+}
+

@@ -1,0 +1,56 @@
+wrapIfMissing:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + wrapIfMissing(null, '\'') + ",");
+        System.out.println("  \"b\": \"" + wrapIfMissing("", '\'') + "\",");
+        System.out.println("  \"c\": \"" + wrapIfMissing("ab", 'x') + "\",");
+        System.out.println("  \"d\": \"" + wrapIfMissing("'ab'", '\'') + "\",");
+        System.out.println("  \"e\": \"" + wrapIfMissing("/", '/') + "\",");
+        System.out.println("  \"f\": \"" + wrapIfMissing("a/b/c", '/') + "\",");
+        System.out.println("  \"g\": \"" + wrapIfMissing("/a/b/c", '/') + "\",");
+        System.out.println("  \"h\": \"" + wrapIfMissing("a/b/c/", '/') + "\"");
+        System.out.println("}");
+    }
+    
+    private static String wrapIfMissing(String input, char wrapper) {
+        if (input == null) return null;
+        
+        boolean startsWithWrapper = !input.isEmpty() && input.charAt(0) == wrapper;
+        boolean endsWithWrapper = !input.isEmpty() && input.charAt(input.length() - 1) == wrapper;
+        
+        if (startsWithWrapper && endsWithWrapper) {
+            return input;
+        }
+        
+        StringBuilder sb = new StringBuilder(input);
+        if (!startsWithWrapper) {
+            sb.insert(0, wrapper);
+        }
+        if (!endsWithWrapper) {
+            sb.append(wrapper);
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "'",
+  "c": "xabx",
+  "d": "'ab'",
+  "e": "/",
+  "f": "/a/b/c/",
+  "g": "/a/b/c/",
+  "h": "/a/b/c/"
+}
+
+

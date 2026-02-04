@@ -1,0 +1,29 @@
+floor:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Integer> result = Arrays.asList(
+                (int) Math.floor(1.5),
+                (int) Math.floor(2.2),
+                (int) Math.floor(3)
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[1, 2, 3]
+
+

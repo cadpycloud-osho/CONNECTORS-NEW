@@ -1,0 +1,52 @@
+isKeyType:
+
+
+INPUT:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isKeyType(Class<?> type) {
+        return type == String.class;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class KeyTypeController {
+
+    @GetMapping("/isKeyType")
+    public Map<String, Boolean> checkKeyTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to "type AKey = Key"
+        Class<?> AKey = String.class;
+
+        result.put("a", TypeUtils.isKeyType(AKey));
+        result.put("b", TypeUtils.isKeyType(String.class));
+        result.put("c", TypeUtils.isKeyType(Boolean.class));
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

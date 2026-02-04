@@ -1,0 +1,67 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DocTypeAsStringProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // dw::xml::Dtd::docTypeAsString({rootName: "cXML", systemId: "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"})
+        String doctype = "cXML SYSTEM \"http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd\"";
+        
+        exchange.getIn().setBody("\"" + doctype + "\"");
+    }
+}
+from("direct:docTypeAsString")
+    .process(new DocTypeAsStringProcessor())
+    .log("${body}");
+
+
+output:
+
+
+"cXML SYSTEM \"http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd\""
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DocTypePublicIdProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // dw::xml::Dtd::docTypeAsString({rootName: "html", publicId: "...", systemId: "..."})
+        String doctype = "html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"";
+        
+        exchange.getIn().setBody("\"" + doctype + "\"");
+    }
+}
+
+from("direct:docTypePublicId")
+    .process(new DocTypePublicIdProcessor())
+    .log("${body}");
+
+output:
+
+"html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\""
+
+
+
+-------------------------------------------------------

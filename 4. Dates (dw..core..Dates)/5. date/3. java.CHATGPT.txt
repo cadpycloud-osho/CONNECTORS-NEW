@@ -1,0 +1,28 @@
+date:
+
+
+
+input:
+
+import java.time.LocalDate;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Equivalent of DataWeave date({year: 2012, month: 10, day: 11})
+        LocalDate newDate = LocalDate.of(2012, 10, 11);
+
+        System.out.println("{ \"newDate\": \"" + newDate + "\" }");
+    }
+}
+
+
+
+output:
+
+
+{
+  "newDate": "2012-10-11"
+}
+

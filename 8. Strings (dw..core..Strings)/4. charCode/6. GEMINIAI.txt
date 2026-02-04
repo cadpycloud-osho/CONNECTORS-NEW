@@ -1,0 +1,42 @@
+charCode:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class CharcodeController {
+
+    /**
+     * Equivalent to the DataWeave expression: { "charCode" : charCode("Mule") }
+     * It gets the ASCII/Unicode value of the first character of the input string.
+     * The input parameter is hardcoded to "Mule" to match the original example.
+     */
+    @GetMapping("/get-char-code")
+    public Map<String, Integer> getCharCode() {
+        String inputString = "Mule"; // The hardcoded input from the DataWeave example
+        
+        // 1. Get the first character of the string
+        char firstChar = inputString.charAt(0);
+        
+        // 2. Casting the char to an int gives its ASCII/Unicode value
+        int charCodeValue = (int) firstChar; 
+        
+        // 3. Return the result in the desired JSON format: { "charCode" : 77 }
+        return Collections.singletonMap("charCode", charCodeValue);
+    }
+}
+
+output:
+
+
+{
+  "charCode": 77
+}
+

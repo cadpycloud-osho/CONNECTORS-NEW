@@ -1,0 +1,47 @@
+cos:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = executeCosTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Double> executeCosTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("cos0", cos(0.0));
+        result.put("cos13", cos(0.13));
+        result.put("cos-1", cos(-1.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave cos() equivalent:
+     * Returns cosine of x (in radians)
+     */
+    public static Double cos(double x) {
+        return Math.cos(x);
+    }
+}
+
+
+
+output:
+
+{
+  cos0=1.0,
+  cos13=0.9915618937147881,
+  cos-1=0.5403023058681398
+}
+
+
+

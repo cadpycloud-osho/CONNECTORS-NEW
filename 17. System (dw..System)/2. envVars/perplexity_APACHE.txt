@@ -1,0 +1,31 @@
+envVars
+
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Map;
+import java.util.HashMap;
+
+public class EnvVarsProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // dw::System::envVars().SHELL equivalent
+        String shellValue = System.getenv("SHELL");
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("envVars", shellValue);  // Direct value assignment
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+
+
+output:
+
+{ "envVars": "/bin/bash" }
+
+

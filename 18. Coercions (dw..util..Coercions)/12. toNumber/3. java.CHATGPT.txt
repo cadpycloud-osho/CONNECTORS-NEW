@@ -1,0 +1,170 @@
+toNumber:
+
+example 1:
+
+
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // a
+        Double a = toNumber("0.005", new String[]{ "seconds", ".00" });
+
+        // b
+        String b = tryToNumber("0.005", new String[]{ "seconds" });
+
+        System.out.println("a = " + a);
+        System.out.println("b = " + b);
+    }
+
+    private static Double toNumber(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                if (format.equals(".00")) {
+                    DecimalFormat df = new DecimalFormat("#.00");
+                    return df.parse(value).doubleValue();
+                }
+                if (format.equals("seconds")) {
+                    throw new ParseException("Unsupported format 'seconds'", 0);
+                }
+            } catch (ParseException ignored) {}
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    private static String tryToNumber(String value, String[] formats) {
+        try {
+            return String.valueOf(toNumber(value, formats));
+        } catch (RuntimeException e) {
+            return e.getMessage();
+        }
+    }
+}
+
+
+output:
+
+
+a = 0.005
+b = Could not find a valid formatter for '0.005'
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String dateTimeString = "2015-10-01T23:57:59Z";
+
+        ZonedDateTime zdt = ZonedDateTime.parse(dateTimeString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        Instant instant = zdt.toInstant();
+
+        Map<String, Long> result = new HashMap<>();
+        result.put("epoch", instant.getEpochSecond());
+        result.put("millis", instant.toEpochMilli());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{epoch=1443743879, millis=1443743879000}
+
+
+--------------------------------------------------------------
+
+
+example 3:
+
+
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) throws ParseException {
+
+        Map<String, Number> result = new HashMap<>();
+
+        // default
+        result.put("default", toNumber("1.0", null, null));
+
+        // with format
+        result.put("withFormat", toNumber("0.005", ".00", null));
+
+        // with locale
+        result.put("withLocal", toNumber("1,25", "#.##", "ES"));
+
+        // with extra placeholders
+        result.put("withExtraPlaceholders", toNumber("5.55", "####.####", null));
+
+        // keyToNumber
+        String myKey = "123";
+        result.put("keyToNumber", toNumber(myKey, null, null));
+
+        System.out.println(result);
+    }
+
+    private static Number toNumber(String value, String pattern, String localeStr) throws ParseException {
+
+        DecimalFormat df;
+        if (pattern != null) {
+            if (localeStr != null) {
+                Locale locale = new Locale(localeStr);
+                DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+                df = new DecimalFormat(pattern, symbols);
+            } else {
+                df = new DecimalFormat(pattern);
+            }
+        } else {
+            if (localeStr != null) {
+                Locale locale = new Locale(localeStr);
+                DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+                df = new DecimalFormat("#.###", symbols);
+            } else {
+                df = new DecimalFormat();
+            }
+        }
+        return df.parse(value).doubleValue();
+    }
+}
+
+
+output:
+
+{default=1.0, withFormat=0.005, withLocal=1.25, withExtraPlaceholders=5.55, keyToNumber=123.0}
+
+
+--------------------------------------------------------------
+
+
+

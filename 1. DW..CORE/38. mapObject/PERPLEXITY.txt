@@ -1,0 +1,126 @@
+mapObject:
+
+example 1:
+
+input:
+
+
+// MapObjectIndexSwapApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class MapObjectIndexSwapApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MapObjectIndexSwapApp.class, args);
+
+        Map<String, String> originalMap = Map.of("a", "b", "c", "d");
+
+        AtomicInteger index = new AtomicInteger(0);
+        Map<Integer, Map<String, String>> mapped = originalMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                e -> index.getAndIncrement(),
+                e -> Map.of(e.getValue(), e.getKey()),
+                (a, b) -> b, LinkedHashMap::new
+            ));
+
+        System.out.println(mapped);
+    }
+}
+
+
+output:
+
+
+{0={b=a}, 1={d=c}}
+
+__________________________________________________________________________
+example 2:
+
+
+input:
+
+// MapObjectPricesApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
+import java.io.ByteArrayInputStream;
+import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class MapObjectPricesApp {
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(MapObjectPricesApp.class, args);
+
+        String xml = "<prices>" +
+                     "<basic>9.99</basic>" +
+                     "<premium>53</premium>" +
+                     "<vip>398.99</vip>" +
+                     "</prices>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        Element root = doc.getDocumentElement();
+        NodeList priceNodes = root.getChildNodes();
+
+        Map<String, String> updatedPrices = new LinkedHashMap<>();
+        DecimalFormat df = new DecimalFormat("##.00");
+
+        for (int i = 0; i < priceNodes.getLength(); i++) {
+            Node node = priceNodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                String key = node.getNodeName();
+                String valueStr = node.getTextContent();
+                double value = Double.parseDouble(valueStr);
+                double newValue = value + 5;
+                updatedPrices.put(key, df.format(newValue));
+            }
+        }
+
+        System.out.println(updatedPrices);
+        // Example XML Output construction is omitted as console cannot print XML directly.
+        // The updatedPrices map is as follows:
+        // {basic=14.99, premium=58.00, vip=403.99}
+    }
+}
+
+
+output:
+
+{basic=14.99, premium=58.00, vip=403.99}
+
+
+__________________________________________________________________________
+example 3:
+
+input:
+
+Empty prices XML input produces empty output
+For an empty <prices></prices> element, the same code above would result in an empty map:
+
+
+{}
+
+
+
+
+
+
+
+
+

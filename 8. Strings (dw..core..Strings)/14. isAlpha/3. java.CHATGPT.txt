@@ -1,0 +1,41 @@
+isAlpha:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isAlpha(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return false;
+        }
+        return input.matches("^[A-Za-z]+$");
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        result.put("a", isAlpha(null));
+        result.put("b", isAlpha(""));
+        result.put("c", isAlpha("  "));
+        result.put("d", isAlpha("abc"));
+        result.put("e", isAlpha("ab2c"));
+        result.put("f", isAlpha("ab-c"));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=false, b=false, c=false, d=true, e=false, f=false}
+
+
+
+

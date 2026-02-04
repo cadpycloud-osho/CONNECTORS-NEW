@@ -1,0 +1,37 @@
+joinBy:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class JoinByController {
+
+    @GetMapping("/join-by")
+    public Map<String, String> hyphenate() {
+        List<String> list = List.of("a", "b", "c");
+
+        String joinedString = String.join("-", list);
+
+        Map<String, String> response = new LinkedHashMap<>();
+        response.put("hyphenate", joinedString);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "hyphenate": "a-b-c"
+}
+
+
+
+

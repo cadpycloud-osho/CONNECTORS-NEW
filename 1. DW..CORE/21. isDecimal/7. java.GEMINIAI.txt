@@ -1,0 +1,78 @@
+isDecimal:
+
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    // --- Utility Methods to replicate DataWeave's isDecimal() behavior ---
+    
+    /**
+     * Handles numeric types (like 1.1).
+     * Returns true if the number has a fractional part (i.e., it's not a whole number).
+     */
+    public static boolean isDecimal(double number) {
+        // A number is a decimal if it is not equal to the closest long (integer) representation
+        return number != (long) number;
+    }
+
+    /**
+     * Handles Integer types (like 1).
+     * For primitive ints, the result is always false, as an int is never a decimal.
+     */
+    public static boolean isDecimal(int number) {
+        return false;
+    }
+
+    /**
+     * Handles String types (like "1.1").
+     * Returns true if the string, when trimmed, contains a decimal separator (.).
+     */
+    public static boolean isDecimal(String str) {
+        if (str == null) {
+            return false;
+        }
+        // DataWeave allows parsing strings like "1.1". We check for a decimal point.
+        // We use try-catch to ensure it's a valid number format before checking for the point.
+        try {
+            Double.parseDouble(str.trim());
+            return str.trim().contains(".");
+        } catch (NumberFormatException e) {
+            // If it's not a valid number format, it can't be a decimal (or any number).
+            return false;
+        }
+    }
+
+    public static void main(String[] args) {
+        
+        // --- DataWeave Expressions to be evaluated ---
+        
+        // isDecimal(1.1) -> Passes to isDecimal(double)
+        boolean result1 = isDecimal(1.1);
+        
+        // isDecimal(1) -> Passes to isDecimal(int)
+        boolean result2 = isDecimal(1);
+        
+        // isDecimal("1.1") -> Passes to isDecimal(String)
+        boolean result3 = isDecimal("1.1");
+
+        // Collect the results into a List (equivalent to the JSON array output)
+        List<Boolean> outputList = Arrays.asList(result1, result2, result3);
+
+        System.out.println("--- DataWeave isDecimal() Conversion ---");
+        System.out.println("Output: " + outputList);
+    }
+}
+
+
+output:
+
+[true, false, true]
+
+
+

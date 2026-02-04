@@ -1,0 +1,145 @@
+mapObject:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MapObjectRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapObject")
+            .setBody(simple("{\"a\":\"b\",\"c\":\"d\"}"))
+            .unmarshal().json(JsonLibrary.Jackson)
+            .process(exchange -> {
+                Map<String, String> input = exchange.getIn().getBody(Map.class);
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                int index = 0;
+                for (Map.Entry<String, String> entry : input.entrySet()) {
+                    String key = entry.getKey();     // "a", "c"
+                    String value = entry.getValue(); // "b", "d"
+                    
+                    // Create nested object: { value: key }
+                    Map<String, String> nested = new LinkedHashMap<>();
+                    nested.put(value, key);
+                    
+                    // Use index as top-level key
+                    result.put(String.valueOf(index), nested);
+                    index++;
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "0": { "b": "a" }, "1": { "d": "c" } }
+
+-----------------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+
+public class MapObjectPricesRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:mapObjectPrices")
+            .setBody(simple("<?xml version='1.0' encoding='UTF-8'?><prices><basic>9.99</basic><premium>53</premium><vip>398.99</vip></prices>"))
+            .process(exchange -> {
+                Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new ByteArrayInputStream(exchange.getIn().getBody(String.class).getBytes()));
+                
+                Element prices = (Element) doc.getElementsByTagName("prices").item(0);
+                NodeList priceNodes = prices.getChildNodes();
+                
+                for (int i = 0; i < priceNodes.getLength(); i++) {
+                    Node node = priceNodes.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element priceElem = (Element) node;
+                        String priceText = priceElem.getTextContent();
+                        
+                        // Add 5 and format to 2 decimals
+                        double newPrice = Double.parseDouble(priceText) + 5;
+                        String formatted = String.format("%.2f", newPrice);
+                        
+                        priceElem.setTextContent(formatted);
+                    }
+                }
+                
+                // Convert back to XML string
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                TransformerFactory.newInstance().newTransformer()
+                    .transform(new DOMSource(doc), new StreamResult(baos));
+                
+                exchange.getIn().setBody(baos.toString("UTF-8"));
+            })
+            .setHeader("Content-Type", constant("application/xml"))
+            .to("log:output?showAll=true");
+    }
+}
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+    <basic>9.99</basic>
+    <premium>53</premium>
+    <vip>398.99</vip>
+</prices>
+
+
+output:
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+  <basic>14.99</basic>
+  <premium>58.00</premium>
+  <vip>403.99</vip>
+</prices>
+
+
+
+-----------------------------------------------------------------
+
+example 3:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+
+public class EmptyPricesRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:emptyPrices")
+            .setBody(simple("<?xml version='1.0' encoding='UTF-8'?><prices></prices>"))
+            // No transformation needed - pass through unchanged
+            .setHeader("Content-Type", constant("application/xml"))
+            .to("log:output?showAll=true");
+    }
+}
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+
+
+output:
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+
+-----------------------------------------------------------------

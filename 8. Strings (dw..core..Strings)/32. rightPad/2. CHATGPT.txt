@@ -1,0 +1,62 @@
+rightPad:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String rightPad(String input, int length) {
+        if (input == null) return null;
+        if (length <= input.length()) return input;
+
+        int paddingLength = length - input.length();
+        StringBuilder sb = new StringBuilder(input);
+
+        for (int i = 0; i < paddingLength; i++) {
+            sb.append(' ');
+        }
+
+        return sb.toString();
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class RightPadController {
+
+    @GetMapping("/rightpad")
+    public Map<String, String> rightPadExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.rightPad(null, 3));
+        result.put("b", StringUtils.rightPad("", 3));
+        result.put("c", StringUtils.rightPad("bat", 5));
+        result.put("d", StringUtils.rightPad("bat", 3));
+        result.put("e", StringUtils.rightPad("bat", -1));
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}
+

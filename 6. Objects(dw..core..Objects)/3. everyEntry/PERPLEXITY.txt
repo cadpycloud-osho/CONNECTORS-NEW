@@ -1,0 +1,93 @@
+everyEntry:
+
+
+
+input:
+
+package com.example.everyentry;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class EveryEntryApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EveryEntryApplication.class, args);
+    }
+}
+
+@RestController
+class EveryEntryController {
+
+    @GetMapping("/every-entry")
+    public Map<String, Boolean> testEveryEntry() {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // a: empty map => everyEntry(...) => true (vacuous truth)
+        Map<String, Object> mapA = Map.of();
+        result.put("a", everyEntry(mapA, (v, k) -> v instanceof String));
+
+        // b: {a: "", b: "123"}
+        Map<String, Object> mapB = Map.of("a", "", "b", "123");
+        result.put("b", everyEntry(mapB, (v, k) -> v instanceof String));
+
+        // c: {a: "", b: 123}
+        Map<String, Object> mapC = Map.of("a", "", "b", 123);
+        result.put("c", everyEntry(mapC, (v, k) -> v instanceof String));
+
+        // d: {a: "", b: 123}, condition: key == "a"
+        Map<String, Object> mapD = Map.of("a", "", "b", 123);
+        result.put("d", everyEntry(mapD, (v, k) -> "a".equals(k)));
+
+        // e: {a: ""}, condition: key == "a"
+        Map<String, Object> mapE = Map.of("a", "");
+        result.put("e", everyEntry(mapE, (v, k) -> "a".equals(k)));
+
+        // f: null map => expected true (DataWeave returns true for null input)
+        Map<String, Object> mapF = null;
+        result.put("f", everyEntry(mapF, (v, k) -> "a".equals(k)));
+
+        return result;
+    }
+
+    /**
+     * Checks if for every entry in the map the predicate returns true.
+     * If the map is null or empty, returns true (vacuous truth).
+     */
+    private boolean everyEntry(Map<String, Object> map, EntryPredicate predicate) {
+        if (map == null || map.isEmpty()) {
+            return true;
+        }
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (!predicate.test(entry.getValue(), entry.getKey())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @FunctionalInterface
+    interface EntryPredicate {
+        boolean test(Object value, String key);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false,
+  "d": false,
+  "e": true,
+  "f": true
+}
+
+

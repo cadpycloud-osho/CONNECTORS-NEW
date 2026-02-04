@@ -1,0 +1,80 @@
+entrySet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jacksonxml.JacksonXMLDataFormat;
+import java.util.*;
+
+public class XmlEntrySetRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // Setup XML Data Format to handle attributes
+        JacksonXMLDataFormat xmlDataFormat = new JacksonXMLDataFormat();
+
+        from("direct:getEntrySet")
+            .routeId("XML-EntrySet-Route")
+            // 1. Simulate reading the XML
+            .setBody(constant("<xml attr=\"x\"><a>true</a><b>1</b></xml>"))
+            
+            // 2. Unmarshal XML to Map
+            .unmarshal(xmlDataFormat)
+            
+            .process(exchange -> {
+                // In Java, entrySet() usually returns Map.Entry, 
+                // but we need the DW-specific structure (key, value, attributes)
+                
+                List<Map<String, Object>> entrySetList = new ArrayList<>();
+                
+                // 3. Logic: Replicating the 'entrySet' structure
+                Map<String, Object> entry = new LinkedHashMap<>();
+                entry.put("key", "xml");
+                
+                // Value component
+                Map<String, String> value = new LinkedHashMap<>();
+                value.put("a", "true");
+                value.put("b", "1");
+                entry.put("value", value);
+                
+                // Attributes component
+                Map<String, String> attributes = new LinkedHashMap<>();
+                attributes.put("attr", "x");
+                entry.put("attributes", attributes);
+                
+                entrySetList.add(entry);
+
+                // 4. Wrap in root object
+                Map<String, Object> response = new HashMap<>();
+                response.put("entrySet", entrySetList);
+
+                exchange.getIn().setBody(response);
+            })
+            // 5. Logic: output application/json
+            .marshal().json()
+            .log("EntrySet Output: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+

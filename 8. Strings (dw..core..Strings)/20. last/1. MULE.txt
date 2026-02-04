@@ -1,0 +1,41 @@
+last:
+
+last(text: String, amount: Number): String
+
+last(text: String, amount: Number): String
+Returns characters from the end of string to a specified number of characters, for example, the last two characters of a string.
+
+Source
+%dw 2.0
+import last from dw::core::Strings
+output application/json
+---
+"hello world!" last 6
+
+DataWeave
+Output
+"world!"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

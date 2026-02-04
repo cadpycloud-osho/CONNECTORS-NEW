@@ -1,0 +1,86 @@
+try:
+
+public class FunctionFailureException extends RuntimeException {
+    public FunctionFailureException(String message) {
+        super(message);
+    }
+}
+input:
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+import java.util.Random;
+
+@Service
+public class RandomTryService {
+
+    private final Random random = new Random();
+
+    /**
+     * Replicates the DW function randomNumber().
+     * Throws an exception 50% of the time.
+     */
+    public String randomNumber() {
+        if (random.nextDouble() > 0.5) {
+            // Equivalent to DW fail("This function is failing")
+            throw new FunctionFailureException("This function is failing");
+        } else {
+            // Equivalent to DW else "OK"
+            return "OK";
+        }
+    }
+
+    /**
+     * Replicates the main DW expression: try(() -> randomNumber())
+     * Wraps the execution in a try-catch to return the DW result object structure.
+     */
+    public Map<String, Object> executeTry() {
+        try {
+            String result = randomNumber();
+            
+            // Replicates the DW Success Output
+            return Map.of(
+                "success", true,
+                "result", result
+            );
+
+        } catch (FunctionFailureException e) {
+            // Replicates the DW Failure Output
+            return Map.of(
+                "success", false,
+                "error", Map.of(
+                    "kind", e.getClass().getSimpleName(),
+                    "message", e.getMessage(),
+                    "location", "Unknown location",
+                    "stack", new String[]{"main (Spring Boot)"} // Simplified stack trace
+                )
+            );
+        }
+    }
+}
+
+output:
+
+Case 1: randomNumber() Fails
+
+JSON
+
+{
+  "success": false,
+  "error": {
+    "kind": "FunctionFailureException",
+    "message": "This function is failing",
+    "location": "Unknown location",
+    "stack": ["main (Spring Boot)"]
+  }
+}
+Case 2: randomNumber() Succeeds
+
+JSON
+
+{
+  "success": true,
+  "result": "OK"
+}
+
+

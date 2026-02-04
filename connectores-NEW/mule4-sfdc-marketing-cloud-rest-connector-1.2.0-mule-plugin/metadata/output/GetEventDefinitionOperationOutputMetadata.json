@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "createdDate": {
+      "type": "string"
+    },
+    "createdBy": {
+      "type": "integer"
+    },
+    "modifiedDate": {
+      "type": "string"
+    },
+    "modifiedBy": {
+      "type": "integer"
+    },
+    "mode": {
+      "type": "string"
+    },
+    "eventDefinitionKey": {
+      "type": "string"
+    },
+    "dataExtensionId": {
+      "type": "string"
+    },
+    "dataExtensionName": {
+      "type": "string"
+    },
+    "schema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "dataType": {
+                  "type": "string"
+                },
+                "maxLength": {
+                  "type": "string"
+                },
+                "isNullable": {
+                  "type": "boolean"
+                },
+                "defaultValue": {
+                  "type": "string"
+                },
+                "isPrimaryKey": {
+                  "type": "boolean"
+                },
+                "isDevicePreference": {
+                  "type": "boolean"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "dataType": {
+                  "type": "string"
+                },
+                "maxLength": {
+                  "type": "string"
+                },
+                "isNullable": {
+                  "type": "boolean"
+                },
+                "defaultValue": {
+                  "type": "string"
+                },
+                "isPrimaryKey": {
+                  "type": "boolean"
+                },
+                "isDevicePreference": {
+                  "type": "boolean"
+                }
+              }
+            }
+          ]
+        },
+        "sendableCustomObjectField": {
+          "type": "string"
+        },
+        "sendableSubscriberField": {
+          "type": "string"
+        },
+        "isPlatformObject": {
+          "type": "boolean"
+        }
+      }
+    },
+    "sourceApplicationExtensionId": {
+      "type": "string"
+    },
+    "filterDefinitionId": {
+      "type": "string"
+    },
+    "filterDefinitionTemplate": {
+      "type": "string"
+    },
+    "iconUrl": {
+      "type": "string"
+    },
+    "arguments": {
+      "type": "object",
+      "properties": {
+        "serializedObjectType": {
+          "type": "integer"
+        },
+        "eventDefinitionId": {
+          "type": "string"
+        },
+        "eventDefinitionKey": {
+          "type": "string"
+        },
+        "dataExtensionId": {
+          "type": "string"
+        },
+        "criteria": {
+          "type": "string"
+        }
+      }
+    },
+    "metaData": {
+      "type": "object",
+      "properties": {
+        "scheduleState": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "scheduleState"
+      ]
+    },
+    "interactionCount": {
+      "type": "integer"
+    },
+    "isVisibleInPicker": {
+      "type": "boolean"
+    },
+    "isPlatformObject": {
+      "type": "boolean"
+    },
+    "category": {
+      "type": "string"
+    },
+    "publishedInteractionCount": {
+      "type": "integer"
+    },
+    "automationId": {
+      "type": "string"
+    },
+    "disableDEDataLogging": {
+      "type": "boolean"
+    }
+  }
+}

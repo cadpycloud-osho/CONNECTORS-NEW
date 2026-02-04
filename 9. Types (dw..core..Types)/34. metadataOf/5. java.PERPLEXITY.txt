@@ -1,0 +1,29 @@
+metadataOf:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        
+        // Simulate metadataOf(AType) where AType = String {format: "YYYY-MM-dd"}
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("format", "YYYY-MM-dd");
+        
+        result.put("a", metadata);
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a={format=YYYY-MM-dd}}
+

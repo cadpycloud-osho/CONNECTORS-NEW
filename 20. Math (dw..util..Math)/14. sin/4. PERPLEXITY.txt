@@ -1,0 +1,65 @@
+sin:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveMathSinApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveMathSinApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/math/sin")
+@RequiredArgsConstructor
+class SinController {
+    
+    private final MathService mathService;
+    
+    @GetMapping("/test")
+    public Map<String, Double> testSin() {
+        return mathService.executeSinTests();
+    }
+}
+
+@Service
+class MathService {
+    
+    public Map<String, Double> executeSinTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("sin0", sin(0.0));
+        result.put("sin13", sin(0.13));
+        result.put("sin-1", sin(-1.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave sin() equivalent:
+     * Returns sine of x (in radians)
+     */
+    public Double sin(double x) {
+        return Math.sin(x);
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+
+{
+  "sin0": 0.0,
+  "sin13": 0.12963414261969486,
+  "sin-1": -0.8414709848078965
+}
+
+

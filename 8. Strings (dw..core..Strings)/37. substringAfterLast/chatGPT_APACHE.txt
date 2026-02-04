@@ -1,0 +1,51 @@
+substringAfterLast:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringAfterLastExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringAfterLast(null, "'"));
+        result.put("b", substringAfterLast("", "-"));
+        result.put("c", substringAfterLast("abc", "b"));
+        result.put("d", substringAfterLast("abcba", "b"));
+        result.put("e", substringAfterLast("abc", "d"));
+        result.put("f", substringAfterLast("abc", ""));
+
+        System.out.println(result);
+    }
+
+    public static String substringAfterLast(String value, String delimiter) {
+        if (value == null) {
+            return null;
+        }
+        if (delimiter == null || delimiter.isEmpty()) {
+            return null; // DW returns null if delimiter is empty
+        }
+        int index = value.lastIndexOf(delimiter);
+        if (index == -1) {
+            return "";
+        }
+        return value.substring(index + delimiter.length());
+    }
+}
+
+
+output:
+
+
+{
+ "a": null,
+ "b": "",
+ "c": "c",
+ "d": "a",
+ "e": "",
+ "f": null
+}
+
+

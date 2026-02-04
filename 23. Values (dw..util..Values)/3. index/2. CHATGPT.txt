@@ -1,0 +1,71 @@
+index:
+
+
+index:
+
+package com.example.demo.model;
+
+public class ValueDescriptor {
+
+    private String kind;
+    private String namespace;
+    private int selector;
+
+    public ValueDescriptor(String kind, String namespace, int selector) {
+        this.kind = kind;
+        this.namespace = namespace;
+        this.selector = selector;
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public int getSelector() {
+        return selector;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.model.ValueDescriptor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class IndexController {
+
+    @GetMapping("/index")
+    public ValueDescriptor getIndexDescriptor() {
+        // Equivalent to DataWeave index(0)
+        return new ValueDescriptor("Array", null, 0);
+    }
+}
+
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+output:
+
+
+{
+  "kind": "Array",
+  "namespace": null,
+  "selector": 0
+}
+

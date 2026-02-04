@@ -1,0 +1,36 @@
+daysBetween:
+
+
+
+input:
+
+
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Input date-time strings
+        String startDateTime = "2016-10-01T23:57:59-03:00";
+        String endDateTime   = "2017-10-01T23:57:59-03:00";
+
+        // Parse strings to OffsetDateTime
+        OffsetDateTime start = OffsetDateTime.parse(startDateTime);
+        OffsetDateTime end   = OffsetDateTime.parse(endDateTime);
+
+        // Calculate days between
+        long days = ChronoUnit.DAYS.between(start, end);
+
+        // Print output
+        System.out.println("{ \"days\" : " + days + " }");
+    }
+}
+
+
+output:
+
+{ "days" : 365 }
+
+

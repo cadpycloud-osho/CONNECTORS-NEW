@@ -1,0 +1,27 @@
+version:
+
+
+input:
+
+
+import java.util.*;
+
+public class DWVersionSimulation {
+
+    public static void main(String[] args) {
+
+        // Simulate DataWeave version
+        String version = "2.5";
+
+        System.out.println(version);  // Output: "2.5"
+    }
+}
+
+
+
+output:
+
+
+"2.5"
+
+

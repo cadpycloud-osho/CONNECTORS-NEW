@@ -1,0 +1,300 @@
+reduce:
+
+example 1:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
+@RestController
+public class Reduce1Controller {
+
+    @GetMapping("/reduce1")
+    public Integer reduceExample1() {
+        List<Integer> numbers = List.of(2, 3);
+        return numbers.stream().reduce((a, b) -> a + b).orElse(null);
+    }
+}
+
+
+output:
+
+5
+
+
+------------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class Reduce2Controller {
+
+    @GetMapping("/reduce2")
+    public Map<String, Object> reduceExample2() {
+        List<Integer> nums = List.of(1, 2, 3, 4);
+
+        int sum = nums.stream().reduce(0, Integer::sum);
+
+        String concat = nums.stream()
+                .map(String::valueOf)
+                .reduce("", String::concat);
+
+        List<Integer> emptyList = List.of();
+        String emptyReduce = emptyList.isEmpty() ? null :
+                emptyList.stream().map(String::valueOf).reduce("", String::concat);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("sum", sum);
+        response.put("concat", concat);
+        response.put("emptyList", emptyReduce);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "sum": 10,
+  "concat": "1234",
+  "emptyList": null
+}
+
+
+------------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+package com.example.demo.controllers;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class ReduceExample3Controller {
+
+    @GetMapping("/reduce/example3")
+    public Map<String, Object> getReduceOperations() {
+
+        List<String> concatList = Arrays.asList("a", "b", "c", "d");
+        List<Integer> sumList = Arrays.asList(0, 1, 2, 3, 4, 5);
+        List<Integer> multiplyList1 = Arrays.asList(2, 3, 3);
+        List<Integer> multiplyList2 = Arrays.asList(2, 2, 3);
+
+        // concat reduce
+        String concat = concatList.stream()
+                .reduce("z", (acc, item) -> acc + item);
+
+        // sum reduce
+        int sum = sumList.stream()
+                .reduce(3, Integer::sum);
+
+        // multiply (no initial accumulator: first element used as acc)
+        int multiply = multiplyList1.stream()
+                .reduce((acc, item) -> acc * item)
+                .orElse(0);
+
+        // multiply with initial default 3
+        int multiplyAcc = multiplyList2.stream()
+                .reduce(3, (acc, item) -> acc * item);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("concat", concat);
+        response.put("sum", sum);
+        response.put("multiply", multiply);
+        response.put("multiplyAcc", multiplyAcc);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "concat": "zabcd",
+  "sum": 18,
+  "multiply": 18,
+  "multiplyAcc": 36
+}
+
+
+------------------------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+package com.example.demo.controllers;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class ReduceExample4Controller {
+
+    @GetMapping("/reduce/example4")
+    public Map<String, Object> getExample4() {
+
+        Map<String, Object> myVar = new HashMap<>();
+        myVar.put("a", Arrays.asList(0, 1, 2, 3, 4, 5));
+        myVar.put("b", Arrays.asList("a", "b", "c", "d", "e"));
+        myVar.put("c", Arrays.asList(
+                Map.of("letter", "a"),
+                Map.of("letter", "b"),
+                Map.of("letter", "c")
+        ));
+        myVar.put("d", Arrays.asList(true, false, false, true, true));
+
+        List<Integer> aList = (List<Integer>) myVar.get("a");
+        List<String> bList = (List<String>) myVar.get("b");
+        List<Map<String, String>> cList = (List<Map<String, String>>) myVar.get("c");
+        List<Boolean> dList = (List<Boolean>) myVar.get("d");
+
+        Map<String, Object> out = new LinkedHashMap<>();
+
+        out.put("a", aList.isEmpty() ? null : aList.get(0));
+        out.put("b", bList.isEmpty() ? null : bList.get(0));
+        out.put("c", cList.stream().reduce("z", (acc, item) -> acc + item.get("letter"), (a,b)->a));
+        out.put("d", cList.isEmpty() ? null : cList.get(0));
+        out.put("e", dList.stream().reduce((acc, item) -> acc && item).orElse(false));
+        out.put("f", dList.stream().reduce(true, (acc, item) -> acc && item));
+        out.put("g", dList.stream().reduce(false, (acc, item) -> acc && item));
+        out.put("h", dList.isEmpty() ? null : dList.get(0));
+
+        out.put("i", aList.stream().reduce(0, Integer::sum));
+        out.put("j", aList.stream().reduce(0, (acc, item) -> acc + item));
+        out.put("k", aList.stream().reduce(3, (acc, item) -> acc + item));
+        out.put("l", aList.get(0));
+
+        out.put("m", bList.stream().reduce("", (acc, item) -> acc + item));
+        out.put("n", bList.stream().reduce("", (acc, item) -> acc + item));
+        out.put("o", bList.stream().reduce("z", (acc, item) -> acc + item));
+        out.put("p", bList.get(0));
+
+        out.put("q", cList.stream().reduce("z", (acc, item) -> acc + item.get("letter"), (a,b)->a));
+        out.put("r", cList.get(0));
+
+        out.put("s", dList.stream().reduce((acc, item) -> acc && item).orElse(false));
+        out.put("t", dList.stream().reduce(true, (acc, item) -> acc && item));
+        out.put("u", dList.stream().reduce(false, (acc, item) -> acc && item));
+        out.put("v", dList.get(0));
+
+        List<Integer> w = new ArrayList<>();
+        for (int i = 0; i <= 4; i++) w.add(i);
+        out.put("w", w);
+
+        out.put("x", null);
+        out.put("y", 0);
+
+        return out;
+    }
+}
+
+
+output:
+
+
+{
+  "a": 0,
+  "b": "a",
+  "c": "zabc",
+  "d": { "letter": "a" },
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": true,
+  "i": 15,
+  "j": 15,
+  "k": 18,
+  "l": 0,
+  "m": "abcde",
+  "n": "abcde",
+  "o": "zabcde",
+  "p": "a",
+  "q": "zabc",
+  "r": { "letter": "a" },
+  "s": false,
+  "t": false,
+  "u": false,
+  "v": true,
+  "w": [0,1,2,3,4],
+  "x": null,
+  "y": 0
+}
+
+
+------------------------------------------------------------------------
+
+
+example 5:
+
+
+input:
+
+package com.example.demo.controllers;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ReduceExample5Controller {
+
+    @GetMapping("/reduce/example5")
+    public String reverseStringExample() {
+        String input = "hello world";
+        String result = "";
+
+        for (char item : input.toCharArray()) {
+            result = item + result;  // Same direction as DataWeave reduce logic
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+
+"dlrow olleh"
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,55 @@
+randomInt:
+
+
+input:
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Random;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // 1. Define the bound (1000 in the DW example)
+        int bound = 1000;
+        
+        // 2. Define the operation: randomInt(1000)
+        // Java equivalent: new Random().nextInt(1000) 
+        // This returns an integer between 0 (inclusive) and 1000 (exclusive), i.e., 0-999.
+        Random randomGenerator = new Random();
+        int randomValue = randomGenerator.nextInt(bound); 
+
+        // 3. Assemble the final data structure: { "price": randomValue } (using standard Map)
+        Map<String, Integer> outputMap = new HashMap<>();
+        outputMap.put("price", randomValue); 
+
+        // 4. Manually format the result into the required pretty-printed JSON
+        String outputJson = formatMapAsPrettyJson(outputMap);
+        
+        System.out.println(outputJson);
+    }
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Assuming only one entry: "price"
+        Map.Entry<String, Integer> entry = map.entrySet().iterator().next();
+        
+        // Output the key and the integer value
+        sb.append("  \"").append(entry.getKey()).append("\": ").append(entry.getValue()); 
+        
+        sb.append("\n}");
+        return sb.toString();
+    }
+}
+
+output:
+
+{
+  "price" : 753
+}

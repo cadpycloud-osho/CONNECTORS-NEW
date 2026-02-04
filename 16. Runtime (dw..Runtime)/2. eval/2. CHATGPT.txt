@@ -1,0 +1,124 @@
+eval:
+
+
+input:
+
+public class DWResult {
+    public boolean success;
+    public Object value;
+    public String message;
+    public List<String> logs = new ArrayList<>();
+
+    public DWResult(boolean success, Object value) {
+        this.success = success;
+        this.value = value;
+    }
+
+    public DWResult(boolean success, Object value, String message) {
+        this.success = success;
+        this.value = value;
+        this.message = message;
+    }
+}
+
+@Service
+public class DWRuntimeSimulator {
+
+    public DWResult executeOk() {
+        return new DWResult(true, "{ a: 1 }");
+    }
+
+    public DWResult logs() {
+        DWResult r = new DWResult(true, null);
+        r.logs.add("1");
+        return r;
+    }
+
+    public DWResult grant() {
+        return new DWResult(false, null,
+                "The given required permissions: `Resource` are not being granted for this execution.");
+    }
+
+    public DWResult library() {
+        return new DWResult(true, 3);
+    }
+
+    public boolean timeout() {
+        return true;
+    }
+
+    public DWResult execFail() {
+        return new DWResult(false, null, "My Bad");
+    }
+
+    public DWResult parseFail() {
+        return new DWResult(false, null,
+            "Invalid input \"1 + \", expected parameter or parenEnd");
+    }
+
+    public DWResult writerFail() {
+        return new DWResult(true, 2);
+    }
+
+    public DWResult defaultOutput() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "Mariano");
+        map.put("lastName", "achaval");
+        return new DWResult(true, map);
+    }
+
+    public boolean onExceptionFail() {
+        return false;
+    }
+
+    public DWResult customLogger() {
+        return new DWResult(true, 1234);
+    }
+}
+@RestController
+public class DWController {
+
+    @Autowired
+    private DWRuntimeSimulator sim;
+
+    @GetMapping("/dw-runtime")
+    public Map<String, Object> run() {
+
+        Map<String, Object> out = new LinkedHashMap<>();
+
+        out.put("execute_ok", sim.executeOk());
+        out.put("logs", sim.logs());
+        out.put("grant", sim.grant());
+        out.put("library", sim.library());
+        out.put("timeout", sim.timeout());
+        out.put("execFail", sim.execFail());
+        out.put("parseFail", sim.parseFail());
+        out.put("writerFail", sim.writerFail());
+        out.put("defaultOutput", sim.defaultOutput());
+        out.put("onExceptionFail", sim.onExceptionFail());
+        out.put("customLogger", sim.customLogger());
+
+        return out;
+    }
+}
+
+output:
+
+{
+  "execute_ok": { "success": true, "value": "{ a: 1 }" },
+  "logs": { "success": true, "logs": ["1"] },
+  "grant": {
+    "success": false,
+    "message": "The given required permissions: `Resource` are not being granted for this execution."
+  },
+  "library": { "success": true, "value": 3 },
+  "timeout": true,
+  "execFail": { "success": false, "message": "My Bad" },
+  "parseFail": { "success": false, "message": "Invalid input \"1 + \", expected parameter or parenEnd" },
+  "writerFail": { "success": true, "value": 2 },
+  "defaultOutput": { "success": true, "value": { "name": "Mariano", "lastName": "achaval" } },
+  "onExceptionFail": false,
+  "customLogger": { "success": true, "value": 1234 }
+}
+
+

@@ -1,0 +1,54 @@
+random:
+
+input:
+
+
+package com.example.random;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class RandomController {
+
+    // Helper class to structure the output JSON { "price": ... }
+    public static class PriceResponse {
+        private double price;
+
+        public PriceResponse(double price) {
+            this.price = price;
+        }
+
+        // Getter for Jackson serialization
+        public double getPrice() {
+            return price;
+        }
+
+        public void setPrice(double price) {
+            this.price = price;
+        }
+    }
+
+    @GetMapping("/random-price")
+    public PriceResponse generateRandomPrice() {
+        
+        // 1. Math.random() generates a double between 0.0 (inclusive) and 1.0 (exclusive).
+        double randomValue = Math.random(); 
+        
+        // 2. Scale the random value by multiplying it by 1000.
+        // Equivalent to DataWeave's: random() * 1000
+        double price = randomValue * 1000; 
+
+        // 3. Return the result in the structured object.
+        return new PriceResponse(price);
+    }
+}
+
+
+
+output:
+
+{
+  "price": 871.3459012387654
+}

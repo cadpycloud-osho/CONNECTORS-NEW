@@ -1,0 +1,103 @@
+flatten:
+
+
+example 1:
+
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<List<Integer>> arrayOfArrays = Arrays.asList(
+                Arrays.asList(1, 2, 3),
+                Arrays.asList(4, 5, 6),
+                Arrays.asList(7, 8, 9)
+        );
+
+        List<Integer> flattened = arrayOfArrays
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        System.out.println(flattened);
+    }
+}
+
+
+output:
+
+
+[1,2,3,4,5,6,7,8,9]
+
+
+____________________________________________________________________
+
+
+example 2:
+
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    static class Person {
+        String name;
+        int id;
+
+        Person(String name, int id) {
+            this.name = name;
+            this.id = id;
+        }
+
+        @Override
+        public String toString() {
+            return "{name=" + name + ", id=" + id + "}";
+        }
+    }
+
+    public static void main(String[] args) {
+
+        List<List<Person>> nestedArrays = Arrays.asList(
+                Arrays.asList(
+                        new Person("Shoki", 5678),
+                        new Person("Mariano", 9123)
+                ),
+                Arrays.asList(
+                        new Person("Sai", 2001),
+                        new Person("Peter", 2002)
+                )
+        );
+
+        List<Person> flattened = nestedArrays
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        System.out.println(flattened);
+    }
+}
+
+
+
+output:
+
+[{name=Shoki, id=5678}, {name=Mariano, id=9123}, {name=Sai, id=2001}, {name=Peter, id=2002}]
+
+
+
+____________________________________________________________________
+
+
+
+

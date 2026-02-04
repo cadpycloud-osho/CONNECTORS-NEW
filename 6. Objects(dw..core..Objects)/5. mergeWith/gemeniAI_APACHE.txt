@@ -1,0 +1,56 @@
+mergeWith:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MergeWithRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:mergeObjects")
+            .routeId("Merge-Objects-Route")
+            .process(exchange -> {
+                // 1. First Object: { "a" : true, "b" : 1 }
+                Map<String, Object> map1 = new LinkedHashMap<>();
+                map1.put("a", true);
+                map1.put("b", 1);
+
+                // 2. Second Object: { "a" : false, "c" : "Test" }
+                Map<String, Object> map2 = new LinkedHashMap<>();
+                map2.put("a", false);
+                map2.put("c", "Test");
+
+                // 3. Logic: mergeWith
+                // Create a new Map and add all from map1, then map2
+                Map<String, Object> merged = new LinkedHashMap<>(map1);
+                merged.putAll(map2); // Overwrites existing keys with new values
+
+                // 4. Structure for JSON output
+                Map<String, Object> response = new HashMap<>();
+                response.put("mergeWith", merged);
+
+                exchange.getIn().setBody(response);
+            })
+            // 5. Logic: output application/json
+            .marshal().json()
+            .log("Merged Object: ${body}");
+    }
+}
+
+output:
+
+{
+  "mergeWith": {
+    "a": false,
+    "b": 1,
+    "c": "Test"
+  }
+}
+
+
+
+

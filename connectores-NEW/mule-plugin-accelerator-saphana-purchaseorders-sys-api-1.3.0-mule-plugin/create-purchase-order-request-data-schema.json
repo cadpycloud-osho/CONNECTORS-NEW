@@ -1,0 +1,352 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "items": {
+        "$ref": "#/definitions/PurchaseOrderExt"
+      },
+      "type": "array"
+    },
+    "PurchaseOrderExt": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default"
+        },
+        "orderLineItemsExt": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/PurchaseOrderItemExt"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "nativeId": {
+          "type": "string"
+        },
+        "companyCode": {
+          "type": "string"
+        },
+        "purchaseOrderNumber": {
+          "type": "string"
+        },
+        "paymentTerms": {
+          "type": "string"
+        },
+        "purchaseOrderDate": {
+          "$ref": "#/definitions/default_1"
+        },
+        "supplierId": {
+          "type": "string"
+        },
+        "purchasingOrganization": {
+          "type": "string"
+        },
+        "exported": {
+          "$ref": "#/definitions/default_2"
+        },
+        "orderLineItems": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/PurchaseOrderItem"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "externalIds": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/ExternalId"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "AuditInfo": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "isDeleted",
+        "createdBy",
+        "updatedBy",
+        "updatedDate",
+        "createdDate"
+      ],
+      "properties": {
+        "createdDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "isDeleted": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "default": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_1": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_2": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "PurchaseOrderItemExt": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "plant": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/definitions/default_3"
+        },
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "unitPrice": {
+          "$ref": "#/definitions/default_4"
+        },
+        "quantity": {
+          "$ref": "#/definitions/default_5"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "PurchaseOrderItem": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_3"
+        },
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "unitPrice": {
+          "$ref": "#/definitions/default_4"
+        },
+        "quantity": {
+          "$ref": "#/definitions/default_5"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "ExternalId": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "externalIdType",
+        "externalId",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_6"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "externalIdType": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/ExternalIdType"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "VALID",
+            "INVALID"
+          ],
+          "type": "string"
+        },
+        "statusLastChangedDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "default_3": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_4": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_5": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_6": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ExternalIdType": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_7"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "default_7": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

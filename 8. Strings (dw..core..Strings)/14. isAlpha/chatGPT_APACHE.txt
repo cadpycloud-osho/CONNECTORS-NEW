@@ -1,0 +1,51 @@
+isAlpha:
+
+
+input:
+
+import java.util.*;
+
+public class IsAlphaExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> output = new LinkedHashMap<>();
+
+        output.put("a", isAlpha(null));
+        output.put("b", isAlpha(""));
+        output.put("c", isAlpha("  "));
+        output.put("d", isAlpha("abc"));
+        output.put("e", isAlpha("ab2c"));
+        output.put("f", isAlpha("ab-c"));
+
+        System.out.println(output);
+    }
+
+    private static boolean isAlpha(String str) {
+        if (str == null || str.isEmpty()) return false;
+
+        for (char c : str.toCharArray()) {
+            if (!Character.isLetter(c)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+
+

@@ -1,0 +1,140 @@
+toLocalDateTime:
+
+
+
+example 1:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class LocalDateTimeController {
+
+    @GetMapping("/localDateTime")
+    public Map<String, String> getLocalDateTime() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: successful parsing using second formatter
+        result.put("a", toLocalDateTime(
+                "2003-10-01 23:57:59",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ss",
+                        "uuuu-MM-dd HH:mm:ss"
+                }
+        ));
+
+        // b: error message when no formatter matches
+        result.put("b", tryToLocalDateTime(
+                "2003-10-01 23:57:59",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ss"
+                }
+        ));
+
+        return result;
+    }
+
+    private String toLocalDateTime(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                LocalDateTime ldt = LocalDateTime.parse(value, formatter);
+                return ldt.toString(); // ISO-8601
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    private String tryToLocalDateTime(String value, String[] formats) {
+        try {
+            return toLocalDateTime(value, formats);
+        } catch (RuntimeException e) {
+            return e.getMessage();
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2003-10-01T23:57:59",
+  "b": "Could not find a valid formatter for '2003-10-01 23:57:59'"
+}
+
+------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class LocalDateTimeController {
+
+    @GetMapping("/localDateTime")
+    public Map<String, String> getLocalDateTimes() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: default ISO parsing
+        LocalDateTime a = LocalDateTime.parse("2015-10-01T23:57:59");
+        result.put("a", a.toString());
+
+        // b: custom format parsing
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
+        LocalDateTime b =
+                LocalDateTime.parse("2003-10-01 23:57:59", formatter);
+        result.put("b", b.toString());
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2015-10-01T23:57:59",
+  "b": "2003-10-01T23:57:59"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

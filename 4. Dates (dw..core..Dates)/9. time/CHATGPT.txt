@@ -1,0 +1,26 @@
+time:
+
+
+
+
+input:
+
+@GetMapping("/newTime")
+public Map<String, String> newTimeExample() {
+    
+    LocalTime time = LocalTime.of(12, 30, 40);
+    ZoneOffset zoneOffset = ZoneOffset.of("-03:00");
+
+    OffsetTime offsetTime = OffsetTime.of(time, zoneOffset);
+
+    return Map.of("newTime", offsetTime.toString());
+}
+
+
+output:
+
+{
+  "newTime": "12:30:40-03:00"
+}
+
+

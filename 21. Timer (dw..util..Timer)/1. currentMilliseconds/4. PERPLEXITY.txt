@@ -1,0 +1,58 @@
+currentMilliseconds:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveTimerCurrentMillisecondsApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTimerCurrentMillisecondsApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/timer")
+@RequiredArgsConstructor
+class TimerController {
+    
+    private final TimerService timerService;
+    
+    @GetMapping("/currentMilliseconds")
+    public Map<String, Long> currentMilliseconds() {
+        return timerService.getCurrentMilliseconds();
+    }
+}
+
+@Service
+class TimerService {
+    
+    /**
+     * DataWeave Timer.currentMilliseconds() equivalent:
+     * Returns current time in milliseconds since Unix epoch (January 1, 1970 00:00:00 GMT)
+     */
+    public Map<String, Long> getCurrentMilliseconds() {
+        return Map.of("currentMilliseconds", currentMilliseconds());
+    }
+    
+    public long currentMilliseconds() {
+        return System.currentTimeMillis();
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+
+output:
+
+
+{
+  "currentMilliseconds": 1734066423000
+}
+
+

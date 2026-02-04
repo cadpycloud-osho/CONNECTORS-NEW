@@ -1,0 +1,59 @@
+isObjectType:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    enum Kind { OBJECT_TYPE, ATTRIBUTE_TYPE }
+
+    static class PathSegment {
+        Kind kind;
+        String selector;
+        String namespace;
+
+        PathSegment(Kind kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        List<PathSegment> pathA = Arrays.asList(
+                new PathSegment(Kind.OBJECT_TYPE, "user", null),
+                new PathSegment(Kind.ATTRIBUTE_TYPE, "name", null)
+        );
+
+        List<PathSegment> pathB = Arrays.asList(
+                new PathSegment(Kind.OBJECT_TYPE, "user", null),
+                new PathSegment(Kind.OBJECT_TYPE, "name", null)
+        );
+
+        List<PathSegment> pathC = Collections.singletonList(
+                new PathSegment(Kind.OBJECT_TYPE, "user", null)
+        );
+
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("a", isObjectType(pathA));
+        result.put("b", isObjectType(pathB));
+        result.put("c", isObjectType(pathC));
+
+        System.out.println(result);
+    }
+
+    private static boolean isObjectType(List<PathSegment> path) {
+        return path.stream().allMatch(segment -> segment.kind == Kind.OBJECT_TYPE);
+    }
+}
+
+
+output:
+
+{a=false, b=true, c=true}
+
+

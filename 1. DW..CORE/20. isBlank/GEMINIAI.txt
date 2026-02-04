@@ -1,0 +1,53 @@
+isBlank:
+
+INPUT:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class DataWeaveIsBlankExample {
+
+    // Custom utility method to replicate DataWeave's isBlank behavior
+    public static boolean isBlank(String str) {
+        // DataWeave's isBlank returns true if the input is null.
+        if (str == null) {
+            return true;
+        }
+        // DataWeave's isBlank returns true if the string is empty or contains only whitespace.
+        // We use Java's built-in String.isBlank() (Java 11+) or trim().isEmpty() (older Java)
+        // Note: Using trim().isEmpty() for compatibility, though String.isBlank() is preferred in modern Java.
+        return str.trim().isEmpty();
+    }
+
+    public static void main(String[] args) {
+        // --- Simulate DataWeave Variables ---
+        String someString = "something";
+        String nullString = null;
+        
+        // Simulate payload.nonExistingValue which resolves to null in DW
+        String nonExistingValue = null; 
+
+        // --- Perform Operations and Collect Output ---
+        Map<String, Boolean> output = new LinkedHashMap<>();
+
+        // checking if the string is blank
+        output.put("emptyString", isBlank(""));              // true
+        output.put("stringWithSpaces", isBlank("     "));    // true
+        output.put("textString", isBlank(someString));       // false
+        output.put("somePayloadValue", isBlank(nonExistingValue)); // true
+        output.put("nullString", isBlank(nullString));       // true
+
+        // checking if the string is not blank (using Java's '!' operator)
+        output.put("notEmptyTextString", !isBlank(" 1234")); // true
+        output.put("notEmptyTextStringTwo", !isBlank(""));   // false
+
+        // Print Output
+        System.out.println("Input Logic: Custom isBlank() implementation");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+OUTPUT:
+
+
+{emptyString=true, stringWithSpaces=true, textString=false, somePayloadValue=true, nullString=true, notEmptyTextString=true, notEmptyTextStringTwo=false}

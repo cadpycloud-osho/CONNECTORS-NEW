@@ -1,0 +1,112 @@
+maxBy:
+
+EXAMPLE 1:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class MaxByExample1Controller {
+
+    @GetMapping("/maxBy1")
+    public Map<String, Integer> maxBy1() {
+        List<Map<String, Integer>> list = Arrays.asList(
+                Collections.singletonMap("a", 1),
+                Collections.singletonMap("a", 3),
+                Collections.singletonMap("a", 2)
+        );
+
+        // find max item by "a"
+        Map<String, Integer> max = list.stream()
+                .max(Comparator.comparing(m -> m.get("a")))
+                .orElse(null);
+
+        return max; // prints highest `a`
+    }
+}
+
+OUTPUT:
+
+{ "a": 3 }
+
+-------------------------------------------------------------------
+
+EXAMPLE 2:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.*;
+import java.util.*;
+
+@RestController
+public class MaxByExample2Controller {
+
+    @GetMapping("/maxBy2")
+    public Map<String, Object> maxBy2() {
+        ZonedDateTime dt1 = ZonedDateTime.parse("2017-10-01T22:57:59-03:00");
+        ZonedDateTime dt2 = ZonedDateTime.parse("2018-10-01T23:57:59-03:00");
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("byDateTime", Stream.of(dt1, dt2).max(ZonedDateTime::compareTo).orElse(null));
+        result.put("byDate", Stream.of(dt1.toLocalDate(), dt2.toLocalDate()).max(LocalDate::compareTo).orElse(null));
+        result.put("byTime", Stream.of(dt1.toOffsetDateTime(), dt2.toOffsetDateTime())
+                .max(OffsetDateTime::compareTo).orElse(null));
+        result.put("emptyArray", null);
+
+        Map<String, Object> wrapper = new HashMap<>();
+        wrapper.put("myMaxBy", result);
+        return wrapper;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "myMaxBy": {
+    "byDateTime": "2018-10-01T23:57:59-03:00",
+    "byDate": "2018-10-01",
+    "byTime": "2018-10-01T23:57:59-03:00",
+    "emptyArray": null
+  }
+}
+
+-------------------------------------------------------------------
+
+
+EXAMPLE 3:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class MaxByExample3Controller {
+
+    @GetMapping("/maxBy3")
+    public String maxBy3() {
+        List<String> items = Arrays.asList("A", "B", "C");
+
+        return items.stream().max(String::compareTo).orElse(null);
+    }
+}
+
+OUTPUT:
+
+"C"
+
+

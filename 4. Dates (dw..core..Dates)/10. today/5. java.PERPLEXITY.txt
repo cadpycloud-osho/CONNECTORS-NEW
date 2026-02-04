@@ -1,0 +1,27 @@
+today:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: today()
+        LocalDate today = LocalDate.now();
+        
+        // Output as JSON string matching DataWeave
+        String output = today.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        System.out.println("\"" + output + "\"");
+    }
+}
+
+
+
+output:
+
+
+"2025-12-16"
+

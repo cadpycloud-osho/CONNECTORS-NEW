@@ -1,0 +1,67 @@
+toArray:
+
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Converts a string into a list of characters (String).
+     */
+    public List<String> toArray(String input) {
+        if (input == null || input.isEmpty()) {
+            // Return empty list for empty string
+            return new ArrayList<>(); 
+        }
+        
+        // Split the string into individual characters
+        List<String> characters = new ArrayList<>();
+        // Note: Using a standard for-loop over toCharArray is efficient for this task.
+        for (char c : input.toCharArray()) {
+            characters.add(String.valueOf(c));
+        }
+        return characters;
+    }
+
+    public Map<String, List<String>> getCoercionMap() {
+        // Apply the transformation logic
+        List<String> aList = toArray("");
+        List<String> bList = toArray("hola");
+
+        // Create the root object (Map in Java)
+        Map<String, List<String>> rootMap = new HashMap<>();
+        
+        // Add the results to the map
+        rootMap.put("a", aList);
+        rootMap.put("b", bList);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, List<String>> result = converter.getCoercionMap();
+        
+        // Print the Java structure (closely matches the desired JSON structure)
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{a=[], b=[h, o, l, a]}
+
+

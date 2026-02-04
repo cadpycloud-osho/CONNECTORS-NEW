@@ -1,0 +1,78 @@
+compose:
+
+
+input:
+
+package com.example.demo.util;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class URLUtils {
+
+    public static String encodeURL(String... parts) {
+        StringBuilder sb = new StringBuilder();
+        for (String part : parts) {
+            if (part == null) continue;
+            try {
+                // Encode path segments to handle spaces
+                String encoded = URLEncoder.encode(part, StandardCharsets.UTF_8.toString())
+                        .replace("+", "%20"); // URLEncoder uses + for space by default
+                sb.append(encoded);
+            } catch (UnsupportedEncodingException e) {
+                sb.append(part);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String composeURL(String base, String path, String file) {
+        // Combine base + encoded path + file
+        try {
+            String encodedPath = URLEncoder.encode(path, StandardCharsets.UTF_8.toString()).replace("+", "%20");
+            return base + encodedPath + file;
+        } catch (UnsupportedEncodingException e) {
+            return base + path + file;
+        }
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.URLUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class URLController {
+
+    @GetMapping("/composeUrl")
+    public Map<String, String> composeURLExample() {
+
+        Map<String, String> result = new HashMap<>();
+        String urlPath = "content folder";
+
+        // First version: compose with array
+        String url1 = URLUtils.composeURL("http://examplewebsite.com/", urlPath, "/page.html");
+        result.put("encodedURL_arrayVersion", url1);
+
+        // Second version: template-style
+        String url2 = "http://examplewebsite.com/" + urlPath.replace(" ", "%20") + "/page.html";
+        result.put("encodedURL_templateVersion", url2);
+
+        return result;
+    }
+}
+
+
+output:
+{
+  "encodedURL_arrayVersion": "http://examplewebsite.com/content%20folder/page.html",
+  "encodedURL_templateVersion": "http://examplewebsite.com/content%20folder/page.html"
+}
+
+
+

@@ -1,0 +1,55 @@
+substringAfter:
+
+substringAfter(text: String, separator: String): String
+
+substringAfter(text: String, separator: String): String
+Gets the substring after the first occurrence of a separator. The separator is not returned.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "a": substringAfter(null, "'"),
+  "b": substringAfter("", "-"),
+  "c": substringAfter("abc", "b"),
+  "d": substringAfter("abcba", "b"),
+  "e": substringAfter("abc", "d"),
+  "f": substringAfter("abc", "")
+}
+
+
+DataWeave
+Output
+{
+
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "cba",
+  "e": "",
+  "f": "abc"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

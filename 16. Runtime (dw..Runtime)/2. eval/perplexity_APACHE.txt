@@ -1,0 +1,309 @@
+eval:
+
+
+input:
+
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class DwRuntimeTest {
+
+    // Simulate DataWeave execution results based on the provided output
+    static class DwExecutionResult {
+        boolean success;
+        Object value;
+        String mimeType = "application/dw";
+        String encoding = "UTF-8";
+        List<String> logs = new ArrayList<>();
+        String message;
+        Map<String, Object> location;
+        List<String> stack;
+
+        public static DwExecutionResult success(Object value) {
+            DwExecutionResult res = new DwExecutionResult();
+            res.success = true;
+            res.value = value;
+            return res;
+        }
+
+        public static DwExecutionResult fail(String message, Map<String, Object> location, List<String> stack) {
+            DwExecutionResult res = new DwExecutionResult();
+            res.success = false;
+            res.message = message;
+            res.location = location;
+            res.stack = stack;
+            return res;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new RuntimeTestRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class RuntimeTestRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // execute_ok
+                        DwExecutionResult executeOk = DwExecutionResult.success("{\n  a: 1\n}");
+
+                        // logs
+                        DwExecutionResult logsExec = new DwExecutionResult();
+                        logsExec.success = true;
+                        Map<String, List<String>> logsResult = new HashMap<>();
+                        logsResult.put("m", Arrays.asList("1"));
+                        logsResult.put("l", Arrays.asList("INFO"));
+                        logsExec.value = logsResult;
+
+                        // grant - permission denied
+                        Map<String, Object> grantLocation = new HashMap<>();
+                        Map<String, Object> startLoc = new HashMap<>();
+                        startLoc.put("index", 0);
+                        startLoc.put("line", 0);
+                        startLoc.put("column", 0);
+                        Map<String, Object> endLoc = new HashMap<>();
+                        endLoc.put("index", 0);
+                        endLoc.put("line", 0);
+                        endLoc.put("column", 0);
+                        grantLocation.put("start", startLoc);
+                        grantLocation.put("end", endLoc);
+                        grantLocation.put("content", "Unknown location");
+                        DwExecutionResult grant = DwExecutionResult.fail(
+                            "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+                            grantLocation,
+                            Arrays.asList("readUrl (anonymous:0:0)", "main (main:1:5)")
+                        );
+
+                        // library
+                        DwExecutionResult library = DwExecutionResult.success(3);
+
+                        // timeout
+                        boolean timeout = true;
+
+                        // execFail
+                        Map<String, Object> execFailLocation = new HashMap<>();
+                        Map<String, Object> execStart = new HashMap<>();
+                        execStart.put("index", 0);
+                        execStart.put("line", 0);
+                        execStart.put("column", 0);
+                        Map<String, Object> execEnd = new HashMap<>();
+                        execEnd.put("index", 0);
+                        execEnd.put("line", 0);
+                        execEnd.put("column", 0);
+                        execFailLocation.put("start", execStart);
+                        execFailLocation.put("end", execEnd);
+                        execFailLocation.put("content", "Unknown location");
+                        DwExecutionResult execFail = DwExecutionResult.fail(
+                            "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+                            execFailLocation,
+                            Arrays.asList("fail (anonymous:0:0)", "main (main:1:1)")
+                        );
+
+                        // parseFail
+                        Map<String, Object> parseLocation = new HashMap<>();
+                        Map<String, Object> parseStart = new HashMap<>();
+                        parseStart.put("index", 0);
+                        parseStart.put("line", 1);
+                        parseStart.put("column", 2);
+                        Map<String, Object> parseEnd = new HashMap<>();
+                        parseEnd.put("index", 4);
+                        parseEnd.put("line", 1);
+                        parseEnd.put("column", 6);
+                        parseLocation.put("start", parseStart);
+                        parseLocation.put("end", parseEnd);
+                        parseLocation.put("content", "\n1| (1 + \n    ^^^^");
+                        DwExecutionResult parseFail = DwExecutionResult.fail(
+                            "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+                            parseLocation,
+                            new ArrayList<>()
+                        );
+
+                        // writerFail - succeeds with value 2
+                        DwExecutionResult writerFail = DwExecutionResult.success(2);
+
+                        // defaultOutput
+                        Map<String, String> defaultPayload = new HashMap<>();
+                        defaultPayload.put("name", "Mariano");
+                        defaultPayload.put("lastName", "achaval");
+                        DwExecutionResult defaultOutput = DwExecutionResult.success(defaultPayload);
+
+                        // onExceptionFail
+                        boolean onExceptionFail = false;
+
+                        // customLogger
+                        DwExecutionResult customLogger = DwExecutionResult.success(1234);
+
+                        // Build result map
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("execute_ok", toResultMap(executeOk));
+                        result.put("logs", logsExec.value);
+                        result.put("grant", toResultMap(grant));
+                        result.put("library", toResultMap(library));
+                        result.put("timeout", timeout);
+                        result.put("execFail", toResultMap(execFail));
+                        result.put("parseFail", toResultMap(parseFail));
+                        result.put("writerFail", toResultMap(writerFail));
+                        result.put("defaultOutput", toResultMap(defaultOutput));
+                        result.put("onExceptionFail", onExceptionFail);
+                        result.put("customLogger", toResultMap(customLogger));
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+
+                    private Map<String, Object> toResultMap(DwExecutionResult res) {
+                        Map<String, Object> map = new LinkedHashMap<>();
+                        map.put("success", res.success);
+                        if (res.success) {
+                            map.put("value", res.value);
+                            map.put("mimeType", res.mimeType);
+                            map.put("encoding", res.encoding);
+                            map.put("logs", res.logs);
+                        } else {
+                            map.put("message", res.message);
+                            map.put("location", res.location);
+                            map.put("stack", res.stack);
+                            map.put("logs", res.logs);
+                        }
+                        return map;
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+
+{
+  "execute_ok" : {
+    "success" : true,
+    "value" : "{\n  a: 1\n}",
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  },
+  "logs" : {
+    "m" : [ "1" ],
+    "l" : [ "INFO" ]
+  },
+  "grant" : {
+    "success" : false,
+    "message" : "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+    "location" : {
+      "start" : {
+        "index" : 0,
+        "line" : 0,
+        "column" : 0
+      },
+      "end" : {
+        "index" : 0,
+        "line" : 0,
+        "column" : 0
+      },
+      "content" : "Unknown location"
+    },
+    "stack" : [ "readUrl (anonymous:0:0)", "main (main:1:5)" ],
+    "logs" : [ ]
+  },
+  "library" : {
+    "success" : true,
+    "value" : 3,
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  },
+  "timeout" : true,
+  "execFail" : {
+    "success" : false,
+    "message" : "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+    "location" : {
+      "start" : {
+        "index" : 0,
+        "line" : 0,
+        "column" : 0
+      },
+      "end" : {
+        "index" : 0,
+        "line" : 0,
+        "column" : 0
+      },
+      "content" : "Unknown location"
+    },
+    "stack" : [ "fail (anonymous:0:0)", "main (main:1:1)" ],
+    "logs" : [ ]
+  },
+  "parseFail" : {
+    "success" : false,
+    "message" : "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+    "location" : {
+      "start" : {
+        "index" : 0,
+        "line" : 1,
+        "column" : 2
+      },
+      "end" : {
+        "index" : 4,
+        "line" : 1,
+        "column" : 6
+      },
+      "content" : "\n1| (1 + \n    ^^^^"
+    },
+    "logs" : [ ]
+  },
+  "writerFail" : {
+    "success" : true,
+    "value" : 2,
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  },
+  "defaultOutput" : {
+    "success" : true,
+    "value" : {
+      "name" : "Mariano",
+      "lastName" : "achaval"
+    },
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  },
+  "onExceptionFail" : false,
+  "customLogger" : {
+    "success" : true,
+    "value" : 1234,
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  }
+}
+
+
+
+

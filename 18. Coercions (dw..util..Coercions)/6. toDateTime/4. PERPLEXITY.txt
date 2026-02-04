@@ -1,0 +1,155 @@
+toDateTime:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+
+@RestController
+public class DateTimeCoercionsController {
+    
+    @GetMapping("/datetime-coercions")
+    public DateTimeResponse getDateTimeCoercions() {
+        DateTimeFormatter multiFormatter = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy/MM/dd HH:mm:ssz")
+            .orAppendPattern("yyyy-MM-dd HH:mm:ssz")
+            .toFormatter();
+        
+        ZonedDateTime dateA = null;
+        String errorB = null;
+        
+        try {
+            dateA = ZonedDateTime.parse("2003-10-01 23:57:59Z", multiFormatter);
+        } catch (DateTimeParseException e) {
+            errorB = "Could not find a valid formatter for '2003-10-01 23:57:59Z'";
+        }
+        
+        return new DateTimeResponse(dateA, errorB);
+    }
+    
+    public static class DateTimeResponse {
+        public ZonedDateTime a;
+        public String b;
+        
+        public DateTimeResponse(ZonedDateTime a, String b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2003-10-01T23:57:59Z",
+  "b": "Could not find a valid formatter for '2003-10-01 23:57:59Z'"
+}
+
+
+
+
+----------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+
+@RestController
+public class EpochCoercionsController {
+    
+    @GetMapping("/epoch-coercions")
+    public EpochResponse getEpochCoercions() {
+        ZonedDateTime fromEpoch = ZonedDateTime.ofInstant(Instant.ofEpochSecond(1443743879), 
+                                                         java.time.ZoneOffset.UTC);
+        ZonedDateTime fromMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(1443743879000L), 
+                                                          java.time.ZoneOffset.UTC);
+        
+        return new EpochResponse(fromEpoch, fromMillis);
+    }
+    
+    public static class EpochResponse {
+        public ZonedDateTime fromEpoch;
+        public ZonedDateTime fromMillis;
+        
+        public EpochResponse(ZonedDateTime fromEpoch, ZonedDateTime fromMillis) {
+            this.fromEpoch = fromEpoch;
+            this.fromMillis = fromMillis;
+        }
+    }
+}
+
+
+output:
+
+{"fromEpoch":"2015-10-01T23:57:59Z","fromMillis":"2015-10-01T23:57:59Z"}
+
+
+----------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+@RestController
+public class DateTimeCoercionsController {
+    
+    @GetMapping("/datetime-coercions")
+    public DateTimeResponse getDateTimeCoercions() {
+        ZonedDateTime dateA = ZonedDateTime.parse("2015-10-01T23:57:59Z");
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssz");
+        ZonedDateTime dateB = ZonedDateTime.parse("2003-10-01 23:57:59Z", formatterB);
+        
+        return new DateTimeResponse(dateA, dateB);
+    }
+    
+    public static class DateTimeResponse {
+        public ZonedDateTime a;
+        public ZonedDateTime b;
+        
+        public DateTimeResponse(ZonedDateTime a, ZonedDateTime b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2015-10-01T23:57:59Z",
+  "b": "2003-10-01T23:57:59Z"
+}
+
+

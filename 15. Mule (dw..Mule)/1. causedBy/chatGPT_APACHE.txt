@@ -1,0 +1,52 @@
+causedBy:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+public class SecurityErrorHandlerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // Global error handler for SECURITY-related exceptions (optional)
+        onException(SecurityException.class)
+            .handled(true) // Continue processing instead of stopping the route
+            .process(exchange -> {
+                Exception e = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                
+                // Choice-like handling for specific error types
+                if (e.getMessage().contains("HTTP:UNAUTHORIZED")) {
+                    // Handle HTTP 401 Unauthorized
+                    System.out.println("Handling UNAUTHORIZED error");
+                } else if (e.getMessage().contains("HTTP:FORBIDDEN")) {
+                    // Handle HTTP 403 Forbidden
+                    System.out.println("Handling FORBIDDEN error");
+                } else {
+                    // General SECURITY error
+                    System.out.println("Handling general SECURITY error");
+                }
+            });
+
+        // Example route
+        from("direct:start")
+            .process(exchange -> {
+                // Simulate some security error
+                // throw new SecurityException("HTTP:UNAUTHORIZED");
+            })
+            .log("Route completed successfully");
+    }
+}
+
+
+output:
+
+Handling general SECURITY error
+Route completed successfully
+
+
+
+

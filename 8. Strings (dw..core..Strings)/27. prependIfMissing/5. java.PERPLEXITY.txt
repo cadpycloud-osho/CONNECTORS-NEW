@@ -1,0 +1,42 @@
+prependIfMissing:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + jsonValue(prependIfMissing(null, "")) + ",");
+        System.out.println("  \"b\": \"" + prependIfMissing("abc", "") + "\",");
+        System.out.println("  \"c\": \"" + prependIfMissing("", "xyz") + "\",");
+        System.out.println("  \"d\": \"" + prependIfMissing("abc", "xyz") + "\",");
+        System.out.println("  \"e\": \"" + prependIfMissing("xyzabc", "xyz") + "\"");
+        System.out.println("}");
+    }
+    
+    private static String prependIfMissing(String text, String prefix) {
+        if (text == null || prefix == null || prefix.isEmpty()) {
+            return text;
+        }
+        return text.startsWith(prefix) ? text : prefix + text;
+    }
+    
+    private static String jsonValue(Object value) {
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+
+
+

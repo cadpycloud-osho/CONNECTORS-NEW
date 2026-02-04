@@ -1,0 +1,89 @@
+atBeginningOfMonth:
+
+example 1:
+
+input:
+
+
+from("direct:beginningOfMonth")
+    .process(exchange -> {
+        ZonedDateTime input = ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        ZonedDateTime startOfMonth = input.withDayOfMonth(1).truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfMonthDateTime", startOfMonth.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+
+{
+  "atBeginningOfMonthDateTime": "2020-10-01T00:00:00-03:00"
+}
+
+
+
+------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:beginningOfMonthLocal")
+    .process(exchange -> {
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        LocalDateTime startOfMonth = input.withDayOfMonth(1).truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfMonthLocalDateTime", startOfMonth.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+
+output:
+
+
+{
+  "atBeginningOfMonthLocalDateTime": "2020-10-01T00:00:00"
+}
+
+
+
+------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:beginningOfMonthDate")
+    .process(exchange -> {
+        LocalDate input = LocalDate.parse("2020-10-06");
+        LocalDate startOfMonth = input.withDayOfMonth(1);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfMonthDate", startOfMonth.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+
+output:
+
+{
+  "atBeginningOfMonthDate": "2020-10-01"
+}
+
+
+
+
+------------------------------------------------
+
+

@@ -1,0 +1,52 @@
+avg(values: Array<Number>): Number
+
+
+input:
+
+from("direct:avgExample")
+.setBody(constant(Map.of(
+    "a", List.of(1, 1000),
+    "b", List.of(1, 2, 3)
+)))
+
+.multicast().parallelProcessing()
+
+    // ---- a: avg([1,1000]) ----
+    .to("direct:avgA")
+
+    // ---- b: avg([1,2,3]) ----
+    .to("direct:avgB")
+
+.end()
+
+.aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedExchangeAggregationStrategy())
+.completionSize(2)
+.process(e -> {
+    Map<String, Object> result = new HashMap<>();
+    for (Exchange ex : e.getMessage().getBody(List.class)) {
+        result.putAll(ex.getMessage().getBody(Map.class));
+    }
+    e.getMessage().setBody(result);
+});
+
+
+
+from("direct:avgA")
+.split(simple("${body[a]}"))
+.aggregate(constant(true), new org.apache.camel.processor.aggregate.AverageAggregationStrategy())
+.completionSize(2)
+.setBody(simple("{\"a\": ${body}}"));
+
+
+
+from("direct:avgB")
+.split(simple("${body[b]}"))
+.aggregate(constant(true), new org.apache.camel.processor.aggregate.AverageAggregationStrategy())
+.completionSize(3)
+.setBody(simple("{\"b\": ${body}}"));
+
+output:
+
+{ "a": 500.5, "b": 2 }
+
+

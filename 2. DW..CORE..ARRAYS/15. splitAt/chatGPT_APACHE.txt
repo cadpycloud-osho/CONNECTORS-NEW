@@ -1,0 +1,37 @@
+splitAt:
+
+
+input:
+
+from("direct:splitAtExample")
+.process(exchange -> {
+    List<String> users = List.of("Mariano", "Leandro", "Julian");
+
+    int splitIndex = 1;
+
+    // Split list at index
+    List<String> left = users.subList(0, splitIndex);
+    List<String> right = users.subList(splitIndex, users.size());
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("l", left);
+    result.put("r", right);
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+
+
+
+
+output:
+
+
+{
+  "l": ["Mariano"],
+  "r": ["Leandro", "Julian"]
+}
+
+

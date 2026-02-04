@@ -1,0 +1,48 @@
+envVars
+
+envVars(): Dictionary<String>
+
+envVars(): Dictionary<String>
+Returns all the environment variables defined in the host system as an array of strings.
+
+
+
+Source
+%dw 2.0
+import dw::System
+output application/json
+---
+{ "envVars" : dw::System::envVars().SHELL }
+
+
+DataWeave
+Output
+{ "envVars": "/bin/bash" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,37 @@
+min:
+
+INPUT:
+
+
+// MinFunctionApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+
+@SpringBootApplication
+public class MinFunctionApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MinFunctionApp.class, args);
+
+        int minA = Collections.min(Arrays.asList(1, 1000));
+        int minB = Collections.min(Arrays.asList(1, 2, 3));
+        double minC = Collections.min(Arrays.asList(1.5, 2.5, 3.5));
+
+        Map<String, Object> result = Map.of(
+            "a", minA,
+            "b", minB,
+            "c", minC
+        );
+        
+        System.out.println(result);  // Output: {a=1, b=1, c=1.5}
+    }
+}
+
+
+OUTPUT:
+
+{a=1, b=1, c=1.5}
+

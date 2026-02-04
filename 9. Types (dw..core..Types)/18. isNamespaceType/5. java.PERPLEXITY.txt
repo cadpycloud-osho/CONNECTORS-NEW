@@ -1,0 +1,34 @@
+isNamespaceType:
+
+
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.namespace.NamespaceContext;
+
+public class Main {
+    public static void main(String[] args) {
+        NamespaceContext namespaceInstance = null; // Namespace equivalent
+        String testString = "test";
+        
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("a", namespaceInstance instanceof NamespaceContext);
+        result.put("b", namespaceInstance instanceof NamespaceContext);
+        result.put("c", testString instanceof NamespaceContext);
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{a=true, b=true, c=false}
+
+

@@ -1,0 +1,41 @@
+literalValueOf:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LiteralValueRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:getLiteralValue")
+            .process(exchange -> {
+                // In Java, we represent the type 'AType' as a constant
+                final String AType = "Mariano";
+
+                Map<String, Object> result = new LinkedHashMap<>();
+
+                // Logic: Extract the value of the 'literal'
+                result.put("a", literalValueOf(AType));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private Object literalValueOf(Object obj) {
+        // In this context, we return the object itself as its literal value
+        return obj;
+    }
+}
+
+output:
+
+{
+  "a": "Mariano"
+}
+
+

@@ -1,0 +1,153 @@
+--:
+
+
+example 1:
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> arr1 = Arrays.asList(0, 1, 1, 2);
+        List<Integer> arr2 = Arrays.asList(1, 2);
+        
+        Set<Integer> toRemove = new HashSet<>(arr2);
+        List<Integer> result = arr1.stream()
+            .filter(item -> !toRemove.contains(item))
+            .collect(Collectors.toList());
+        
+        System.out.println(Map.of("a", result));
+    }
+}
+
+
+output:
+
+{"a": [0]}
+
+
+-----------------------------------------------------------------------
+example 2:
+
+input:
+
+
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> original = Map.of(
+            "yes", "no", 
+            "good", "bad", 
+            "old", "new"
+        );
+        
+        List<String> keysToRemove = Arrays.asList("yes", "old");
+        Set<String> removeSet = new HashSet<>(keysToRemove);
+        
+        Map<String, String> result = original.entrySet().stream()
+            .filter(entry -> !removeSet.contains(entry.getKey()))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, 
+                Map.Entry::getValue
+            ));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+//Alternative Using removeAll Approach
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> obj = new HashMap<>(Map.of(
+            "yes", "no", "good", "bad", "old", "new"
+        ));
+        
+        obj.keySet().removeAll(Arrays.asList("yes", "old"));
+        System.out.println(obj);
+    }
+}
+
+
+
+output:
+
+{"good": "bad"}
+
+
+-----------------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> original = Map.of(
+            "hello", "world", 
+            "name", "DW"
+        );
+        
+        List<String> keysToRemove = Arrays.asList("hello");
+        Set<String> removeSet = new HashSet<>(keysToRemove);
+        
+        Map<String, String> result = original.entrySet().stream()
+            .filter(entry -> !removeSet.contains(entry.getKey()))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, 
+                Map.Entry::getValue
+            ));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+
+
+//Alternative Mutable Approach
+//java
+
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> obj = new HashMap<>(Map.of(
+            "hello", "world", 
+            "name", "DW"
+        ));
+        
+        obj.remove("hello");
+        System.out.println(obj);
+    }
+}
+
+
+output:
+
+{"name": "DW"}
+
+
+
+
+

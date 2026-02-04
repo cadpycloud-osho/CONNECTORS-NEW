@@ -1,0 +1,101 @@
+replace:
+
+example 1:
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class ReplaceArrayController {
+
+    @GetMapping("/replace-array")
+    public List<Object> replaceArray() {
+        String str1 = "123-456-7890";
+        // Remove all characters up to last hyphen inclusive
+        String replaced1 = str1.replaceAll(".*-", "");
+
+        String str2 = "abc123def";
+        // Replace characters b,1,3,e with '-'
+        String replaced2 = str2.replaceAll("[b13e]", "-");
+
+        // Parse replaced1 to number if possible, else keep as string
+        Object replaced1Parsed;
+        try {
+            replaced1Parsed = Integer.parseInt(replaced1);
+        } catch (NumberFormatException e) {
+            replaced1Parsed = replaced1;
+        }
+
+        return Arrays.asList(replaced1Parsed, replaced2);
+    }
+}
+
+
+output:
+
+[7890, "a-c-2-d-f"]
+
+
+
+---------------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
+
+@SpringBootApplication
+public class DemoApplication2 {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication2.class, args);
+    }
+}
+
+@RestController
+class ReplaceObjectController {
+
+    @GetMapping("/replace-object")
+    public Map<String, String> replaceObject() {
+        String original = "admin123";
+        String replaced = original.replace("123", "ID");
+        return Collections.singletonMap("replace", replaced);
+    }
+}
+
+
+
+output:
+
+{"replace": "adminID"}
+

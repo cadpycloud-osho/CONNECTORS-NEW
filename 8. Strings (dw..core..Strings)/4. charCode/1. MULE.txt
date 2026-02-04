@@ -1,0 +1,55 @@
+charCode:
+
+charCode(text: String): Number
+
+charCode(text: String): Number
+Returns the Unicode for the first character in an input string.
+
+For an empty string, the function fails and returns Unexpected empty string.
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "charCode" : charCode("Mule")
+}
+
+DataWeave
+Output
+{ "charCode" : 77 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

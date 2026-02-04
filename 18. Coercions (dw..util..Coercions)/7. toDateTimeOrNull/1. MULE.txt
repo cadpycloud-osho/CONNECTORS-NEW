@@ -1,0 +1,54 @@
+toDateTimeOrNull:
+
+toDateTimeOrNull(str: String, formatters: Array<Formatter>): DateTime | Null
+
+toDateTimeOrNull(str: String, formatters: Array<Formatter>): DateTime | Null
+Transforms a String value into a DateTime value using the first Formatter that matches with the given value to transform.
+
+If none of the Formatter matches with the given value, the function returns a null value.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+  a: toDateTimeOrNull("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}, {format: "uuuu-MM-dd HH:mm:ssz"}]),
+  b: toDateTimeOrNull("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}])
+}
+
+
+Output
+{
+  a: |2003-10-01T23:57:59Z| as DateTime {format: "uuuu-MM-dd HH:mm:ssz"},
+  b: null
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

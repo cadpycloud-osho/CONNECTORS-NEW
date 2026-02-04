@@ -1,0 +1,55 @@
+isTypeType:
+
+
+input:
+
+import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isTypeType(Class<?> clazz) {
+        return Type.class.isAssignableFrom(clazz);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> AType = Type.class;
+
+        result.put("a", isTypeType(AType));
+        result.put("b", isTypeType(Type.class));
+        result.put("c", isTypeType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=true, c=false}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

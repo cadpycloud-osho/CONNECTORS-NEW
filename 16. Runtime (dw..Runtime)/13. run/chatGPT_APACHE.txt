@@ -1,0 +1,170 @@
+run:
+
+input:
+
+
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+
+import java.util.*;
+
+public class RuntimeRunSimulation {
+
+    static ObjectMapper mapper = new ObjectMapper();
+
+    static ObjectNode success(String value, String mime) {
+        ObjectNode n = mapper.createObjectNode();
+        n.put("success", true);
+        n.put("value", value);
+        n.put("mimeType", mime);
+        n.put("encoding", "UTF-8");
+        n.set("logs", mapper.createArrayNode());
+        return n;
+    }
+
+    static ObjectNode failure(String message) {
+        ObjectNode n = mapper.createObjectNode();
+        n.put("success", false);
+        n.put("message", message);
+        n.set("logs", mapper.createArrayNode());
+        return n;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        ObjectNode output = mapper.createObjectNode();
+
+        // execute_ok
+        output.set("execute_ok",
+                success("{\n  a: 1\n}", "application/dw"));
+
+        // logs
+        ObjectNode logs = mapper.createObjectNode();
+        logs.set("m", mapper.valueToTree(List.of("1")));
+        logs.set("l", mapper.valueToTree(List.of("INFO")));
+        output.set("logs", logs);
+
+        // grant
+        ObjectNode grant = failure(
+                "The given required permissions: `Resource` are not being granted for this execution."
+        );
+        grant.set("stack", mapper.valueToTree(
+                List.of("readUrl (anonymous:0:0)", "main (main:1:5)")
+        ));
+        output.set("grant", grant);
+
+        // library
+        output.set("library",
+                success("3", "application/dw"));
+
+        // timeout
+        output.put("timeout", false);
+
+        // execFail
+        ObjectNode execFail = failure("My Bad");
+        execFail.set("stack", mapper.valueToTree(
+                List.of("fail (anonymous:0:0)", "main (main:1:1)")
+        ));
+        output.set("execFail", execFail);
+
+        // parseFail
+        ObjectNode parseFail = failure(
+                "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2)"
+        );
+        output.set("parseFail", parseFail);
+
+        // writerFail
+        ObjectNode writerFail = failure(
+                "Trying to output non-whitespace characters outside main element tree (in prolog or epilog)"
+        );
+        output.set("writerFail", writerFail);
+
+        // readerFail
+        ObjectNode readerFail = failure(
+                "Unexpected end-of-input while reading payload as Json"
+        );
+        output.set("readerFail", readerFail);
+
+        // defaultOutput
+        ObjectNode defaultOutput = success(
+                "name|lastName\nMariano|achaval\n",
+                "application/csv"
+        );
+        output.set("defaultOutput", defaultOutput);
+
+        // Print FINAL OUTPUT
+        System.out.println(
+                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(output)
+        );
+    }
+}
+
+
+
+output:
+
+{
+  "execute_ok" : {
+    "success" : true,
+    "value" : "{\n  a: 1\n}",
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  },
+  "logs" : {
+    "m" : [ "1" ],
+    "l" : [ "INFO" ]
+  },
+  "grant" : {
+    "success" : false,
+    "message" : "The given required permissions: `Resource` are not being granted for this execution.",
+    "logs" : [ ],
+    "stack" : [ "readUrl (anonymous:0:0)", "main (main:1:5)" ]
+  },
+  "library" : {
+    "success" : true,
+    "value" : "3",
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  },
+  "timeout" : false,
+  "execFail" : {
+    "success" : false,
+    "message" : "My Bad",
+    "logs" : [ ],
+    "stack" : [ "fail (anonymous:0:0)", "main (main:1:1)" ]
+  },
+  "parseFail" : {
+    "success" : false,
+    "message" : "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2)",
+    "logs" : [ ]
+  },
+  "writerFail" : {
+    "success" : false,
+    "message" : "Trying to output non-whitespace characters outside main element tree (in prolog or epilog)",
+    "logs" : [ ]
+  },
+  "readerFail" : {
+    "success" : false,
+    "message" : "Unexpected end-of-input while reading payload as Json",
+    "logs" : [ ]
+  },
+  "defaultOutput" : {
+    "success" : true,
+    "value" : "name|lastName\nMariano|achaval\n",
+    "mimeType" : "application/csv",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  }
+}
+
+
+
+
+
+
+
+
+
+

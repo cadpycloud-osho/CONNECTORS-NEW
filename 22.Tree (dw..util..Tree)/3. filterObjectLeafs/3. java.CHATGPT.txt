@@ -1,0 +1,80 @@
+filterObjectLeafs:
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.Predicate;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> firstFriend = new HashMap<>();
+        firstFriend.put("name", "");
+        firstFriend.put("id", "test");
+
+        Map<String, Object> secondFriend = new HashMap<>();
+        secondFriend.put("name", "Me");
+        secondFriend.put("id", null);
+
+        List<Map<String, Object>> myArray = Arrays.asList(firstFriend, secondFriend);
+
+        Map<String, Object> a = new HashMap<>();
+        a.put("name", "Mariano");
+        a.put("lastName", null);
+        a.put("age", 123);
+        a.put("friends", myArray);
+
+        Map<String, Object> filteredA = filterObjectLeafs(a, value -> !(value == null || value instanceof String));
+
+        Map<String, Object> b = new HashMap<>();
+        b.put("c", null);
+        b.put("d", "hello");
+
+        Map<String, Object> filteredB = filterObjectLeafs(b, value -> value == null);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", filteredA);
+        result.put("b", filteredB);
+
+        System.out.println(result);
+    }
+
+    private static Map<String, Object> filterObjectLeafs(Map<String, Object> map, Predicate<Object> predicate) {
+        Map<String, Object> filtered = new HashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                Map<String, Object> childFiltered = filterObjectLeafs((Map<String, Object>) value, predicate);
+                if (!childFiltered.isEmpty()) filtered.put(entry.getKey(), childFiltered);
+            } else if (value instanceof List) {
+                List<Object> listFiltered = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    if (item instanceof Map) {
+                        Map<String, Object> childFiltered = filterObjectLeafs((Map<String, Object>) item, predicate);
+                        listFiltered.add(childFiltered);
+                    } else if (predicate.test(item)) {
+                        listFiltered.add(item);
+                    } else {
+                        listFiltered.add(new HashMap<>()); // empty object
+                    }
+                }
+                filtered.put(entry.getKey(), listFiltered);
+            } else if (predicate.test(value)) {
+                filtered.put(entry.getKey(), value);
+            }
+        }
+        return filtered;
+    }
+}
+
+
+output:
+
+
+{a={age=123, friends=[{}, {}]}, b={c=null}}
+
+
+

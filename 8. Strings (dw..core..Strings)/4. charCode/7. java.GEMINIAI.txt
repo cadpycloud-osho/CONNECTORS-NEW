@@ -1,0 +1,38 @@
+charCode:
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source input from the DataWeave example
+        String inputString = "Mule"; 
+        
+        // Perform the DataWeave charCode logic:
+        
+        // 1. Check if the string is not empty before accessing the first character
+        if (inputString != null && !inputString.isEmpty()) {
+            
+            // 2. Get the first character of the string
+            char firstChar = inputString.charAt(0);
+            
+            // 3. Casting the char to an int automatically gives its ASCII/Unicode value
+            int charCodeValue = (int) firstChar;
+            
+            // 4. Print the result in a format similar to the desired JSON output
+            System.out.println("Output");
+            System.out.println("{ \"charCode\" : " + charCodeValue + " }");
+            
+        } else {
+            System.out.println("Input string is empty or null.");
+        }
+    }
+}
+
+output:
+
+{ "charCode" : 77 }
+
+

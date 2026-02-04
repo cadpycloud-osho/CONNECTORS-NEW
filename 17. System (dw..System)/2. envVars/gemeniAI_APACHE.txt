@@ -1,0 +1,43 @@
+envVars
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+
+public class EnvMapRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getEnvMap")
+            .routeId("Env-Map-Route")
+            .process(exchange -> {
+                // 1. Logic: Retrieve all environment variables as a Map
+                // This is the direct Java equivalent of dw::System::envVars()
+                Map<String, String> allVars = System.getenv();
+
+                // 2. Extract the specific variable
+                String shellValue = allVars.get("SHELL");
+
+                // 3. Set the structured body
+                exchange.getIn().setBody(Map.of("envVars", shellValue));
+            })
+            .marshal().json()
+            .log("Output: ${body}");
+
+        // --- Alternative using Simple Language ---
+        // If you only need the value for a header or log:
+        // .setHeader("myShell", simple("${sysenv.SHELL}"))
+    }
+}
+
+
+output:
+
+{
+  "envVars": "/bin/bash"
+}
+

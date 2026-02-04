@@ -1,0 +1,60 @@
+unionItems:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+public class CamelUnionItemsCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                        .process(exchange -> {
+
+                            // type AType = String | Number
+                            List<String> a = unionItems();
+
+                            Map<String, Object> result = new HashMap<>();
+                            result.put("a", a);
+
+                            exchange.getMessage().setBody(result);
+                        })
+                        .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave unionItems
+    private static List<String> unionItems() {
+        return List.of("String", "Number");
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": ["String","Number"]
+}
+
+

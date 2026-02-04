@@ -1,0 +1,166 @@
+toDateTime:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class DateTimeCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceDateTime")
+            .process(exchange -> {
+                String input = "2003-10-01 23:57:59Z";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                // Formatters matching the DW source patterns
+                List<DateTimeFormatter> formatters = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX"),
+                    DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssX")
+                );
+
+                // logic for 'a' - Chained fallback parsing
+                response.put("a", tryParseDateTime(input, formatters));
+
+                // logic for 'b' - Intentional failure to match the try() block
+                List<DateTimeFormatter> failingFormatters = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX")
+                );
+                
+                try {
+                    tryParseDateTime(input, failingFormatters);
+                } catch (Exception e) {
+                    response.put("b", e.getMessage());
+                }
+
+                exchange.getIn().setBody(response);
+            });
+    }
+
+    private ZonedDateTime tryParseDateTime(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return ZonedDateTime.parse(input, formatter);
+            } catch (Exception ignored) {}
+        }
+        throw new IllegalArgumentException("Could not find a valid formatter for '" + input + "'");
+    }
+}
+
+output:
+
+{
+  a: |2003-10-01T23:57:59Z| as DateTime {format: "uuuu-MM-dd HH:mm:ssz"},
+  b: "Could not find a valid formatter for '2003-10-01 23:57:59Z'"
+}
+
+--------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class EpochToDateTimeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertEpoch")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Case A: Seconds (1443743879)
+                long seconds = 1443743879L;
+                results.put("fromEpoch", 
+                    ZonedDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneOffset.UTC));
+
+                // Case B: Milliseconds (1443743879000)
+                long millis = 1443743879000L;
+                results.put("fromMillis", 
+                    ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneOffset.UTC));
+
+                exchange.getIn().setBody(results);
+            });
+    }
+}
+
+output:
+
+{
+  fromEpoch: |2015-10-01T23:57:59Z|,
+  fromMillis: |2015-10-01T23:57:59Z| as DateTime {unit: "milliseconds"}
+}
+
+--------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DateTimeFormatRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceDateTime")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Case A: Standard ISO-8601 with 'T' and 'Z'
+                // Camel's TypeConverter handles this natively using java.time
+                String inputA = "2015-10-01T23:57:59Z";
+                results.put("a", ZonedDateTime.parse(inputA));
+
+                // Case B: Custom Pattern with Space
+                String inputB = "2003-10-01 23:57:59Z";
+                // 'X' or 'z' can be used for the 'Z' (UTC) suffix
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssX");
+                results.put("b", ZonedDateTime.parse(inputB, formatter));
+
+                exchange.getIn().setBody(results);
+            });
+    }
+}
+
+output:
+
+{
+  a: |2015-10-01T23:57:59Z|,
+  b: |2003-10-01T23:57:59Z| as DateTime {format: "uuuu-MM-dd HH:mm:ssz"}
+}
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

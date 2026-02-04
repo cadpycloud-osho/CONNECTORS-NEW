@@ -1,0 +1,36 @@
+isBooleanType:
+
+
+input:
+
+import java.util.*;
+
+public class IsBooleanTypeConverter {
+    public static boolean isBooleanType(String typeName) {
+        return "Boolean".equals(typeName) || "ABoolean".equals(typeName);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isBooleanType("ABoolean"));  // type ABoolean = Boolean
+        result.put("b", isBooleanType("Boolean"));   // built-in Boolean
+        result.put("c", isBooleanType("String"));    // concrete type
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+

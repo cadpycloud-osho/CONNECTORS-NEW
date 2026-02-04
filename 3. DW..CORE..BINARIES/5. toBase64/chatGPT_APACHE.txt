@@ -1,0 +1,48 @@
+toBase64:
+
+input:
+
+from("direct:gravatar")
+.process(exchange -> {
+
+    // 1. Email
+    String email = "achaval@gmail.com";
+
+    // 2. MD5 checksum (same as Crypto::MD5)
+    java.security.MessageDigest md =
+            java.security.MessageDigest.getInstance("MD5");
+    byte[] digest = md.digest(email.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+    // Convert MD5 bytes → hex string
+    StringBuilder hex = new StringBuilder();
+    for (byte b : digest) {
+        hex.append(String.format("%02x", b));
+    }
+    String emailChecksum = hex.toString();
+
+    // 3. Gravatar URL
+    String url = "https://www.gravatar.com/avatar/" + emailChecksum;
+    exchange.getIn().setHeader("CamelHttpUri", url);
+})
+// HTTP call → binary (octet-stream)
+.to("https://dummyhost?throwExceptionOnFailure=true")
+.process(exchange -> {
+
+    // 4. Read image as byte[]
+    byte[] imageBytes = exchange.getIn().getBody(byte[].class);
+
+    // 5. Convert to Base64 (same as toBase64)
+    String base64Image = java.util.Base64
+            .getEncoder()
+            .encodeToString(imageBytes);
+
+    exchange.getIn().setBody(base64Image);
+});
+
+
+
+output:
+
+/9j/4AAQSkZJRgABAQEAYABgAAD//...
+
+

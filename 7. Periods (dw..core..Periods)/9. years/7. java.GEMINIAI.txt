@@ -1,0 +1,72 @@
+years:
+
+
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Define the fixed input ZonedDateTime (UTC)
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        
+        // Formatter for ZonedDateTime output in ISO 8601 format
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        // --- 1. DateTime Arithmetic ---
+
+        // nextYear: |2020-10-05T20:22:34.385Z| + years(1)
+        ZonedDateTime nextYear = baseDateTime.plusYears(1);
+        String nextYearOutput = nextYear.format(formatter).replace(".000Z", "Z");
+
+        // --- 2. Period Construction and Arithmetic ---
+
+        // fourYearPeriod: years(4)
+        Period fourYearPeriod = Period.ofYears(4);
+        String fourYearPeriodOutput = fourYearPeriod.toString(); // P4Y
+
+        // addNegativeValue: years(-1) + years(2)
+        Period combinedPeriod = Period.ofYears(-1).plus(Period.ofYears(2)); // P1Y
+        // DW outputs the total magnitude in months (12 months)
+        long addNegativeValue = combinedPeriod.toTotalMonths(); // 12
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        System.out.println("  \"nextYear\": \"" + nextYearOutput + "\",");
+        System.out.println("  \"fourYearPeriod\": \"" + fourYearPeriodOutput + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "nextYear": "2021-10-05T20:22:34.385Z",
+  "fourYearPeriod": "P4Y",
+  "addNegativeValue": 12
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

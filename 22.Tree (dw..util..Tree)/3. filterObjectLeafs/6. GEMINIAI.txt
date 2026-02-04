@@ -1,0 +1,128 @@
+filterObjectLeafs:
+
+
+
+input:
+
+package com.example.service;
+
+import org.springframework.stereotype.Service;
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+
+@Service
+public class TreeFilterService {
+
+    // Input variable 'myArray'
+    private final List<Map<String, Object>> MY_ARRAY = List.of(
+        Map.of("name", "", "id", "test"), // Metadata is ignored in this Java simulation
+        Map.of("name", "Me", "id", null)
+    );
+
+    // --- Predicates replicating DataWeave logic ---
+
+    // Predicate for 'a': !(value is Null or value is String)
+    private final BiPredicate<Object, List<Object>> PREDICATE_A = 
+        (value, path) -> !(value == null || value instanceof String);
+
+    // Predicate for 'b': (value is Null and isObjectType(path)) 
+    // DataWeave's isObjectType(path) checks if the path points to an object, 
+    // which is implicitly true here as we are inside an object structure.
+    private final BiPredicate<Object, List<Object>> PREDICATE_B = 
+        (value, path) -> (value == null); 
+
+
+    // --- Core Recursive Filter Logic ---
+
+    /**
+     * Recursively traverses and filters object leaf elements based on the predicate.
+     * Replicates the core logic of dw::util::Tree::filterObjectLeafs.
+     * @param input The current object/list being processed.
+     * @param predicate The filtering condition.
+     * @return The filtered object.
+     */
+    @SuppressWarnings("unchecked")
+    private Object filterObjectLeafsRecursive(Object input, BiPredicate<Object, List<Object>> predicate) {
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            // Primitives are handled by the calling Map/List logic. 
+            // Here, we just return them for recursion into Maps/Lists to use.
+            return input;
+        } else if (input instanceof Map) {
+            // Object Type - This is where the filtering happens.
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            originalMap.forEach((key, value) -> {
+                if (value == null || value instanceof Number || value instanceof String || value instanceof Boolean) {
+                    // Leaf node (primitive or null) - APPLY FILTER
+                    if (predicate.test(value, List.of())) { // Path is simplified
+                        newMap.put(key, value);
+                    }
+                } else {
+                    // Non-leaf node (List or nested Map) - RECURSE
+                    Object result = filterObjectLeafsRecursive(value, predicate);
+                    // Non-leaf structures are preserved even if they recursively become empty
+                    newMap.put(key, result);
+                }
+            });
+            // Resulting map (Object) is always preserved, even if empty.
+            return newMap;
+        } else if (input instanceof List) {
+            // Array Type - Recurse but DO NOT filter the array items themselves (as per filterObjectLeafs)
+            List<Object> originalList = (List<Object>) input;
+            
+            return originalList.stream()
+                .map(item -> filterObjectLeafsRecursive(item, predicate))
+                .collect(Collectors.toList());
+        } 
+        return input;
+    }
+
+    // --- Public Execution Method ---
+
+    public Map<String, Object> runFilterSimulation() {
+        Map<String, Object> output = new LinkedHashMap<>();
+        
+        // Input structure for 'a'
+        Map<String, Object> inputA = Map.of(
+            "name", "Mariano",
+            "lastName", null,
+            "age", 123,
+            "friends", MY_ARRAY
+        );
+        
+        // a: filterObjectLeafs (!(value is Null or value is String))
+        output.put("a", filterObjectLeafsRecursive(inputA, PREDICATE_A));
+        
+        // b: { c : null, d : "hello" } filterObjectLeafs ((value is Null and isObjectType(path)))
+        Map<String, Object> inputB = Map.of("c", null, "d", "hello");
+        output.put("b", filterObjectLeafsRecursive(inputB, PREDICATE_B));
+
+        return output;
+    }
+}
+
+output:
+
+
+{
+  "a": {
+    "age": 123,
+    "friends": [
+      {
+        "name": {},
+        "id": {}
+      },
+      {
+        "name": {},
+        "id": {}
+      }
+    ]
+  },
+  "b": {
+    "c": null
+  }
+}
+
+

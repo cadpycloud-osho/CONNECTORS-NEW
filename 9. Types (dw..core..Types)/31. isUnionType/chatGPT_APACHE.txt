@@ -1,0 +1,64 @@
+isUnionType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelUnionTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type AType = String | Number (simulated as Object for union)
+                        Class<?> AType = Object.class;
+
+                        // Simulating DataWeave isUnionType
+                        boolean a = isUnionType(AType);
+                        boolean b = isUnionType(Boolean.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave isUnionType
+    private static boolean isUnionType(Class<?> clazz) {
+        // In Java, we can simulate union types as Object.class
+        return clazz == Object.class;
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+

@@ -1,0 +1,36 @@
+words:
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class WordsConverter {
+    public static List<String> words(String text) {
+        if (text == null) return new ArrayList<>();
+        
+        // Split on whitespace: spaces, tabs (\t), newlines (\n)
+        return Arrays.stream(text.split("[\\s\\t\\n]+"))
+                    .filter(word -> !word.isEmpty())
+                    .collect(Collectors.toList());
+    }
+    
+    public static void main(String[] args) {
+        List<String> result = words("hello world\nhere\t\t\tdata-weave");
+        
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("words", result);
+        System.out.println(output);
+    }
+}
+
+
+
+
+output:
+
+
+["hello", "world", "here", "data-weave"]
+
+
+

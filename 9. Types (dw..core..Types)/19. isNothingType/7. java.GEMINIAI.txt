@@ -1,0 +1,64 @@
+isNothingType:
+
+
+
+input:
+
+
+import java.lang.Void;
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isNothingType(Type).
+     * Checks if the provided type is Void or a subclass/implementation.
+     * Void is used here as a proxy for the DataWeave Nothing type.
+     */
+    public static boolean isNothingType(Class<?> type) {
+        return Void.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ANothing' (which is Nothing)
+        Class<?> aNothingClass = Void.class;
+
+        // 2. Mimics the type 'Nothing'
+        Class<?> nothingClass = Void.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isNothingType(ANothing)
+        boolean a = isNothingType(aNothingClass); 
+
+        // b: isNothingType(Nothing)
+        boolean b = isNothingType(nothingClass); 
+        
+        // c: isNothingType(String)
+        boolean c = isNothingType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

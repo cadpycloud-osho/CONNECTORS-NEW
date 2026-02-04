@@ -1,0 +1,282 @@
+mapObject:
+
+example 1:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * DataWeave equivalent logic: 
+     * { "a": "b", "c": "d" } mapObject ((value, key, index) -> 
+     * (index): { (value): key }
+     * )
+     * Output:
+     * { "0" : { "b" : "a" }, "1" : { "d" : "c" } }
+     */
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input Map (LinkedHashMap preserves insertion order for index)
+        Map<String, String> inputMap = new LinkedHashMap<>();
+        inputMap.put("a", "b");
+        inputMap.put("c", "d");
+
+        // Use a list of key-value pairs to store the inner object strings
+        Map<String, String> outputElements = new LinkedHashMap<>();
+
+        int index = 0;
+
+        // 2. Iterate (mapObject) over the input map entries
+        for (Map.Entry<String, String> entry : inputMap.entrySet()) {
+            String key = entry.getKey();      // 'a', 'c' (DataWeave: $$)
+            String value = entry.getValue();  // 'b', 'd' (DataWeave: $)
+            String indexKey = String.valueOf(index); // '0', '1' (DataWeave: $$$)
+
+            // 3. Manually create the inner JSON object string: { (value): key }
+            // Format: "b" : "a"
+            String innerContent = "\"" + value + "\" : \"" + key + "\"";
+            
+            // 4. Create the outer element: { (index) : innerObject }
+            // Format: "0" : { innerContent }
+            String innerObjectString = "  \"" + indexKey + "\" : {\n    " + innerContent + "\n  }";
+            
+            outputElements.put(indexKey, innerObjectString);
+            
+            index++;
+        }
+
+        // 5. Manually construct the final JSON object string with pretty printing
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("{\n");
+
+        String joinedContent = outputElements.values().stream()
+            .collect(Collectors.joining(",\n"));
+
+        jsonBuilder.append(joinedContent);
+        
+        jsonBuilder.append("\n}");
+        
+        String outputJson = jsonBuilder.toString();
+        
+        System.out.println(outputJson);
+    }
+}
+output:
+
+{
+  "0" : {
+    "b" : "a"
+  },
+  "1" : {
+    "d" : "c"
+  }
+}
+
+---------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.io.StringReader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import java.io.StringWriter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input XML
+        String inputXml = "<?xml version='1.0' encoding='UTF-8'?>" +
+                          "<prices>" +
+                          "  <basic>9.99</basic>" +
+                          "  <premium>53</premium>" +
+                          "  <vip>398.99</vip>" +
+                          "</prices>";
+
+        // --- Standard Java XML Parsing Setup ---
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new InputSource(new StringReader(inputXml)));
+        Element root = doc.getDocumentElement();
+
+        // DataWeave's format: "##.00" is equivalent to DecimalFormat in Java
+        // Use Locale.US to ensure dot (.) as decimal separator
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat decimalFormat = new DecimalFormat("0.00", symbols);
+        
+        // 2. Iterate (mapObject) over the price entries (child elements of <prices>)
+        NodeList priceNodes = root.getChildNodes();
+        
+        for (int i = 0; i < priceNodes.getLength(); i++) {
+            if (priceNodes.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                Element priceElement = (Element) priceNodes.item(i);
+                String stringValue = priceElement.getTextContent().trim();
+
+                try {
+                    // 3. Convert value to number, add 5, and format
+                    double originalValue = Double.parseDouble(stringValue);
+                    double newValue = originalValue + 5; // value + 5
+                    
+                    // Format the result to "##.00"
+                    String formattedValue = decimalFormat.format(newValue);
+                    
+                    // 4. Update the element's text content
+                    priceElement.setTextContent(formattedValue);
+
+                } catch (NumberFormatException e) {
+                    // Skip or log non-numeric values
+                    System.err.println("Skipping non-numeric value for tag: " + priceElement.getTagName());
+                }
+            }
+        }
+        
+        // --- Output XML Generation ---
+        
+        // 5. Use Transformer to write the modified DOM document back to a string
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        
+        // Optional: Remove XML declaration for exact output match (though standard practice is to keep it)
+        transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+        
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        
+        // Clean up the output to match the desired format precisely
+        String outputXml = writer.toString()
+                                .trim()
+                                .replace("  ", " ") // Simplify indentation
+                                .replace("\n<", "\n <"); // Add space for pretty-print
+
+        System.out.println(outputXml);
+    }
+}
+
+
+
+output:
+
+
+
+
+<prices>
+  <basic>14.99</basic>
+  <premium>58.00</premium>
+  <vip>403.99</vip>
+</prices>
+
+
+---------------------------------------------------------------
+
+example 3:
+
+input:
+
+import java.io.StringReader;
+import java.io.StringWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+public class Main {
+
+    /**
+     * DataWeave equivalent logic:
+     * %dw 2.0
+     * output application/xml
+     * input payload application/xml
+     * ---
+     * payload.prices mapObject ((value, key, index) -> {})
+     * * Since the input XML <prices> has no child elements, mapObject returns an empty object, 
+     * resulting in an empty <prices> tag in the output.
+     */
+    public static void main(String[] args) throws Exception {
+        // 1. Define the empty input XML
+        String inputXml = "<?xml version='1.0' encoding='UTF-8'?>" +
+                          "<prices></prices>";
+
+        // --- Standard Java XML Parsing Setup ---
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new InputSource(new StringReader(inputXml)));
+        
+        // In the original DataWeave, mapObject over an empty node results in an empty object.
+        // Since we are not changing the structure, we just need to read and write the root element.
+
+        // --- Output XML Generation ---
+        
+        // 2. Use Transformer to write the DOM document back to a string
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        
+        // Remove XML declaration and prevent unwanted default indentation spaces
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        
+        // Get the output string and trim it to match the expected single-line output
+        String outputXml = writer.toString().trim();
+
+        // The exact output required is simple <prices></prices>
+        System.out.println(outputXml);
+    }
+}
+
+Output (Example 2 - Case B)
+XML
+
+<prices>
+</prices>
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

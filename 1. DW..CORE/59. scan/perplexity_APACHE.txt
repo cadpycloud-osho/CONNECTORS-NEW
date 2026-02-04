@@ -1,0 +1,94 @@
+scan:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.regex.*;
+
+public class ScanFlattenRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:scanFlatten")
+            .process(exchange -> {
+                String input = "www.mulesoft.com";
+                Pattern pattern = Pattern.compile("([w]* )\\.([a-z]*)\\.([a-z]*)");
+                Matcher matcher = pattern.matcher(input);
+                
+                List<String> result = new ArrayList<>();
+                
+                // DataWeave scan behavior: full match + all capture groups
+                while (matcher.find()) {
+                    result.add(input);           // full match: "www.mulesoft.com"
+                    result.add(matcher.group(1)); // group 1: "www" 
+                    result.add(matcher.group(2)); // group 2: "mulesoft"
+                    result.add(matcher.group(3)); // group 3: "com"
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[ "www.mulesoft.com", "www", "mulesoft", "com" ]
+
+
+----------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.regex.*;
+
+public class ScanMultipleMatchesRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:scanMultiple")
+            .process(exchange -> {
+                String input = "anypt@mulesoft.com,max@mulesoft.com";
+                Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+                Matcher matcher = pattern.matcher(input);
+                
+                List<List<String>> result = new ArrayList<>();
+                
+                // DataWeave scan: each match → [fullMatch, group1, group2]
+                while (matcher.find()) {
+                    List<String> match = new ArrayList<>();
+                    match.add(matcher.group(0)); // full match
+                    match.add(matcher.group(1)); // username
+                    match.add(matcher.group(2)); // domain
+                    result.add(match);
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[
+  [ "anypt@mulesoft.com", "anypt", "mulesoft" ],
+  [ "max@mulesoft.com", "max", "mulesoft" ]
+]
+
+
+

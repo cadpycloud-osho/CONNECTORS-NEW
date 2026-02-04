@@ -1,0 +1,41 @@
+field:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        String namespaceUri = "http://acme.com/foo";
+        String fieldName = "myFieldName";
+        
+        Map<String, Object> result = createField(namespaceUri, fieldName);
+        System.out.println(result);
+    }
+    
+    public static Map<String, Object> createField(String namespaceUri, String fieldName) {
+        Map<String, Object> field = new HashMap<>();
+        field.put("kind", "Object");
+        field.put("namespace", namespaceUri);
+        field.put("selector", fieldName);
+        return field;
+    }
+}
+
+
+
+output:
+
+
+{
+   "kind": "Object",
+   "namespace": "http://acme.com/foo",
+   "selector": "myFieldName"
+}
+
+
+
+

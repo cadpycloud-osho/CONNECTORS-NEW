@@ -1,0 +1,34 @@
+upper:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        String input = "mulesoft";
+
+        // Convert to uppercase
+        String upperCaseInput = input.toUpperCase();
+
+        // Print JSON output manually
+        System.out.println("{");
+        System.out.println("  \"name\" : \"" + upperCaseInput + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "name" : "MULESOFT"
+}
+
+
+
+
+

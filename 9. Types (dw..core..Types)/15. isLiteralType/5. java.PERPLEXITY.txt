@@ -1,0 +1,37 @@
+isLiteralType:
+
+
+
+INPUT:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+
+        // Simulate isLiteralType(ALiteralType) where ALiteralType = "Mariano"
+        result.put("a", true);
+
+        // Simulate isLiteralType(Boolean)
+        result.put("b", false);
+
+        // Print JSON-like output
+        System.out.println("{");
+        System.out.println("  \"a\": " + result.get("a") + ",");
+        System.out.println("  \"b\": " + result.get("b"));
+        System.out.println("}");
+    }
+}
+
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+
+

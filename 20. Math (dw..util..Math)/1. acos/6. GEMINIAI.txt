@@ -1,0 +1,58 @@
+acos:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the acos function.
+     * @return A map containing the results of the acos calculations.
+     */
+    @GetMapping("/calculateAcos")
+    public Map<String, Object> calculateAcos() {
+        // Use LinkedHashMap to maintain insertion order, matching DataWeave's predictable output structure.
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // Helper function to replicate DataWeave's acos behavior (returning null for out-of-range input)
+        Object acos(double x) {
+            // DataWeave's acos returns null if x is outside the range [-1, 1].
+            if (x < -1.0 || x > 1.0) {
+                return null;
+            }
+            // Math.acos returns the arc cosine of a value; the returned angle is in the range 0.0 through pi.
+            return Math.acos(x);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("acos0", acos(0));
+        output.put("acos13", acos(0.13));
+        output.put("acos-1", acos(-1));
+        output.put("acos1", acos(1));
+        output.put("acos1.1", acos(1.1));
+
+        return output;
+    }
+}
+
+
+output:
+
+
+{
+  "acos0": 1.5707963267948966,
+  "acos13": 1.440427347091751,
+  "acos-1": 3.141592653589793,
+  "acos1": 0.0,
+  "acos1.1": null
+}
+

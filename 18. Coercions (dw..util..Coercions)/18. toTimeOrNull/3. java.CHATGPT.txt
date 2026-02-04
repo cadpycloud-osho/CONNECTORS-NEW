@@ -1,0 +1,52 @@
+toTimeOrNull:
+
+
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String input = "13:44:12.283-08:00";
+
+        Map<String, String> result = new HashMap<>();
+        result.put("a", toTimeOrNull(input, new String[]{
+                "HH:mm:ss.SSS",
+                "HH:mm:ss.nXXX"
+        }));
+
+        result.put("b", toTimeOrNull(input, new String[]{
+                "HH:mm:ss.SSS"
+        }));
+
+        System.out.println(result);
+    }
+
+    private static String toTimeOrNull(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                OffsetTime time = OffsetTime.parse(value, formatter);
+                return time.toString();
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+{a=13:44:12.000000283-08:00, b=null}
+
+
+

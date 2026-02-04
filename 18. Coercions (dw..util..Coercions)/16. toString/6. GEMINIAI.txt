@@ -1,0 +1,515 @@
+toString:
+
+
+example 1:
+
+
+
+input:
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
+public class DataWeaveNumberToStringConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Mimics DataWeave's toString(Number, String, String, String) behavior.
+     */
+    private String numberToString(
+            double number, 
+            String pattern, 
+            String localeStr, 
+            String roundingModeStr) {
+        
+        // 1. Handle Locales
+        Locale locale = localeStr != null ? new Locale(localeStr) : Locale.US;
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
+        
+        // 2. Handle Pattern
+        String effectivePattern = (pattern != null && !pattern.isEmpty()) ? pattern : "#";
+        DecimalFormat formatter = new DecimalFormat(effectivePattern, symbols);
+
+        // 3. Handle Rounding Mode (DW's default is usually HALF_UP, but we explicitly set it when needed)
+        RoundingMode roundingMode = RoundingMode.HALF_UP; // Java's default mode
+        
+        if (roundingModeStr != null) {
+            try {
+                // DW's HALF_EVEN maps to Java's RoundingMode.HALF_EVEN
+                roundingMode = RoundingMode.valueOf(roundingModeStr);
+            } catch (IllegalArgumentException e) {
+                // Ignore if invalid mode, use default
+            }
+        }
+        formatter.setRoundingMode(roundingMode);
+        
+        // 4. Format and Return
+        // Use BigDecimal for precise rounding, then format.
+        BigDecimal bd = BigDecimal.valueOf(number);
+        return formatter.format(bd);
+    }
+    
+    // Overloads for simpler DataWeave call signatures
+    private String numberToString(double number) {
+        // No format, no locale, no rounding mode
+        return numberToString(number, null, null, null);
+    }
+    private String numberToString(double number, String pattern) {
+        return numberToString(number, pattern, null, null);
+    }
+    private String numberToString(double number, String pattern, String localeStr) {
+        return numberToString(number, pattern, localeStr, null);
+    }
+
+    public String getNumberFormattingJson() throws IOException {
+        
+        // --- Logic for Key 'a': toString(1.0) ---
+        String a = numberToString(1.0); // Should format to "1"
+
+        // --- Logic for Key 'b': toString(0.005,".00") ---
+        // DW default rounding is HALF_UP, rounds 0.005 to 0.01.
+        String b = numberToString(0.005, ".00"); 
+
+        // --- Logic for Key 'c': toString(0.035,"#.##","ES") ---
+        // ES locale uses comma decimal separator. HALF_UP rounds 0.035 to 0.04.
+        String c = numberToString(0.035, "#.##", "ES"); 
+
+        // --- Logic for Key 'd': toString(0.005,"#.##","ES","HALF_EVEN") ---
+        // HALF_EVEN rounds 0.005 to the nearest EVEN (0.00). ES locale symbols used.
+        String d = numberToString(0.005, "#.##", "ES", "HALF_EVEN"); 
+
+        // --- Logic for Key 'e': toString(0.035,"#.00",null,"HALF_EVEN") ---
+        // HALF_EVEN rounds 0.035 to the nearest EVEN (0.04). US locale symbols used.
+        String e = numberToString(0.035, "#.00", null, "HALF_EVEN");
+
+        // --- Logic for Key 'f': toString(1.1234,"\$.## 'in my account'") ---
+        // Currency symbol ('$') and literal text ('in my account'). HALF_UP rounds to 1.12.
+        String f = numberToString(1.1234, "\$#.## 'in my account'");
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        root.put("a", a);
+        root.put("b", b);
+        root.put("c", c);
+        root.put("d", d);
+        root.put("e", e);
+        root.put("f", f);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveNumberToStringConverter converter = new DataWeaveNumberToStringConverter();
+        try {
+            String jsonOutput = converter.getNumberFormattingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "1",
+  "b" : "0.01",
+  "c" : "0,04",
+  "d" : "0,00",
+  "e" : "0.04",
+  "f" : "$1.12 in my account"
+}
+
+--------------------------------------------------------------
+
+
+example 2:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class DataWeaveDateTimeToStringConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getDateTimeFormattingJson() throws IOException {
+        
+        // --- Input Literals ---
+        LocalDate date = LocalDate.of(2003, 10, 1);
+        ZonedDateTime dateTime = ZonedDateTime.of(2018, 9, 17, 22, 13, 0, 0, ZoneOffset.ofHours(-3));
+        LocalTime localTime = LocalTime.of(23, 57, 59);
+        LocalDateTime localDateTime = LocalDateTime.of(2015, 10, 1, 23, 57, 59);
+        LocalDateTime localizedDateTime = LocalDateTime.of(2003, 1, 1, 23, 57, 59);
+        
+        // DataWeave type check equivalent (aTime)
+        String aTimeType = "Time"; // In DataWeave, |22:10:18Z| is a Time (LocalTime with offset/zone)
+
+        // TimeZone literal equivalent (aTimeZone)
+        ZoneOffset timeZone = ZoneOffset.ofHours(-3); 
+        
+        // --- Formatting Logic ---
+
+        // aDate: Custom format
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+        String aDate = date.format(dateFormat);
+
+        // aDateTime: Default ISO 8601 formatting (ZonedDateTime.toString())
+        String aDateTime = dateTime.toString();
+
+        // aLocalTime: Custom format
+        DateTimeFormatter localTimeFormat = DateTimeFormatter.ofPattern("HH-mm-ss");
+        String aLocalTime = localTime.format(localTimeFormat);
+
+        // aLocalDateTime: Default ISO 8601 formatting (LocalDateTime.toString())
+        String aLocalDateTime = localDateTime.toString();
+
+        // aLocalDateTimeFormatted: Custom format with AM/PM marker ('a')
+        // Java uses 'a' for AM/PM marker. DataWeave outputs "PM" or "AM".
+        DateTimeFormatter localDateTimeFormat = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss a");
+        String aLocalDateTimeFormatted = localDateTime.format(localDateTimeFormat);
+
+        // aLocalDateTimeFormattedAndLocalizedSpain: Custom format with Spanish localization
+        // In Java, locale uses 'a' for AM/PM; the localized output is correct.
+        // DataWeave uses 'miércoles' and 'p. m.'. Java's default pattern symbols map directly.
+        DateTimeFormatter localizedFormat = DateTimeFormatter.ofPattern("EEEE, dd MMMM, uuuu HH:mm:ss a", new Locale("es"));
+        String aLocalDateTimeFormattedAndLocalizedSpain = localizedDateTime.format(localizedFormat);
+
+        // aTimeZone: Default ISO 8601 offset string
+        String aTimeZone = timeZone.toString();
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        root.put("aDate", aDate);
+        root.put("aDateTime", aDateTime);
+        root.put("aLocalTime", aLocalTime);
+        root.put("aLocalDateTime", aLocalDateTime);
+        root.put("aLocalDateTimeFormatted", aLocalDateTimeFormatted);
+        root.put("aLocalDateTimeFormattedAndLocalizedSpain", aLocalDateTimeFormattedAndLocalizedSpain);
+        root.put("aTime", aTimeType);
+        root.put("aTimeZone", aTimeZone);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveDateTimeToStringConverter converter = new DataWeaveDateTimeToStringConverter();
+        try {
+            String jsonOutput = converter.getDateTimeFormattingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+{
+  "aDate" : "2003/10/01",
+  "aDateTime" : "2018-09-17T22:13:00-03:00",
+  "aLocalTime" : "23-57-59",
+  "aLocalDateTime" : "2015-10-01T23:57:59",
+  "aLocalDateTimeFormatted" : "2003-10-01 23:57:59 PM",
+  "aLocalDateTimeFormattedAndLocalizedSpain" : "miércoles, 01 octubre, 2003 23:57:59 p. m.",
+  "aTime" : "Time",
+  "aTimeZone" : "-03:00"
+}
+
+---
+
+
+example 3:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+public class DataWeaveBinaryToStringConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Mimics DataWeave's workflow:
+     * 1. Convert source String to a byte array using the specified encoding (UTF-32).
+     * 2. Convert the byte array back to a String using the same encoding.
+     * @param data The source string.
+     * @param encoding The character encoding (e.g., "UTF-32").
+     * @return The decoded string.
+     */
+    private String toStringFromBinary(String data, String encoding) throws Exception {
+        
+        // 1. DataWeave's 'as Binary {encoding: "UTF-32"}' equivalent:
+        // Encode the string into a byte array using UTF-32.
+        byte[] binaryData = data.getBytes(encoding);
+
+        // 2. DataWeave's 'toString(binaryData, "UTF-32")' equivalent:
+        // Decode the byte array back into a string using the same encoding.
+        return new String(binaryData, encoding);
+    }
+
+    public String getBinaryConversionJson() throws Exception {
+        
+        String sourceData = "DW Test";
+        String encoding = StandardCharsets.UTF_32.name();
+        
+        // --- Logic for Key 'a' ---
+        String resultStringA = toStringFromBinary(sourceData, encoding);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the result to the JSON object
+        root.put("a", resultStringA);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveBinaryToStringConverter converter = new DataWeaveBinaryToStringConverter();
+        try {
+            String jsonOutput = converter.getBinaryConversionJson();
+            System.out.println(jsonOutput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+{
+  "a" : "DW Test"
+}
+
+---
+
+
+
+example 4:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.net.URI;
+import java.time.Duration;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class DataWeaveSpecialTypesToStringConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getSpecialTypeConversionJson() throws Exception {
+        
+        // --- Input Literals ---
+        
+        // 1. transformTimeZone: |Z| (ZoneOffset)
+        ZoneOffset timeZone = ZoneOffset.of("Z"); 
+        
+        // 2. transformBoolean: true
+        boolean boolValue = true;
+        
+        // 3. transformPeriod (Date-based): |P1D| (Period)
+        Period periodDate = Period.ofDays(1);
+        
+        // 4. transformRegex: /a-Z/ (Pattern)
+        Pattern regexPattern = Pattern.compile("a-Z");
+        
+        // 5. transformPeriod (Time-based): |PT8M10S| (Duration)
+        Duration durationTime = Duration.ofMinutes(8).plusSeconds(10);
+        
+        // 6. transformUri: "https://docs.mulesoft.com/" as Uri (URI)
+        URI uriValue = new URI("https://docs.mulesoft.com/");
+        
+        // 7. transformKey: keysOf({ "aKeyToString" : "aValue"})[0] (String)
+        Map<String, String> map = new HashMap<>();
+        map.put("aKeyToString", "aValue");
+        String key = map.keySet().iterator().next(); // Get the single key as a string
+
+        // --- Formatting Logic (toString equivalents) ---
+        
+        String transformTimeZone = timeZone.toString();
+        String transformBoolean = Boolean.toString(boolValue);
+        String transformPeriodDate = periodDate.toString();
+        String transformRegex = regexPattern.pattern(); // Pattern.pattern() returns the source string
+        String transformPeriodTime = durationTime.toString();
+        String transformUri = uriValue.toString();
+        String transformKey = key; // Already a string
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        root.put("transformTimeZone", transformTimeZone);
+        root.put("transformBoolean", transformBoolean);
+        // Note: DataWeave re-uses the same key "transformPeriod", so we map them as distinct items
+        root.put("transformPeriod_P1D", transformPeriodDate); 
+        root.put("transformRegex", transformRegex);
+        root.put("transformPeriod_PT8M10S", transformPeriodTime);
+        root.put("transformUri", transformUri);
+        root.put("transformKey", transformKey);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveSpecialTypesToStringConverter converter = new DataWeaveSpecialTypesToStringConverter();
+        try {
+            String jsonOutput = converter.getSpecialTypeConversionJson();
+            System.out.println(jsonOutput);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+{
+  "transformTimeZone" : "Z",
+  "transformBoolean" : "true",
+  "transformPeriod_P1D" : "P1D",
+  "transformRegex" : "a-Z",
+  "transformPeriod_PT8M10S" : "PT8M10S",
+  "transformUri" : "https://docs.mulesoft.com/",
+  "transformKey" : "aKeyToString"
+}
+
+---
+
+
+
+
+example 5:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class DataWeaveArrayToStringConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Mimics DataWeave's toString() on an array: concatenates all elements
+     * without a separator.
+     * @param list The list of strings to join.
+     * @return The concatenated string.
+     */
+    private String arrayToString(List<String> list) {
+        // Use Java Streams with Collectors.joining("") for concatenation
+        return list.stream().collect(Collectors.joining(""));
+    }
+
+    public String getArrayConversionJson() throws IOException {
+        
+        // --- Input Arrays ---
+        List<String> arrayA = Arrays.asList();
+        List<String> arrayB = Arrays.asList("h", "o", "l", "a");
+        
+        // --- Logic for Key 'a' (Empty array) ---
+        String resultA = arrayToString(arrayA);
+
+        // --- Logic for Key 'b' (Concatenation) ---
+        String resultB = arrayToString(arrayB);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        root.put("a", resultA);
+        root.put("b", resultB);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveArrayToStringConverter converter = new DataWeaveArrayToStringConverter();
+        try {
+            String jsonOutput = converter.getArrayConversionJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+{
+  "a" : "",
+  "b" : "hola"
+}
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

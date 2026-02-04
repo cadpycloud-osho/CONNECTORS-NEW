@@ -1,0 +1,76 @@
+HMACBinary:
+
+
+
+
+Java Equivalent Logic
+
+HMAC-SHA512:
+
+Mac mac = Mac.getInstance("HmacSHA512");
+SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "HmacSHA512");
+mac.init(keySpec);
+byte[] raw = mac.doFinal(messageBytes);
+String output = new String(raw, StandardCharsets.UTF_8);
+
+
+input:
+package com.example.demo.util;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
+public class CryptoUtil {
+
+    public static String hmacBinary(String message, String key, String algorithm) {
+        try {
+            Mac mac = Mac.getInstance(algorithm);
+            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm);
+            mac.init(secretKey);
+
+            byte[] rawBytes = mac.doFinal(message.getBytes(StandardCharsets.UTF_8));
+
+            // Return raw binary interpreted as UTF-8 (same as DataWeave)
+            return new String(rawBytes, StandardCharsets.UTF_8);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.CryptoUtil;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class CryptoController {
+
+    @GetMapping("/hmacBinary")
+    public Map<String, String> generateHmac() {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        String message = "confidential";
+        String key = "xxxxx";
+        String algorithm = "HmacSHA512";
+
+        result.put("HMACBinary", CryptoUtil.hmacBinary(message, key, algorithm));
+
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "HMACBinary": "    ^h !3\u0005 ֎\u00017    ` 8? jn7 bs;\t ƅ    x&g ~  % 7>1 K\u000e@ C\u0011 T }W"
+}
+

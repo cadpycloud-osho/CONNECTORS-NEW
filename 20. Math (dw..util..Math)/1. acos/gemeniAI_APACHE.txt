@@ -1,0 +1,49 @@
+acos:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathAcosRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateAcos")
+            .routeId("Math-Acos-Transformation")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                results.put("acos0", Math.acos(0));
+                results.put("acos13", Math.acos(0.13));
+                results.put("acos-1", Math.acos(-1));
+                results.put("acos1", Math.acos(1));
+                
+                // Java's Math.acos(1.1) returns Double.NaN
+                // We handle it to match DataWeave's 'null' output
+                double acosLimit = Math.acos(1.1);
+                results.put("acos1.1", Double.isNaN(acosLimit) ? null : acosLimit);
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Acos Results: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "acos0": 1.5707963267948966,
+  "acos13": 1.440427347091751,
+  "acos-1": 3.141592653589793,
+  "acos1": 0.0,
+  "acos1.1": null
+}
+
+
+

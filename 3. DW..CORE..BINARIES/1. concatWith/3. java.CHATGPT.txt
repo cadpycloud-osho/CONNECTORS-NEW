@@ -1,0 +1,45 @@
+concatWith:
+
+
+
+input:
+
+import java.util.Base64;
+
+public class Main {
+
+    // Convert hex string to byte array
+    private static byte[] hexToBytes(String hex) {
+        int len = hex.length();
+        byte[] bytes = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            bytes[i / 2] = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
+        }
+        return bytes;
+    }
+
+    public static void main(String[] args) {
+
+        byte[] first = hexToBytes("CAFE");
+        byte[] second = hexToBytes("ABCD");
+
+        // Concatenate byte arrays
+        byte[] combined = new byte[first.length + second.length];
+        System.arraycopy(first, 0, combined, 0, first.length);
+        System.arraycopy(second, 0, combined, first.length, second.length);
+
+        // Convert to Base64
+        String base64Result = Base64.getEncoder().encodeToString(combined);
+
+        System.out.println(base64Result);
+    }
+}
+
+
+
+output:
+
+yv6rzQ==
+
+
+

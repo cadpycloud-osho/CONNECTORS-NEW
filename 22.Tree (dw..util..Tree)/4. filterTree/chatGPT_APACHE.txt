@@ -1,0 +1,149 @@
+filterTree:
+
+
+input:
+
+import java.util.*;
+
+public class FilterTreeExample {
+
+    public static void main(String[] args) {
+
+        // Construct 'a'
+        Map<String, Object> friend1 = new LinkedHashMap<>();
+        friend1.put("id", "");
+        friend1.put("test", true);
+
+        Map<String, Object> friend2 = new LinkedHashMap<>();
+        friend2.put("age", 123);
+
+        List<Map<String, Object>> friends = new ArrayList<>();
+        friends.add(friend1);
+        friends.add(friend2);
+
+        Map<String, Object> a = new LinkedHashMap<>();
+        a.put("name", "");
+        a.put("lastName", "Achaval"); // metadata ignored
+        a.put("friends", friends);    // metadata ignored
+
+        // Construct 'b'
+        Object b = null;
+
+        // Construct 'c'
+        Map<String, Object> c1 = new LinkedHashMap<>();
+        c1.put("name", "Mariano");
+        c1.put("friends", new ArrayList<>());
+
+        Map<String, Object> c2 = new LinkedHashMap<>();
+        c2.put("test", Arrays.asList(1,2,3));
+
+        Map<String, Object> c3 = new LinkedHashMap<>();
+        c3.put("dw", "");
+
+        List<Map<String, Object>> c = Arrays.asList(c1, c2, c3);
+
+        // Apply filterTree logic
+        Map<String, Object> filteredA = filterTree(a, value -> {
+            if (value instanceof String) {
+                return !((String) value).isEmpty();
+            }
+            return true;
+        });
+
+        Object filteredB = filterTreeObject(b, value -> value instanceof String);
+
+        List<Map<String, Object>> filteredC = new ArrayList<>();
+        for (Map<String, Object> item : c) {
+            filteredC.add(filterTree(item, value -> {
+                if (value instanceof List) {
+                    return !((List<?>) value).isEmpty();
+                }
+                return true;
+            }));
+        }
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", filteredA);
+        output.put("b", filteredB);
+        output.put("c", filteredC);
+
+        System.out.println(output);
+    }
+
+    // Recursive filterTree for maps
+    private static Map<String, Object> filterTree(Map<String, Object> map, java.util.function.Predicate<Object> predicate) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                Map<String, Object> filtered = filterTree((Map<String, Object>) value, predicate);
+                if (!filtered.isEmpty()) result.put(entry.getKey(), filtered);
+            } else if (value instanceof List) {
+                List<Object> filteredList = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    if (item instanceof Map) {
+                        Map<String, Object> filteredItem = filterTree((Map<String, Object>) item, predicate);
+                        if (!filteredItem.isEmpty()) filteredList.add(filteredItem);
+                    } else if (predicate.test(item)) {
+                        filteredList.add(item);
+                    }
+                }
+                if (!filteredList.isEmpty()) result.put(entry.getKey(), filteredList);
+            } else if (predicate.test(value)) {
+                result.put(entry.getKey(), value);
+            }
+        }
+        return result;
+    }
+
+    private static Object filterTreeObject(Object obj, java.util.function.Predicate<Object> predicate) {
+        if (obj instanceof Map) {
+            return filterTree((Map<String, Object>) obj, predicate);
+        } else if (obj instanceof List) {
+            List<Object> list = new ArrayList<>();
+            for (Object item : (List<?>) obj) {
+                if (predicate.test(item)) list.add(item);
+            }
+            return list;
+        } else {
+            return predicate.test(obj) ? obj : null;
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a": {
+    "lastName": "Achaval",
+    "friends": [
+      {
+        "test": true
+      },
+      {
+        "age": 123
+      }
+    ]
+  },
+  "b": null,
+  "c": [
+    {
+      "name": "Mariano"
+    },
+    {
+      "test": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "dw": ""
+    }
+  ]
+}
+
+
+

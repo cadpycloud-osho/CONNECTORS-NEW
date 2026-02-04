@@ -1,0 +1,121 @@
+unzip:
+
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Object>> input = Arrays.asList(
+                Arrays.asList(0, "a"),
+                Arrays.asList(1, "b"),
+                Arrays.asList(2, "c"),
+                Arrays.asList(3, "d")
+        );
+
+        // unzip logic
+        List<Object> first = input.stream().map(list -> list.get(0)).collect(Collectors.toList());
+        List<Object> second = input.stream().map(list -> list.get(1)).collect(Collectors.toList());
+
+        List<List<Object>> output = Arrays.asList(first, second);
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+[[0, 1, 2, 3], [a, b, c, d]]
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Object>> input = Arrays.asList(
+                Arrays.asList(0, "a"),
+                Arrays.asList(1, "a", "foo"),
+                Arrays.asList(2),
+                Arrays.asList(3, "a")
+        );
+
+        // Only extract the first element of each sublist
+        List<Object> output = input.stream()
+                                   .map(list -> list.get(0))
+                                   .collect(Collectors.toList());
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+[0, 1, 2, 3]
+
+
+-------------------------------------------------------
+
+
+
+
+example 3:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<List<Object>> input = Arrays.asList(
+                Arrays.asList(0, "a", "W"),
+                Arrays.asList(1, "b", "X"),
+                Arrays.asList(2, "c", "Y"),
+                Arrays.asList(3, "d", "Z")
+        );
+
+        // unzip logic
+        int maxLength = input.stream().mapToInt(List::size).max().orElse(0);
+        List<List<Object>> output = new ArrayList<>();
+
+        for (int i = 0; i < maxLength; i++) {
+            List<Object> column = new ArrayList<>();
+            for (List<Object> row : input) {
+                if (i < row.size()) {
+                    column.add(row.get(i));
+                }
+            }
+            output.add(column);
+        }
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+[[0, 1, 2, 3], [a, b, c, d], [W, X, Y, Z]]
+
+
+-------------------------------------------------------

@@ -1,0 +1,55 @@
+toBase64:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.security.MessageDigest;
+
+public class GravatarBase64Route extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:fetchGravatarBase64")
+            .routeId("Gravatar-Integration-Route")
+            
+            // 1. Logic: Crypto::MD5("achaval@gmail.com")
+            .process(exchange -> {
+                String email = "achaval@gmail.com";
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte[] hashBytes = md.digest(email.getBytes("UTF-8"));
+                
+                // Convert bytes to Hex string
+                StringBuilder sb = new StringBuilder();
+                for (byte b : hashBytes) {
+                    sb.append(String.format("%02x", b));
+                }
+                
+                // Store the checksum for the next step
+                exchange.getIn().setHeader("emailChecksum", sb.toString());
+            })
+            
+            // 2. Logic: log("https://www.gravatar.com/avatar/$(emailChecksum)")
+            .log("Fetching Gravatar from: https://www.gravatar.com/avatar/${header.emailChecksum}")
+
+            // 3. Logic: readUrl(..., "application/octet-stream")
+            // toD allows dynamic URI construction using the header we just created
+            .toD("https://www.gravatar.com/avatar/${header.emailChecksum}?bridgeEndpoint=true")
+
+            // 4. Logic: toBase64(image)
+            // This marshals the binary image body into a Base64 encoded string
+            .marshal().base64()
+
+            // 5. Logic: output application/json
+            // We wrap the result in quotes to ensure it is a valid JSON string
+            .setBody(simple("\"${body}\""))
+            
+            .to("mock:result");
+    }
+}
+
+
+output:
+
+"/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAyADIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5/ooooAKKKKACKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP//Z"
+

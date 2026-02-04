@@ -1,0 +1,113 @@
+causedBy:
+
+
+
+input:
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+// --- 1. Mock/Simulated Classes to replace Servlet dependencies ---
+
+// Minimal Throwable class to simulate Spring Security's AccessDeniedException
+class AccessDeniedException extends Exception {
+    public AccessDeniedException(String message) {
+        super(message);
+    }
+}
+
+// Minimal Mock for HttpServletResponse
+class MockHttpServletResponse {
+    public static final int SC_UNAUTHORIZED = 401;
+    public static final int SC_FORBIDDEN = 403;
+    public static final int SC_INTERNAL_SERVER_ERROR = 500;
+
+    private int status = 200;
+    private String contentType = "text/plain";
+    private StringWriter sw = new StringWriter();
+    private PrintWriter writer = new PrintWriter(sw);
+
+    public void setStatus(int status) { this.status = status; }
+    public void setContentType(String contentType) { this.contentType = contentType; }
+    public PrintWriter getWriter() { return writer; }
+    
+    // Helper to get the final output string
+    public String getOutput() {
+        return sw.toString().trim();
+    }
+}
+
+// --- 2. Main Logic Class (Simulating the Filter) ---
+
+public class Main {
+
+    // Simulates the doFilter logic without actual Servlet dependencies
+    public static String simulateDoFilter(Exception simulatedException) throws IOException {
+        
+        MockHttpServletResponse httpResponse = new MockHttpServletResponse();
+        
+        try {
+            // Simulate processing the request chain where an exception is thrown
+            if (simulatedException != null) {
+                throw simulatedException;
+            }
+            // chain.doFilter(request, response); would be here if successful
+            
+        } catch (Exception e) {
+            // Find the root cause of the exception
+            Throwable cause = getRootCause(e);
+            
+            // --- Replicating Mule's 'choice' logic based on cause ---
+            
+            // Case 1: HTTP:UNAUTHORIZED
+            if (cause.getClass().getSimpleName().contains("AuthenticationException")) {
+                httpResponse.setStatus(MockHttpServletResponse.SC_UNAUTHORIZED); // 401
+                httpResponse.setContentType("application/json");
+                httpResponse.getWriter().write("{\"status\": \"401\", \"message\": \"Authentication Failed.\"}");
+                
+            // Case 2: HTTP:FORBIDDEN (Targeted case for the requested output)
+            } else if (cause.getClass().getSimpleName().contains("AccessDeniedException")) {
+                httpResponse.setStatus(MockHttpServletResponse.SC_FORBIDDEN); // 403
+                httpResponse.setContentType("application/json");
+                httpResponse.getWriter().write("{\"status\": \"403\", \"message\": \"Access Forbidden.\"}");
+
+            // Case 3: Other exceptions
+            } else {
+                httpResponse.setStatus(MockHttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500
+                httpResponse.setContentType("application/json");
+                httpResponse.getWriter().write("{\"status\": \"500\", \"message\": \"Internal Server Error.\"}");
+            }
+        }
+        
+        return httpResponse.getOutput();
+    }
+
+    // Simple utility to get the root exception cause
+    private static Throwable getRootCause(Throwable throwable) {
+        Throwable cause = throwable;
+        while (cause.getCause() != null && cause.getCause() != cause) {
+            cause = cause.getCause();
+        }
+        return cause;
+    }
+
+    public static void main(String[] args) {
+        try {
+            // Simulate the execution path where an AccessDeniedException occurs
+            Exception simulatedError = new AccessDeniedException("User role mismatch.");
+            String result = simulateDoFilter(simulatedError);
+
+            System.out.println(result);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{"status": "403", "message": "Access Forbidden."}
+
+

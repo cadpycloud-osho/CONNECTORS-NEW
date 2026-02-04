@@ -1,0 +1,109 @@
+findDataFormatDescriptorByMime:
+
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class FindDataFormatDescriptorTest {
+
+    // Simulate DataFormatDescriptor structure
+    static class DataFormatDescriptor {
+        String name;
+        String defaultMimeType;
+        
+        DataFormatDescriptor(String name, String defaultMimeType) {
+            this.name = name;
+            this.defaultMimeType = defaultMimeType;
+        }
+    }
+
+    // Simulate findDataFormatDescriptorByMime function
+    static DataFormatDescriptor findDataFormatDescriptorByMime(Map<String, Object> mimeSpecifier) {
+        String subtype = (String) mimeSpecifier.get("subtype");
+        Map<String, Object> parameters = (Map<String, Object>) mimeSpecifier.get("parameters");
+        
+        if ("json".equals(subtype)) {
+            return new DataFormatDescriptor("json", "application/json");
+        }
+        return null; // unknown
+    }
+
+    // DataWeave match equivalent
+    static Map<String, String> simplify(DataFormatDescriptor df) {
+        if (df != null) {
+            return Map.of("name", df.name, "defaultMimeType", df.defaultMimeType);
+        }
+        return Map.of("name", "unknown", "defaultMimeType", "unknown");
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new DataFormatRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class DataFormatRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // jsonDF - findDataFormatDescriptorByMime({'type': "*", subtype: "json", parameters: {}})
+                        Map<String, Object> jsonMime = new HashMap<>();
+                        jsonMime.put("type", "*");
+                        jsonMime.put("subtype", "json");
+                        jsonMime.put("parameters", new HashMap<>());
+                        DataFormatDescriptor jsonDF = findDataFormatDescriptorByMime(jsonMime);
+
+                        // unknownDF - findDataFormatDescriptorByMime({'type': "*", subtype: "*", parameters: {}})
+                        Map<String, Object> unknownMime = new HashMap<>();
+                        unknownMime.put("type", "*");
+                        unknownMime.put("subtype", "*");
+                        unknownMime.put("parameters", new HashMap<>());
+                        DataFormatDescriptor unknownDF = findDataFormatDescriptorByMime(unknownMime);
+
+                        // Build result using simplify function
+                        Map<String, Object> result = new HashMap<>();
+                        result.put("json", simplify(jsonDF));
+                        result.put("unknown", simplify(unknownDF));
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+Output:
+{
+  "json" : {
+    "name" : "json",
+    "defaultMimeType" : "application/json"
+  },
+  "unknown" : {
+    "name" : "unknown",
+    "defaultMimeType" : "unknown"
+  }
+}
+
+

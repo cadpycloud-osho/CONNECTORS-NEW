@@ -1,0 +1,65 @@
+dropWhile:
+
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class DropWhileExample {
+
+    /**
+     * Replicates the DataWeave 'dropWhile' function.
+     * Removes elements from the start of the list as long as the predicate is true.
+     * * @param sourceList The list to process.
+     * @param predicate The condition to test against elements.
+     * @return A list containing the remaining elements.
+     */
+    public static <T> List<T> dropWhile(List<T> sourceList, Predicate<T> predicate) {
+        if (sourceList == null || sourceList.isEmpty()) {
+            return List.of();
+        }
+
+        int dropCount = 0;
+        
+        // Iterate through the list to find the first element that does NOT satisfy the condition
+        for (T element : sourceList) {
+            if (predicate.test(element)) {
+                dropCount++;
+            } else {
+                // Stop counting as soon as the condition fails
+                break;
+            }
+        }
+        
+        // Return the sublist starting from the index where the condition failed
+        return sourceList.subList(dropCount, sourceList.size());
+    }
+
+    public static void main(String[] args) {
+        // Input array/List
+        List<Integer> arr = Arrays.asList(0, 1, 3, 2, 1);
+        
+        // DataWeave Logic: arr dropWhile $ < 3
+        // Predicate: n -> n < 3
+        List<Integer> result = dropWhile(arr, n -> n < 3);
+        
+        System.out.println("--- Input List ---");
+        System.out.println(arr);
+        
+        System.out.println("\n--- DataWeave dropWhile Equivalent Output ---");
+        // Print the result to replicate the DataWeave JSON output format [ 3, 2, 1 ]
+        System.out.println(result.toString());
+    }
+}
+
+output:
+
+[
+  3,
+  2,
+  1
+]

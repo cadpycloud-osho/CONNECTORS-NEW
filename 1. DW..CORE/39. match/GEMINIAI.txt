@@ -1,0 +1,103 @@
+match:
+
+EXAMPLE 1:
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Collections;
+
+@RestController
+public class MatchController {
+
+    /**
+     * DataWeave Source: "me@mulesoft.com" match(/([a-z]*)@([a-z]*)\.com/)
+     * Accessible at http://localhost:8080/match/email
+     */
+    @GetMapping("/match/email")
+    public Map<String, List<String>> matchEmail() {
+        String input = "me@mulesoft.com";
+        // The Java Pattern equivalent of the DataWeave regex
+        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+        Matcher matcher = pattern.matcher(input);
+
+        List<String> results = new ArrayList<>();
+
+        if (matcher.find()) {
+            // 1. Add the full match (equivalent to index 0 in DW/Java regex results)
+            results.add(matcher.group(0));
+
+            // 2. Add captured group 1 (username)
+            results.add(matcher.group(1));
+
+            // 3. Add captured group 2 (domain name)
+            results.add(matcher.group(2));
+        }
+
+        // Return the results wrapped in a map for JSON output structure
+        return Collections.singletonMap("output", results);
+    }
+}
+
+OUTPUT:
+
+
+{
+  "output": [
+    "me@mulesoft.com",
+    "me",
+    "mulesoft"
+  ]
+}
+____________________________________________________________________
+
+EXAMPLE 2:
+
+INPUT:
+
+// ... inside the MatchController class ...
+
+import java.util.stream.Collectors;
+
+    /**
+     * DataWeave Source: [ a, b, c ] flatMap ( $ match(/.*[$4]/) )
+     * Interpreted as: Filter the list to include only strings containing '4'.
+     * Accessible at http://localhost:8080/match/ip-filter
+     */
+    @GetMapping("/match/ip-filter")
+    public List<String> matchIpFilter() {
+        // Data setup
+        List<String> ipList = Arrays.asList(
+            "192.88.99.0/24",  // Contains '4' (in '/24')
+            "192.168.0.0/16",  // Contains '16'
+            "192.175.48.0/24"  // Contains '4' (in '48' and '/24')
+        );
+
+        // Define the filter pattern (we search for the digit '4' to replicate the DW output)
+        Pattern filterPattern = Pattern.compile("4");
+
+        // Use Java Stream filter to replicate the flatMap filtering behavior.
+        // The original DW match returns the full string on match, or null/empty on no match.
+        List<String> filteredList = ipList.stream()
+            // Filter: only keep the string if the pattern matches (i.e., it contains '4')
+            .filter(ip -> filterPattern.matcher(ip).find())
+            // Collect the matching strings
+            .collect(Collectors.toList());
+
+        return filteredList;
+    }
+}
+
+OUTPUT:
+
+
+[
+  "192.88.99.0/24",
+  "192.175.48.0/24"
+]

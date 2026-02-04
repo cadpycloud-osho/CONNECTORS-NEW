@@ -1,0 +1,54 @@
+isAlphanumeric:
+
+input:
+
+import java.util.*;
+
+public class IsAlphanumericExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> output = new LinkedHashMap<>();
+
+        output.put("a", isAlphanumeric(null));
+        output.put("b", isAlphanumeric(""));
+        output.put("c", isAlphanumeric("  "));
+        output.put("d", isAlphanumeric("abc"));
+        output.put("e", isAlphanumeric("ab c"));
+        output.put("f", isAlphanumeric("ab2c"));
+        output.put("g", isAlphanumeric("ab-c"));
+
+        System.out.println(output);
+    }
+
+    private static boolean isAlphanumeric(String str) {
+        if (str == null || str.isEmpty()) return false;
+
+        for (char c : str.toCharArray()) {
+            if (!Character.isLetterOrDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": true,
+  "g": false
+}
+
+
+
+

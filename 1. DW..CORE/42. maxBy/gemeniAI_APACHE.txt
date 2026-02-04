@@ -1,0 +1,192 @@
+maxBy:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class CamelMaxByExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [ { "a" : 1 }, { "a" : 3 }, { "a" : 2 } ]
+                        List<Map<String, Integer>> input = Arrays.asList(
+                            Map.of("a", 1),
+                            Map.of("a", 3),
+                            Map.of("a", 2)
+                        );
+
+                        // Equivalent to maxBy ((item) -> item.a)
+                        // We find the max by comparing the value of key "a"
+                        Optional<Map<String, Integer>> maxItem = input.stream()
+                            .max(Comparator.comparingInt(item -> item.get("a")));
+
+                        // Set the body to the result (if present)
+                        exchange.getIn().setBody(maxItem.orElse(null));
+                    })
+                    // Convert the resulting Map to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{ "a": 3 }
+
+---------------------------------------------------
+
+
+example 2:
+
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.*;
+import java.util.*;
+import java.util.stream.Stream;
+
+public class CamelMaxByTemporal {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Setup Data (Equivalent to DW vars)
+                        OffsetDateTime dt1 = OffsetDateTime.parse("2017-10-01T22:57:59-03:00");
+                        OffsetDateTime dt2 = OffsetDateTime.parse("2018-10-01T23:57:59-03:00");
+
+                        // 2. Perform maxBy logic using Java Streams
+                        Map<String, Object> myMaxBy = new LinkedHashMap<>();
+
+                        // byDateTime
+                        myMaxBy.put("byDateTime", Stream.of(dt1, dt2)
+                                .max(Comparator.naturalOrder()).get().toString());
+
+                        // byDate
+                        myMaxBy.put("byDate", Stream.of(dt1.toLocalDate(), dt2.toLocalDate())
+                                .max(Comparator.naturalOrder()).get().toString());
+
+                        // byTime
+                        myMaxBy.put("byTime", Stream.of(dt1.toOffsetTime(), dt2.toOffsetTime())
+                                .max(Comparator.naturalOrder()).get().toString());
+
+                        // emptyArray
+                        myMaxBy.put("emptyArray", Stream.<OffsetDateTime>empty()
+                                .max(Comparator.naturalOrder()).orElse(null));
+
+                        exchange.getIn().setBody(Map.of("myMaxBy", myMaxBy));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{
+  "myMaxBy": {
+    "byDateTime": "2018-10-01T23:57:59-03:00",
+    "byDate": "2018-10-01",
+    "byTime": "23:57:59-03:00",
+    "emptyArray": null
+  }
+}
+
+---------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
+public class CamelMaxByString {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [ "A", "B", "C" ]
+                        List<String> input = Arrays.asList("A", "B", "C");
+
+                        // Equivalent to maxBy ((item) -> item)
+                        String result = input.stream()
+                            .max(Comparator.naturalOrder())
+                            .orElse(null);
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+"C"
+
+---------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

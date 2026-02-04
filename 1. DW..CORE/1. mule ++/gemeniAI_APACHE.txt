@@ -1,0 +1,241 @@
+++:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+public class ArrayConcatenationProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Define the two arrays as they appear in the DataWeave code
+        List<Object> array1 = Arrays.asList(0, 1, true, "my string");
+        List<Object> array2 = Arrays.asList(2, Arrays.asList(3, 4, 5), Collections.singletonMap("a", 6));
+
+        // Concatenate the arrays using Java List methods
+        List<Object> concatenatedArray = new ArrayList<>(array1);
+        concatenatedArray.addAll(array2);
+
+        // Create the final output map: { "a": [concatenatedArray] }
+        Map<String, Object> result = Collections.singletonMap("a", concatenatedArray);
+
+        // Set the resulting Java object as the new message body
+        exchange.getIn().setBody(result);
+    }
+}
+
+
+output:
+
+{ "a": [0, 1, true, "my string", 2, [3, 4, 5], { "a": 6}] }
+
+
+Camel Route (XML DSL)
+The route invokes the Java Processor and uses the Jackson Data Format to marshal the Java Map back into a JSON string.
+
+XML
+
+<route id="dataweaveArrayConcatenationRoute">
+    <from uri="direct:startArrayConcatenation"/>
+    <process ref="arrayConcatenationProcessor"/>
+    <marshal><json library="Jackson"/></marshal>
+    <to uri="mock:result"/>
+</route>
+
+<bean id="arrayConcatenationProcessor" class="com.example.ArrayConcatenationProcessor"/>
+
+
+-------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Map;
+
+public class DateTimeCombiner {
+    public Map<String, String> combineDateTime() {
+        // Define the date and time components
+        LocalDate date = LocalDate.parse("2017-10-01");
+        LocalTime time = LocalTime.parse("23:57:59");
+        
+        // Combine them into a LocalDateTime
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        
+        // Return the required JSON structure: { "LocalDateTime": "..." }
+        return Collections.singletonMap("LocalDateTime", dateTime.toString());
+    }
+}
+
+
+output:
+
+{ "LocalDateTime": "2017-10-01T23:57:59" }
+
+
+<route id="dataweaveDateTimeCombinationRoute">
+    <from uri="direct:startDateTimeCombination"/>
+    <bean ref="dateTimeCombiner" method="combineDateTime"/>
+    <marshal><json library="Jackson"/></marshal>
+    <to uri="mock:result"/>
+</route>
+
+<bean id="dateTimeCombiner" class="com.example.DateTimeCombiner"/>
+
+-------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ComplexDateTimeCombiner {
+    public Map<String, String> combineComplexDates() {
+        Map<String, String> results = new LinkedHashMap<>();
+        LocalDate date = LocalDate.parse("2017-10-01");
+
+        // 1. Time with no offset (becomes Z) + Date -> LocalDateTime, then append 'Z'
+        LocalTime time1 = LocalTime.parse("23:57:59");
+        LocalDateTime dt1 = LocalDateTime.of(date, time1);
+        results.put("DateTime1", dt1.toString() + "Z");
+
+        // 2. Time with Z (UTC) + Date -> ZonedDateTime
+        // Parse the combined string to ZonedDateTime (or use explicit UTC zone)
+        // Note: DW's implicit nature is hard to replicate. The simplest is string manipulation or using UTC zone.
+        ZonedDateTime dt2 = ZonedDateTime.of(dt1, ZoneId.of("UTC")); // Using dt1 since both are 23:57:59
+        results.put("DateTime2", dt2.format(DateTimeFormatter.ISO_INSTANT)); // ISO_INSTANT ensures T23:57:59Z format
+
+        // 3. Date + Time with +02:00 offset -> ZonedDateTime
+        OffsetTime offsetTime3 = OffsetTime.parse("23:57:59+02:00");
+        ZonedDateTime dt3 = ZonedDateTime.of(date, offsetTime3.toLocalTime(), offsetTime3.getOffset());
+        results.put("DateTime3", dt3.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        
+        return results;
+    }
+}
+
+
+output:
+
+<route id="dataweaveComplexCombinationRoute">
+    <from uri="direct:startComplexCombination"/>
+    <bean ref="complexDateTimeCombiner" method="combineComplexDates"/>
+    <marshal><json library="Jackson"/></marshal>
+    <to uri="mock:result"/>
+</route>
+
+<bean id="complexDateTimeCombiner" class="com.example.ComplexDateTimeCombiner"/>
+
+
+-------------------------------------------------------
+
+
+
+
+example 4:
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.OffsetTime;
+import java.util.Collections;
+import java.util.Map;
+
+public class TimeWithZoneCombiner {
+    
+    /**
+     * Combines a LocalTime and a ZoneOffset into an OffsetTime.
+     */
+    public Map<String, String> combineTimeAndZone() {
+        // 1. Parse the time component (LocalTime)
+        LocalTime time = LocalTime.parse("23:57");
+        
+        // 2. Parse the zone offset component (ZoneOffset)
+        ZoneOffset offset = ZoneOffset.of("-03:00");
+        
+        // 3. Combine them using OffsetTime.of()
+        OffsetTime offsetTime = OffsetTime.of(time, offset);
+        
+        // 4. Return the result in the required map structure
+        return Collections.singletonMap("Time", offsetTime.toString());
+    }
+}
+
+output:
+
+
+{ "Time": "23:57:00-03:00" }
+
+
+<route id="dataweaveTimeFirstCombinationRoute">
+    <from uri="direct:startTimeFirst"/>
+    <bean ref="timeWithZoneCombiner" method="combineTimeAndZone"/>
+    <marshal><json library="Jackson"/></marshal>
+    <to uri="mock:result4"/>
+</route>
+
+<bean id="timeWithZoneCombiner" class="com.example.TimeWithZoneCombiner"/>
+-------------------------------------------------------
+
+
+
+
+example 5:
+
+
+input:
+
+from("direct:timeZone2")
+.process(exchange -> {
+    ZoneId zone = ZoneId.of("-03:00");
+    LocalTime time = LocalTime.of(23, 57);
+    ZonedDateTime result = time.atDate(LocalDate.now()).atZone(zone);
+    exchange.getMessage().setBody(Map.of("Time", result.toLocalTime().atOffset(ZoneOffset.of("-03:00"))));
+});
+
+
+
+
+output:
+
+
+<route id="dataweaveTimeZoneFirstCombinationRoute">
+    <from uri="direct:startTimeZoneFirst"/>
+    <bean ref="timeWithZoneCombiner" method="combineTimeAndZone"/>
+    <marshal><json library="Jackson"/></marshal>
+    <to uri="mock:result5"/>
+</route>
+
+<bean id="timeWithZoneCombiner" class="com.example.TimeWithZoneCombiner"/>
+
+
+
+-------------------------------------------------------
+
+

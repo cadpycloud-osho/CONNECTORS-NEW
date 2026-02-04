@@ -1,0 +1,53 @@
+isObjectType:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ObjectTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkObject")
+            .process(exchange -> {
+                // In Java/Camel, 'Object' in a DataWeave context 
+                // refers to a Map/Dictionary structure.
+                Object refA = Map.class;           // Represents {name: String}
+                Object refB = Boolean.class;       // Represents Boolean type
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if it's a Map type (structured object)
+                result.put("a", isObjectType(refA));
+                result.put("b", isObjectType(refB));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isObjectType(Object obj) {
+        if (obj == null) return false;
+        
+        // If it's a class reference (e.g., Map.class)
+        if (obj instanceof Class) {
+            return Map.class.isAssignableFrom((Class<?>) obj);
+        }
+        
+        // If it's an actual instance
+        return obj instanceof Map;
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": false
+}
+

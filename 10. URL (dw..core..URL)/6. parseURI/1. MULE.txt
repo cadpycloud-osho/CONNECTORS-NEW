@@ -1,0 +1,57 @@
+parseURI:
+parseURI(uri: String): URI
+
+
+The isValid: Boolean property in the output URI object indicates whether the parsing process succeeded. Every field in this object is optional, and a field will appear in the output only if it was present in the URL input.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::URL
+output application/json
+---
+{
+  'composition': parseURI('https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer')
+}
+Output
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

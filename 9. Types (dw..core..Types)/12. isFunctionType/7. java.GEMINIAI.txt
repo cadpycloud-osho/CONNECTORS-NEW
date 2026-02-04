@@ -1,0 +1,47 @@
+isFunctionType:
+
+
+
+INPUT:
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    private static final String FUNCTION_TYPE_INDICATOR = "->";
+
+    /**
+     * Pure Java method to mimic the DataWeave isFunctionType() function.
+     */
+    public static boolean checkIsFunctionType(String typeRepresentation) {
+        // Checks if the type representation contains the function structure indicator
+        return typeRepresentation.contains(FUNCTION_TYPE_INDICATOR);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Define the input types (mimicking the DW type aliases and built-in types)
+        final String AFunction_Representation = "(String) -> String"; 
+        final String Builtin_Boolean = "Boolean";
+
+        // 2. Perform the transformation
+        boolean resultA = checkIsFunctionType(AFunction_Representation);
+        boolean resultB = checkIsFunctionType(Builtin_Boolean);
+
+        // 3. Structure the final output map: { "a": resultA, "b": resultB }
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", resultA);
+        output.put("b", resultB);
+
+        // 4. Print the result to the console
+        System.out.println("DataWeave Output Emulation:");
+        // Simple print of the Map structure (looks like JSON key-value pairs)
+        System.out.println(output.toString().replace("=", ": "));
+    }
+}
+
+OUTPUT:
+
+{a: true, b: false}
+

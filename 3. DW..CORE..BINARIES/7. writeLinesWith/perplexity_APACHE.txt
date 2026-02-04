@@ -1,0 +1,28 @@
+writeLinesWith:
+
+
+input:
+
+from("direct:writeLines")
+    .process(exchange -> {
+        List<String> lines = IntStream.rangeClosed(1, 10)
+            .mapToObj(i -> "Line " + i)
+            .collect(Collectors.toList());
+        
+        String joined = String.join("\n", lines) + "\n";
+        Map<String, String> result = new HashMap<>();
+        result.put("lines", joined);
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+{
+  "lines": "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10\n"
+}
+
+
+
+

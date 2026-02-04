@@ -1,0 +1,36 @@
+log10:
+
+
+input:
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("log1010", log10(10));
+        result.put("log1013", log10(0.13));
+        result.put("log10-20", log10(-20));
+
+        System.out.println(result);
+    }
+
+    // Equivalent of DW log10()
+    private static Double log10(double value) {
+        if (value <= 0) {
+            return null;
+        }
+        return Math.log10(value);
+    }
+}
+
+
+
+output:
+
+
+{log1010=1.0, log1013=-0.8860566476931632, log10-20=null}
+

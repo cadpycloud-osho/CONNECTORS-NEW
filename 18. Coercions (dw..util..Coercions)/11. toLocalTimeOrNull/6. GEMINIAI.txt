@@ -1,0 +1,90 @@
+toLocalTimeOrNull:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveToLocalTimeOrNullConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceTimeString = "23:57:59";
+
+    /**
+     * Mimics DataWeave's toLocalTimeOrNull() behavior with chained formatters.
+     * Returns the parsed LocalTime upon success, or null if all formatters fail.
+     */
+    private LocalTime toLocalTimeOrNull(String timeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return LocalTime.parse(timeString, formatter);
+            } catch (DateTimeParseException e) {
+                // DataWeave's behavior: swallow the exception and continue to the next formatter
+            }
+        }
+        // If the loop completes without a successful parse, return null
+        return null; 
+    }
+
+    public String getLocalTimeParsingJson() throws IOException {
+        // Define formatters
+        // Using 'S' for fractions of seconds to represent DataWeave's 'n' expecting fractional time
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm:ss.S", Locale.US); 
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
+        
+        // --- Logic for Key 'a' (Success after chain) ---
+        // Try formatter1 (fails), then formatter2 (succeeds)
+        LocalTime parsedTimeA = toLocalTimeOrNull(sourceTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Failure) ---
+        // Only try formatter1 (fails), resulting in null
+        LocalTime parsedTimeB = toLocalTimeOrNull(sourceTimeString, formatter1);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes LocalTime as a standard ISO string or null.
+        if (parsedTimeA != null) {
+             root.put("a", parsedTimeA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        if (parsedTimeB != null) {
+             root.put("b", parsedTimeB.toString());
+        } else {
+             root.putNull("b");
+        }
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToLocalTimeOrNullConverter converter = new DataWeaveToLocalTimeOrNullConverter();
+        try {
+            String jsonOutput = converter.getLocalTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "23:57:59",
+  "b" : null
+}
+
+

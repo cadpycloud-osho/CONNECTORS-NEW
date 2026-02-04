@@ -1,0 +1,55 @@
+isUnionType:
+
+
+
+input:
+
+package com.example.demo.util;
+
+import java.util.List;
+
+public class TypeUtils {
+
+    // A union type is represented as a list of Java classes
+    public static boolean isUnionType(Object type) {
+        return (type instanceof List);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class UnionTypeController {
+
+    @GetMapping("/isUnionType")
+    public Map<String, Boolean> checkUnionType() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to: type AType = String | Number
+        List<Class<?>> AType = List.of(String.class, Number.class);
+
+        result.put("a", TypeUtils.isUnionType(AType));
+        result.put("b", TypeUtils.isUnionType(Boolean.class));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+

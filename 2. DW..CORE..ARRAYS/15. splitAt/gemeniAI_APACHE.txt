@@ -1,0 +1,72 @@
+splitAt:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+
+public class CamelSplitAtExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: var users = ["Mariano", "Leandro", "Julian"]
+                        List<String> users = List.of("Mariano", "Leandro", "Julian");
+                        int splitIndex = 1;
+
+                        // Java equivalent of splitAt
+                        // Ensure index is within bounds to prevent IndexOutOfBoundsException
+                        int idx = Math.max(0, Math.min(splitIndex, users.size()));
+                        
+                        List<String> left = users.subList(0, idx);
+                        List<String> right = users.subList(idx, users.size());
+
+                        exchange.getIn().setBody(Map.of(
+                            "l", left,
+                            "r", right
+                        ));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+public class SplitService {
+    public Map<String, List<?>> splitList(List<?> input, int index) {
+        int idx = Math.max(0, Math.min(index, input.size()));
+        return Map.of(
+            "l", input.subList(0, idx),
+            "r", input.subList(idx, input.size())
+        );
+    }
+}
+
+// In the Route:
+from("direct:splitLogic")
+    .bean(SplitService.class, "splitList(${body}, 1)")
+    .log("Left side count: ${body[l].size}");
+
+output:
+
+{
+  "l": ["Mariano"],
+  "r": ["Leandro", "Julian"]
+}
+
+

@@ -1,0 +1,52 @@
+asin:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = executeAsinTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Double> executeAsinTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("asin0", asin(0.0));
+        result.put("asin13", asin(0.13));
+        result.put("asin-1", asin(-1.0));
+        result.put("asin1.1", asin(1.1));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave asin() equivalent:
+     * Returns arcsine of x, or null if x is outside [-1, 1] range
+     */
+    public static Double asin(double x) {
+        // Check domain: x must be in [-1, 1]
+        if (x < -1.0 || x > 1.0) {
+            return null;
+        }
+        return Math.asin(x);
+    }
+}
+
+
+
+output:
+
+{
+  asin0=0.0,
+  asin13=0.1303689797031455,
+  asin-1=-1.5707963267948966,
+  asin1.1=null
+}
+
+

@@ -1,0 +1,65 @@
+functionParamTypes:
+
+functionParamTypes(t: Type): Array<FunctionParam>
+
+functionParamTypes(t: Type): Array<FunctionParam>
+Returns the list of parameters from the given function type. This function fails if the provided type is not a Function type.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::core::Types
+type AFunction = (String, Number) -> Number
+type AFunction2 = () -> Number
+---
+{
+    a: functionParamTypes(AFunction),
+    b: functionParamTypes(AFunction2)
+}
+
+
+DataWeave
+Output
+{
+   "a": [
+     {
+       "paramType": "String",
+       "optional": false
+     },
+     {
+       "paramType": "Number",
+       "optional": false
+     }
+   ],
+   "b": [
+
+   ]
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

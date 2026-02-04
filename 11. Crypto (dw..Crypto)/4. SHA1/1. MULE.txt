@@ -1,0 +1,45 @@
+SHA1:
+
+SHA1(content: Binary): String
+
+SHA1(content: Binary): String
+Computes the SHA1 hash and transforms the result into a hexadecimal, lowercase string.
+
+
+
+Source
+%dw 2.0
+import dw::Crypto
+output application/json
+---
+{ "sha1" : Crypto::SHA1("dsasd" as Binary) }
+
+
+DataWeave
+Output
+{ "sha1": "2fa183839c954e6366c206367c9be5864e4f4a65" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

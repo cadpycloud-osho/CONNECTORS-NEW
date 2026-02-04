@@ -1,0 +1,53 @@
+hours:
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
+public class DataWeavePeriodsExample {
+
+    public static void main(String[] args) {
+
+        // Original DateTime
+        ZonedDateTime originalDate = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        // Calculations
+        ZonedDateTime nextHour = originalDate.plusHours(1);
+        ZonedDateTime previousHour = originalDate.minusHours(1);
+
+        // Only time input |20:22|
+        LocalTime timeOnly = LocalTime.parse("20:22");
+
+        LocalTime threeHoursLater = timeOnly.plusHours(3);
+        LocalTime addDecimalInput = timeOnly.plusMinutes((long)(3.5 * 60)); // 3.5 hours = 210 mins
+
+        Duration decimalInputAsPeriod = Duration.ofSeconds((long)(4.555 * 3600)); 
+        Duration fourHourPeriod = Duration.ofHours(4);
+        Duration addNegativeValue = Duration.ofHours(-1).plusHours(2);
+
+        // Printing output
+        System.out.println("nextHour: " + nextHour);
+        System.out.println("previousHour: " + previousHour);
+        System.out.println("threeHoursLater: " + threeHoursLater);
+        System.out.println("addDecimalInput: " + addDecimalInput);
+        System.out.println("decimalInputAsPeriod: " + decimalInputAsPeriod);
+        System.out.println("fourHourPeriod: " + fourHourPeriod);
+        System.out.println("addNegativeValue: " + addNegativeValue.getSeconds());
+    }
+}
+
+
+
+output:
+
+nextHour: 2020-10-05T21:22:34.385Z
+previousHour: 2020-10-05T19:22:34.385Z
+threeHoursLater: 23:22
+addDecimalInput: 23:52
+decimalInputAsPeriod: PT4H33M18S
+fourHourPeriod: PT4H
+addNegativeValue: 3600
+

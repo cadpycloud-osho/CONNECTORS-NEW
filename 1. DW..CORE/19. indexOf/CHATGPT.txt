@@ -1,0 +1,83 @@
+indexOf:
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IndexOfArrayController {
+
+    @GetMapping("/indexOfArray")
+    public Map<String, Integer> getIndexValues() {
+        Map<String, Integer> result = new LinkedHashMap<>();
+
+        List<String> list1 = List.of("a", "b", "c", "d");
+        List<String> list2 = List.of("x", "w", "x");
+        List<String> list3 = List.of("a", "b", "c", "c");
+
+        result.put("present", list1.indexOf("c"));
+        result.put("notPresent", list2.indexOf("c")); // -1 if not exists
+        result.put("presentMoreThanOnce", list3.indexOf("c")); // always first match
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+
+
+_______________________________________________________________________
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class IndexOfStringController {
+
+    @GetMapping("/indexOfString")
+    public Map<String, Integer> getIndexFromStrings() {
+        Map<String, Integer> result = new LinkedHashMap<>();
+
+        String s1 = "abcd";
+        String s2 = "xyz";
+        String s3 = "abcdc";
+
+        result.put("present", s1.indexOf("c"));
+        result.put("notPresent", s2.indexOf("c")); // -1 if not found
+        result.put("presentMoreThanOnce", s3.indexOf("c")); // first index
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+
+
+

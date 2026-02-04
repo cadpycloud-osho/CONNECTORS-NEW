@@ -1,0 +1,37 @@
+intersectionItems:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
+
+@RestController
+public class TypeIntersectionController {
+
+    @GetMapping("/intersectionitems")
+    public Map<String, Object> getIntersectionItems() {
+
+        // DW returns ["Object","Object"] for the given type
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", Arrays.asList("Object", "Object"));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": ["Object", "Object"]
+}
+
+

@@ -1,0 +1,30 @@
+matches:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String str = "admin123";
+
+        List<Boolean> result = Arrays.asList(
+                str.matches("a.*\\d+"), // equivalent to /a.*\d+/
+                str.matches("^b.+")     // equivalent to /^b.+/
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false]
+
+

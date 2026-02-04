@@ -1,0 +1,24 @@
+toRadixNumber:
+
+toRadixNumber(number: Number, radix: Number): String
+
+toRadixNumber(number: Number, radix: Number): String
+Transforms a decimal number into a number string in other radix.
+
+
+
+Source
+%dw 2.0
+import toRadixNumber from dw::core::Numbers
+output application/json
+---
+{
+    a: toRadixNumber(2, 2),
+    b: toRadixNumber(255, 16)
+}
+DataWeave
+Output
+{
+  "a": "10",
+  "b": "ff"
+}

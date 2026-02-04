@@ -1,0 +1,39 @@
+toRadixNumber:
+
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: toRadixNumber(2, 2)
+        String a = toRadixNumber(2, 2);
+
+        // DataWeave: toRadixNumber(255, 16)
+        String b = toRadixNumber(255, 16);
+
+        // JSON-like output
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a + "\",");
+        System.out.println("  \"b\": \"" + b + "\"");
+        System.out.println("}");
+    }
+
+    // DataWeave Numbers::toRadixNumber equivalent
+    public static String toRadixNumber(int value, int radix) {
+        return Integer.toString(value, radix);
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": "10",
+  "b": "ff"
+}
+

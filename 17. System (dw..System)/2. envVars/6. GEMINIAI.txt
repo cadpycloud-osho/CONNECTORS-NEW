@@ -1,0 +1,48 @@
+
+envVars():
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+
+public class SimpleEnvironmentVariableReader {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getEnvironmentVariableJson() throws IOException {
+        // Get the value from the System Environment
+        String shellValue = System.getenv("SHELL");
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the key-value pair, matching the DataWeave output
+        // If the variable is not set, shellValue will be null.
+        root.put("envVars", shellValue); 
+
+        // Convert the root object to a pretty-printed JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        // Example usage (in a Spring @RestController or main class)
+        SimpleEnvironmentVariableReader reader = new SimpleEnvironmentVariableReader();
+        try {
+            String jsonOutput = reader.getEnvironmentVariableJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+
+{
+  "envVars" : "/bin/bash"
+}
+

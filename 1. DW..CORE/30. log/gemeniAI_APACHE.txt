@@ -1,0 +1,106 @@
+log:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelLogExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // The equivalent of log("WARNING", "...")
+                    // This prints to the console but doesn't change the body
+                    .log(LoggingLevel.WARN, "Houston, we have a problem")
+                    
+                    // Sending to stream:out to show the "Expression Output"
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        
+        // Sending the string "Houston, we have a problem" as the body
+        context.createProducerTemplate().sendBody("direct:start", "Houston, we have a problem");
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[main] route1 WARN  Houston, we have a problem
+
+"Houston, we have a problem"
+----------------------------------------------------------
+example 2:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import java.util.Map;
+
+public class CamelLogAndExtract {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // Define the complex object
+                Map<String, Object> myUser = Map.of(
+                    "user", Map.of(
+                        "friend", Map.of("name", "Shoki"),
+                        "id", 1,
+                        "name", "Tomo"
+                    ),
+                    "accountId", "leansh"
+                );
+
+                from("direct:start")
+                    .setBody(constant(myUser))
+                    
+                    // 1. Logic for: log("User", myUser.user)
+                    // We extract the 'user' part to log it, but don't change the main body yet
+                    .process(exchange -> {
+                        Map<String, Object> body = exchange.getIn().getBody(Map.class);
+                        Object userPart = body.get("user");
+                        System.out.println("User - " + userPart); 
+                    })
+
+                    // 2. Logic for: .friend.name
+                    // We navigate deep into the object to return only the friend's name
+                    .transform(jsonpath("$.user.friend.name"))
+                    
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+User - {friend={name=Shoki}, id=1, name=Tomo}
+
+Shoki
+
+

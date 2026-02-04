@@ -1,0 +1,49 @@
+valuesOf:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class CamelValuesOfExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave input: {a: true, b: 1}
+                        Map<String, Object> inputMap = Map.of("a", true, "b", 1);
+                        
+                        // Java Map.values() returns a Collection
+                        // We convert it to a List to match the DataWeave array output
+                        List<Object> values = new ArrayList<>(inputMap.values());
+
+                        exchange.getIn().setBody(Map.of("valuesOf", values));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "valuesOf": [true, 1]
+}
+

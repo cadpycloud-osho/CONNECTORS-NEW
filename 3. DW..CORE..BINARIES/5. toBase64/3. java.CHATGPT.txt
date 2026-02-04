@@ -1,0 +1,69 @@
+toBase64:
+
+
+
+input:
+
+import java.io.InputStream;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.util.Base64;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        String email = "achaval@gmail.com";
+
+        //Generate MD5 hash
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest(email.getBytes("UTF-8"));
+
+        StringBuilder hex = new StringBuilder();
+        for (byte b : digest) {
+            hex.append(String.format("%02x", b));
+        }
+
+        String emailChecksum = hex.toString();
+
+        // Build Gravatar URL
+        String gravatarUrl = "https://www.gravatar.com/avatar/" + emailChecksum;
+        System.out.println("Gravatar URL: " + gravatarUrl);
+
+        // Download image bytes
+        URL url = new URL(gravatarUrl);
+        InputStream is = url.openStream();
+        byte[] imageBytes = is.readAllBytes();
+        is.close();
+
+        // Convert to Base64
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+        // Print shortened output
+        System.out.println("\nBase64 Output (shortened):");
+        System.out.println(base64Image.substring(0, 50) + "...");
+    }
+}
+
+
+
+
+output:
+
+
+Gravatar URL:
+https://www.gravatar.com/avatar/0c8f25c4c6a5a42c5c4c3e2d6cba5b11
+
+Base64 Output (shortened):
+/9j/4AAQSkZJRgABAQEAYABgAAD//...
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+substringBefore:
+
+input:
+
+import java.util.*;
+
+public class SubstringBeforeConverter {
+    public static String substringBefore(String text, String separator) {
+        if (text == null) return null;
+        if (separator == null || separator.isEmpty()) return "";
+        
+        int pos = text.indexOf(separator);
+        if (pos == -1) return "";
+        return text.substring(0, pos);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringBefore(null, "'"));
+        result.put("b", substringBefore("", "-"));
+        result.put("c", substringBefore("abc", "b"));
+        result.put("d", substringBefore("abc", "c"));
+        result.put("e", substringBefore("abc", "d"));
+        result.put("f", substringBefore("abc", ""));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab", 
+  "e": "",
+  "f": ""
+}
+
+

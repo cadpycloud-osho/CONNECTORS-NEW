@@ -1,0 +1,192 @@
+filter:
+
+
+filter<T>(@StreamCapable items: Array<T>, criteria: (item: T, index: Number) -> Boolean): Array<T>
+Iterates over an array and applies an expression that returns matching values.
+
+The expression must return true or false. If the expression returns true for a value or index in the array, the value gets captured in the output array. If it returns false for a value or index in the array, that item gets filtered out of the output. If there are no matches, the output array will be empty.
+
+
+
+Source:
+[9,2,3,4,5] filter (value, index) -> (value > 2)
+
+
+DataWeave
+Output:
+[9,3,4,5]
+
+
+
+_____________________________________________________________________
+
+
+Source:
+%dw 2.0
+---
+[{name: "Mariano", age: 37}, {name: "Shoki", age: 30}, {name: "Tomo", age: 25}, {name: "Ana", age: 29}]
+          filter ((value, index) -> value.age >= 30)
+DataWeave
+Output:
+[
+   {
+     "name": "Mariano",
+     "age": 37
+   },
+   {
+     "name": "Shoki",
+     "age": 30
+   }
+]
+
+
+
+
+_______________________________________________________________--
+
+Source
+%dw 2.0
+output application/json
+---
+[9, 2, 3, 4, 5] filter (($$ > 1) and ($ < 5))
+
+
+DataWeave
+Output
+[3,4]
+
+
+
+__________________________________________________________________
+
+
+Source
+%dw 2.0
+output application/json
+
+var users = [
+   {
+      "user": {
+         "name": "123",
+         "lastName": "Smith"
+      },
+      "error": "That name doesn't exists"
+   },
+   {
+      "user": {
+         "name": "John",
+         "lastName": "Johnson"
+      },
+      "error": null
+   }
+]
+---
+users filter ((item, index) -> item.error == null)
+DataWeave
+Output
+[
+  {
+    "user": {
+      "name": "John",
+      "lastName": "Johnson"
+    },
+    "error": null
+  }
+]
+
+
+
+
+
+
+______________________________________________________________________
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+    id: payload.Id,
+    markCode: payload.marketCode,
+    languageCode: payload.languageCode,
+    username: payload.profile.base.username,
+    phoneNumber: (payload.profile.base.phone filter ($.activeInd == "Y" and $.primaryInd== "Y")).number default []
+}
+
+
+DataWeave
+Input
+{
+  "Id": "1184001100000000517",
+  "marketCode": "US",
+  "languageCode": "en-US",
+  "profile": {
+  "base": {
+     "username": "TheMule",
+     "activeInd": "R",
+     "phone": [
+       {
+          "activeInd": "Y",
+          "type": "mobile",
+          "primaryInd": "Y",
+          "number": "230678123"
+       },
+       {
+         "activeInd": "N",
+         "type": "mobile",
+         "primaryInd": "N",
+         "number": ""
+       },
+       {
+          "activeInd": "Y",
+          "type": "mobile",
+          "primaryInd": "Y",
+          "number": "154896523"
+       }
+      ]
+    }
+  }
+ }
+
+
+JSON
+Output
+{
+  "id": "1184001100000000517",
+  "markCode": "US",
+  "languageCode": "en-US",
+  "username": "TheMule",
+  "phoneNumber": [
+    "230678123"
+    "154896523"
+  ]
+}
+
+
+
+
+
+________________________________________________________________________
+
+
+filter(@StreamCapable text: String, criteria: (character: String, index: Number) -> Boolean): String
+
+
+Source
+%dw 2.0
+output application/json
+---
+"hello world" filter ($$ mod 2) == 0
+
+
+Output
+"hlowrd"
+
+
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+min:
+
+
+min<T <: Comparable>(@StreamCapable values: Array<T>): T | Null
+
+min<T <: Comparable>(@StreamCapable values: Array<T>): T | Null
+Returns the lowest Comparable value in an array.
+
+The items must be of the same type or min throws an error. The function returns null if the array is empty.
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ a: min([1, 1000]), b: min([1, 2, 3]), c: min([1.5, 2.5, 3.5]) }
+
+DataWeave
+Output
+{ "a": 1, "b": 1, "c": 1.5 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

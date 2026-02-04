@@ -1,0 +1,88 @@
+flatten:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class FlattenRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:start")
+            // 1. Convert JSON to List
+            .unmarshal().json()
+            
+            // 2. The Pure Camel version of .flatMap(List::stream)
+            // This is the functional equivalent to DataWeave's flatten()
+            .transform().groovy("body.flatten()")
+            
+            // 3. Convert back to JSON
+            .marshal().json()
+            
+            // 4. Output: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            .to("stream:out");
+    }
+}
+
+output:
+
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+---------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class FlattenObjectsRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:extractAndFlatten")
+            // 1. Unmarshal incoming JSON to a Map structure
+            .unmarshal().json(JsonLibrary.Jackson)
+
+            // 2. The Pure Camel equivalent of flatten(myData.user.myarray)
+            // Uses GPath to collect 'myarray' from all users and then flattens the result
+            .transform().groovy("body.user.myarray.flatten()")
+
+            // 3. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+[
+  {
+    "name": "Shoki",
+    "id": 5678
+  },
+  {
+    "name": "Mariano",
+    "id": 9123
+  },
+  {
+    "name": "Sai",
+    "id": 2001
+  },
+  {
+    "name": "Peter",
+    "id": 2002
+  }
+]
+
+
+---------------------------------------------------
+

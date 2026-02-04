@@ -1,0 +1,62 @@
+wait:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DwWaitTest {
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new WaitRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class WaitRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Simulate DataWeave computation: { "user" : 1 }
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("user", 1);
+
+                        // Simulate "wait 2000" - sleep for 2 seconds (non-blocking in real DataWeave)
+                        Thread.sleep(2000);
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "user" : 1
+}
+
+
+
+

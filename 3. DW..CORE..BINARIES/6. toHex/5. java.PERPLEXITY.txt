@@ -1,0 +1,75 @@
+toHex:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: var myBinary = "Mule" as Binary
+        byte[] myBinary = "Mule".getBytes();
+        
+        // DataWeave equivalent: var testType = typeOf(myBinary) -> "Binary"
+        String testType = typeOf(myBinary);
+        
+        // DataWeave equivalent: toHex(myBinary)
+        String binaryToHex = toHex(myBinary);
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"binaryToHex\": \"" + binaryToHex + "\"");
+        System.out.println("}");
+        
+        // Additional verification
+        System.out.println("\nVerification:");
+        System.out.println("Original text: Mule");
+        System.out.println("Binary bytes: " + bytesToHex(myBinary));
+        System.out.println("Type: " + testType);
+    }
+    
+    // DataWeave "toHex(myBinary)" equivalent
+    public static String toHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b & 0xFF));
+        }
+        return sb.toString();
+    }
+    
+    // DataWeave "typeOf(myBinary)" equivalent
+    public static String typeOf(byte[] content) {
+        return "Binary";
+    }
+    
+    // Utility to display bytes as hex (for verification)
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X ", b & 0xFF));
+        }
+        return sb.toString().trim();
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "binaryToHex": "4D756C65"
+}
+
+Verification:
+Original text: Mule
+Binary bytes: 4D 75 6C 65
+Type: Binary
+
+
+
+
+
+
+

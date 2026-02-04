@@ -1,0 +1,43 @@
+fromHex:
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.binary.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class FromHexDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(FromHexDemoApplication.class, args);
+    }
+}
+
+@RestController
+class FromHexController {
+    
+    @GetMapping("/fromHex")
+    public Map<String, String> fromHexExample() {
+        // "4D756C65" = "Mule" in ASCII
+        byte[] hexBytes = Hex.decodeHex("4D756C65".toCharArray());
+        String base64Result = Base64.encodeBase64String(hexBytes);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("hexToBinary", base64Result);
+        
+        return result;
+    }
+}
+
+OUTPUT:
+
+{
+  "hexToBinary": "TXVsZQ=="
+}
+

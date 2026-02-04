@@ -1,0 +1,54 @@
+toTimeZone:
+
+
+
+
+input:
+
+import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Mimics DataWeave's toTimeZone() behavior.
+     */
+    private String toTimeZone(String zoneString) {
+        // ZoneId.of() handles all required formats: fixed offsets (like Z, -03:00) and region IDs.
+        return ZoneId.of(zoneString).toString();
+    }
+
+    public Map<String, String> getTimeZoneConversionMap() {
+        
+        // --- Logic for Keys ---
+        String offsetResult = toTimeZone("-03:00"); 
+        String abbreviationResult = toTimeZone("Z"); 
+        String nameResult = toTimeZone("America/Argentina/Buenos_Aires");
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("toTimeZoneOffset", offsetResult);
+        rootMap.put("toTimeZoneAbbreviation", abbreviationResult);
+        rootMap.put("toTimeZoneName", nameResult);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaToTimeZoneConverter converter = new PureJavaToTimeZoneConverter();
+        Map<String, String> result = converter.getTimeZoneConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{toTimeZoneName=America/Argentina/Buenos_Aires, toTimeZoneAbbreviation=Z, toTimeZoneOffset=-03:00}
+

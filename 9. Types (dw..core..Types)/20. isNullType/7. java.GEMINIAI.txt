@@ -1,0 +1,68 @@
+isNullType:
+
+
+
+input:
+
+
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptual proxy class for the DataWeave 'Null' type. 
+     * This class is never instantiated; it's only used for Class type comparison.
+     */
+    private static final class NullType {
+        private NullType() {}
+    }
+
+    /**
+     * Conceptually mirrors DataWeave's isNullType(Type).
+     * Checks if the provided type is our NullType proxy or a subclass/implementation.
+     */
+    public static boolean isNullType(Class<?> type) {
+        return NullType.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ANull' (which is Null)
+        Class<?> aNullClass = NullType.class;
+
+        // 2. Mimics the type 'Null'
+        Class<?> nullTypeClass = NullType.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isNullType(ANull)
+        boolean a = isNullType(aNullClass); 
+
+        // b: isNullType(Null)
+        boolean b = isNullType(nullTypeClass); 
+        
+        // c: isNullType(String)
+        boolean c = isNullType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

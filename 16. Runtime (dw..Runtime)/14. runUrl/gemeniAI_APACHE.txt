@@ -1,0 +1,54 @@
+runUrl:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Collections;
+import java.util.Map;
+
+public class RunUrlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:executeRunUrl")
+            .doTry()
+                // Loads and executes the script from classpath
+                // DataSonnet is the Camel-native alternative to DataWeave
+                .to("datasonnet:resource:classpath:org/mule/weave/v2/engine/runtime_runUrl/example.ds")
+                .process(exchange -> {
+                    Object result = exchange.getIn().getBody();
+                    // Construct the structured response
+                    Map<String, Object> response = Map.of(
+                        "success", true,
+                        "value", "\"" + result.toString() + "\"",
+                        "mimeType", "application/dw",
+                        "encoding", "UTF-8",
+                        "logs", Collections.emptyList()
+                    );
+                    exchange.getIn().setBody(response);
+                })
+            .doCatch(Exception.class)
+                .process(exchange -> {
+                    Exception e = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                    exchange.getIn().setBody(Map.of("success", false, "error", e.getMessage()));
+                })
+            .end();
+    }
+}
+
+
+output:
+
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "\"Mariano\"",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8",
+    "logs": []
+  }
+}
+
+

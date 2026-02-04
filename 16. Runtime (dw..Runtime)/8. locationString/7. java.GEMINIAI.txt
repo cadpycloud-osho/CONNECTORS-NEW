@@ -1,0 +1,31 @@
+locationString:
+
+
+
+input:
+
+public class Main {
+
+    // Manual storage of the source code snippet (Replicating the literal source data)
+    private static final String SOURCE_DEFINITION = "var a = 123";
+
+    /**
+     * Simulates the dw::Runtime::locationString(a) function.
+     * @return The source code snippet.
+     */
+    public static String getLocationString() {
+        // The Java code returns the manually stored string
+        return SOURCE_DEFINITION;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java LocationString Simulation ---");
+        System.out.println(getLocationString());
+    }
+}
+
+output:
+
+
+var a = 123
+

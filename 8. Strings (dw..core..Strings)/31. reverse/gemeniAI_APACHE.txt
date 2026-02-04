@@ -1,0 +1,38 @@
+reverse:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ReverseStringRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:reverseText")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang matches DataWeave's null and empty behavior
+                results.put("a", StringUtils.reverse("Mariano"));
+                results.put("b", StringUtils.reverse(null));
+                results.put("c", StringUtils.reverse(""));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+
+output:
+
+{
+  "a": "onairaM",
+  "b": null,
+  "c": ""
+}
+

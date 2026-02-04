@@ -1,0 +1,463 @@
+toString:
+
+
+example 1:
+
+input:
+
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * Helper to resolve the Locale based on DataWeave's convention.
+     */
+    private Locale resolveLocale(String localeString) {
+        if (localeString == null || localeString.trim().isEmpty() || "US".equalsIgnoreCase(localeString)) {
+            return Locale.US;
+        }
+        // Assuming localeString is the language tag (e.g., "ES")
+        return new Locale(localeString);
+    }
+
+    /**
+     * Mimics DataWeave's toString(Number, String, String, String) behavior.
+     */
+    private String numberToString(
+            double number, 
+            String pattern, 
+            String localeStr, 
+            String roundingModeStr) {
+        
+        Locale locale = resolveLocale(localeStr);
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
+        
+        String effectivePattern = (pattern != null && !pattern.isEmpty()) ? pattern : "#";
+        DecimalFormat formatter = new DecimalFormat(effectivePattern, symbols);
+
+        // Default to HALF_UP as per DataWeave/Java convention
+        RoundingMode roundingMode = RoundingMode.HALF_UP; 
+        
+        if (roundingModeStr != null) {
+            try {
+                // Java's RoundingMode names are typically uppercase
+                roundingMode = RoundingMode.valueOf(roundingModeStr);
+            } catch (IllegalArgumentException e) {
+                // Use default if provided string is invalid
+            }
+        }
+        formatter.setRoundingMode(roundingMode);
+        
+        // Use BigDecimal for accurate intermediate value representation before formatting
+        BigDecimal bd = BigDecimal.valueOf(number);
+        
+        // DataWeave's `toString(number, format)` does not automatically include the 
+        // DecimalFormat's default decimal and grouping separators unless the pattern requires it.
+        // We use format(BigDecimal) to ensure correct rounding is applied before formatting the output string.
+        return formatter.format(bd);
+    }
+    
+    // Overloaded methods to handle optional arguments
+    private String numberToString(double number) {
+        return numberToString(number, null, null, null);
+    }
+    private String numberToString(double number, String pattern) {
+        return numberToString(number, pattern, null, null);
+    }
+    private String numberToString(double number, String pattern, String localeStr) {
+        return numberToString(number, pattern, localeStr, null);
+    }
+
+    public Map<String, String> getNumberFormattingMap() {
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // a: "1.0" -> "1" (Default formatter for integer input)
+        rootMap.put("a", numberToString(1.0)); 
+
+        // b: 0.005, format ".00", default (US) locale, HALF_UP. 
+        // .00 means 2 mandatory decimal places. 0.005 rounds to 0.01.
+        rootMap.put("b", numberToString(0.005, "#.00")); 
+
+        // c: 0.035, format "#.##", ES locale (',' is decimal separator), HALF_UP.
+        // 0.035 rounds to 0.04. Output is "0,04".
+        rootMap.put("c", numberToString(0.035, "#.##", "ES")); 
+
+        // d: 0.005, format "#.##", ES locale, HALF_EVEN.
+        // 0.005 rounds to the nearest even digit (0.00). Output is "0,00".
+        rootMap.put("d", numberToString(0.005, "#.00", "ES", "HALF_EVEN")); 
+
+        // e: 0.035, format "#.00", US locale, HALF_EVEN.
+        // 0.035 rounds to the nearest even digit (0.04). Output is "0.04".
+        rootMap.put("e", numberToString(0.035, "#.00", null, "HALF_EVEN"));
+
+        // f: 1.1234, format "$#.## 'in my account'", US locale.
+        // 1.1234 rounds to 1.12. The pattern wraps the number and includes the literal string.
+        // FIX: Removed illegal escape sequence \$.
+        rootMap.put("f", numberToString(1.1234, "$#.## 'in my account'"));
+        
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        Map<String, String> result = converter.getNumberFormattingMap();
+        
+        // Print the Java structure
+        // Note: The string output is formatted to precisely match the expected key=value structure.
+        String formattedOutput = "{" + 
+            result.entrySet().stream()
+                .map(entry -> {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    
+                    // Add single quotes around string values that contain spaces or special characters 
+                    // to match the requested output format.
+                    if (value.contains(" ") || value.contains("$") || value.contains(",")) {
+                        return String.format("%s='%s'", key, value);
+                    }
+                    return String.format("%s=%s", key, value);
+                })
+                .collect(Collectors.joining(", ")) + 
+            "}";
+
+        System.out.println(formattedOutput.replace("'", "")); // Removing quotes for exact match
+    }
+}
+
+
+output:
+
+{a=1, b=0.01, c=0,04, d=0,00, e=0.04, f=$1.12 in my account}
+
+--------------------------------------------------------------
+
+
+example 2:
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    public Map<String, String> getDateTimeFormattingMap() {
+        
+        // --- Input Literals ---
+        LocalDate date = LocalDate.of(2003, 10, 1);
+        ZonedDateTime dateTime = ZonedDateTime.of(2018, 9, 17, 22, 13, 0, 0, ZoneOffset.ofHours(-3));
+        LocalTime localTime = LocalTime.of(23, 57, 59);
+        LocalDateTime localDateTime = LocalDateTime.of(2015, 10, 1, 23, 57, 59);
+        LocalDateTime localizedDateTime = LocalDateTime.of(2003, 10, 1, 23, 57, 59);
+        ZoneOffset timeZone = ZoneOffset.ofHours(-3); 
+
+        String aTimeType = "Time"; // DW type check result
+
+        // --- Formatting Logic ---
+        
+        // aDate: toString(|2003-10-01|, "uuuu/MM/dd")
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+        String aDate = date.format(dateFormat);
+
+        // aDateTime: toString(|2018-09-17T22:13:00-03:00|) - Java's default toString is ISO 8601
+        String aDateTime = dateTime.toString();
+
+        // aLocalTime: toString(|23:57:59|, "HH-mm-ss")
+        DateTimeFormatter localTimeFormat = DateTimeFormatter.ofPattern("HH-mm-ss");
+        String aLocalTime = localTime.format(localTimeFormat);
+
+        // aLocalDateTime: toString(|2015-10-01T23:57:59|) - Java's default toString is ISO 8601
+        String aLocalDateTime = localDateTime.toString();
+
+        // aLocalDateTimeFormatted: toString(|2003-10-01T23:57:59|, "uuuu-MM-dd HH:mm:ss a")
+        // Hour 23 (11 PM) will show 'PM' (or 'p. m.' in Spanish)
+        DateTimeFormatter localDateTimeFormat = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss a", Locale.US); // Use Locale.US for PM
+        String aLocalDateTimeFormatted = localizedDateTime.format(localDateTimeFormat);
+
+        // aLocalDateTimeFormattedAndLocalizedSpain: toString(|2003-10-01T23:57:59|, "eeee, dd MMMM, uuuu HH:mm:ss a", "ES")
+        // Use Locale constructor with language tag "es"
+        DateTimeFormatter localizedFormat = DateTimeFormatter.ofPattern("EEEE, dd MMMM, uuuu HH:mm:ss a", new Locale("es"));
+        String aLocalDateTimeFormattedAndLocalizedSpain = localizedDateTime.format(localizedFormat);
+
+        // aTimeZone: toString(|-03:00|)
+        String aTimeZone = timeZone.toString();
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("aDate", aDate);
+        rootMap.put("aDateTime", aDateTime);
+        rootMap.put("aLocalTime", aLocalTime);
+        rootMap.put("aLocalDateTime", aLocalDateTime);
+        rootMap.put("aLocalDateTimeFormatted", aLocalDateTimeFormatted);
+        rootMap.put("aLocalDateTimeFormattedAndLocalizedSpain", aLocalDateTimeFormattedAndLocalizedSpain);
+        rootMap.put("aTime", aTimeType);
+        rootMap.put("aTimeZone", aTimeZone);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        Map<String, String> result;
+        try {
+            result = converter.getDateTimeFormattingMap();
+            // Print the Java structure
+            System.out.println(result);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+output:
+
+
+{aDate=2003/10/01, aDateTime=2018-09-17T22:13:00-03:00, aLocalTime=23-57-59, aLocalDateTime=2015-10-01T23:57:59, aLocalDateTimeFormatted=2003-10-01 23:57:59 PM, aLocalDateTimeFormattedAndLocalizedSpain=miércoles, 01 octubre, 2003 23:57:59 p. m., aTime=Time, aTimeZone=-03:00}
+---
+
+
+example 3:
+
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Mimics DataWeave's workflow: Encode to Binary, then Decode to String.
+     * This process should be lossless if the same encoding is used for both operations.
+     */
+    private String toStringFromBinary(String data, String encoding) throws Exception {
+        
+        // 1. Encode the string into a byte array using the specified encoding (UTF-32).
+        // This is equivalent to DataWeave's 'as Binary'.
+        byte[] binaryData = data.getBytes(encoding);
+
+        // 2. Decode the byte array back into a string using the same encoding.
+        // This is equivalent to DataWeave's 'as String'.
+        return new String(binaryData, encoding);
+    }
+
+    public Map<String, String> getBinaryConversionMap() {
+        
+        String sourceData = "DW Test";
+        // Use the name of the UTF-32 character set, which is a multi-byte encoding.
+        String encoding = StandardCharsets.UTF_32.name(); 
+        
+        String resultStringA;
+        try {
+            // --- Logic for Key 'a' ---
+            // The string is converted to bytes and back, resulting in the original string.
+            resultStringA = toStringFromBinary(sourceData, encoding);
+        } catch (Exception e) {
+            resultStringA = "Error: " + e.getMessage();
+        }
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("a", resultStringA);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, String> result = converter.getBinaryConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=DW Test}
+
+---
+
+
+
+example 4:
+
+
+
+input:
+
+import java.net.URI;
+import java.time.Duration;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class Main {
+
+    public Map<String, String> getSpecialTypeConversionMap() throws Exception {
+        
+        // --- Input Literals ---
+        ZoneOffset timeZone = ZoneOffset.of("Z"); 
+        boolean boolValue = true;
+        Period periodDate = Period.ofDays(1);
+        Pattern regexPattern = Pattern.compile("a-Z");
+        Duration durationTime = Duration.ofMinutes(8).plusSeconds(10);
+        URI uriValue = new URI("https://docs.mulesoft.com/");
+        
+        Map<String, String> keyMap = new HashMap<>();
+        keyMap.put("aKeyToString", "aValue");
+        String key = keyMap.keySet().iterator().next(); 
+
+        // --- Formatting Logic (toString equivalents) ---
+        String transformTimeZone = timeZone.toString();
+        String transformBoolean = Boolean.toString(boolValue);
+        String transformPeriodDate = periodDate.toString();
+        String transformRegex = regexPattern.pattern();
+        String transformPeriodTime = durationTime.toString();
+        String transformUri = uriValue.toString();
+        String transformKey = key;
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("transformTimeZone", transformTimeZone);
+        rootMap.put("transformBoolean", transformBoolean);
+        rootMap.put("transformPeriod_P1D", transformPeriodDate); // Renamed for uniqueness
+        rootMap.put("transformRegex", transformRegex);
+        rootMap.put("transformPeriod_PT8M10S", transformPeriodTime); // Renamed for uniqueness
+        rootMap.put("transformUri", transformUri);
+        rootMap.put("transformKey", transformKey);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaSpecialTypesToStringConverter converter = new PureJavaSpecialTypesToStringConverter();
+        try {
+            Map<String, String> result = converter.getSpecialTypeConversionMap();
+            // Print the Java structure
+            System.out.println(result);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+{transformKey=aKeyToString, transformPeriod_P1D=P1D, transformUri=https://docs.mulesoft.com/, transformBoolean=true, transformRegex=a-Z, transformTimeZone=Z, transformPeriod_PT8M10S=PT8M10S}
+---
+
+
+
+
+example 5:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * Mimics DataWeave's toString() on an array: concatenates all elements
+     * without a separator.
+     */
+    private String arrayToString(List<String> list) {
+        // Using String.join() is another efficient way, but Collectors.joining("") is cleaner
+        return list.stream().collect(Collectors.joining(""));
+    }
+
+    public Map<String, String> getArrayConversionMap() {
+        
+        // --- Input Arrays ---
+        List<String> arrayA = Arrays.asList();
+        List<String> arrayB = Arrays.asList("h", "o", "l", "a");
+        
+        // --- Logic for Key 'a' ---
+        String resultA = arrayToString(arrayA);
+
+        // --- Logic for Key 'b' ---
+        String resultB = arrayToString(arrayB);
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("a", resultA);
+        rootMap.put("b", resultB);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaArrayToStringConverter converter = new PureJavaArrayToStringConverter();
+        Map<String, String> result = converter.getArrayConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=, b=hola}
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

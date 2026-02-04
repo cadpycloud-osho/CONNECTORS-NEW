@@ -1,0 +1,37 @@
+slice:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class SliceRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:slice")
+            .process(exchange -> {
+                List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+                
+                // slice(arr, 1, 4) → indices 1,2,3 (exclusive end)
+                List<Integer> result = IntStream.range(1, 4)
+                    .mapToObj(arr::get)
+                    .collect(Collectors.toList());
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+
+output:
+
+
+[1, 2, 3]
+
+

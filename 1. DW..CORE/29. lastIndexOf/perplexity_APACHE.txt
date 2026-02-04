@@ -1,0 +1,101 @@
+lastIndexOf:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class LastIndexOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:lastIndexOf")
+            .process(exchange -> {
+                List<String> arr1 = Arrays.asList("a", "b", "c", "d");
+                List<String> arr2 = Arrays.asList("x", "w", "x");
+                List<String> arr3 = Arrays.asList("a", "b", "c", "c");
+                
+                int present = lastIndexOf(arr1, "c");        // 2
+                int notPresent = lastIndexOf(arr2, "c");     // -1
+                int multiple = lastIndexOf(arr3, "c");       // 3
+                
+                Map<String, Integer> result = new LinkedHashMap<>();
+                result.put("present", present);
+                result.put("notPresent", notPresent);
+                result.put("presentMoreThanOnce", multiple);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private int lastIndexOf(List<String> list, String target) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (list.get(i).equals(target)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+
+
+
+
+---------------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class StringLastIndexOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:stringLastIndexOf")
+            .process(exchange -> {
+                String str1 = "abcd";
+                String str2 = "xyz";
+                String str3 = "abcdc";
+                
+                int present = str1.lastIndexOf("c");        // 2
+                int notPresent = str2.lastIndexOf("c");     // -1
+                int multiple = str3.lastIndexOf("c");       // 4
+                
+                Map<String, Integer> result = new LinkedHashMap<>();
+                result.put("present", present);
+                result.put("notPresent", notPresent);
+                result.put("presentMoreThanOnce", multiple);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}
+
+

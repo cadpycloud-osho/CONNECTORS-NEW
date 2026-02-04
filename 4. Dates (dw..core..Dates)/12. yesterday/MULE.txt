@@ -1,0 +1,43 @@
+yesterday:
+
+yesterday(): Date
+
+yesterday(): Date
+Returns the date for yesterday as a Date type.
+
+
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+yesterday()
+
+DataWeave
+Output
+"2021-05-14"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

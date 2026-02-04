@@ -1,0 +1,63 @@
+mapString:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.regex.Pattern;
+
+@RestController
+public class DataWeaveController {
+
+    private final Pattern digitPattern = Pattern.compile("\\d");
+
+    /**
+     * Simulates the DataWeave transformation: 
+     * Replacing every numeric character in "$234" with "~".
+     *
+     * @return A JSON object matching the DataWeave output structure.
+     */
+    @GetMapping("/transform")
+    public TransformationResult transformDataWeaveString() {
+        String input = "$234";
+        
+        // --- Core DataWeave Logic ---
+        // Implementation using Regular Expression: 
+        // "\\d" matches any digit. replaceAll replaces all matches with "~".
+        String transformedBalance = input.replaceAll("\\d", "~");
+        // -----------------------------
+        
+        return new TransformationResult(transformedBalance);
+    }
+
+    /**
+     * Inner class representing the JSON output structure.
+     */
+    public static class TransformationResult {
+        private String balance;
+
+        public TransformationResult(String balance) {
+            this.balance = balance;
+        }
+
+        // Standard Getters for Spring Boot/Jackson JSON serialization
+        public String getBalance() {
+            return balance;
+        }
+
+        public void setBalance(String balance) {
+            this.balance = balance;
+        }
+    }
+}
+
+output:
+
+{
+  "balance": "$~~~"
+}
+
+
+

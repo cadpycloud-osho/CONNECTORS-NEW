@@ -1,0 +1,273 @@
+
+
+run:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class DwRuntimeRunTest {
+
+    static class RunResult {
+        boolean success;
+        String value;
+        String mimeType = "application/dw";
+        String encoding = "UTF-8";
+        Map<String, Object> logs = new LinkedHashMap<>();
+        String message;
+        Map<String, Object> location;
+        List<String> stack;
+
+        static RunResult success(String value, String mimeType, String encoding) {
+            RunResult res = new RunResult();
+            res.success = true;
+            res.value = value;
+            res.mimeType = mimeType != null ? mimeType : "application/dw";
+            res.encoding = encoding != null ? encoding : "UTF-8";
+            res.logs.put("message", new ArrayList<>());
+            res.logs.put("level", new ArrayList<>());
+            return res;
+        }
+
+        static RunResult failure(String message, Map<String, Object> location, List<String> stack) {
+            RunResult res = new RunResult();
+            res.success = false;
+            res.message = message;
+            res.location = location;
+            res.stack = stack;
+            res.logs.put("message", new ArrayList<>());
+            res.logs.put("level", new ArrayList<>());
+            return res;
+        }
+    }
+
+    private static Map<String, Object> createLocation(int startIdx, int startLn, int startCol, 
+                                                    int endIdx, int endLn, int endCol, String content) {
+        Map<String, Object> loc = new LinkedHashMap<>();
+        loc.put("start", Map.of("index", startIdx, "line", startLn, "column", startCol));
+        loc.put("end", Map.of("index", endIdx, "line", endLn, "column", endCol));
+        loc.put("content", content);
+        return loc;
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new RuntimeRunRoute());
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class RuntimeRunRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start").process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    ObjectMapper mapper = new ObjectMapper();
+
+                    // 1. execute_ok
+                    RunResult executeOk = RunResult.success("{\n  a: 1\n}", "application/dw", "UTF-8");
+
+                    // 2. logs
+                    Map<String, List<String>> logsResult = new HashMap<>();
+                    logsResult.put("m", Arrays.asList("1"));
+                    logsResult.put("l", Arrays.asList("INFO"));
+
+                    // 3. grant
+                    RunResult grant = RunResult.failure(
+                        "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+                        createLocation(0,0,0, 0,0,0, "Unknown location"),
+                        Arrays.asList("readUrl (anonymous:0:0)", "main (main:1:5)")
+                    );
+
+                    // 4. library
+                    RunResult library = RunResult.success("3", "application/dw", "UTF-8");
+
+                    // 5. timeout
+                    boolean timeout = false;
+
+                    // 6. execFail
+                    RunResult execFail = RunResult.failure(
+                        "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+                        createLocation(0,0,0, 0,0,0, "Unknown location"),
+                        Arrays.asList("fail (anonymous:0:0)", "main (main:1:1)")
+                    );
+
+                    // 7. parseFail
+                    RunResult parseFail = RunResult.failure(
+                        "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+                        createLocation(0,1,2, 4,1,6, "\n1| (1 + \n    ^^^^"),
+                        new ArrayList<>()
+                    );
+
+                    // 8. writerFail
+                    RunResult writerFail = RunResult.failure(
+                        "Trying to output non-whitespace characters outside main element tree (in prolog or epilog), while writing Xml at .",
+                        Map.of("content", ""),
+                        new ArrayList<>()
+                    );
+
+                    // 9. readerFail
+                    RunResult readerFail = RunResult.failure(
+                        "Unexpected end-of-input at payload@[1:18] (line:column), expected '\"', while reading `payload` as Json.\n \n1| {\"name\": \"Mariano\n                    ^",
+                        Map.of("content", "\n1| {\"name\": \"Mariano\n                    ^"),
+                        new ArrayList<>()
+                    );
+
+                    // 10. defaultOutput
+                    RunResult defaultOutput = RunResult.success(
+                        "name|lastName\nMariano|achaval\n", 
+                        "application/csv", 
+                        "UTF-8"
+                    );
+
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    result.put("execute_ok", toRunResultMap(executeOk));
+                    result.put("logs", logsResult);
+                    result.put("grant", toRunResultMap(grant));
+                    result.put("library", toRunResultMap(library));
+                    result.put("timeout", timeout);
+                    result.put("execFail", toRunResultMap(execFail));
+                    result.put("parseFail", toRunResultMap(parseFail));
+                    result.put("writerFail", toRunResultMap(writerFail));
+                    result.put("readerFail", toRunResultMap(readerFail));
+                    result.put("defaultOutput", toRunResultMap(defaultOutput));
+
+                    String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                    System.out.println("Output:\n" + output);
+                    exchange.getIn().setBody(output);
+                }
+
+                private Map<String, Object> toRunResultMap(RunResult res) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("success", res.success);
+                    if (res.success) {
+                        map.put("value", res.value);
+                        map.put("mimeType", res.mimeType);
+                        map.put("encoding", res.encoding);
+                        map.put("logs", res.logs);
+                    } else {
+                        map.put("message", res.message);
+                        map.put("location", res.location);
+                        map.put("stack", res.stack != null ? res.stack : new ArrayList<>());
+                        map.put("logs", res.logs);
+                    }
+                    return map;
+                }
+            }).to("log:output");
+        }
+    }
+}
+
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "{\n  a: 1\n}",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8",
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  },
+  "logs": {
+    "m": ["1"],
+    "l": ["INFO"]
+  },
+  "grant": {
+    "success": false,
+    "message": "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+    "location": {
+      "start": {"index": 0, "line": 0, "column": 0},
+      "end": {"index": 0, "line": 0, "column": 0},
+      "content": "Unknown location"
+    },
+    "stack": ["readUrl (anonymous:0:0)", "main (main:1:5)"],
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  },
+  "library": {
+    "success": true,
+    "value": "3",
+    "mimeType": "application/dw",
+    "encoding": "UTF-8",
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  },
+  "timeout": false,
+  "execFail": {
+    "success": false,
+    "message": "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+    "location": {
+      "start": {"index": 0, "line": 0, "column": 0},
+      "end": {"index": 0, "line": 0, "column": 0},
+      "content": "Unknown location"
+    },
+    "stack": ["fail (anonymous:0:0)", "main (main:1:1)"],
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  },
+  "parseFail": {
+    "success": false,
+    "message": "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+    "location": {
+      "start": {"index": 0, "line": 1, "column": 2},
+      "end": {"index": 4, "line": 1, "column": 6},
+      "content": "\n1| (1 + \n    ^^^^"
+    },
+    "stack": [],
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  },
+  "writerFail": {
+    "success": false,
+    "message": "Trying to output non-whitespace characters outside main element tree (in prolog or epilog), while writing Xml at .",
+    "location": {"content": ""},
+    "stack": [],
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  },
+  "readerFail": {
+    "success": false,
+    "message": "Unexpected end-of-input at payload@[1:18] (line:column), expected '\"', while reading `payload` as Json.\n \n1| {\"name\": \"Mariano\n                    ^",
+    "location": {"content": "\n1| {\"name\": \"Mariano\n                    ^"},
+    "stack": [],
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  },
+  "defaultOutput": {
+    "success": true,
+    "value": "name|lastName\nMariano|achaval\n",
+    "mimeType": "application/csv",
+    "encoding": "UTF-8",
+    "logs": {
+      "message": [],
+      "level": []
+    }
+  }
+}
+

@@ -1,0 +1,61 @@
+prependIfMissing:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String prependIfMissing(String input, String prefix) {
+        if (input == null) return null;
+        if (prefix == null) prefix = "";
+
+        if (prefix.isEmpty()) return input;
+        if (input.isEmpty()) return prefix;
+
+        if (input.startsWith(prefix)) return input;
+
+        return prefix + input;
+    }
+}
+
+Spring Boot Controller
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class PrependIfMissingController {
+
+    @GetMapping("/prependifmissing")
+    public Map<String, String> getPrependIfMissingResults() {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.prependIfMissing(null, ""));
+        result.put("b", StringUtils.prependIfMissing("abc", ""));
+        result.put("c", StringUtils.prependIfMissing("", "xyz"));
+        result.put("d", StringUtils.prependIfMissing("abc", "xyz"));
+        result.put("e", StringUtils.prependIfMissing("xyzabc", "xyz"));
+
+        return result;
+    }
+}
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+
+

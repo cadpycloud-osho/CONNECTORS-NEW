@@ -1,0 +1,49 @@
+substring:
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String substringDW(String input, int start, int length) {
+        if (input == null) return null;
+        if (start < 0) start = 0;
+        if (length <= 0) return "";
+
+        int endIndex = Math.min(start + length, input.length());
+        if (start >= input.length()) return "";
+
+        return input.substring(start, endIndex);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class SubstringController {
+
+    @GetMapping("/substring")
+    public Map<String, String> substringExample() {
+
+        String text = "hello world!";
+        String result = StringUtils.substringDW(text, 1, 5);
+
+        return Map.of("result", result);
+    }
+}
+
+output:
+
+{
+  "result": "ello"
+}
+
+

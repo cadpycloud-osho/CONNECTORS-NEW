@@ -1,0 +1,61 @@
+isTimeZoneType:
+
+
+input:
+
+import java.time.ZoneId;
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isTimeZoneType(Type).
+     * Checks if the provided type is java.time.ZoneId or a subclass/implementation.
+     * ZoneId is used as the Java equivalent of DataWeave's TimeZone type.
+     */
+    public static boolean isTimeZoneType(Class<?> type) {
+        return ZoneId.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ATimeZone' (which is TimeZone)
+        Class<?> aTimeZoneClass = ZoneId.class;
+
+        // 2. Mimics the type 'TimeZone'
+        Class<?> timeZoneClass = ZoneId.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isTimeZoneType(ATimeZone)
+        boolean a = isTimeZoneType(aTimeZoneClass); 
+
+        // b: isTimeZoneType(TimeZone)
+        boolean b = isTimeZoneType(timeZoneClass); 
+        
+        // c: isTimeZoneType(String)
+        boolean c = isTimeZoneType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

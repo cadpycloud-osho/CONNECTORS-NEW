@@ -1,0 +1,346 @@
+diff:
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
+</dependencies>
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveDiffApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveDiffApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/diff")
+@RequiredArgsConstructor
+class DiffController {
+    
+    private final DiffService diffService;
+    
+    @GetMapping("/test")
+    public Map<String, Object> testDiffs() {
+        return diffService.executeAllTests();
+    }
+}
+
+@Service
+class DiffService {
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    public Map<String, Object> executeAllTests() {
+        Map<String, Object> result = new HashMap<>();
+        
+        // Define namespace prefixes for display
+        Map<String, String> nsPrefixes = Map.of(
+            "ns0", "http://locahost.com",
+            "ns1", "http://acme.com"
+        );
+        
+        result.put("a", diff(mapper().apply("a", 1), mapper().apply("b", 1)));
+        result.put("b", diff(mapper().apply("ns0#a", 1), mapper().apply("ns1#a", 1)));
+        result.put("c", diff(Arrays.asList(1,2,3), Collections.emptyList()));
+        result.put("d", diff(Collections.emptyList(), Arrays.asList(1,2,3)));
+        result.put("e", diff(Arrays.asList(1,2,3), Arrays.asList(1,2,3,4)));
+        result.put("f", diff(Arrays.asList(mapper().apply("a", 1)), Arrays.asList(mapper().apply("a", 2))));
+        result.put("g", diff(mapper().apply("a", 1, "c", 2), mapper().apply("a", 1, "c", 3)));
+        result.put("h", diff(true, false));
+        result.put("i", diff(1, 2));
+        result.put("j", diff("test", "other test"));
+        result.put("k", diff(mapper().apply("a", 1), mapper().apply("a", 1)));
+        result.put("l", diff(mapper().apply("ns0#a", 1), mapper().apply("ns0#a", 1)));
+        result.put("m", diff(Arrays.asList(1,2,3), Arrays.asList(1,2,3)));
+        result.put("n", diff(Collections.emptyList(), Collections.emptyList()));
+        result.put("o", diff(Arrays.asList(mapper().apply("a", 1)), Arrays.asList(mapper().apply("a", 1))));
+        result.put("p", diff(mapper().apply("a", 1, "c", 2), mapper().apply("a", 1, "c", 2)));
+        result.put("q", diff(true, true));
+        result.put("r", diff(1, 1));
+        result.put("s", diff("other test", "other test"));
+        result.put("t", diff(mapper().apply("a", 1, "b", 2), mapper().apply("b", 2, "a", 1), true));
+        result.put("u", diff(
+            Arrays.asList(mapper().apply("format", "ssn", "data", "ABC")), 
+            Arrays.asList(mapper().apply("format", "ssn", "data", "ABC"))
+        ));
+        
+        return result;
+    }
+    
+    private Object mapper() {
+        return new ObjectMapper();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> diff(Object expected, Object actual) {
+        return diff(expected, actual, false);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> diff(Object expected, Object actual, boolean unordered) {
+        DiffResult result = compare(expected, actual, "/", unordered);
+        
+        Map<String, Object> output = new HashMap<>();
+        output.put("matches", result.isMatch());
+        output.put("diffs", result.getDiffs());
+        return output;
+    }
+    
+    private DiffResult compare(Object expected, Object actual, String path, boolean unordered) {
+        if (expected == null && actual == null) return new DiffResult(true, Collections.emptyList());
+        if (expected == null || actual == null) {
+            return new DiffResult(false, List.of(createDiff(expected, actual, path)));
+        }
+        
+        if (expected.getClass() != actual.getClass()) {
+            return new DiffResult(false, List.of(createDiff(expected, actual, path)));
+        }
+        
+        if (expected instanceof Map) {
+            return compareMaps((Map<String, Object>) expected, (Map<String, Object>) actual, path, unordered);
+        } else if (expected instanceof List) {
+            return compareLists((List<?>) expected, (List<?>) actual, path, unordered);
+        } else {
+            boolean matches = Objects.equals(expected, actual);
+            return new DiffResult(matches, matches ? Collections.emptyList() : 
+                List.of(createDiff(expected, actual, path)));
+        }
+    }
+    
+    private DiffResult compareMaps(Map<String, Object> expected, Map<String, Object> actual, 
+                                 String path, boolean unordered) {
+        List<Map<String, Object>> diffs = new ArrayList<>();
+        
+        Set<String> allKeys = new HashSet<>(expected.keySet());
+        allKeys.addAll(actual.keySet());
+        
+        for (String key : allKeys) {
+            String newPath = path.equals("/") ? path + key : path + "." + key;
+            Object expValue = expected.get(key);
+            Object actValue = actual.get(key);
+            
+            if (expValue == null) {
+                diffs.add(createDiff(null, actValue, newPath));
+            } else if (actValue == null) {
+                diffs.add(createDiff(expValue, null, newPath));
+            } else {
+                DiffResult subResult = compare(expValue, actValue, newPath, unordered);
+                diffs.addAll(subResult.getDiffs());
+            }
+        }
+        
+        boolean matches = diffs.isEmpty();
+        return new DiffResult(matches, diffs);
+    }
+    
+    private DiffResult compareLists(List<?> expected, List<?> actual, String path, boolean unordered) {
+        List<Map<String, Object>> diffs = new ArrayList<>();
+        
+        if (expected.size() != actual.size()) {
+            String expectedDesc = String.format("Array size is %d", expected.size());
+            String actualDesc = String.format("was %d", actual.size());
+            diffs.add(createDiff(expectedDesc, actualDesc, path));
+            return new DiffResult(false, diffs);
+        }
+        
+        for (int i = 0; i < expected.size(); i++) {
+            String newPath = path + "[" + i + "]";
+            DiffResult subResult = compare(expected.get(i), actual.get(i), newPath, unordered);
+            diffs.addAll(subResult.getDiffs());
+        }
+        
+        boolean matches = diffs.isEmpty();
+        return new DiffResult(matches, diffs);
+    }
+    
+    private Map<String, Object> createDiff(Object expected, Object actual, String path) {
+        String expectedStr = formatValue(expected);
+        String actualStr = formatValue(actual);
+        return Map.of(
+            "expected", expectedStr,
+            "actual", actualStr,
+            "path", path
+        );
+    }
+    
+    private String formatValue(Object value) {
+        if (value == null) return "null";
+        if (value instanceof Number || value instanceof Boolean) return value.toString();
+        if (value instanceof String) return "\"" + value + "\"";
+        return value.toString();
+    }
+    
+    private static class DiffResult {
+        private final boolean match;
+        private final List<Map<String, Object>> diffs;
+        
+        DiffResult(boolean match, List<Map<String, Object>> diffs) {
+            this.match = match;
+            this.diffs = diffs;
+        }
+        
+        boolean isMatch() { return match; }
+        List<Map<String, Object>> getDiffs() { return diffs; }
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).a"
+      }
+    ]
+  },
+  "b": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).ns0#a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).ns0#a"
+      }
+    ]
+  },
+  "c": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 0",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "d": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 3",
+        "actual": "was 0",
+        "path": "(root)"
+      }
+    ]
+  },
+  "e": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 4",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "f": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "1 as String {mimeType: \"application/dw\"}",
+        "actual": "2 as String {mimeType: \"application/dw\"}",
+        "path": "(root)[0].a"
+      }
+    ]
+  },
+  "g": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "3",
+        "actual": "2",
+        "path": "(root)"
+      }
+    ]
+  },
+  "h": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "false",
+        "actual": "true",
+        "path": "(root)"
+      }
+    ]
+  },
+  "i": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "2",
+        "actual": "1",
+        "path": "(root)"
+      }
+    ]
+  },
+  "j": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "other test",
+        "actual": "test",
+        "path": "(root)"
+      }
+    ]
+  },
+  "k": {
+    "matches": true,
+    "diffs": []
+  },
+  "l": {
+    "matches": true,
+    "diffs": []
+  },
+  "m": {
+    "matches": true,
+    "diffs": []
+  },
+  "n": {
+    "matches": true,
+    "diffs": []
+  },
+  "o": {
+    "matches": true,
+    "diffs": []
+  },
+  "p": {
+    "matches": true,
+    "diffs": []
+  },
+  "q": {
+    "matches": true,
+    "diffs": []
+  },
+  "r": {
+    "matches": true,
+    "diffs": []
+  },
+  "s": {
+    "matches": true,
+    "diffs": []
+  },
+  "t": {
+    "matches": true,
+    "diffs": []
+  },
+  "u": {
+    "matches": true,
+    "diffs": []
+  }
+}

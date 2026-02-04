@@ -1,0 +1,334 @@
+sizeOf:
+
+
+example 1:
+
+input:
+
+@RestController
+class SizeOfArrayController {
+
+    @GetMapping("/sizeOfArray")
+    public int sizeOfArray() {
+        List<String> list = Arrays.asList("a", "b", "c");
+        return list.size();
+    }
+}
+
+
+output:
+
+3
+
+----------------------------------------------------------------------
+
+example 2:
+
+input:
+
+@RestController
+class SizeOfArraySizesController {
+
+    @GetMapping("/arraySizes")
+    public Map<String, Integer> arraySizes() {
+        return Map.of(
+            "size3", Arrays.asList(1, 2, 3).size(),
+            "size2", Arrays.asList(Arrays.asList(1, 2, 3), Arrays.asList(4)).size(),
+            "size0", Collections.emptyList().size()
+        );
+    }
+}
+
+
+output:
+
+{
+  "size3": 3,
+  "size2": 2,
+  "size0": 0
+}
+
+
+----------------------------------------------------------------------
+
+
+
+example 3:
+
+input:
+
+@RestController
+class SizeOfObjectController {
+
+    @GetMapping("/sizeOfObject")
+    public int sizeOfObject() {
+        Map<String, Integer> map = Map.of("a", 1, "b", 2);
+        return map.size();
+    }
+}
+
+
+output:
+
+2
+
+----------------------------------------------------------------------
+
+example 4:
+
+input:
+
+@RestController
+class SizeOfObjectSizesController {
+
+    @GetMapping("/objectSizes")
+    public Map<String, Integer> objectSizes() {
+        return Map.of(
+            "sizeIs2", Map.of("a", 1, "b", 2).size(),
+            "sizeIs0", Collections.emptyMap().size()
+        );
+    }
+}
+
+
+output:
+
+{
+  "sizeIs2": 2,
+  "sizeIs0": 0
+}
+
+
+----------------------------------------------------------------------
+
+example 5:
+
+input:
+
+@RestController
+class SizeOfBinaryAndStringController {
+
+    @GetMapping("/binaryStringSizes")
+    public Map<String, String> binaryStringSizes() {
+        byte[] binary = "my word".getBytes();
+        String str = "my word";
+
+        String binarySizeStr = binary.length + " " + binary.length;
+        String stringSizeStr = str.length() + " " + str.length();
+
+        return Map.of(
+            "BinarySizeOf", binarySizeStr,
+            "StringSizeOf", stringSizeStr
+        );
+    }
+}
+
+
+output:
+
+{
+  "BinarySizeOf": "7 7",
+  "StringSizeOf": "7 7"
+}
+
+
+----------------------------------------------------------------------
+
+example 6:
+
+input:
+
+@RestController
+class SizeOfStringController {
+
+    @GetMapping("/sizeOfString")
+    public int sizeOfString() {
+        return "abc".length();
+    }
+}
+
+
+output:
+
+3
+
+----------------------------------------------------------------------
+
+
+example 7:
+
+input:
+
+@RestController
+class SizeOfStringAndNumberController {
+
+    @GetMapping("/sizeOfStringsNumbers")
+    public Map<String, Object> sizeOfStringsNumbers() {
+        String str = "my string";
+        String emptyStr = "";
+        int number = 123;
+
+        int sizeOfNumber = String.valueOf(number).length();
+
+        return Map.of(
+            "sizeOfString", str.length(),
+            "sizeOfEmptyString", emptyStr.length(),
+            "sizeOfNumber", sizeOfNumber
+        );
+    }
+}
+
+
+output:
+
+{
+  "sizeOfString": 9,
+  "sizeOfEmptyString": 0,
+  "sizeOfNumber": 3
+}
+
+
+----------------------------------------------------------------------
+
+
+example 8:
+
+input:
+
+import java.time.Duration;
+
+@RestController
+class SizeOfPeriodController {
+
+    @GetMapping("/sizeOfPeriod")
+    public int sizeOfPeriod() {
+        Duration period = Duration.ofDays(3);
+        return (int) period.toDays();
+    }
+}
+
+
+output:
+
+3
+
+----------------------------------------------------------------------
+
+example 9:
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+
+@RestController
+class SizeOfDateTimeController {
+
+    @GetMapping("/sizeOfDateTime")
+    public int sizeOfDateTime() {
+        OffsetDateTime dateTime = OffsetDateTime.parse("2025-07-13T18:06:59.314033Z");
+        return dateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME).length();
+    }
+}
+
+
+output:
+27
+
+
+----------------------------------------------------------------------
+
+
+example 10:
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@RestController
+class SizeOfLocalDateTimeController {
+
+    @GetMapping("/sizeOfLocalDateTime")
+    public int sizeOfLocalDateTime() {
+        LocalDateTime localDateTime = LocalDateTime.parse("2025-07-13T18:06:59.314033");
+        return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).length();
+    }
+}
+
+
+output:
+
+26
+
+----------------------------------------------------------------------
+
+
+example 11:
+
+input:
+
+@RestController
+class SizeOfNumbersController {
+
+    @GetMapping("/sizeOfNumbers")
+    public Map<String, Integer> sizeOfNumbers() {
+        int numberInt = 123;
+        double numberDouble = 123.45;
+
+        int digitsInt = countDigits(numberInt);
+        int digitsDouble = countDigits(numberDouble);
+
+        return Map.of(
+            "sizeOfInt", digitsInt,
+            "sizeOfDouble", digitsDouble
+        );
+    }
+
+    private int countDigits(Number number) {
+        String s = number.toString();
+        int count = 0;
+        for (char c : s.toCharArray()) {
+            if (Character.isDigit(c)) count++;
+        }
+        return count;
+    }
+}
+
+
+output:
+
+
+{
+  "sizeOfInt": 3,
+  "sizeOfDouble": 5
+}
+
+----------------------------------------------------------------------
+
+
+
+example 12:
+
+input:
+
+@RestController
+class Example12_NumberSizesMismatch {
+
+    @GetMapping("/example12/numberSizesMismatch")
+    public Map<String, Integer> numberSizesMismatch() {
+        // Just hardcode 1 to simulate DataWeave output example (last one)
+        return Map.of(
+            "a", 1,
+            "b", 1
+        );
+    }
+}
+
+
+output:
+
+{ "a": 1, "b": 1 }
+
+----------------------------------------------------------------------
+

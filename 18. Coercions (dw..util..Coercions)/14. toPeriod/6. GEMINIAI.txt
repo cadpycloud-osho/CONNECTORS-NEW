@@ -1,0 +1,59 @@
+toPeriod:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Period;
+
+public class DataWeaveToPeriodConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getPeriodConversionJson() throws IOException {
+        
+        // --- Logic for Key 'toPeriodEx1' (P1D) ---
+        String durationString1 = "P1D";
+        // Java's Period class is ideal for parsing date-based durations (Years, Months, Days).
+        Period parsedPeriod1 = Period.parse(durationString1); 
+
+        // --- Logic for Key 'toPeriodEx2' (PT1H1M) ---
+        String durationString2 = "PT1H1M";
+        // Java's Duration class is ideal for parsing time-based durations (Hours, Minutes, Seconds).
+        Duration parsedDuration2 = Duration.parse(durationString2);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Java's Period and Duration objects' toString() method returns the standard ISO 8601 format.
+        root.put("toPeriodEx1", parsedPeriod1.toString());
+        root.put("toPeriodEx2", parsedDuration2.toString());
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToPeriodConverter converter = new DataWeaveToPeriodConverter();
+        try {
+            String jsonOutput = converter.getPeriodConversionJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "toPeriodEx1" : "P1D",
+  "toPeriodEx2" : "PT1H1M"
+}
+
+

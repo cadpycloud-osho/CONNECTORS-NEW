@@ -1,0 +1,33 @@
+isKeyType:
+
+
+INPUT:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isKeyType(Class<?> type) {
+        return type == String.class;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> AKey = String.class;
+
+        result.put("a", isKeyType(AKey));
+        result.put("b", isKeyType(String.class));
+        result.put("c", isKeyType(Boolean.class));
+
+        System.out.println(result);
+    }
+}
+
+OUTPUT:
+
+
+
+{a=true, b=true, c=false}

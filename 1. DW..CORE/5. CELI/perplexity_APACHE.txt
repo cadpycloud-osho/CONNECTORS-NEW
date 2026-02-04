@@ -1,0 +1,24 @@
+ceil(number: Number): Number
+
+
+input:
+
+from("direct:start")
+  .process().groovy("""
+    def input = [1.5, 2.1, 3]
+    def result = input.collect { Math.ceil(it) }
+    def json = new groovy.json.JsonBuilder(result)
+    exchange.in.body = json.toString()
+  """)
+  .to("mock:result");
+
+
+output:
+
+[2, 3, 3]
+
+
+<dependency>
+    <groupId>org.apache.camel</groupId>
+    <artifactId>camel-groovy</artifactId>
+</dependency>

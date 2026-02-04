@@ -1,0 +1,68 @@
+isLocalDateTimeType:
+
+
+input:
+
+
+import java.time.LocalTime;
+import java.lang.String;
+import java.util.Map;
+
+public class Main {
+
+    // A method that conceptually mirrors DataWeave's isLocalTimeType(Type)
+    public static boolean isLocalTimeType(Class<?> type) {
+        return LocalTime.class.isAssignableFrom(type);
+    }
+
+    // A method that conceptually mirrors DataWeave's isLocalTimeType(Value)
+    public static boolean isLocalTimeType(Object value) {
+        return value instanceof LocalTime;
+    }
+
+    public static void main(String[] args) {
+        // 1. Mimics the Type alias 'ALocalTime' (which is LocalTime)
+        Class<?> aLocalTimeClass = LocalTime.class;
+
+        // 2. Mimics the type 'LocalTime'
+        Class<?> localTimeClass = LocalTime.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isLocalTimeType(ALocalTime)
+        boolean a = isLocalTimeType(aLocalTimeClass); 
+
+        // b: isLocalTimeType(LocalTime)
+        boolean b = isLocalTimeType(localTimeClass); 
+        
+        // c: isLocalTimeType(String)
+        boolean c = isLocalTimeType(stringClass); 
+
+        // Store results in a Map for simple, desired output format
+        Map<String, Boolean> output = Map.of(
+            "a", a,
+            "b", b,
+            "c", c
+        );
+
+        // Print the result to match the requested format: {a=true, b=true, c=false}
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+

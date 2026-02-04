@@ -1,0 +1,102 @@
+keysOf:
+
+
+example 1:
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", true);
+        map.put("b", 1);
+
+        List<String> keysOf = new ArrayList<>(map.keySet());
+
+        System.out.println("{ \"keysOf\": " + keysOf + " }");
+    }
+}
+
+
+
+output:
+
+{ "keysOf": [a, b] }
+
+
+
+example 2:
+
+input:
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        String xml =
+            "<users xmlns=\"http://test.com\">" +
+            "<user name=\"Mariano\" lastName=\"Achaval\"/>" +
+            "<user name=\"Stacey\" lastName=\"Duke\"/>" +
+            "</users>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        Element root = doc.getDocumentElement();
+        NodeList users = root.getElementsByTagNameNS("*", "user");
+
+        List<Object> keysOfExample = new ArrayList<>();
+        List<Object> namesOfExample = new ArrayList<>();
+
+        // Namespace (equivalent to $.#)
+        for (int i = 0; i < users.getLength(); i++) {
+            keysOfExample.add(root.getNamespaceURI());
+            namesOfExample.add(null);
+        }
+
+        // Attributes (equivalent to $.@)
+        for (int i = 0; i < users.getLength(); i++) {
+            Element user = (Element) users.item(i);
+
+            Map<String, String> attrs = new LinkedHashMap<>();
+            attrs.put("name", user.getAttribute("name"));
+            attrs.put("lastName", user.getAttribute("lastName"));
+
+            keysOfExample.add(attrs);
+            namesOfExample.add(null);
+        }
+
+        System.out.println("{");
+        System.out.println("  \"keysOfExample\": " + keysOfExample + ",");
+        System.out.println("  \"namesOfExample\": " + namesOfExample);
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "keysOfExample": [
+    "http://test.com",
+    "http://test.com",
+    {name=Mariano, lastName=Achaval},
+    {name=Stacey, lastName=Duke}
+  ],
+  "namesOfExample": [null, null, null, null]
+}
+

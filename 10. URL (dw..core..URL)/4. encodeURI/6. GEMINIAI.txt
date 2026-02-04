@@ -1,0 +1,80 @@
+
+encodeURI:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriEncodeController {
+
+    private static final String INPUT_1 = "http://asd/ text to decode /%/\"\\/text";
+    private static final String INPUT_2 = "http://:;,/?:@&=\\$_-_.!~*'()";
+
+    // List of characters that encodeURI should NOT encode (reserved and unreserved characters)
+    private static final String PRESERVED_CHARS = 
+        ":;/,?@&=\\$_-_.!~*'()";
+
+    /**
+     * Helper method mirroring DataWeave's URL::encodeURI logic (simplified for test cases).
+     */
+    private String encodeUriCustom(String inputUri) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            for (char c : inputUri.toCharArray()) {
+                if (c == ' ') {
+                    sb.append("%20");
+                } else if (c == '%') {
+                    sb.append("%25");
+                } else if (c == '"') {
+                    sb.append("%22");
+                } else if (c == '\\') {
+                    sb.append("%5C");
+                } else if (PRESERVED_CHARS.indexOf(c) != -1 || 
+                           (c >= 'A' && c <= 'Z') || 
+                           (c >= 'a' && c <= 'z') || 
+                           (c >= '0' && c <= '9')) {
+                    // Preserve reserved, unreserved, and structural characters
+                    sb.append(c);
+                } else {
+                    // Fallback to standard encoding for completeness
+                    sb.append(URLEncoder.encode(String.valueOf(c), StandardCharsets.UTF_8.toString()));
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            return "Encoding Error";
+        }
+        return sb.toString();
+    }
+
+    @GetMapping("/encode-uri")
+    public Map<String, String> getEncodedUri() {
+        
+        String encodedURI = encodeUriCustom(INPUT_1);
+        String notEncoded = encodeUriCustom(INPUT_2); // Since all chars are preserved, the output is the same as input
+
+        // Map the results to match the desired JSON structure
+        Map<String, String> output = new HashMap<>();
+        output.put("encodeURI", encodedURI);
+        output.put("not_encoded", notEncoded);
+        
+        return output; 
+    }
+}
+output:
+
+{
+  "encodeURI": "http://asd/%20text%20to%20decode%20/%25/%22%5C/text",
+  "not_encoded": "http://:;,/?:@&=$_-_.!~*'()"
+}
+
+

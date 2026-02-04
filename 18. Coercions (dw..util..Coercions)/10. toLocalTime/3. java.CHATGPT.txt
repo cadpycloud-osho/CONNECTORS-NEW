@@ -1,0 +1,108 @@
+toLocalTime:
+
+
+example 1:
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a
+        result.put("a", toLocalTime(
+                "23:57:59",
+                new String[]{
+                        "HH:mm:ss.n",
+                        "HH:mm:ss"
+                }
+        ));
+
+        // b
+        result.put("b", tryToLocalTime(
+                "23:57:59",
+                new String[]{
+                        "HH:mm:ss.n"
+                }
+        ));
+
+        System.out.println(result);
+    }
+
+    private static String toLocalTime(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                LocalTime time = LocalTime.parse(value, formatter);
+                return time.toString();
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    private static String tryToLocalTime(String value, String[] formats) {
+        try {
+            return toLocalTime(value, formats);
+        } catch (RuntimeException e) {
+            return e.getMessage();
+        }
+    }
+}
+
+
+output:
+
+{a=23:57:59, b=Could not find a valid formatter for '23:57:59'}
+
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        result.put("toLocalTimeEx", toLocalTime("23:57:59", null));
+        result.put("toLocalTimeEx2", toLocalTime("13:44:12.283", "HH:mm:ss.SSS"));
+
+        System.out.println(result);
+    }
+
+    private static String toLocalTime(String value, String pattern) {
+        LocalTime time;
+        if (pattern != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+            time = LocalTime.parse(value, formatter);
+        } else {
+            time = LocalTime.parse(value);
+        }
+        return time.toString();
+    }
+}
+
+
+output:
+
+{toLocalTimeEx=23:57:59, toLocalTimeEx2=13:44:12.283}
+

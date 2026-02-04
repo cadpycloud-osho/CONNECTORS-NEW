@@ -1,0 +1,34 @@
+endsWith:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: [ "Mariano" endsWith "no", "Mariano" endsWith "to" ]
+
+        String sourceString = "Mariano";
+        
+        // 1. First check: "Mariano" endsWith "no"
+        boolean result1 = sourceString.endsWith("no"); // true
+
+        // 2. Second check: "Mariano" endsWith "to"
+        boolean result2 = sourceString.endsWith("to"); // false
+
+        // 3. Collect the results into a List<Boolean> to match the array output
+        List<Boolean> outputList = Arrays.asList(result1, result2);
+
+        // Print the result (similar to the DataWeave JSON array output)
+        System.out.println("Output:");
+        System.out.println(outputList);
+    }
+}
+
+output:
+
+
+[true, false]

@@ -1,0 +1,74 @@
+then:
+
+then(value: Null, callback: (previousResult: Nothing) -> Any): Null
+
+then(value: Null, callback: (previousResult: Nothing) -> Any): Null
+Helper function that enables then to work with a null value.
+
+
+
+
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+    "chainResult": ["mariano", "de Achaval"]
+            reduce ((item, accumulator) -> item ++ accumulator)
+            then ((result) -> sizeOf(result)),
+    "referenceResult" : ["mariano", "de Achaval"]
+                         map ((item, index) -> upper(item))
+                         then {
+                            name: $[0],
+                            lastName: $[1],
+                            length: sizeOf($)
+                        },
+    "onNullReturnNull": []
+                reduce ((item, accumulator) -> item ++ accumulator)
+                then ((result) -> sizeOf(result))
+}
+
+
+
+DataWeave
+Output
+{
+   "chainResult": 17,
+   "referenceResult": {
+     "name": "MARIANO",
+     "lastName": "DE ACHAVAL",
+     "length": 2
+   },
+   "onNullReturnNull": null
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

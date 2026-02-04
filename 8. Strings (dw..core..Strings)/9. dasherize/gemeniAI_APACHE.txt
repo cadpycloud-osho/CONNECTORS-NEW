@@ -1,0 +1,55 @@
+dasherize:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DasherizeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:dasherizeStrings")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                results.put("a", dasherize("customer"));
+                results.put("b", dasherize("customer_first_name"));
+                results.put("c", dasherize("customer NAME"));
+                results.put("d", dasherize("customerName"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic to replicate DW dasherize:
+     * 1. Inserts dashes at camelCase transitions.
+     * 2. Replaces underscores and spaces with dashes.
+     * 3. Converts the entire string to lowercase.
+     */
+    private String dasherize(String input) {
+        if (input == null) return null;
+        
+        return input
+            // Handle camelCase: insert dash between lower and upper (e.g., rN -> r-N)
+            .replaceAll("([a-z])([A-Z])", "$1-$2")
+            // Replace spaces and underscores with dashes
+            .replaceAll("[_\\s]+", "-")
+            // Convert to lowercase
+            .toLowerCase();
+    }
+}
+
+output:
+
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+

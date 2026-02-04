@@ -1,0 +1,61 @@
+dasherize:
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String dasherize(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        // Convert camelCase → customer-name
+        String camelToKebab = input.replaceAll("([a-z])([A-Z])", "$1-$2");
+
+        // Replace underscores & spaces → hyphens
+        String normalized = camelToKebab
+                .replace("_", "-")
+                .replace(" ", "-");
+
+        return normalized.toLowerCase();
+    }
+}
+
+Spring Boot Controller:
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DasherizeController {
+
+    @GetMapping("/dasherize")
+    public Map<String, String> dasherizeStrings() {
+        Map<String, String> result = new HashMap<>();
+
+        result.put("a", StringUtils.dasherize("customer"));
+        result.put("b", StringUtils.dasherize("customer_first_name"));
+        result.put("c", StringUtils.dasherize("customer NAME"));
+        result.put("d", StringUtils.dasherize("customerName"));
+
+        return result;
+    }
+}
+
+output:
+
+
+
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+

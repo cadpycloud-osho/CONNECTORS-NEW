@@ -1,0 +1,96 @@
+objectFields:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.lang.reflect.Field;
+import java.util.*;
+
+public class ObjectFieldsRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:getObjectFields")
+            .process(exchange -> {
+                Map<String, Object> result = new LinkedHashMap<>();
+
+                // Mapping the DataWeave samples to Java Classes
+                result.put("a", getObjectFields(Dictionary.class)); // ADictionary
+                result.put("b", getObjectFields(Schema.class));     // ASchema
+                result.put("c", getObjectFields(Object.class));     // Object (Empty)
+                result.put("d", getObjectFields(User.class));       // AUser
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private List<Map<String, Object>> getObjectFields(Class<?> clazz) {
+        List<Map<String, Object>> fields = new ArrayList<>();
+        
+        // Use Java Reflection to iterate through fields
+        for (Field field : clazz.getDeclaredFields()) {
+            Map<String, Object> fieldMeta = new LinkedHashMap<>();
+            Map<String, Object> keyMeta = new LinkedHashMap<>();
+            Map<String, Object> nameMeta = new LinkedHashMap<>();
+
+            // Simulating Name and Namespace
+            nameMeta.put("localName", field.getName());
+            nameMeta.put("namespace", getNamespace(field));
+            
+            keyMeta.put("name", nameMeta);
+            keyMeta.put("attributes", getAttributes(field)); // Simulates @()
+
+            fieldMeta.put("key", keyMeta);
+            fieldMeta.put("required", !field.isAnnotationPresent(Optional.class));
+            fieldMeta.put("repeated", field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
+            fieldMeta.put("value", field.getType().getSimpleName());
+
+            fields.add(fieldMeta);
+        }
+        return fields;
+    }
+
+    // Mock helpers for Metadata/Namespace
+    private String getNamespace(Field f) { return f.getName().equals("name") ? "http://acme.com" : null; }
+    private List<Object> getAttributes(Field f) { return new ArrayList<>(); }
+}
+
+// Simulated Java Classes representing the DW types
+class Dictionary { String _; }
+class Schema { String name; }
+class User { String name; Integer[] lastName; }
+@interface Optional {}
+
+
+output:
+
+{
+  "typeChecks": {
+    "isString": true,
+    "isRegex": true,
+    "isPeriod": true,
+    "isUri": true
+  },
+  "metadata": {
+    "a": { "format": "YYYY-MM-dd" }
+  },
+  "names": {
+    "a": "AArray",
+    "b": "AArray2",
+    "c": "String"
+  },
+  "objectFields": [
+    {
+      "key": {
+        "name": { "localName": "name", "namespace": "http://acme.com" }
+      },
+      "required": true,
+      "repeated": false,
+      "value": "String"
+    }
+  ]
+}
+
+

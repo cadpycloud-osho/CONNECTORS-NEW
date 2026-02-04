@@ -1,0 +1,34 @@
+functionReturnType:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String functionReturnType(Class<?> returnType) {
+        if (returnType == null) return null;
+        return returnType.getSimpleName();
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        // DW: AFunction → returns Number
+        result.put("a", functionReturnType(Number.class));
+
+        // DW: AFunction2 → returns Number
+        result.put("b", functionReturnType(Number.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=Number, b=Number}
+
+

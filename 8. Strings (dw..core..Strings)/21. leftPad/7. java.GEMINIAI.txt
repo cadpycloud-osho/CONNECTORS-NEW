@@ -1,0 +1,71 @@
+leftPad:
+
+
+
+input:
+
+import java.util.Collections;
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's leftPad(text, length) function.
+     * Pads the start of the string with spaces to reach the specified length.
+     */
+    public static String leftPadString(String input, int length) {
+        // 1. Handle null input: DataWeave returns null.
+        if (input == null) {
+            return null;
+        }
+
+        int currentLength = input.length();
+
+        // 2. Handle length <= currentLength (or negative length)
+        if (length <= currentLength) {
+            return input;
+        }
+
+        // 3. Calculate padding and create the padding string
+        int paddingCount = length - currentLength;
+        
+        // Using String.repeat() for clean padding generation (requires Java 11+)
+        // For Java 8 compatibility, use StringBuilder:
+        // StringBuilder sb = new StringBuilder();
+        // for (int i = 0; i < paddingCount; i++) sb.append(' ');
+        // String padding = sb.toString();
+        
+        String padding = " ".repeat(paddingCount); // Using String.repeat for brevity (Java 11+)
+
+        // Prepend the padding
+        return padding + input;
+    }
+
+    public static void main(String[] args) {
+        // Testing inputs:
+        String a = leftPadString(null, 3);
+        String b = leftPadString("", 3);
+        String c = leftPadString("bat", 5);
+        String d = leftPadString("bat", 3);
+        String e = leftPadString("bat", -1);
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": \"" + b + "\",");
+        System.out.println("  \"c\": \"" + c + "\",");
+        System.out.println("  \"d\": \"" + d + "\",");
+        System.out.println("  \"e\": \"" + e + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}

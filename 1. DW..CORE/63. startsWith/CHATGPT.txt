@@ -1,0 +1,43 @@
+startsWith:
+
+
+input:
+
+@GetMapping("/startswith1")
+public boolean startsWithExample1() {
+    return "Mari".startsWith("Mar");
+}
+
+
+Output (JSON)
+true
+
+
+input:
+@GetMapping("/startswith2")
+public boolean startsWithExample2() {
+    return "Mari".startsWith("Em");
+}
+
+Output (JSON)
+false
+
+
+input:
+Combined Equivalent (Optional Endpoint)
+
+
+@GetMapping("/startswithAll")
+public List<Boolean> startsWithAll() {
+    return Arrays.asList(
+        "Mari".startsWith("Mar"),
+        "Mari".startsWith("Em")
+    );
+}
+
+
+
+output:
+
+
+[ true, false ]

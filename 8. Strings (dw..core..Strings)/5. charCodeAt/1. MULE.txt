@@ -1,0 +1,26 @@
+charCodeAt:
+
+charCodeAt(content: String, position: Number): Number
+
+charCodeAt(content: String, position: Number): Number
+Returns the Unicode for a character at the specified index.
+
+This function fails if the index is invalid.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "charCodeAt" : charCodeAt("MuleSoft", 1)
+}
+
+
+DataWeave
+Output
+{ "charCodeAt": 117 }
+
+

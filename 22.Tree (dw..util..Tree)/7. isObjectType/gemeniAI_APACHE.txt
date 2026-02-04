@@ -1,0 +1,63 @@
+isObjectType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class ObjectInspectorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:inspectObjectPath")
+            .process(exchange -> {
+                // Scenario A: Ends in Attribute
+                List<Map<String, String>> pathA = List.of(
+                    Map.of("kind", "Object", "selector", "user"),
+                    Map.of("kind", "Attribute", "selector", "name")
+                );
+
+                // Scenario B: Ends in Object
+                List<Map<String, String>> pathB = List.of(
+                    Map.of("kind", "Object", "selector", "user"),
+                    Map.of("kind", "Object", "selector", "name")
+                );
+
+                // Scenario C: Is just an Object segment
+                List<Map<String, String>> pathC = List.of(
+                    Map.of("kind", "Object", "selector", "user")
+                );
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+                result.put("a", isObjectType(pathA));
+                result.put("b", isObjectType(pathB));
+                result.put("c", isObjectType(pathC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic: Returns true if the final segment of the path is an Object field
+     */
+    private boolean isObjectType(List<Map<String, String>> path) {
+        if (path == null || path.isEmpty()) return false;
+        
+        Map<String, String> lastSegment = path.get(path.size() - 1);
+        return "Object".equalsIgnoreCase(lastSegment.get("kind"));
+    }
+}
+
+output:
+
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}

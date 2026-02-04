@@ -1,0 +1,159 @@
+mask:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.*;
+
+public class MaskPasswordRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) {
+
+                    List<Map<String, Object>> users = new ArrayList<>();
+
+                    Map<String, Object> u1 = new LinkedHashMap<>();
+                    u1.put("name", "Peter Parker");
+                    u1.put("password", "spiderman");
+
+                    Map<String, Object> u2 = new LinkedHashMap<>();
+                    u2.put("name", "Bruce Wayne");
+                    u2.put("password", "batman");
+
+                    users.add(u1);
+                    users.add(u2);
+
+                    // Equivalent of: mask field("password") with "*****"
+                    for (Map<String, Object> user : users) {
+                        if (user.containsKey("password")) {
+                            user.put("password", "*****");
+                        }
+                    }
+
+                    exchange.getMessage().setBody(users);
+                }
+            })
+            .to("log:output");
+    }
+}
+
+
+output:
+
+[
+  {
+    "name": "Peter Parker",
+    "password": "*****"
+  },
+  {
+    "name": "Bruce Wayne",
+    "password": "*****"
+  }
+]
+
+
+-----------------------------------------------------
+
+
+example 2:
+
+input:
+
+List<Map<String, Object>> users = new ArrayList<>();
+
+Map<String, Object> u1 = new LinkedHashMap<>();
+u1.put("name", "Peter Parker");
+u1.put("password", "spiderman");
+
+Map<String, Object> u2 = new LinkedHashMap<>();
+u2.put("name", "Bruce Wayne");
+u2.put("password", "batman");
+
+users.add(u1);
+users.add(u2);
+
+// mask "password" with "*****"
+for (Map<String, Object> user : users) {
+    if (user.containsKey("password")) {
+        user.put("password", "*****");
+    }
+}
+
+
+output:
+
+[
+  {
+    "name": "Peter Parker",
+    "password": "*****"
+  },
+  {
+    "name": "Bruce Wayne",
+    "password": "*****"
+  }
+]
+
+
+-----------------------------------------------------
+
+example 3:
+
+input:
+
+List<List<Object>> data = new ArrayList<>();
+
+data.add(new ArrayList<>(Arrays.asList(123, true)));
+data.add(new ArrayList<>(Arrays.asList(456, true)));
+
+// mask index 1 with false
+for (List<Object> item : data) {
+    if (item.size() > 1) {
+        item.set(1, false);
+    }
+}
+
+
+output:
+
+[
+  [
+    123,
+    false
+  ],
+  [
+    456,
+    false
+  ]
+]
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

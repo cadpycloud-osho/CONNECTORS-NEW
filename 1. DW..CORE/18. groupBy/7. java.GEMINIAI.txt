@@ -1,0 +1,278 @@
+groupBy:
+
+example 1:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class Main {
+
+    public static void main(String[] args) {
+        List<String> inputList = Arrays.asList("a", "b", "c");
+
+        // Java does not have a single operation to get both item and index in a stream
+        // We use IntStream.range to iterate over indices and map them to the items.
+        Map<Integer, List<String>> outputMap = IntStream.range(0, inputList.size())
+            .boxed() // Convert int stream to Integer stream
+            .collect(Collectors.groupingBy(
+                // Key: Use the index (i) itself as the grouping key
+                i -> i, 
+                // Value: Use the element at that index
+                Collectors.mapping(inputList::get, Collectors.toList())
+            ));
+
+        System.out.println("--- DataWeave GroupBy Example 1 (by Index) ---");
+        // Note: DW output may have keys in non-sequential order, Java Map order varies.
+        System.out.println("Output: " + outputMap);
+    }
+}
+
+
+output:
+{0=[a], 1=[b], 2=[c]}
+
+-------------------------------------------------------------
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+// Helper Class to represent the JSON object structure
+class Programmer {
+    public String name;
+    public String language;
+
+    public Programmer(String name, String language) {
+        this.name = name;
+        this.language = language;
+    }
+
+    @Override
+    public String toString() {
+        return "{ \"name\": \"" + name + "\", \"language\": \"" + language + "\" }";
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+        List<Programmer> myArray = Arrays.asList(
+            new Programmer("Foo", "Java"),
+            new Programmer("Bar", "Scala"),
+            new Programmer("FooBar", "Java")
+        );
+
+        // DataWeave: myArray groupBy (item) -> item.language
+        Map<String, List<Programmer>> outputMap = myArray.stream()
+            .collect(Collectors.groupingBy(
+                // Key: Group by the 'language' field
+                item -> item.language
+            ));
+
+        System.out.println("--- DataWeave GroupBy Example 2 (by Field) ---");
+        System.out.println("Output:");
+        // Print the output map to match the DataWeave format
+        outputMap.forEach((key, value) -> System.out.println(" \"" + key + "\": " + value));
+    }
+}
+
+
+output:
+
+
+ "Scala": [{ "name": "Bar", "language": "Scala" }]
+ "Java": [{ "name": "Foo", "language": "Java" }, { "name": "FooBar", "language": "Java" }]
+
+-------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Simulating the JSON input structure with only relevant fields
+        List<Map<String, String>> items = Arrays.asList(
+            Map.of("id", "internal"),
+            Map.of("id", "left", "label", "Move Left"),
+            Map.of("id", "right", "label", "Move Right"),
+            Map.of("id", "up", "label", "Move Up"),
+            Map.of("id", "down", "label", "Move Down")
+        );
+
+        // 1. Transformation: myVar.menu.items.*label (Extract only 'label' values that exist)
+        List<String> labels = items.stream()
+            .filter(item -> item.containsKey("label"))
+            .map(item -> item.get("label"))
+            .collect(Collectors.toList());
+            
+        // 2. Grouping: groupBy "myLabels" (Group the entire list under one key)
+        Map<String, List<String>> outputMap = labels.stream()
+            .collect(Collectors.groupingBy(
+                // Key: Hardcode the key for every element
+                item -> "myLabels",
+                // Collector: Keep the elements as a list
+                Collectors.toList()
+            ));
+
+        System.out.println("--- DataWeave GroupBy Example 3 (Single Key) ---");
+        System.out.println("Output: " + outputMap);
+    }
+}
+
+
+
+output:
+{myLabels=[Move Left, Move Right, Move Up, Move Down]}
+
+-------------------------------------------------------------
+
+
+example 4:
+
+input:
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        String inputString = "hello world!";
+
+        // DataWeave: "hello world!" groupBy (not isEmpty($ find /[aeiou]/))
+        Map<Boolean, String> outputMap = inputString.chars()
+            .mapToObj(c -> String.valueOf((char) c))
+            .filter(s -> !s.equals(" ")) // Remove spaces as they are not grouped in DW output
+            .collect(Collectors.groupingBy(
+                // Key: The boolean condition (true for vowel, false for consonant/other)
+                s -> s.matches("[aeiou]"), 
+                // Value: Concatenate all matching characters back into a String
+                Collectors.joining()
+            ));
+
+        System.out.println("--- DataWeave GroupBy Example 4 (String by Condition) ---");
+        System.out.println("Output: " + outputMap);
+    }
+}
+
+
+output:
+{false=hll wrld!, true=eoo}
+
+-------------------------------------------------------------
+
+
+example 5:
+
+input:
+
+import java.util.Map;
+import java.util.AbstractMap;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, String> inputMap = Map.of("a", "b", "c", "d");
+
+        // DataWeave: { "a" : "b", "c" : "d"} groupBy upper($)
+        Map<String, Map<String, String>> outputMap = inputMap.entrySet().stream()
+            .collect(Collectors.groupingBy(
+                // Key: Group by the uppercase value (upper($))
+                entry -> entry.getValue().toUpperCase(), 
+                // Value: Re-collect the grouped entries back into a Map
+                Collectors.toMap(
+                    Map.Entry::getKey, 
+                    Map.Entry::getValue
+                )
+            ));
+
+        System.out.println("--- DataWeave GroupBy Example 5 (Object by Value) ---");
+        System.out.println("Output: " + outputMap);
+    }
+}
+
+
+output:
+{D={c=d}, B={a=b}}
+
+-------------------------------------------------------------
+
+
+example 6:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.AbstractMap;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // Simulating the result of myRead.prices (a complex object with multiple 'price' entries)
+        // In DW, myRead.prices is an object containing a list of objects or key/value pairs
+        // We simulate the key/value pairs resulting from the DW XML reading of multiple elements with the same name.
+        
+        // Simulating the internal structure of myRead.prices: a list of map entries
+        List<Map.Entry<String, String>> pricesData = Arrays.asList(
+            new AbstractMap.SimpleEntry<>("price", "9.99"),
+            new AbstractMap.SimpleEntry<>("price", "10.99")
+        );
+
+        // DataWeave: myRead.prices groupBy "costs"
+        // Java Streams: Group the entire list of entries under the key "costs"
+        Map<String, Map<String, String>> outputMap = pricesData.stream()
+            .collect(Collectors.groupingBy(
+                // Key: Hardcode the key to "costs"
+                entry -> "costs", 
+                // Value: Collect all entries into a Map (to simulate the resulting XML structure)
+                Collectors.toMap(
+                    Map.Entry::getKey, 
+                    Map.Entry::getValue,
+                    // Handle duplicate keys (MuleSoft allows this, Java needs a merger function)
+                    (oldValue, newValue) -> newValue // Use the new value for the 'price' key
+                )
+            ));
+
+        System.out.println("--- DataWeave GroupBy Example 6 (XML Grouping) ---");
+        System.out.println("Output: " + outputMap);
+    }
+}
+
+
+output:
+
+{costs={price=10.99}}
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+

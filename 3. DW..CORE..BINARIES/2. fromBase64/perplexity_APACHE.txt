@@ -1,0 +1,34 @@
+fromBase64:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Base64;
+
+public class FromBase64Route extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:fromBase64")
+            .process(exchange -> {
+                // Assume payload contains Base64 string, e.g. "yv6rzQ=="
+                String base64Input = exchange.getIn().getBody(String.class);
+                
+                // Decode Base64 to raw bytes
+                byte[] binaryOutput = Base64.getDecoder().decode(base64Input);
+                
+                // Set as octet-stream binary
+                exchange.getIn().setBody(binaryOutput);
+                exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "application/octet-stream");
+            })
+            .to("log:output?showHeaders=true&showBodyType=true");
+    }
+}
+
+
+
+output:
+
+
+
+

@@ -1,0 +1,66 @@
+toLocalTime:
+
+
+input:
+
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class ToLocalTimeExample {
+
+    public static void main(String[] args) {
+
+        String input = "23:57:59";
+
+        List<DateTimeFormatter> formattersA = List.of(
+                DateTimeFormatter.ofPattern("HH:mm:ss.n"),
+                DateTimeFormatter.ofPattern("HH:mm:ss")
+        );
+
+        List<DateTimeFormatter> formattersB = List.of(
+                DateTimeFormatter.ofPattern("HH:mm:ss.n")
+        );
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", parseOrError(input, formattersA));
+        output.put("b", tryParseErrorMessage(input, formattersB));
+
+        // Print
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+
+    private static LocalTime parseOrError(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                return LocalTime.parse(value, fmt);
+            } catch (DateTimeParseException e) {
+                // ignore and try next formatter
+            }
+        }
+        return null;
+    }
+
+    private static String tryParseErrorMessage(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                LocalTime.parse(value, fmt);
+                return null; // success
+            } catch (DateTimeParseException e) {
+                return "Could not find a valid formatter for '" + value + "'";
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+
+a: 23:57:59
+b: Could not find a valid formatter for '23:57:59'
+
+

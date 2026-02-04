@@ -1,0 +1,162 @@
+maxBy:
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Input data: [{"a":1}, {"a":3}, {"a":2}]
+        Map<String, Integer> item1 = new HashMap<>();
+        item1.put("a", 1);
+        Map<String, Integer> item2 = new HashMap<>();
+        item2.put("a", 3);
+        Map<String, Integer> item3 = new HashMap<>();
+        item3.put("a", 2);
+        
+        List<Map<String, Integer>> input = Arrays.asList(item1, item2, item3);
+        
+        // maxBy equivalent: find item with maximum 'a' value
+        Map<String, Integer> maxItem = input.stream()
+            .max((item1_, item2_) -> Integer.compare(item1_.get("a"), item2_.get("a")))
+            .orElse(null);
+        
+        // Output JSON manually
+        System.out.println("{\"a\":" + maxItem.get("a") + "}");
+    }
+}
+
+
+output:
+
+{"a":3}
+
+
+
+
+Alternative without Jackson (using custom class):
+
+java
+import java.util.*;
+
+class Item {
+    int a;
+    Item(int a) { this.a = a; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        List<Item> input = Arrays.asList(new Item(1), new Item(3), new Item(2));
+        
+        Item maxItem = input.stream()
+            .max(Comparator.comparingInt(item -> item.a))
+            .orElse(null);
+        
+        System.out.println("{\"a\":" + maxItem.a + "}");
+    }
+}
+Both produce identical output: {"a":3}
+----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Stream;
+
+public class Main {
+    public static void main(String[] args) {
+        // Parse DataWeave datetime format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+        
+        ZonedDateTime myDateTime1 = ZonedDateTime.parse("2017-10-01T22:57:59-03:00", formatter);
+        ZonedDateTime myDateTime2 = ZonedDateTime.parse("2018-10-01T23:57:59-03:00", formatter);
+        
+        // byDateTime: max by full datetime
+        ZonedDateTime maxDateTime = Stream.of(myDateTime1, myDateTime2)
+            .max(ZonedDateTime::compareTo).orElse(null);
+        
+        // byDate: max by date only
+        LocalDate date1 = myDateTime1.toLocalDate();
+        LocalDate date2 = myDateTime2.toLocalDate();
+        LocalDate maxDate = Stream.of(date1, date2)
+            .max(LocalDate::compareTo).orElse(null);
+        
+        // byTime: max by time only
+        OffsetTime time1 = myDateTime1.toLocalTime().atOffset(myDateTime1.getOffset());
+        OffsetTime time2 = myDateTime2.toLocalTime().atOffset(myDateTime2.getOffset());
+        OffsetTime maxTime = Stream.of(time1, time2)
+            .max(OffsetTime::compareTo).orElse(null);
+        
+        // emptyArray: returns null
+        ZonedDateTime maxEmpty = Stream.<ZonedDateTime>empty()
+            .max(ZonedDateTime::compareTo).orElse(null);
+        
+        // Output JSON format
+        System.out.println("{\"myMaxBy\":{");
+        System.out.println("  \"byDateTime\":\"" + maxDateTime.format(formatter) + "\",");
+        System.out.println("  \"byDate\":\"" + maxDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "\",");
+        System.out.println("  \"byTime\":\"" + maxTime.format(DateTimeFormatter.ISO_OFFSET_TIME) + "\",");
+        System.out.println("  \"emptyArray\":null");
+        System.out.println("}}");
+    }
+}
+
+
+output:
+
+{
+  "myMaxBy":{
+    "byDateTime":"2018-10-01T23:57:59-03:00",
+    "byDate":"2018-10-01",
+    "byTime":"23:57:59-03:00",
+    "emptyArray":null
+  }
+}
+
+
+----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Stream;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> input = Arrays.asList("A", "B", "C");
+        
+        String maxString = input.stream()
+            .max(String::compareTo)
+            .orElse(null);
+        
+        System.out.println(maxString);
+    }
+}
+
+
+
+output:
+
+C
+
+
+
+
+

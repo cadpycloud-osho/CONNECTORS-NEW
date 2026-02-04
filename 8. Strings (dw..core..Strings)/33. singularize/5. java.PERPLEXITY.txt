@@ -1,0 +1,26 @@
+singularize:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        String result = singularize("boxes");
+        System.out.println("{ \"singularize\" : \"" + result + "\" }");
+    }
+    
+    private static String singularize(String word) {
+        if (word.endsWith("es") && word.length() > 2 && word.charAt(word.length() - 3) == 'x') {
+            return word.substring(0, word.length() - 2);
+        }
+        return word;
+    }
+}
+
+
+output:
+
+
+{ "singularize" : "box" }
+

@@ -1,0 +1,95 @@
+some:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Collections;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class SomeAnyMatchExample {
+
+    /**
+     * Replicates the DataWeave 'some' function using Java's Stream.anyMatch().
+     * Returns true if at least one element satisfies the predicate, otherwise false.
+     */
+    private static <T> boolean runSome(List<T> list, Predicate<T> predicate) {
+        // Java's anyMatch() is the direct equivalent of DataWeave's 'some'
+        return list.stream().anyMatch(predicate);
+    }
+    
+    // Predicate with logging to simulate the 'log' function in DataWeave
+    private static Predicate<Integer> checkValueWithLog(int target) {
+        return n -> {
+            // Uncomment the line below to see short-circuiting in the console
+            // System.out.println("Checking value == " + n); 
+            return n == target;
+        };
+    }
+    
+    public static void main(String[] args) throws Exception {
+        // Input arrays
+        List<Integer> listA = Arrays.asList(1, 2, 3);
+        List<Integer> listB = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
+        List<Integer> listC = Arrays.asList(1, 1, 1);
+        List<Integer> listD = Collections.singletonList(1); // [1]
+
+        // --- OK Block Logic (Expected: true, true, true, true, true, true, true) ---
+        boolean ok1 = runSome(listA, n -> (n % 2) == 0); // [1,2,3] some (($ mod 2) == 0) -> true (at 2)
+        boolean ok2 = runSome(listA, n -> (n % 2) == 0); // [1,2,3] some ((nextNum) -> (nextNum mod 2) == 0) -> true (at 2)
+        boolean ok3 = runSome(listA, n -> (n % 2) == 1); // [1,2,3] some (($ mod 2) == 1) -> true (at 1)
+        
+        // [1,2,3,4,5,6,7,8] some (log('should stop at 2 ==', $) == 2) -> true (at 2)
+        boolean ok4 = runSome(listB, checkValueWithLog(2)); 
+        
+        boolean ok5 = runSome(listA, n -> n == 1);       // [1,2,3] some ($ == 1) -> true (at 1)
+        boolean ok6 = runSome(listC, n -> n == 1);       // [1,1,1] some ($ == 1) -> true (at 1)
+        boolean ok7 = runSome(listD, n -> n == 1);       // [1] some ($ == 1) -> true (at 1)
+
+        // --- ERR Block Logic (Expected: false, false) ---
+        boolean err1 = runSome(listA, n -> n == 100);    // [1,2,3] some ($ == 100) -> false
+        boolean err2 = runSome(listD, n -> n == 2);      // [1] some ($ == 2) -> false
+
+        // --- CONSTRUCTING THE FINAL OUTPUT (Simulating JSON structure) ---
+        List<Boolean> okResults = Arrays.asList(ok1, ok2, ok3, ok4, ok5, ok6, ok7);
+        List<Boolean> errResults = Arrays.asList(err1, err2);
+        
+        // Final map structure matching the desired output
+        List<Object> finalResult = Arrays.asList(
+            Map.of("ok", okResults),
+            Map.of("err", errResults)
+        );
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave some Equivalent Output ---");
+        
+        // The DataWeave structure uses an array of objects inside "results".
+        // The Java Map.of keys will be sorted alphabetically (err, ok) by default, 
+        // so we manually construct the list of maps to maintain order.
+        
+        System.out.println("{");
+        System.out.println("  \"results\": " + mapper.writeValueAsString(finalResult));
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+
+{
+   "results": [
+     {
+       "ok": [ true, true, true, true, true, true, true ]
+     },
+     {
+       "err": [ false, false ]
+     }
+   ]
+}

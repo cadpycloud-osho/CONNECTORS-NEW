@@ -1,0 +1,368 @@
+orderBy:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelOrderByExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Setup Source: [{ letter: "e" }, { letter: "d" }]
+                        List<Map<String, String>> input = new ArrayList<>();
+                        input.add(Map.of("letter", "e"));
+                        input.add(Map.of("letter", "d"));
+
+                        // 2. Logic: Equivalent to orderBy($.letter)
+                        List<Map<String, String>> sortedList = input.stream()
+                            .sorted(Comparator.comparing(m -> m.get("letter")))
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(sortedList);
+                    })
+                    // 3. Marshal to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  { "letter": "d" },
+  { "letter": "e" }
+]
+
+----------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelSortDescending {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source List: [3, 8, 1]
+                        List<Integer> input = Arrays.asList(3, 8, 1);
+
+                        // Logic: Sort descending
+                        List<Integer> sortedDescending = input.stream()
+                            .sorted(Comparator.reverseOrder())
+                            .collect(Collectors.toList());
+
+                        // Wrap in a Map for the JSON key: "orderDescending"
+                        Map<String, List<Integer>> result = Collections.singletonMap(
+                            "orderDescending", sortedDescending
+                        );
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{
+  "orderDescending": [8, 3, 1]
+}
+
+
+----------------------------------------------------------
+
+example 3:
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CamelBasicSort {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [3, 2, 3]
+                        List<Integer> input = Arrays.asList(3, 2, 3);
+
+                        // Equivalent to: orderBy $
+                        List<Integer> sorted = input.stream()
+                            .sorted(Comparator.naturalOrder())
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(sorted);
+                    })
+                    // Marshal to JSON: [2, 3, 3]
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[ 2, 3, 3 ]
+
+----------------------------------------------------------
+
+example 4:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelOrderByProperty {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Setup Data: List of Maps
+                        List<Map<String, Object>> people = new ArrayList<>();
+                        people.add(Map.of("name", "Santiago", "age", 42));
+                        people.add(Map.of("name", "Leandro", "age", 29));
+                        people.add(Map.of("name", "Mariano", "age", 35));
+
+                        // 2. Logic: Equivalent to orderBy (person) -> person.age
+                        List<Map<String, Object>> sorted = people.stream()
+                            .sorted(Comparator.comparingInt(m -> (Integer) m.get("age")))
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(sorted);
+                    })
+                    // 3. Marshal to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  { "name": "Leandro", "age": 29 },
+  { "name": "Mariano", "age": 35 },
+  { "name": "Santiago", "age": 42 }
+]
+
+----------------------------------------------------------
+
+example 5:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CamelSortDatesDescending {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Setup Data (ISO-8601 strings)
+                        List<String> input = Arrays.asList(
+                            "2020-10-01T23:57:59.017Z",
+                            "2022-12-22T12:12:12.011Z",
+                            "2020-10-01T12:40:10.012Z",
+                            "2020-10-01T23:57:59.021Z"
+                        );
+
+                        // 2. Logic: Parse to Instant and sort descending
+                        // Equivalent to orderBy -($ as Number)
+                        List<String> result = input.stream()
+                            .map(Instant::parse)
+                            .sorted(Comparator.reverseOrder())
+                            .map(Instant::toString)
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+----------------------------------------------------------
+
+example 6:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class CamelComplexSortDescending {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Setup Source Data
+                        List<Map<String, Object>> myInput = new ArrayList<>();
+                        
+                        myInput.add(createAccount("987999321", "QA", "AAAA", Map.of("Status", "Open")));
+                        myInput.add(createAccount("12399978", "QA", "BBBB", Map.of()));
+                        myInput.add(createAccount("32199974", "QA", "CCCC", Map.of()));
+
+                        // 2. Logic: Equivalent to (orderBy $.Type)[-1 to 0]
+                        List<Map<String, Object>> result = myInput.stream()
+                            .sorted(Comparator.comparing(
+                                (Map<String, Object> m) -> (String) m.get("Type")
+                            ).reversed())
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+
+            // Helper to build the nested map structure
+            private Map<String, Object> createAccount(String acc, String name, String type, Map<String, String> details) {
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put("AccountNumber", acc);
+                map.put("NameOnAccount", name);
+                map.put("Type", type);
+                map.put("CDetail", details);
+                return map;
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  {
+    "AccountNumber": "32199974",
+    "NameOnAccount": "QA",
+    "Type": "CCCC",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "12399978",
+    "NameOnAccount": "QA",
+    "Type": "BBBB",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "987999321",
+    "NameOnAccount": "QA",
+    "Type": "AAAA",
+    "CDetail": { "Status": "Open" }
+  }
+]
+
+----------------------------------------------------------
+

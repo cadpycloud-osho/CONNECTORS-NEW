@@ -1,0 +1,40 @@
+wrapWith:
+
+
+
+input:
+
+import java.util.*;
+
+public class WrapWithConverter {
+    public static String wrapWith(String text, char wrapper) {
+        if (text == null) return null;
+        return wrapper + text + wrapper;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", wrapWith(null, '\''));
+        result.put("b", wrapWith("", '\''));
+        result.put("c", wrapWith("ab", 'x'));
+        result.put("d", wrapWith("'ab'", '\''));
+        result.put("e", wrapWith("ab", '\''));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}
+
+

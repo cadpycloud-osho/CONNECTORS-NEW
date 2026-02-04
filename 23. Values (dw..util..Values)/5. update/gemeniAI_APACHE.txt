@@ -1,0 +1,349 @@
+update:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.HashMap;
+import java.util.Map;
+
+public class UpdateValueRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:updateName")
+            .routeId("Update-Value-Route")
+            .process(exchange -> {
+                // 1. Original Object (Incoming Payload)
+                Map<String, Object> original = new HashMap<>();
+                original.put("name", "Mariano");
+
+                // 2. Logic: Replicating 'update "name" with "Data Weave"'
+                // In Java, we update the key in the map
+                original.put("name", "Data Weave");
+
+                // 3. Set the modified object back to the exchange
+                exchange.getIn().setBody(original);
+            })
+            .marshal().json()
+            .log("Updated Result: ${body}");
+    }
+}
+
+
+output:
+
+
+{
+  "name": "Data Weave"
+}
+
+
+--------------------------------------------------------
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.HashMap;
+import java.util.Map;
+
+public class FieldUpdateRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:updateField")
+            .process(exchange -> {
+                // 1. Existing Map (Input: {name: "Mariano"})
+                Map<String, Object> body = new HashMap<>();
+                body.put("name", "Mariano");
+
+                // 2. Logic: update field("name") with "Data Weave"
+                if (body.containsKey("name")) {
+                    body.put("name", "Data Weave");
+                }
+
+                exchange.getIn().setBody(body);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+{
+  "name": "Data Weave"
+}
+
+
+--------------------------------------------------------
+example 3:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UpdateArrayRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:updateArray")
+            .routeId("Update-Array-Index-Route")
+            .process(exchange -> {
+                // 1. Original List (Input: [1, 2, 3])
+                List<Integer> original = List.of(1, 2, 3);
+                
+                // 2. Logic: Create a mutable copy and update index 1
+                // Replicating: [1,2,3] update 1 with 5
+                List<Integer> modified = new ArrayList<>(original);
+                
+                if (modified.size() > 1) {
+                    modified.set(1, 5); // Index 1 is the second element
+                }
+
+                // 3. Set the new list as the payload
+                exchange.getIn().setBody(modified);
+            })
+            .marshal().json()
+            .log("Updated Array: ${body}");
+    }
+}
+
+
+output:
+
+
+[
+  1,
+  5,
+  3
+]
+
+
+--------------------------------------------------------
+example 4:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class BulkUpdateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:bulkUpdateRole")
+            .routeId("Bulk-Update-Processor")
+            .process(exchange -> {
+                // 1. Original List of Maps
+                List<Map<String, String>> heroes = List.of(
+                    Map.of("role", "a", "name", "spiderman"),
+                    Map.of("role", "b", "name", "batman")
+                );
+
+                // 2. Logic: Replicating 'update "role" with "Super Hero"'
+                // We map each object to a new one with the updated field
+                List<Map<String, String>> updatedHeroes = heroes.stream()
+                    .map(hero -> {
+                        // Create a mutable copy since Map.of is immutable
+                        Map<String, String> newHero = new java.util.HashMap<>(hero);
+                        newHero.put("role", "Super Hero");
+                        return newHero;
+                    })
+                    .collect(Collectors.toList());
+
+                // 3. Set output
+                exchange.getIn().setBody(updatedHeroes);
+            })
+            .marshal().json()
+            .log("Updated Heroes: ${body}");
+    }
+}
+
+
+output:
+
+[
+  {
+    "role": "Super Hero",
+    "name": "spiderman"
+  },
+  {
+    "role": "Super Hero",
+    "name": "batman"
+  }
+]
+
+
+
+--------------------------------------------------------
+example 5:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UpdateByIndexRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:updateByIndex")
+            .routeId("Update-List-Index-Route")
+            .process(exchange -> {
+                // 1. Original List (Input: [1, 2, 3])
+                List<Integer> inputList = List.of(1, 2, 3);
+                
+                // 2. Logic: Create a mutable copy and update index 1
+                // Replicating: update index(1) with 5
+                List<Integer> resultList = new ArrayList<>(inputList);
+                
+                // Safety check to ensure the index exists in the list
+                if (resultList.size() > 1) {
+                    resultList.set(1, 5); // .set(index, value)
+                }
+
+                // 3. Set the result as the new message body
+                exchange.getIn().setBody(resultList);
+            })
+            .marshal().json()
+            .log("Updated List: ${body}");
+    }
+}
+
+
+output:
+
+[
+  1,
+  5,
+  3
+]
+
+
+
+--------------------------------------------------------
+example 6:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+import java.util.HashMap;
+
+public class NestedUpdateRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:processNested")
+            .process(exchange -> {
+                // 1. Existing Structure: {user: {name: "Mariano"}}
+                Map<String, Object> inner = new HashMap<>();
+                inner.put("name", "Mariano");
+                
+                Map<String, Object> root = new HashMap<>();
+                root.put("user", inner);
+
+                // 2. Deep Update Logic
+                // We cast the "user" object back to a Map to reach "name"
+                Map<String, Object> userMap = (Map<String, Object>) root.get("user");
+                if (userMap != null) {
+                    userMap.put("name", "Data Weave");
+                }
+
+                exchange.getIn().setBody(root);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+{
+  "user": {
+    "name": "Data Weave"
+  }
+}
+
+
+--------------------------------------------------------
+example 7:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
+public class XmlUpdateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:updateXmlLanguage")
+            .routeId("XML-Conditional-Update")
+            .convertBodyTo(Document.class) // Ensure body is a DOM Document
+            .process(exchange -> {
+                Document doc = exchange.getIn().getBody(Document.class);
+                var xpath = XPathFactory.newInstance().newXPath();
+
+                // 1. Logic: Find all language nodes within users/user
+                NodeList nodes = (NodeList) xpath.evaluate("//users/user/language", 
+                                          doc, XPathConstants.NODESET);
+
+                // 2. Iterate and apply conditional update
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    var node = nodes.item(i);
+                    String currentVal = node.getTextContent();
+                    
+                    // Replicating: (if ($ == "English") "Gibberish" else $)
+                    if ("English".equals(currentVal)) {
+                        node.setTextContent("Gibberish");
+                    }
+                }
+                
+                exchange.getIn().setBody(doc);
+            })
+            .marshal().serialization() // Or keep as XML string
+            .log("Updated XML: ${body}");
+    }
+}
+
+
+output:
+
+
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>Gibberish</language>
+  </user>
+</users>
+
+
+--------------------------------------------------------
+
+

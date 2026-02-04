@@ -1,0 +1,55 @@
+try:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+
+            String result = randomNumber();  // may fail
+
+            response.put("success", true);
+            response.put("result", result);
+
+        } catch (Exception e) {
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("kind", "UserException");
+            error.put("message", e.getMessage());
+            error.put("location", "Unknown location");
+            error.put("stack", Arrays.asList(
+                    "fail (anonymous:0:0)",
+                    "randomNumber (anonymous:1:114)",
+                    "main (anonymous:1:179)"
+            ));
+
+            response.put("success", false);
+            response.put("error", error);
+        }
+
+        System.out.println(response);
+    }
+
+    private static String randomNumber() {
+        if (Math.random() > 0.5) {
+            throw new RuntimeException("This function is failing");
+        }
+        return "OK";
+    }
+}
+
+
+output:
+Case 1 — Failure
+
+{success=false, error={kind=UserException, message=This function is failing, location=Unknown location, stack=[fail (anonymous:0:0), randomNumber (anonymous:1:114), main (anonymous:1:179)]}}
+
+Case 2 — Success
+{success=true, result=OK}

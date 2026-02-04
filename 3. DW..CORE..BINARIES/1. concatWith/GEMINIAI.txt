@@ -1,0 +1,65 @@
+concatWith:
+
+
+INPUT:
+
+
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HexFormat;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+public class BinaryConcatExample {
+
+    /**
+     * Replicates DataWeave's Binary concatWith logic.
+     * Decodes Base16 inputs, concatenates the resulting byte arrays, and encodes
+     * the final result in Base64.
+     */
+    public static String concatBinaryHex(String hex1, String hex2) throws IOException {
+        
+        // 1. Decode Base16 (Hex) Strings to Byte Arrays
+        // Note: HexFormat is available in Java 17+. For older versions, use DatatypeConverter or custom logic.
+        byte[] bytes1 = HexFormat.of().parseHex(hex1); // CAFE -> [0xCA, 0xFE]
+        byte[] bytes2 = HexFormat.of().parseHex(hex2); // ABCD -> [0xAB, 0xCD]
+
+        // 2. Concatenate Byte Arrays
+        // Use ByteArrayOutputStream for efficient, readable concatenation
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        outputStream.write(bytes1);
+        outputStream.write(bytes2);
+        
+        byte[] finalBytes = outputStream.toByteArray(); // [0xCA, 0xFE, 0xAB, 0xCD]
+
+        // 3. Encode the final byte array to Base64 (DataWeave output format)
+        return Base64.getEncoder().encodeToString(finalBytes);
+    }
+
+    public static void main(String[] args) {
+        String inputHex1 = "CAFE";
+        String inputHex2 = "ABCD";
+        String base64Output;
+
+        try {
+            base64Output = concatBinaryHex(inputHex1, inputHex2);
+            
+            System.out.println("--- DataWeave Binary concatWith Equivalent Output ---");
+            System.out.println("Input 1 (Base16): " + inputHex1);
+            System.out.println("Input 2 (Base16): " + inputHex2);
+            System.out.println("Concatenated Raw Bytes (Hex): CAFEABCD");
+            
+            // Print the result to match the DataWeave format: "yv6rzQ==" as Binary {base: "64"}
+            System.out.println("Output (Base64): \"" + base64Output + "\" as Binary {base: \"64\"}");
+            
+        } catch (IOException e) {
+            System.err.println("Error during byte array concatenation: " + e.getMessage());
+        }
+    }
+}
+
+
+OUTPUT:
+
+
+"yv6rzQ==" as Binary {base: "64"}

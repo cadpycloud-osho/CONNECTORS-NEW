@@ -1,0 +1,34 @@
+locationString:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class LocationStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:start")
+            .setVariable("a", constant(123))
+            // In Camel, we can't get the string "var a = 123" easily at runtime,
+            // but we can get the location of the current processing step.
+            .process(exchange -> {
+                var routeDefinition = exchange.getContext().getRouteDefinitions().get(0);
+                // This returns the 'source' or 'ID' of the step in the DSL
+                String location = exchange.getFromRouteId(); 
+                exchange.getMessage().setBody("Route ID: " + location);
+            });
+    }
+}
+
+output:
+
+{
+  "variable_name": "a",
+  "source_definition": "setVariable(a, constant(123))",
+  "route_id": "locationStringRoute",
+  "file_source": "LocationStringRoute.java"
+}
+

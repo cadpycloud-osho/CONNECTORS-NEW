@@ -1,0 +1,35 @@
+isFunctionType:
+
+
+
+INPUT:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+public class Main {
+
+    public static boolean isFunctionType(Class<?> type) {
+        return Function.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> AFunction = Function.class;
+
+        result.put("a", isFunctionType(AFunction));
+        result.put("b", isFunctionType(Boolean.class));
+
+        System.out.println(result);
+    }
+}
+
+
+OUTPUT:
+
+
+{a=true, b=false}
+

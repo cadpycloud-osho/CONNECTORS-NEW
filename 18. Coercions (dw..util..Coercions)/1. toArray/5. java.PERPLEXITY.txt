@@ -1,0 +1,41 @@
+toArray:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        CoercionsResponse response = new CoercionsResponse(
+            "".toCharArray(),
+            "hola".toCharArray()
+        );
+        System.out.println(response);
+    }
+    
+    public static class CoercionsResponse {
+        public char[] a;
+        public char[] b;
+        
+        public CoercionsResponse(char[] a, char[] b) {
+            this.a = a;
+            this.b = b;
+        }
+        
+        @Override
+        public String toString() {
+            return "{\"a\":" + java.util.Arrays.toString(a) + 
+                   ",\"b\":" + java.util.Arrays.toString(b) + "}";
+        }
+    }
+}
+
+
+
+output:
+
+{"a":[],"b":["h","o","l","a"]}
+
+
+
+

@@ -1,0 +1,69 @@
+someEntry:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Generic someEntry method
+    private static boolean someEntry(Map<String, Object> map, EntryPredicate predicate) {
+        if (map == null) return false;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (predicate.test(entry.getValue(), entry.getKey())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Functional interface for the predicate
+    @FunctionalInterface
+    interface EntryPredicate {
+        boolean test(Object value, String key);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> mapA = new LinkedHashMap<>();
+        Map<String, Object> mapB = new LinkedHashMap<>();
+        mapB.put("a", "");
+        mapB.put("b", "123");
+
+        Map<String, Object> mapC = new LinkedHashMap<>();
+        mapC.put("a", "");
+        mapC.put("b", 123);
+
+        Map<String, Object> mapD = new LinkedHashMap<>();
+        mapD.put("a", "");
+        mapD.put("b", 123);
+
+        Map<String, Object> mapE = new LinkedHashMap<>();
+        mapE.put("a", "");
+
+        Map<String, Object> mapF = null;
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", someEntry(mapA, (v, k) -> v instanceof String));
+        result.put("b", someEntry(mapB, (v, k) -> v instanceof String));
+        result.put("c", someEntry(mapC, (v, k) -> v instanceof String));
+        result.put("d", someEntry(mapD, (v, k) -> k.equals("a")));
+        result.put("e", someEntry(mapE, (v, k) -> k.equals("b")));
+        result.put("f", someEntry(mapF, (v, k) -> k.equals("a")));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=false, b=true, c=true, d=true, e=false, f=false}
+
+
+

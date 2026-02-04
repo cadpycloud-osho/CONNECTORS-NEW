@@ -1,0 +1,155 @@
+form:
+A. Prerequisites: File Setup and Data Models
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item><id>1001</id><qty>1</qty><price>$100</price></item>
+    <item><id>2001</id><qty>2</qty><price>$50</price></item>
+  </order>
+</orders>
+example 1:
+
+
+input:
+
+
+public class UserInfo {
+    private String user;
+    // Getter and Setter omitted for brevity
+    public UserInfo(String user) { this.user = user; }
+    public String getUser() { return user; }
+    public void setUser(String user) { this.user = user; }
+}
+
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import java.io.File;
+import java.nio.file.Paths;
+
+@Service
+public class ComplexMultipartService {
+
+    private static final String FILE_PATH = "src/main/resources/orders.xml";
+
+    /**
+     * Builds a MultiValueMap containing a file, a text field, and a JSON object part.
+     */
+    public MultiValueMap<String, HttpEntity<?>> buildComplexMultipartBody() {
+        // --- 1. Prepare Data and Resources ---
+        File file = Paths.get(FILE_PATH).toFile();
+        if (!file.exists()) {
+            throw new RuntimeException("File not found at: " + file.getAbsolutePath());
+        }
+        FileSystemResource fileResource = new FileSystemResource(file);
+        
+        UserInfo userInfo = new UserInfo("Annie Point");
+        
+        // --- 2. Define Headers for Each Part ---
+
+        // Part 1: File Part (XML)
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.APPLICATION_XML);
+        fileHeaders.setContentDispositionFormData("file", "myorders.xml");
+
+        // Part 2: Text Field (Plain Text)
+        HttpHeaders textHeaders = new HttpHeaders();
+        textHeaders.setContentType(MediaType.TEXT_PLAIN); // Optional, but good practice
+        textHeaders.setContentDispositionFormData("userName", null); // Name only
+
+        // Part 3: JSON Field (Marshaled Object)
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+        jsonHeaders.setContentDispositionFormData("myJson", "userInfo.json");
+
+        // --- 3. Build the Body ---
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // Part 1: File
+        builder.part("file", fileResource)
+               .headers(h -> h.addAll(fileHeaders));
+
+        // Part 2: Text Field
+        builder.part("userName", "Annie Point")
+               .headers(h -> h.addAll(textHeaders));
+
+        // Part 3: JSON Object (Spring marshals the UserInfo object to JSON)
+        builder.part("myJson", userInfo, MediaType.APPLICATION_JSON)
+               .headers(h -> h.addAll(jsonHeaders));
+
+        return builder.build();
+    }
+}
+output:
+
+Content-Type: multipart/form-data; boundary=...
+--<GENERATED_BOUNDARY>
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+<?xml version='1.0' encoding='UTF-8'?>...
+--<GENERATED_BOUNDARY>
+Content-Type: text/plain
+Content-Disposition: form-data; name="userName"
+Annie Point
+--<GENERATED_BOUNDARY>
+Content-Type: application/json
+Content-Disposition: form-data; name="myJson"; filename="userInfo.json"
+{"user":"Annie Point"}
+--<GENERATED_BOUNDARY>--
+-----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SimpleMultipartService {
+
+    /**
+     * Builds a MultiValueMap that represents the multipart/form-data body.
+     * @return MultiValueMap representing the multipart body parts.
+     */
+    public MultiValueMap<String, ?> buildSimpleMultipartBody() {
+        String firstPartContent = "content for my first part";
+        String secondPartContent = "content for my second part";
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        
+        // Add the first form field. The key ("myFirstPart") becomes the 'name' 
+        // in the Content-Disposition header.
+        builder.part("myFirstPart", firstPartContent); 
+        
+        // Add the second form field.
+        builder.part("mySecondPart", secondPartContent);
+
+        return builder.build();
+    }
+}
+
+
+output:
+
+Content-Type: multipart/form-data; boundary=...
+--<GENERATED_SPRING_BOUNDARY>
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+--<GENERATED_SPRING_BOUNDARY>
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+--<GENERATED_SPRING_BOUNDARY>--
+

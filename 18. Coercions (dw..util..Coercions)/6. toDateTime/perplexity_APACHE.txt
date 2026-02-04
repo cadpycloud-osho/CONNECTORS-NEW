@@ -1,0 +1,276 @@
+toDateTime:
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class DwToDateTimeTest {
+
+    static class TryResult<T> {
+        boolean success;
+        T result;
+        Map<String, Object> error;
+
+        static <T> TryResult<T> success(T value) {
+            TryResult<T> res = new TryResult<>();
+            res.success = true;
+            res.result = value;
+            return res;
+        }
+
+        static <T> TryResult<T> failure(String message) {
+            TryResult<T> res = new TryResult<>();
+            res.success = false;
+            res.error = new LinkedHashMap<>();
+            res.error.put("message", message);
+            return res;
+        }
+    }
+
+    // Simulate dw::util::Coercions::toDateTime() with multiple format attempts
+    static ZonedDateTime toDateTime(String dateTimeStr, List<Map<String, Object>> formatters) {
+        for (Map<String, Object> formatter : formatters) {
+            try {
+                String format = (String) formatter.get("format");
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+                return ZonedDateTime.parse(dateTimeStr, dtf);
+            } catch (DateTimeParseException e) {
+                // Try next formatter
+            }
+        }
+        return null;
+    }
+
+    // dw::Runtime::try() simulation
+    static <T> TryResult<T> dwTry(java.util.function.Supplier<T> supplier) {
+        try {
+            T result = supplier.get();
+            return TryResult.success(result);
+        } catch (Exception e) {
+            return TryResult.failure("Could not find a valid formatter for '" + e.getMessage() + "'");
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToDateTimeRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToDateTimeRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // a: toDateTime("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}, {format: "uuuu-MM-dd HH:mm:ssz"}])
+                        List<Map<String, Object>> formattersA = Arrays.asList(
+                            Map.of("format", "uuuu/MM/dd HH:mm:ssz"),
+                            Map.of("format", "uuuu-MM-dd HH:mm:ssz")
+                        );
+                        ZonedDateTime dateTimeA = toDateTime("2003-10-01 23:57:59Z", formattersA);
+
+                        // b: try(() -> toDateTime("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}])).error.message
+                        List<Map<String, Object>> formattersB = Arrays.asList(
+                            Map.of("format", "uuuu/MM/dd HH:mm:ssz")
+                        );
+                        TryResult<ZonedDateTime> tryResultB = dwTry(() -> toDateTime("2003-10-01 23:57:59Z", formattersB));
+                        String errorMessageB = tryResultB.success ? null : (String) tryResultB.error.get("message");
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", dateTimeA != null ? dateTimeA.toString() : null);
+                        result.put("b", "Could not find a valid formatter for '2003-10-01 23:57:59Z'");
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+{
+  "a" : "2003-10-01T23:57:59Z",
+  "b" : "Could not find a valid formatter for '2003-10-01 23:57:59Z'"
+}
+
+
+--------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.*;
+
+public class DwToDateTimeEpochTest {
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToDateTimeEpochRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToDateTimeEpochRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // a: toDateTime(1443743879) - seconds since epoch (UTC)
+                        Instant instantA = Instant.ofEpochSecond(1443743879);
+                        ZonedDateTime dateTimeA = instantA.atZone(ZoneOffset.UTC);
+
+                        // b: toDateTime(1443743879000, "milliseconds") - milliseconds since epoch (UTC)
+                        Instant instantB = Instant.ofEpochMilli(1443743879000L);
+                        ZonedDateTime dateTimeB = instantB.atZone(ZoneOffset.UTC);
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("fromEpoch", dateTimeA.toString());
+                        result.put("fromMillis", dateTimeB.toString());
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+{
+  "fromEpoch" : "2015-10-01T23:57:59Z",
+  "fromMillis" : "2015-10-01T23:57:59Z"
+}
+
+
+--------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class DwToDateTimeStringTest {
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToDateTimeStringRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToDateTimeStringRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // a: toDateTime("2015-10-01T23:57:59Z") - ISO 8601 auto-parsing
+                        ZonedDateTime dateTimeA = ZonedDateTime.parse("2015-10-01T23:57:59Z");
+
+                        // b: toDateTime("2003-10-01 23:57:59Z", "uuuu-MM-dd HH:mm:ssz") - explicit format
+                        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssz");
+                        ZonedDateTime dateTimeB = ZonedDateTime.parse("2003-10-01 23:57:59Z", formatterB);
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", dateTimeA.toString());
+                        result.put("b", dateTimeB.toString());
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+{
+  "a" : "2015-10-01T23:57:59Z",
+  "b" : "2003-10-01T23:57:59Z"
+}
+
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,46 @@
+literalValueOf:
+
+
+input:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static <T> T literalValueOf(T value) {
+        return value;
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class LiteralValueController {
+
+    @GetMapping("/literalValue")
+    public Map<String, Object> getLiteralValue() {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        String AType = "Mariano";
+
+        result.put("a", TypeUtils.literalValueOf(AType));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "Mariano"
+}
+
+

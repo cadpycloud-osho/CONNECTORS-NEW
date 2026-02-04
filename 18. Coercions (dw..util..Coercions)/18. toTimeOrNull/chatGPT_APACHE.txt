@@ -1,0 +1,57 @@
+toTimeOrNull:
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+public class Main {
+    public static void main(String[] args) {
+        OffsetTime a = null;
+        OffsetTime b = null;
+
+        String input = "13:44:12.283-08:00";
+
+        // Attempt formats for 'a'
+        DateTimeFormatter[] formattersA = new DateTimeFormatter[] {
+            DateTimeFormatter.ofPattern("HH:mm:ss.SSS"),
+            DateTimeFormatter.ofPattern("HH:mm:ss.nXXX")
+        };
+
+        for (DateTimeFormatter fmt : formattersA) {
+            try {
+                a = OffsetTime.parse(input, fmt);
+                break;
+            } catch (DateTimeParseException e) {
+                // continue trying next formatter
+            }
+        }
+
+        // Attempt single format for 'b'
+        try {
+            DateTimeFormatter fmtB = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+            b = OffsetTime.parse(input, fmtB);
+        } catch (DateTimeParseException e) {
+            b = null; // equivalent to toTimeOrNull
+        }
+
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a.toString() + "\",");
+        System.out.println("  \"b\": " + (b == null ? "null" : "\"" + b.toString() + "\""));
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": "13:44:12.000000283-08:00",
+  "b": null
+}
+
+
+
+

@@ -1,0 +1,50 @@
+firstWith:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+
+        java.util.List<java.util.Map<String, String>> users = java.util.List.of(
+            java.util.Map.of("name", "Mariano", "lastName", "Achaval"),
+            java.util.Map.of("name", "Ana", "lastName", "Felisatti"),
+            java.util.Map.of("name", "Mariano", "lastName", "de Sousa")
+        );
+
+        java.util.Map<String, String> a =
+            users.stream()
+                 .filter(u -> "Mariano".equals(u.get("name")))
+                 .findFirst()
+                 .orElse(null);
+
+        java.util.Map<String, String> b =
+            users.stream()
+                 .filter(u -> "Peter".equals(u.get("name")))
+                 .findFirst()
+                 .orElse(null);
+
+        exchange.getIn().setBody(
+            java.util.Map.of(
+                "a", a,
+                "b", b
+            )
+        );
+    });
+
+
+
+
+
+output:
+
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+
+
+

@@ -1,0 +1,42 @@
+mapString:
+
+
+input:
+
+
+import java.util.Map;
+
+public class Main {
+
+    public static String mapStringReplaceNumeric(String input) {
+        if (input == null) return null;
+
+        StringBuilder result = new StringBuilder();
+
+        for (char ch : input.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                result.append("~");
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+
+        String input = "$234";
+        String result = mapStringReplaceNumeric(input);
+
+        System.out.println(Map.of("balance", result));
+    }
+}
+
+
+output:
+
+
+{balance=$~~~}
+
+
+

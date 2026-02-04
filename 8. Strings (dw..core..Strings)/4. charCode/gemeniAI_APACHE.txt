@@ -1,0 +1,33 @@
+charCode:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Collections;
+
+public class CharCodeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getCharCode")
+            .process(exchange -> {
+                String input = "Mule";
+                
+                // Parity logic: get the first char and cast to int
+                int code = (input != null && !input.isEmpty()) 
+                           ? (int) input.charAt(0) 
+                           : -1; // Handle empty/null case
+
+                exchange.getIn().setBody(Collections.singletonMap("charCode", code));
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "charCode": 77
+}
+

@@ -1,0 +1,47 @@
+isLiteralType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LiteralTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkLiteral")
+            .process(exchange -> {
+                // Mocking the DataWeave logic: 
+                // 'a' represents a specific literal value ("Mariano")
+                // 'b' represents a general type (Boolean)
+                Object inputA = "Mariano"; 
+                Object inputB = Boolean.class;
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: In Java, we check if the object is a specific constant value
+                result.put("a", isLiteralValue(inputA, "Mariano"));
+                result.put("b", isLiteralValue(inputB, "Mariano"));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isLiteralValue(Object val, Object expected) {
+        // Simulating Literal Type check by comparing value equality 
+        // and ensuring it's not just a class type definition
+        return val != null && val.equals(expected);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+

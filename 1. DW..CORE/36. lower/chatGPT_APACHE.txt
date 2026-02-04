@@ -1,0 +1,19 @@
+lower:
+
+
+input:
+
+from("direct:lowerExample")
+.setBody(simple(
+    "{ \"name\": \"${'MULESOFT'.toLowerCase()}\" }"
+));
+
+
+output:
+
+
+{
+  "name": "mulesoft"
+}
+
+

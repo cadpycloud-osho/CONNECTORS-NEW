@@ -1,0 +1,48 @@
+toMilliseconds:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class TimerController {
+
+    private static final String INPUT_TIMESTAMP = "2018-07-23T22:03:04.829Z";
+
+    /**
+     * Simulates the DataWeave logic for the toMilliseconds() function.
+     * @return A map containing the converted time in milliseconds since the epoch.
+     */
+    @GetMapping("/toMilliseconds")
+    public Map<String, Long> convertToMilliseconds() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Long> output = new LinkedHashMap<>();
+
+        // 1. Parse the ISO 8601 string into a Java Instant object.
+        Instant instant = Instant.parse(INPUT_TIMESTAMP);
+
+        // 2. Convert the Instant to milliseconds since the epoch.
+        // This is the Java equivalent of dw::util::Timer::toMilliseconds()
+        long milliseconds = instant.toEpochMilli();
+
+        // Simulating the DataWeave call:
+        output.put("toMilliseconds", milliseconds);
+
+        return output;
+    }
+}
+
+output:
+
+{
+  "toMilliseconds": 1532383384829
+}
+

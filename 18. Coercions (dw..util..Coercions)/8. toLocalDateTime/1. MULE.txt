@@ -1,0 +1,77 @@
+toLocalDateTime:
+
+toLocalDateTime(str: String, formatters: Array<Formatter>): LocalDateTime
+
+toLocalDateTime(str: String, formatters: Array<Formatter>): LocalDateTime
+Transforms a String value into a LocalDateTime value using the first Formatter that matches with the given value to transform.
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+import * from dw::Runtime
+output application/dw
+---
+{
+  a: toLocalDateTime("2003-10-01 23:57:59", [{format: "uuuu/MM/dd HH:mm:ss"}, {format: "uuuu-MM-dd HH:mm:ss"}]),
+  b: try(() -> toLocalDateTime("2003-10-01 23:57:59", [{format: "uuuu/MM/dd HH:mm:ss"}])).error.message
+}
+
+
+DataWeave
+Output
+{
+  a: |2003-10-01T23:57:59| as LocalDateTime {format: "uuuu-MM-dd HH:mm:ss"},
+  b: "Could not find a valid formatter for '2003-10-01 23:57:59'"
+}
+
+
+---------------------------------------------------------------------
+
+
+toLocalDateTime(str: String, format: String | Null = null, locale: String | Null = null): LocalDateTime
+Transforms a String value into a LocalDateTime value and accepts a format and locale
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+  a: toLocalDateTime("2015-10-01T23:57:59"),
+  b: toLocalDateTime("2003-10-01 23:57:59","uuuu-MM-dd HH:mm:ss")
+}
+
+
+
+DataWeave
+Output
+{
+  a: |2015-10-01T23:57:59|,
+  b: |2003-10-01T23:57:59| as LocalDateTime {format: "uuuu-MM-dd HH:mm:ss"}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

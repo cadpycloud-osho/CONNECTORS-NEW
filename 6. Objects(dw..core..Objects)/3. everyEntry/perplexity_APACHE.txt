@@ -1,0 +1,70 @@
+everyEntry:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+import java.util.function.BiPredicate;
+
+public class EveryEntryRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:everyEntry")
+            .process(exchange -> {
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // a: {} everyEntry → true (vacuous truth)
+                result.put("a", everyEntry(new HashMap<>(), (v, k) -> v instanceof String));
+                
+                // b: {a:"", b:"123"} → all strings ✓
+                result.put("b", everyEntry(
+                    Map.of("a", "", "b", "123"), 
+                    (v, k) -> v instanceof String));
+                
+                // c: {a:"", b:123} → b fails (not String) ✗
+                result.put("c", everyEntry(
+                    Map.of("a", "", "b", 123), 
+                    (v, k) -> v instanceof String));
+                
+                // d: {a:"", b:123} → key=="a" fails for b ✗
+                result.put("d", everyEntry(
+                    Map.of("a", "", "b", 123), 
+                    (v, k) -> k.equals("a")));
+                
+                // e: {a:""} → key=="a" ✓
+                result.put("e", everyEntry(
+                    Map.of("a", ""), 
+                    (v, k) -> k.equals("a")));
+                
+                // f: null everyEntry → true (no entries to fail)
+                result.put("f", everyEntry(null, (v, k) -> k.equals("a")));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private boolean everyEntry(Map<String, ?> obj, BiPredicate<Object, String> predicate) {
+        if (obj == null || obj.isEmpty()) return true;
+        
+        return obj.entrySet().stream()
+            .allMatch(entry -> predicate.test(entry.getValue(), entry.getKey()));
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false,
+  "d": false,
+  "e": true,
+  "f": true
+}
+
+

@@ -1,0 +1,99 @@
+firstWith:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String usersJson = "[{\"name\":\"Mariano\",\"lastName\":\"Achaval\"},{\"name\":\"Ana\",\"lastName\":\"Felisatti\"},{\"name\":\"Mariano\",\"lastName\":\"de Sousa\"}]";
+        
+        String resultA = findFirstUser(usersJson, "Mariano");
+        String resultB = findFirstUser(usersJson, "Peter");
+        
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s\n}",
+            resultA, resultB
+        );
+        System.out.println(output);
+    }
+    
+    private static String findFirstUser(String usersJson, String targetName) {
+        // Simple manual JSON parsing for this specific case
+        if (usersJson.contains("\"name\":\"" + targetName + "\"")) {
+            int nameIndex = usersJson.indexOf("\"name\":\"" + targetName + "\"");
+            int start = usersJson.lastIndexOf("{", nameIndex);
+            int end = usersJson.indexOf("}", start);
+            return usersJson.substring(start, end + 1);
+        }
+        return "null";
+    }
+}
+
+
+
+output:
+
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional approach using findFirst which short-circuits like DataWeave firstWith.
+
+java
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList(
+            "{\"name\":\"Mariano\",\"lastName\":\"Achaval\"}",
+            "{\"name\":\"Ana\",\"lastName\":\"Felisatti\"}",
+            "{\"name\":\"Mariano\",\"lastName\":\"de Sousa\"}"
+        );
+        
+        String resultA = users.stream()
+            .filter(user -> user.contains("\"name\":\"Mariano\""))
+            .findFirst()
+            .orElse(null);
+            
+        String resultB = users.stream()
+            .filter(user -> user.contains("\"name\":\"Peter\""))
+            .findFirst()
+            .orElse(null);
+        
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s\n}",
+            resultA != null ? resultA : "null",
+            resultB != null ? resultB : "null"
+        );
+        System.out.println(output);
+    }
+}
+
+
+
+Output: Identical to above with first Mariano object for "a" and null for "b".
+
+
+
+
+
+
+

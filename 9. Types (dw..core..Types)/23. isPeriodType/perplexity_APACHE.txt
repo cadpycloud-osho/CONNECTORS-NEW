@@ -1,0 +1,57 @@
+isPeriodType:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.Period;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeavePeriodTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processPeriodChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processPeriodChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // APeriod = Period (type alias)
+        result.put("a", isPeriodType(Period.class));
+        
+        // Built-in Period type
+        result.put("b", isPeriodType(Period.class));
+        
+        // String - not Period
+        result.put("c", isPeriodType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isPeriodType(Class<?> type) {
+        // DataWeave Period type check equivalent
+        // Returns true for Period and its aliases (time duration representation)
+        return type == Period.class || 
+               "Period".equals(type.getSimpleName()) ||
+               type.getName().contains("Period");
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

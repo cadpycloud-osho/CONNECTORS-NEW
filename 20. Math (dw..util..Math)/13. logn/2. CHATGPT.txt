@@ -1,0 +1,48 @@
+logn:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MathLogController {
+
+    @GetMapping("/logn")
+    public Map<String, Double> lognExample() {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("logn10", logn(10));
+        result.put("logn13", logn(0.13));
+        result.put("logn-20", logn(-20));
+
+        return result;
+    }
+
+    // Equivalent of dw::util::Math::logn
+    private Double logn(double value) {
+        if (value <= 0) {
+            return null;
+        }
+        return Math.log(value);
+    }
+}
+
+
+output:
+
+
+{
+  "logn10": 2.302585092994046,
+  "logn13": -2.0402208285265546,
+  "logn-20": null
+}
+

@@ -1,0 +1,42 @@
+toHex:
+
+
+input:
+
+from("direct:toHex")
+.process(exchange -> {
+
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+
+    // Input numbers
+    java.math.BigInteger a = java.math.BigInteger.valueOf(-1);
+    java.math.BigInteger b = new java.math.BigInteger("100000000000000000000000000000000000000000000000000000000000000");
+    java.math.BigInteger c = java.math.BigInteger.ZERO;
+    java.math.BigInteger d = null; // null input
+    java.math.BigInteger e = java.math.BigInteger.valueOf(15);
+
+    // Convert to hexadecimal strings
+    output.put("a", a != null ? a.toString(16) : null);
+    output.put("b", b != null ? b.toString(16) : null);
+    output.put("c", c != null ? c.toString(16) : null);
+    output.put("d", d != null ? d.toString(16) : null);
+    output.put("e", e != null ? e.toString(16) : null);
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+
+{
+  "a": "-1",
+  "b": "3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "f"
+}
+
+
+
+

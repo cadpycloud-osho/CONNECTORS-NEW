@@ -1,0 +1,91 @@
+entrySet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+import java.util.*;
+import java.io.StringReader;
+
+public class EntrySetRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:entrySet")
+            .process(exchange -> {
+                String xml = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+                
+                // Parse XML like DataWeave read()
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new InputSource(new StringReader(xml)));
+                
+                NodeList children = doc.getChildNodes();
+                List<Map<String, Object>> entries = new ArrayList<>();
+                
+                for (int i = 0; i < children.getLength(); i++) {
+                    Node node = children.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element elem = (Element) node;
+                        
+                        // Build nested object for child elements
+                        Map<String, Object> valueObj = new LinkedHashMap<>();
+                        NodeList valueChildren = elem.getChildNodes();
+                        for (int j = 0; j < valueChildren.getLength(); j++) {
+                            Node child = valueChildren.item(j);
+                            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                                valueObj.put(child.getNodeName(), child.getTextContent());
+                            }
+                        }
+                        
+                        // Extract attributes
+                        Map<String, String> attributes = new LinkedHashMap<>();
+                        NamedNodeMap attrs = elem.getAttributes();
+                        for (int k = 1; k < attrs.getLength(); k++) {  // Skip index 0
+                            Node attr = attrs.item(k);
+                            attributes.put(attr.getNodeName(), attr.getNodeValue());
+                        }
+                        
+                        Map<String, Object> entry = new LinkedHashMap<>();
+                        entry.put("key", elem.getTagName());
+                        entry.put("value", valueObj);
+                        entry.put("attributes", attributes);
+                        
+                        entries.add(entry);
+                    }
+                }
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("entrySet", entries);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+
+output:
+
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+
+

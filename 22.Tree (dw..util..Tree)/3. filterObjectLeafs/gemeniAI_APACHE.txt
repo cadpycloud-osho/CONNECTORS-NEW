@@ -1,0 +1,78 @@
+filterObjectLeafs:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class TreeFilterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:startFilter")
+            .process(exchange -> {
+                // Setup Input A
+                Map<String, Object> friend1 = Map.of("name", "", "id", "test");
+                Map<String, Object> friend2 = new HashMap<>(); 
+                friend2.put("name", "Me"); friend2.put("id", null);
+                
+                List<Map<String, Object>> friends = List.of(friend1, friend2);
+                Map<String, Object> aInput = new LinkedHashMap<>();
+                aInput.put("name", "Mariano");
+                aInput.put("lastName", null);
+                aInput.put("age", 123);
+                aInput.put("friends", friends);
+
+                // Setup Input B
+                Map<String, Object> bInput = new LinkedHashMap<>();
+                bInput.put("c", null);
+                bInput.put("d", "hello");
+
+                // Process Results
+                Map<String, Object> finalOutput = new LinkedHashMap<>();
+                finalOutput.put("a", filterObjectLeafs(aInput, (val, isObj) -> !(val == null || val instanceof String)));
+                finalOutput.put("b", filterObjectLeafs(bInput, (val, isObj) -> val == null && isObj));
+
+                exchange.getIn().setBody(finalOutput);
+            })
+            .marshal().json();
+    }
+
+    private Object filterObjectLeafs(Object node, java.util.function.BiPredicate<Object, Boolean> predicate) {
+        if (node instanceof Map) {
+            Map<Object, Object> result = new LinkedHashMap<>();
+            ((Map<?, ?>) node).forEach((k, v) -> {
+                Object processed = filterObjectLeafs(v, predicate);
+                // In Java, check if value is a "leaf" (not Map/List)
+                if (!(processed instanceof Map || processed instanceof List)) {
+                    if (predicate.test(processed, true)) result.put(k, processed);
+                } else {
+                    result.put(k, processed); // Keep containers (Objects/Arrays)
+                }
+            });
+            return result;
+        } else if (node instanceof List) {
+            return ((List<?>) node).stream()
+                .map(item -> filterObjectLeafs(item, predicate))
+                .collect(Collectors.toList());
+        }
+        return node;
+    }
+}
+
+output:
+
+{
+  "a": {
+    "age": 123,
+    "friends": [
+      {},
+      {}
+    ]
+  },
+  "b": {
+    "c": null
+  }
+}

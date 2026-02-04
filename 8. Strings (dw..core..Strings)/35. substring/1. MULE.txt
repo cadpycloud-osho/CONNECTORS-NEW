@@ -1,0 +1,53 @@
+substring:
+
+substring(text: String, from: Number, until: Number): String
+
+substring(text: String, from: Number, until: Number): String
+Returns a substring that spans from the character at the specified from index to the last character before the until index.
+
+The characters in the substring satisfy the condition from <= indexOf(string) < until.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+var text = "hello world!"
+---
+substring(text, 1, 5)
+
+DataWeave
+Output
+"ello"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

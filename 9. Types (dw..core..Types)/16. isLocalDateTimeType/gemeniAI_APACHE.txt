@@ -1,0 +1,54 @@
+isLocalDateTimeType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LocalDateTimeCheckRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkDateTime")
+            .process(exchange -> {
+                // Mocking the types for comparison
+                Object typeA = LocalDateTime.class;
+                Object typeB = LocalDateTime.now(); // Instance of LocalDateTime
+                Object typeC = "2023-10-27T10:00:00"; // A String literal
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if the class or instance is of type java.time.LocalDateTime
+                result.put("a", isLocalDateTime(typeA));
+                result.put("b", isLocalDateTime(typeB));
+                result.put("c", isLocalDateTime(typeC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isLocalDateTime(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the Class itself or an instance of the Class
+        return obj instanceof LocalDateTime || obj.equals(LocalDateTime.class);
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

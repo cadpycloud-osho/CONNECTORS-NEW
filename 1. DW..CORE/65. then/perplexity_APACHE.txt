@@ -1,0 +1,62 @@
+then:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class ThenChainRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:thenChain")
+            .process(exchange -> {
+                List<String> names = Arrays.asList("mariano", "de Achaval");
+                
+                // chainResult: reduce → concat → sizeOf
+                int chainResult = names.stream()
+                    .reduce("", String::concat)
+                    .map(String::length)
+                    .orElse(0);
+                
+                // referenceResult: map → upper → object construction
+                List<String> upperNames = names.stream()
+                    .map(String::toUpperCase)
+                    .collect(Collectors.toList());
+                Map<String, Object> referenceResult = Map.of(
+                    "name", upperNames.get(0),
+                    "lastName", upperNames.get(1),
+                    "length", upperNames.size()
+                );
+                
+                // onNullReturnNull: empty reduce → sizeOf → null
+                Integer onNullResult = Arrays.asList().stream()
+                    .reduce("", String::concat)
+                    .map(String::length)
+                    .orElse(null);
+                
+                exchange.getIn().setBody(Map.of(
+                    "chainResult", chainResult,
+                    "referenceResult", referenceResult,
+                    "onNullReturnNull", onNullResult
+                ));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "chainResult": 17,
+  "referenceResult": {
+    "name": "MARIANO",
+    "lastName": "DE ACHAVAL", 
+    "length": 2
+  },
+  "onNullReturnNull": null
+}
+
+

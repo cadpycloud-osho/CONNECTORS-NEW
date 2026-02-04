@@ -1,0 +1,32 @@
+isBinaryType:
+
+input:
+
+import java.util.*;
+
+public class IsBinaryTypeConverter {
+    public static boolean isBinaryType(String typeName) {
+        return "Binary".equals(typeName) || "ABinary".equals(typeName);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isBinaryType("ABinary"));  // type ABinary = Binary
+        result.put("b", isBinaryType("Binary"));   // built-in Binary
+        result.put("c", isBinaryType("String"));   // concrete type
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

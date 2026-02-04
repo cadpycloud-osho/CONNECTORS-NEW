@@ -1,0 +1,30 @@
+lower:
+
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        String input = "MULESOFT";
+
+        // Convert to lowercase (same as DataWeave lower())
+        String result = input.toLowerCase();
+
+        // Output as JSON-style string
+        System.out.println("{ \"name\": \"" + result + "\" }");
+    }
+}
+
+
+
+
+output:
+
+
+{ "name": "mulesoft" }
+
+

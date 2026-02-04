@@ -1,0 +1,30 @@
+index:
+
+index(index: Number): PathElement
+
+index(index: Number): PathElement
+This function creates a PathElement data type to use for selecting an array element and populates the type’s selector field with the specified index.
+
+Some versions of the update and mask functions accept a PathElement as an argument.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::util::Values
+ns ns0 http://acme.com/foo
+---
+index(0)
+
+
+
+DataWeave
+Output
+{
+   "kind": "Array",
+   "namespace": null,
+   "selector": 0
+ }
+

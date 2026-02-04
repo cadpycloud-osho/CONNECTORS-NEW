@@ -1,0 +1,55 @@
+envVar:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class EnvVarController {
+
+    @GetMapping("/env")
+    public Map<String, List<Map<String, String>>> getEnvVars() {
+
+        List<Map<String, String>> envVars = new ArrayList<>();
+
+        // real env var
+        Map<String, String> real = new HashMap<>();
+        real.put("real", System.getenv("SHELL"));
+        envVars.add(real);
+
+        // fake env var
+        Map<String, String> fake = new HashMap<>();
+        fake.put("fake", System.getenv("FAKE_ENV_VAR"));
+        envVars.add(fake);
+
+        Map<String, List<Map<String, String>>> response = new HashMap<>();
+        response.put("envVars", envVars);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "envVars": [
+    {
+      "real": "/bin/bash"
+    },
+    {
+      "fake": null
+    }
+  ]
+}
+
+
+

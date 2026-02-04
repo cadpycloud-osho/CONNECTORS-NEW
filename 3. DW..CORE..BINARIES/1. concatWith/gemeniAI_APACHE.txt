@@ -1,0 +1,49 @@
+concatWith:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.codec.binary.Hex; // Requires Apache Commons Codec
+import java.util.Base64;
+
+public class BinaryConcatRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startBinaryConcat")
+            .routeId("Binary-Concat-Route")
+            .process(exchange -> {
+                // 1. Define the Hex source strings
+                String hexPart1 = "CAFE";
+                String hexPart2 = "ABCD";
+
+                // 2. Convert Hex strings to byte arrays
+                byte[] bytes1 = Hex.decodeHex(hexPart1);
+                byte[] bytes2 = Hex.decodeHex(hexPart2);
+
+                // 3. Concatenate the two byte arrays
+                byte[] combined = new byte[bytes1.length + bytes2.length];
+                System.arraycopy(bytes1, 0, combined, 0, bytes1.length);
+                System.arraycopy(bytes2, 0, combined, bytes1.length, bytes2.length);
+
+                // 4. Encode the combined binary to Base64
+                // This results in the string "yv6rzQ=="
+                String base64Result = Base64.getEncoder().encodeToString(combined);
+
+                // Set the result as the message body
+                exchange.getIn().setBody(base64Result);
+            })
+            .log("Final Base64 Output: ${body}");
+    }
+}
+
+
+
+output:
+
+yv6rzQ==
+
+

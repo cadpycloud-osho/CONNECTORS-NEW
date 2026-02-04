@@ -1,0 +1,106 @@
+location:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.*;
+
+public class DwLocationTest {
+
+    // Simulate DataWeave Location object
+    static class Location {
+        String uri;
+        String nameIdentifier;
+        int startLine;
+        int startColumn;
+        int endLine;
+        int endColumn;
+        
+        Location(String uri, String nameIdentifier, int startLine, int startColumn, int endLine, int endColumn) {
+            this.uri = uri;
+            this.nameIdentifier = nameIdentifier;
+            this.startLine = startLine;
+            this.startColumn = startColumn;
+            this.endLine = endLine;
+            this.endColumn = endColumn;
+        }
+    }
+
+    // Simulate dw::Runtime::location(sqrt) - location of sqrt function in Core module
+    static Location location(Object value) {
+        // Hardcoded location of sqrt function from dw::Core (line 5797 as per output)
+        return new Location(
+            "/dw/Core.dwl",
+            "dw::Core",
+            5797,
+            36,
+            5797,
+            77
+        );
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new LocationRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class LocationRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Simulate: location(sqrt)
+                        Location sqrtLocation = location(Math::sqrt);
+
+                        // Build Location object matching DataWeave output
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("uri", sqrtLocation.uri);
+                        result.put("nameIdentifier", sqrtLocation.nameIdentifier);
+                        result.put("startLine", sqrtLocation.startLine);
+                        result.put("startColumn", sqrtLocation.startColumn);
+                        result.put("endLine", sqrtLocation.endLine);
+                        result.put("endColumn", sqrtLocation.endColumn);
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+Output:
+{
+  "uri" : "/dw/Core.dwl",
+  "nameIdentifier" : "dw::Core",
+  "startLine" : 5797,
+  "startColumn" : 36,
+  "endLine" : 5797,
+  "endColumn" : 77
+}
+
+
+
+

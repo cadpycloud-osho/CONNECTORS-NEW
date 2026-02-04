@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "requestId",
+        "responses"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string"
+        },
+        "responses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/response"
+          }
+        }
+      }
+    },
+    "response": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "recipientSendId",
+        "hasErrors"
+      ],
+      "properties": {
+        "recipientSendId": {
+          "type": "string"
+        },
+        "hasErrors": {
+          "type": "boolean"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "messageErrors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/messageError"
+          }
+        }
+      }
+    },
+    "messageError": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "messageErrorCode",
+        "messageErrorStatus"
+      ],
+      "properties": {
+        "messageErrorCode": {
+          "type": "number"
+        },
+        "messageErrorStatus": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

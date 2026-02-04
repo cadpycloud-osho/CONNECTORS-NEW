@@ -1,0 +1,230 @@
+file:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultipartFileRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Path to the file
+                String ordersFilePath = "src/main/resources/orders.xml";
+
+                // Read file content
+                String fileContent = Files.readString(Paths.get(ordersFilePath));
+
+                // Prepare headers
+                Map<String, Object> headers = new HashMap<>();
+                headers.put("Content-Type", "application/xml");
+
+                Map<String, String> contentDisposition = new HashMap<>();
+                contentDisposition.put("name", "file");
+                contentDisposition.put("filename", "orders.xml");
+                headers.put("Content-Disposition", contentDisposition);
+
+                // Set message body and headers
+                Message message = exchange.getMessage();
+                message.setBody(fileContent);
+                message.setHeaders(headers);
+            });
+    }
+}
+
+
+output:
+
+{
+  "headers": {
+    "Content-Type": "application/xml",
+    "Content-Disposition": {
+      "name": "file",
+      "filename": "orders.xml"
+    }
+  },
+  "content": "<?xml version='1.0' encoding='UTF-8'?>\n<orders>\n  <order>\n    <item>\n      <id>1001</id>\n      <qty>1</qty>\n      <price>$100</price>\n    </item>\n    <item>\n      <id>2001</id>\n      <qty>2</qty>\n      <price>$50</price>\n    </item>\n  </order>\n</orders>"
+}
+
+
+-----------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultipartFileFormRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Path to the file
+                String ordersFilePath = "src/main/resources/orders.xml";
+
+                // Read file content
+                String fileContent = Files.readString(Paths.get(ordersFilePath));
+
+                // Prepare headers for the file part
+                Map<String, Object> fileHeaders = new HashMap<>();
+                fileHeaders.put("Content-Type", "application/xml");
+
+                Map<String, String> contentDisposition = new HashMap<>();
+                contentDisposition.put("name", "file");
+                contentDisposition.put("filename", "myorders.xml");
+                fileHeaders.put("Content-Disposition", contentDisposition);
+
+                // Prepare body as a single "part" map
+                Map<String, Object> multipartBody = new HashMap<>();
+                multipartBody.put("file", fileContent);
+
+                // Set message body and headers
+                Message message = exchange.getMessage();
+                message.setBody(multipartBody);
+                message.setHeader(Exchange.CONTENT_TYPE, "multipart/form-data");
+                message.setHeader("CamelHttpMultipartHeaders", fileHeaders); // optional, used in Camel multipart
+            });
+    }
+}
+
+
+output:
+
+
+------=_Part_123456789
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_123456789--
+
+
+-----------------------------------------------------
+
+example 3:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultipartJsonFileRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Path to the JSON file
+                String jsonFilePath = "src/main/resources/myClients.json";
+
+                // Read file content
+                String fileContent = Files.readString(Paths.get(jsonFilePath));
+
+                // Prepare headers for the file part
+                Map<String, Object> fileHeaders = new HashMap<>();
+                fileHeaders.put("Content-Type", "application/json");
+
+                Map<String, String> contentDisposition = new HashMap<>();
+                contentDisposition.put("name", "myFile");
+                contentDisposition.put("filename", "partMyClients.json");
+                fileHeaders.put("Content-Disposition", contentDisposition);
+
+                // Prepare multipart body
+                Map<String, Object> multipartBody = new HashMap<>();
+                multipartBody.put("myFile", fileContent);
+
+                // Set body and headers
+                Message message = exchange.getMessage();
+                message.setBody(multipartBody);
+                message.setHeader(Exchange.CONTENT_TYPE, "multipart/form-data");
+                message.setHeader("CamelHttpMultipartHeaders", fileHeaders); // optional, used in Camel multipart
+            });
+    }
+}
+
+
+
+output:
+
+------=_Part_123456789
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+   clients: {
+     client: {
+       id: 1,
+       name: "Mariano"
+     },
+     client: {
+       id: 2,
+       name: "Shoki"
+     }
+   }
+}
+------=_Part_123456789--
+
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

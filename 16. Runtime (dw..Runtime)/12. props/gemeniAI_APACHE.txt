@@ -1,0 +1,80 @@
+props:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Properties;
+import java.util.TreeMap;
+
+public class AllPropertiesProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Get all JVM System Properties
+        Properties sysProps = System.getProperties();
+        
+        // Use a TreeMap if you want them alphabetized like the DW output
+        TreeMap<String, String> propsMap = new TreeMap<>();
+        sysProps.forEach((k, v) -> propsMap.put(k.toString(), v.toString()));
+
+        // Wrap in the "props" key to match the source structure
+        exchange.getMessage().setBody(java.util.Map.of("props", propsMap));
+    }
+}
+
+output:
+
+{
+  "props": {
+    "awt.toolkit": "sun.lwawt.macosx.LWCToolkit",
+    "file.encoding": "UTF-8",
+    "file.separator": "/",
+    "ftp.nonProxyHosts": "local|*.local|169.254/16|*.169.254/16",
+    "gopherProxySet": "false",
+    "http.nonProxyHosts": "local|*.local|169.254/16|*.169.254/16",
+    "java.class.path": "/Users/dev/camel-app/target/classes:...",
+    "java.class.version": "61.0",
+    "java.home": "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home",
+    "java.io.tmpdir": "/var/folders/42/dd73l3rx7...",
+    "java.runtime.name": "Java(TM) SE Runtime Environment",
+    "java.runtime.version": "17.0.1+12-LTS",
+    "java.specification.name": "Java Platform API Specification",
+    "java.specification.vendor": "Oracle Corporation",
+    "java.specification.version": "17",
+    "java.vendor": "Oracle Corporation",
+    "java.vendor.url": "https://java.oracle.com/",
+    "java.version": "17.0.1",
+    "java.vm.info": "mixed mode, sharing",
+    "java.vm.name": "Java HotSpot(TM) 64-Bit Server VM",
+    "java.vm.specification.name": "Java Virtual Machine Specification",
+    "java.vm.specification.vendor": "Oracle Corporation",
+    "java.vm.specification.version": "17",
+    "line.separator": "\n",
+    "os.arch": "aarch64",
+    "os.name": "Mac OS X",
+    "os.version": "14.2.1",
+    "path.separator": ":",
+    "socksNonProxyHosts": "local|*.local|169.254/16|*.169.254/16",
+    "sun.arch.data.model": "64",
+    "sun.boot.library.path": "/Library/Java/JavaVirtualMachines/jdk-17.jdk/...",
+    "sun.cpu.endian": "little",
+    "sun.io.unicode.encoding": "UnicodeBig",
+    "sun.java.command": "org.apache.camel.main.Main",
+    "sun.jnu.encoding": "UTF-8",
+    "sun.management.compiler": "HotSpot 64-Bit Tiered Compilers",
+    "user.country": "US",
+    "user.dir": "/Users/dev/camel-app",
+    "user.home": "/Users/dev",
+    "user.language": "en",
+    "user.name": "developer",
+    "user.timezone": "UTC"
+  }
+}
+
+
+
+
+
+
+

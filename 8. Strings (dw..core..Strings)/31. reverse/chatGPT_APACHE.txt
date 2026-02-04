@@ -1,0 +1,43 @@
+reverse:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ReverseExample {
+
+    public static void main(String[] args) {
+        System.out.println(result());
+    }
+
+    public static Map<String, String> result() {
+        Map<String, String> map = new LinkedHashMap<>();
+
+        map.put("a", reverse("Mariano"));
+        map.put("b", reverse(null));
+        map.put("c", reverse(""));
+
+        return map;
+    }
+
+    public static String reverse(String input) {
+        if (input == null) {
+            return null;
+        }
+        return new StringBuilder(input).reverse().toString();
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": "onairaM",
+  "b": null,
+  "c": ""
+}
+
+

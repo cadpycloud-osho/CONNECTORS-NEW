@@ -1,0 +1,45 @@
+encodeURIComponent:
+
+
+input:
+
+
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        Map<String, Object> inner = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+        
+        String path = " PATH/ TO /ENCODE ";
+        String specialChars = ";,/?:@&=";
+        String safeChars = "-_.!~*'()";
+        
+        // Spaces encoded by both (%20)
+        String encodedPath = path.replace(" ", "%20");
+        inner.put("encodeURIComponent", encodedPath);
+        inner.put("encodeURI", encodedPath);
+        
+        // encodeURIComponent encodes reserved chars to hex
+        inner.put("encodeURIComponent_to_hex", URLEncoder.encode(specialChars, "UTF-8"));
+        
+        // encodeURI leaves reserved chars unencoded
+        inner.put("encodeURI_not_to_hex", specialChars);
+        
+        // Safe chars unencoded by both
+        inner.put("encodeURIComponent_not_encoded", safeChars);
+        inner.put("encodeURI_not_encoded", safeChars);
+        
+        result.put("comparing_encode_functions_output", inner);
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{comparing_encode_functions_output={encodeURIComponent= PATH/ TO /ENCODE , encodeURI= PATH/ TO /ENCODE , encodeURIComponent_to_hex=%3B%2C%2F%3F%3A%40%26%3D, encodeURI_not_to_hex=;,/?:@&=, encodeURIComponent_not_encoded=-_.!~*'(), encodeURI_not_encoded=-_.!~*'()}}
+

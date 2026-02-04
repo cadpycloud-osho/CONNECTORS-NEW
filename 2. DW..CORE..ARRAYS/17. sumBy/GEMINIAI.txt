@@ -1,0 +1,65 @@
+sumBy:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+// Data structure matching the DataWeave array elements
+class DataItem {
+    public int a;
+    public DataItem(int a) {
+        this.a = a;
+    }
+    public int getA() { // Getter required for mapping
+        return a;
+    }
+}
+
+public class SumByExample {
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        // Input List of DataItem objects
+        List<DataItem> items = Arrays.asList(
+            new DataItem(1), 
+            new DataItem(2), 
+            new DataItem(3)
+        );
+        
+        // --- DataWeave Logic: [ { a: 1 }, { a: 2 }, { a: 3 } ] sumBy $.a ---
+        // Java Equivalent: mapToInt(DataItem::getA).sum()
+        
+        int sumResult = items.stream()
+                // Map each object to the integer value of its 'a' field
+                .mapToInt(DataItem::getA) 
+                // Sum the resulting integers
+                .sum(); 
+
+        // The DataWeave output structure is: { "sumBy" : [ 6, 6 ] }
+        Map<String, List<Integer>> result = Map.of(
+            "sumBy", Arrays.asList(sumResult, sumResult)
+        );
+        
+        // --- Output Generation (Simulating JSON structure) ---
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave sumBy Equivalent Output ---");
+        System.out.println("Input List: " + items.stream().map(d -> d.a).collect(Collectors.toList()));
+        
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+}
+
+output:
+
+{ 
+  "sumBy" : [ 6, 6 ] 
+}

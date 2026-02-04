@@ -1,0 +1,78 @@
+nameSet:
+
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * Simulates the DataWeave nameSet() function on a standard object.
+     * Since nameSet() on a plain object is equivalent to keySet(), 
+     * we use the standard Map.keySet() method.
+     * @param inputMap The map (DW object) to extract names from.
+     * @return A Set of names (keys).
+     */
+    public static Set<String> nameSet(Map<String, Object> inputMap) {
+        // Map.keySet() directly gives the set of keys, which are the names.
+        return inputMap.keySet();
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // 1. Define the input object/Map, using LinkedHashMap to match typical DW order
+        Map<String, Object> inputObject = new LinkedHashMap<>();
+        inputObject.put("a", true);
+        inputObject.put("b", 1);
+        
+        // 2. Apply the nameSet() function
+        Set<String> names = nameSet(inputObject);
+        
+        // 3. Format the final JSON output
+        String namesArrayString = names.stream()
+            // Map each key to a quoted string (e.g., "a")
+            .map(s -> "\"" + s + "\"")
+            // Join them with a comma
+            .collect(Collectors.joining(","));
+
+        String jsonOutput = String.format(
+            "{\n  \"nameSet\": [%s]\n}",
+            namesArrayString
+        );
+
+        System.out.println("--- DataWeave nameSet() Simulation ---");
+        System.out.println("Input Object: " + inputObject);
+        System.out.println("Extracted Names: " + names);
+        System.out.println("--------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+--- DataWeave nameSet() Simulation ---
+Input Object: {a=true, b=1}
+Extracted Names: [a, b]
+--------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "nameSet": ["a","b"]
+}

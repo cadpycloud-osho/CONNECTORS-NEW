@@ -1,0 +1,73 @@
+asExpressionString:
+
+
+
+input:
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Replicates dw::util::Tree::asExpressionString()
+     * Converts a DataWeave-like AST into an expression string.
+     */
+    public static String asExpressionString(List<Map<String, Object>> treeStructure) {
+        StringBuilder expression = new StringBuilder();
+
+        for (Map<String, Object> node : treeStructure) {
+            String kind = (String) node.get("kind");
+            String selector = (String) node.get("selector");
+
+            switch (kind) {
+                case "OBJECT_TYPE":
+                    expression.append(".").append(selector);
+                    break;
+
+                case "ATTRIBUTE_TYPE":
+                    expression.append(".@").append(selector);
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Unsupported kind: " + kind);
+            }
+        }
+
+        return expression.toString();
+    }
+
+    public static void main(String[] args) {
+
+        // Build AST safely (no Map.of with nulls)
+        List<Map<String, Object>> inputAst = new ArrayList<>();
+
+        Map<String, Object> objectNode = new HashMap<>();
+        objectNode.put("kind", "OBJECT_TYPE");
+        objectNode.put("selector", "user");
+        objectNode.put("namespace", null);
+
+        Map<String, Object> attributeNode = new HashMap<>();
+        attributeNode.put("kind", "ATTRIBUTE_TYPE");
+        attributeNode.put("selector", "name");
+        attributeNode.put("namespace", null);
+
+        inputAst.add(objectNode);
+        inputAst.add(attributeNode);
+
+        String result = asExpressionString(inputAst);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+  "expression": ".user.@name"
+}
+

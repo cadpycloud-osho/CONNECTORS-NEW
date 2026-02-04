@@ -1,0 +1,49 @@
+months:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MonthsController {
+    
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ISO_INSTANT;
+    private static final Instant BASE = Instant.parse("2020-10-05T20:22:34.385Z");
+
+    @GetMapping("/months")
+    public Map<String, Object> getMonths() {
+        LocalDateTime baseLdt = BASE.atZone(ZoneOffset.UTC).toLocalDateTime();
+        LocalDateTime nextMonthLdt = baseLdt.plusMonths(1);
+        Instant nextMonth = nextMonthLdt.toInstant(ZoneOffset.UTC);
+        
+        String fourMonthPeriod = "P4M";
+        long addNegativeValue = -1 + 2;
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("nextMonth", FMT.format(nextMonth));
+        result.put("fourMonthPeriod", fourMonthPeriod);
+        result.put("addNegativeValue", addNegativeValue);
+        
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+

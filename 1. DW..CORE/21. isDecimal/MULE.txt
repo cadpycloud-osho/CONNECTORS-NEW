@@ -1,0 +1,23 @@
+isDecimal:
+
+isDecimal(number: Number): Boolean
+
+Returns true if the given number contains a decimal, false if not.
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[ isDecimal(1.1), isDecimal(1), isDecimal("1.1") ]
+
+DataWeave
+Output
+[ true, false, true ]
+
+
+
+
+
+

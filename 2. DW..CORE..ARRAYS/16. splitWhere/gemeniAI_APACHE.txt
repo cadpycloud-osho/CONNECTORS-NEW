@@ -1,0 +1,81 @@
+splitWhere:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
+
+public class CamelSplitWhereExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: var users = ["Mariano", "Leandro", "Julian", "Tomo"]
+                        List<String> users = List.of("Mariano", "Leandro", "Julian", "Tomo");
+
+                        // 1. Find the first index where the condition is met
+                        int pivotIndex = IntStream.range(0, users.size())
+                                .filter(i -> users.get(i).startsWith("Jul"))
+                                .findFirst()
+                                .orElse(users.size()); // If no match, everything goes to 'l'
+
+                        // 2. Perform the split
+                        List<String> left = users.subList(0, pivotIndex);
+                        List<String> right = users.subList(pivotIndex, users.size());
+
+                        exchange.getIn().setBody(Map.of(
+                            "l", left,
+                            "r", right
+                        ));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+public class ArrayUtils {
+    public Map<String, List<String>> splitByPrefix(List<String> input, String prefix) {
+        int idx = IntStream.range(0, input.size())
+                .filter(i -> input.get(i).startsWith(prefix))
+                .findFirst()
+                .orElse(input.size());
+        
+        return Map.of(
+            "l", input.subList(0, idx),
+            "r", input.subList(idx, input.size())
+        );
+    }
+}
+
+// In the Route:
+from("direct:processUsers")
+    .bean(ArrayUtils.class, "splitByPrefix(${body}, 'Jul')")
+    .log("Split into ${body[l].size} items on left and ${body[r].size} on right");
+
+
+
+output:
+
+{
+  "l": ["Mariano", "Leandro"],
+  "r": ["Julian", "Tomo"]
+}
+
+

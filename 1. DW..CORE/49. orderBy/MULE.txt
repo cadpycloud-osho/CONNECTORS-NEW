@@ -1,0 +1,177 @@
+orderBy:
+
+orderBy<K, V, R, O <: { (K)?: V }>(object: O, criteria: (value: V, key: K) -> R): O
+
+orderBy<K, V, R, O <: { (K)?: V }>(object: O, criteria: (value: V, key: K) -> R): O
+
+Reorders the elements of an input using criteria that acts on selected elements of that input.
+
+This version of orderBy takes an object as input. Other versions act on an input array or handle a null value.
+
+Note that you can reference the index with the anonymous parameter $$ and the value with $.
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[{ letter: "e" }, { letter: "d" }] orderBy($.letter)
+
+
+DataWeave
+Output
+[
+  {
+    "letter": "d"
+  },
+  {
+    "letter": "e"
+  }
+]
+
+
+
+-----------------------------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/json
+---
+orderDescending: ([3,8,1] orderBy $)[-1 to 0]
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+{ "orderDescending": [8,3,1] }
+
+
+-----------------------------------------------------------------------
+
+
+orderBy<T, R>(array: Array<T>, criteria: (item: T, index: Number) -> R): Array<T>
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[3,2,3] orderBy $
+DataWeave
+Output
+[ 2, 3, 3 ]
+
+
+-----------------------------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/json
+---
+[{name: "Santiago", age: 42},{name: "Leandro", age: 29}, {name: "Mariano", age: 35}] orderBy (person) -> person.age
+DataWeave
+Output
+[
+  {
+    name: "Leandro",
+    age: 29
+  },
+  {
+    name: "Mariano",
+    age: 35
+  },
+  {
+    name: "Santiago",
+    age: 42
+  }
+]
+
+---------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+[|2020-10-01T23:57:59.017Z|, |2022-12-22T12:12:12.011Z|, |2020-10-01T12:40:10.012Z|, |2020-10-01T23:57:59.021Z|]
+  orderBy -($ as Number {unit: "milliseconds"})
+
+
+DataWeave
+Output
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+
+-----------------------------------------------------------------------
+
+Source
+%dw 2.0
+var myInput = [
+    {
+        "AccountNumber": "987999321",
+        "NameOnAccount": "QA",
+        "Type": "AAAA",
+        "CDetail": {
+            "Status": "Open"
+        }
+    },
+    {
+        "AccountNumber": "12399978",
+        "NameOnAccount": "QA",
+        "Type": "BBBB",
+        "CDetail": {}
+    },
+    {
+        "AccountNumber": "32199974",
+        "NameOnAccount": "QA",
+        "Type": "CCCC",
+        "CDetail": {}
+    }
+]
+
+
+
+output application/json
+---
+(myInput orderBy $.Type)[-1 to 0]
+
+DataWeave
+Output
+[
+  {
+    "AccountNumber": "32199974",
+    "NameOnAccount": "QA",
+    "Type": "CCCC",
+    "CDetail": {
+
+    }
+  },
+  {
+    "AccountNumber": "12399978",
+    "NameOnAccount": "QA",
+    "Type": "BBBB",
+    "CDetail": {
+
+    }
+  },
+  {
+    "AccountNumber": "987999321",
+    "NameOnAccount": "QA",
+    "Type": "AAAA",
+    "CDetail": {
+      "Status": "Open"
+    }
+  }
+]
+
+
+
+
+

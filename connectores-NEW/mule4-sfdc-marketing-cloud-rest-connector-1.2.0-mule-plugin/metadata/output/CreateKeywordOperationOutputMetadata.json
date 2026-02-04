@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "keywordId"
+      ],
+      "properties": {
+        "keywordId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+entriesOf:
+
+INPUT:
+
+
+// XmlEntriesController.java
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class XmlEntriesController {
+
+    @GetMapping("/xml-entries")
+    public Map<String, Object> xmlEntries() throws Exception {
+        // XML string similar to DataWeave's input
+        String xml = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new org.xml.sax.InputSource(new java.io.StringReader(xml)));
+        Element root = doc.getDocumentElement();
+
+        // Extract attributes of root element
+        NamedNodeMap attrMap = root.getAttributes();
+        Map<String, String> attributes = new HashMap<>();
+        for (int i = 0; i < attrMap.getLength(); i++) {
+            Node attr = attrMap.item(i);
+            attributes.put(attr.getNodeName(), attr.getNodeValue());
+        }
+
+        // Extract child elements as key-value pairs (text content)
+        Map<String, String> valueMap = new LinkedHashMap<>();
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                valueMap.put(child.getNodeName(), child.getTextContent());
+            }
+        }
+
+        // Build the entriesOf structure
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("key", root.getNodeName());
+        entry.put("value", valueMap);
+        entry.put("attributes", attributes);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("entriesOf", Collections.singletonList(entry));
+        return response;
+    }
+}
+
+
+Output:
+
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+
+
+
+_____________________________________________________________________
+
+
+entriesOf(obj: Null): Null
+Helper function that enables entriesOf to work with a null value.

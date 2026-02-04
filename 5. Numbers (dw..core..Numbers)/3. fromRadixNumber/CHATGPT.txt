@@ -1,0 +1,37 @@
+fromRadixNumber:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class NumberController {
+
+    @GetMapping("/radix")
+    public Map<String, Integer> convertRadix() {
+
+        int a = Integer.parseInt("10", 2);  // Binary → Decimal
+        int b = Integer.parseInt("FF", 16); // Hex → Decimal
+
+        return Map.of(
+                "a", a,
+                "b", b
+        );
+    }
+}
+
+
+output:
+
+{
+  "a": 2,
+  "b": 255
+}
+
+

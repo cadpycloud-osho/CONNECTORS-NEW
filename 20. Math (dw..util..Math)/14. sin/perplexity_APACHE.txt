@@ -1,0 +1,29 @@
+sin:
+
+input:
+
+import java.util.*;
+import static java.lang.Math.*;
+
+public class SinConverter {
+    public static void main(String[] args) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        result.put("sin0", sin(0));
+        result.put("sin13", sin(0.13));
+        result.put("sin-1", sin(-1));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+  "sin0": 0.0,
+  "sin13": 0.12963414261969486,
+  "sin-1": -0.8414709848078965
+}
+

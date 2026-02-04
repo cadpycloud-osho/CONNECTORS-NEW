@@ -1,0 +1,282 @@
+field:
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.support.DefaultExchange;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class MultipartProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String firstPart = "content for my first part";
+        String secondPart = "content for my second part";
+        String boundary = "----=_Part_" + UUID.randomUUID().toString().replace("-", "");
+        
+        StringBuilder multipartBody = new StringBuilder();
+        
+        // Part 1
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"myFirstPart\"\r\n\r\n");
+        multipartBody.append(firstPart).append("\r\n");
+        
+        // Part 2  
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"mySecondPart\"\r\n\r\n");
+        multipartBody.append(secondPart).append("\r\n");
+        
+        // Closing boundary
+        multipartBody.append(boundary).append("--\r\n");
+        
+        // Set headers for multipart response
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary);
+        exchange.getIn().setBody(multipartBody.toString());
+    }
+}
+
+@Override
+public void configure() {
+    from("direct:multipart")
+        .process(new MultipartProcessor());
+}
+
+
+output:
+
+
+------=_Part_[random-uuid]
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_[random-uuid]
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_[random-uuid]--
+
+
+
+-------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.camel.util.xml.StringSource;
+import java.util.UUID;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+public class MultipartComplexProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Data from DataWeave
+        List<Map<String, Object>> myOrder = List.of(
+            Map.of("order", 1, "amount", 2),
+            Map.of("order", 32, "amount", 1)
+        );
+        
+        Map<String, Object> myClients = Map.of(
+            "clients", Map.of(
+                "client", List.of(
+                    Map.of("id", 1, "name", "Mariano"),
+                    Map.of("id", 2, "name", "Shoki")
+                )
+            )
+        );
+        
+        String boundary = "------=_Part_8032_681891620.1542560124825";
+        ObjectMapper jsonMapper = new ObjectMapper();
+        
+        StringBuilder multipartBody = new StringBuilder();
+        
+        // Part 1: JSON order with filename
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/json\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"order\"; filename=\"order.json\"\r\n\r\n");
+        multipartBody.append(jsonMapper.writeValueAsString(myOrder)).append("\r\n");
+        
+        // Part 2: XML clients
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/xml\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"clients\"\r\n\r\n");
+        multipartBody.append(toXml(myClients)).append("\r\n");
+        
+        // Closing boundary
+        multipartBody.append(boundary).append("--\r\n");
+        
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary.substring(6));
+        exchange.getIn().setBody(multipartBody.toString());
+    }
+    
+    private String toXml(Map<String, Object> data) {
+        StringBuilder xml = new StringBuilder();
+        xml.append("<clients>\n");
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> clients = (List<Map<String, Object>>) data.get("clients").get("client");
+        for (Map<String, Object> client : clients) {
+            xml.append("  <client>\n")
+               .append("    <id>").append(client.get("id")).append("</id>\n")
+               .append("    <name>").append(client.get("name")).append("</name>\n")
+               .append("  </client>\n");
+        }
+        xml.append("</clients>");
+        return xml.toString();
+    }
+}
+
+from("direct:multipartComplex")
+    .process(new MultipartComplexProcessor());
+
+
+
+output:
+
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[{"order":1,"amount":2},{"order":32,"amount":1}]
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_8032_681891620.1542560124825--
+
+
+
+
+-------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+public class MultipartPositionalProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Data from DataWeave var definitions
+        List<Map<String, Integer>> myOrder = List.of(
+            Map.of("order", 1, "amount", 2),
+            Map.of("order", 32, "amount", 1)
+        );
+        
+        Map<String, Object> myClients = Map.of(
+            "clients", Map.of(
+                "client", Map.of("id", 1, "name", "Mariano"),
+                "client", Map.of("id", 2, "name", "Shoki")
+            )
+        );
+        
+        String boundary = "------=_Part_4846_2022598837.1542560230901";
+        ObjectMapper jsonMapper = new ObjectMapper();
+        StringBuilder multipartBody = new StringBuilder();
+        
+        // Part 1: Multipart::field("order", myOrder, "application/json", "order.json")
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/json\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"order\"; filename=\"order.json\"\r\n\r\n");
+        multipartBody.append(jsonMapper.writeValueAsString(myOrder)).append("\r\n");
+        
+        // Part 2: Multipart::field("clients", myClients, "application/xml")
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/xml\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"clients\"\r\n\r\n");
+        multipartBody.append(toXml(myClients)).append("\r\n");
+        
+        // Closing boundary
+        multipartBody.append(boundary).append("--\r\n");
+        
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary.substring(6));
+        exchange.getIn().setBody(multipartBody.toString());
+    }
+    
+    private String toXml(Map<String, Object> data) {
+        StringBuilder xml = new StringBuilder("<clients>\n");
+        
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Object>> clients = (Map<String, Map<String, Object>>) data.get("clients");
+        for (Map.Entry<String, Map<String, Object>> entry : clients.entrySet()) {
+            Map<String, Object> client = entry.getValue();
+            xml.append("  <client>\n")
+               .append("    <id>").append(client.get("id")).append("</id>\n")
+               .append("    <name>").append(client.get("name")).append("</name>\n")
+               .append("  </client>\n");
+        }
+        xml.append("</clients>");
+        return xml.toString();
+    }
+}
+
+from("direct:multipartPositional")
+    .process(new MultipartPositionalProcessor());
+
+
+output:
+
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[{"order":1,"amount":2},{"order":32,"amount":1}]
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_4846_2022598837.1542560230901--
+
+
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

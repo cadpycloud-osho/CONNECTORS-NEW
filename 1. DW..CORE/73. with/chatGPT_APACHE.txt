@@ -1,0 +1,23 @@
+with:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        String ssn = "987-65-4321";
+        String replaced = ssn.replaceAll("[0-9]", "x");
+
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+        result.put("ssn", replaced);
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+{ "ssn": "xxx-xx-xxxx" }
+
+

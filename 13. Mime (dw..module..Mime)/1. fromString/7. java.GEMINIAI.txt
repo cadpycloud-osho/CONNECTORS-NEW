@@ -1,0 +1,191 @@
+fromString:
+
+
+example 1:
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+
+    // 1. Conceptual Class to mimic the structure of the input (MimeResult)
+    // The actual conversion logic will happen in the main method.
+    record MimeResult(String type, String subtype, Map<String, String> parameters) {}
+
+    /**
+     * Conceptual method to mimic the process of converting a MimeResult (or type/subtype)
+     * into a Content-Type header value, ignoring parameters for simplicity.
+     */
+    public static String convertToContentType(String type, String subtype) {
+        // Simple MIME type composition: type/subtype
+        return type + "/" + subtype;
+    }
+
+    public static void main(String[] args) {
+        // Input MimeResult object
+        MimeResult simple = new MimeResult("application", "json", Map.of());
+
+        // Perform the conceptual conversion
+        String result = convertToContentType(simple.type(), simple.subtype());
+
+        // Output the result in the requested JSON format
+        System.out.println("{");
+        System.out.println("  \"result\": \"" + result + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+{
+  "result": "application/json"
+}
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // 1. Conceptual Class to mimic the structure of the input (MimeResult)
+    record MimeResult(String type, String subtype, Map<String, String> parameters) {}
+
+    /**
+     * Conceptual method to emulate the composition of a Content-Type string 
+     * from a type, subtype, and a map of parameters.
+     */
+    public static String convertToContentType(String type, String subtype, Map<String, String> parameters) {
+        
+        // 1. Start with the base MIME type: type/subtype
+        StringBuilder mimeBuilder = new StringBuilder();
+        mimeBuilder.append(type).append("/").append(subtype);
+
+        // 2. Append parameters if they exist
+        if (parameters != null && !parameters.isEmpty()) {
+            
+            // Map the parameters into the format "; key=value"
+            String parameterString = parameters.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("; ", "; ", ""));
+            
+            mimeBuilder.append(parameterString);
+        }
+        
+        return mimeBuilder.toString();
+    }
+
+    public static void main(String[] args) {
+        
+        // Input MimeResult object
+        MimeResult withParam = new MimeResult("text", "plain", 
+            Map.of("charset", "UTF-8"));
+
+        // Perform the conceptual conversion
+        String result = convertToContentType(withParam.type(), withParam.subtype(), withParam.parameters());
+
+        // Output the result in the requested JSON format
+        System.out.println("{");
+        System.out.println("  \"result\": \"" + result + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+{
+  "result": "text/plain; charset=UTF-8"
+}
+
+------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // 1. Conceptual Class to mimic the structure of the input (MimeResult)
+    record MimeResult(String type, String subtype, Map<String, String> parameters) {}
+
+    /**
+     * Conceptual method to mimic the process of converting a MimeResult
+     * into a Content-Type header value, including parameters.
+     */
+    public static String convertToContentType(String type, String subtype, Map<String, String> parameters) {
+        
+        // 1. Start with the base MIME type: type/subtype
+        StringBuilder mimeBuilder = new StringBuilder();
+        mimeBuilder.append(type).append("/").append(subtype);
+
+        // 2. Append parameters if they exist
+        if (parameters != null && !parameters.isEmpty()) {
+            
+            // Map the parameters into the format "; key=value"
+            String parameterString = parameters.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("; ", "; ", ""));
+            
+            mimeBuilder.append(parameterString);
+        }
+        
+        return mimeBuilder.toString();
+    }
+
+    public static void main(String[] args) {
+        
+        // --- Emulating Input Data ---
+        // Input MimeResult object with form-data and a boundary parameter
+        MimeResult withParam = new MimeResult("multipart", "form-data", 
+            Map.of("boundary", "----WebKitFormBoundary7MA4YWxkTrZzQFJ"));
+            
+        // --- Conversion Logic ---
+        String result = convertToContentType(withParam.type(), withParam.subtype(), withParam.parameters());
+
+        // --- Output ---
+        // Output the result in the expected JSON format
+        System.out.println("{");
+        System.out.println("  \"result\": \"" + result + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "result": "multipart/form-data; boundary=\"the-boundary\"; version=\"1.0\""
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

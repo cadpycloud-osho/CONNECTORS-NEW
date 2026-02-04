@@ -1,0 +1,64 @@
+time:
+
+
+input:
+
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, List<TimerResult>> result = executeTimerTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, List<TimerResult>> executeTimerTests() {
+        List<TimerResult> results = new ArrayList<>();
+        
+        // Test 1: Simulates dw::Runtime::wait("My result", 100) - 100ms delay
+        results.add(time(() -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return "My result";
+        }));
+        
+        // Test 2: Simulates sum([1,2,3,4]) - instant calculation
+        results.add(time(() -> sum(Arrays.asList(1, 2, 3, 4))));
+        
+        return Map.of("testing", results);
+    }
+    
+    private static int sum(List<Integer> numbers) {
+        return numbers.stream().mapToInt(Integer::intValue).sum();
+    }
+    
+    /**
+     * Core Timer.time() implementation matching DataWeave behavior
+     */
+    public static <T> TimerResult time(Supplier<T> function) {
+        String start = Instant.now().toString();
+        T result = function.get();
+        String end = Instant.now().toString();
+        
+        return new TimerResult(start, result, end);
+    }
+    
+    public record TimerResult(String start, Object result, String end) {}
+}
+
+
+output:
+
+
+{
+  testing=[TimerResult[start=2025-12-13T09:12:34.123456789Z, result=My result, end=2025-12-13T09:12:34.223456789Z], TimerResult[start=2025-12-13T09:12:34.223789012Z, result=10, end=2025-12-13T09:12:34.223890123Z]]
+}
+
+
+

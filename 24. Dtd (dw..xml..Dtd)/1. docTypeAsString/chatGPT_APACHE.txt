@@ -1,0 +1,73 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class DtdRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                String rootName = "cXML";
+                String systemId = "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd";
+
+                String docType = rootName + " SYSTEM " + systemId;
+
+                exchange.getMessage().setBody(docType);
+            });
+    }
+}
+
+
+output:
+
+
+"cXML SYSTEM http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class HtmlDtdRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                String rootName = "html";
+                String publicId = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+                String systemId = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+
+                String docType =
+                        rootName + " PUBLIC " + publicId + " " + systemId;
+
+                exchange.getMessage().setBody(docType);
+            });
+    }
+}
+
+
+output:
+
+
+"html PUBLIC -//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+
+
+
+
+-------------------------------------------------------

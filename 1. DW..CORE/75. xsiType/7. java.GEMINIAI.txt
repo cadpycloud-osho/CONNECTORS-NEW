@@ -1,0 +1,57 @@
+xsiType:
+
+
+
+
+input:
+
+
+public class Main {
+
+    // Define the namespaces used in the output
+    public static final String XSI_NS_URI = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String ACME_NS_URI = "http://acme.com";
+
+    public static void main(String[] args) throws Exception {
+        
+        // --- Input Data ---
+        String name = "Peter";
+        String lastName = "Parker";
+        
+        // --- 1. Define the operation ---
+        // DataWeave: The entire structure is manually constructed in Java string format.
+        
+        // XML Root Element and Attributes
+        String rootElement = String.format(
+            "<user xmlns=\"%s\" xmlns:xsi=\"%s\" xsi:type=\"acme:user\">", 
+            ACME_NS_URI, 
+            XSI_NS_URI
+        );
+        
+        // XML Content Elements
+        String nameElement = String.format("  <name>%s</name>", name);
+        String lastNameElement = String.format("  <lastName>%s</lastName>", lastName);
+        
+        // XML Footer
+        String footer = "</user>";
+        
+        // --- 2. Assemble the final XML output ---
+        // Assemble the full XML string with newlines for formatting
+        String finalOutput = rootElement + "\n" +
+                             nameElement + "\n" +
+                             lastNameElement + "\n" +
+                             footer;
+
+        System.out.println(finalOutput);
+    }
+}
+
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+ <user xsi:type="acme:user" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:acme="http://acme.com">
+  <name>Peter</name>
+  <lastName>Parker</lastName>
+ </user>

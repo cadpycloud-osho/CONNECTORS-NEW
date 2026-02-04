@@ -1,0 +1,225 @@
+diff:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.builder.RouteBuilder;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.container.ListChange;
+import org.javers.core.diff.changetype.map.MapChange;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class DataWeaveDiffMirrorRoute extends RouteBuilder {
+
+    // 1. Initialize Javers once for the class
+    private final Javers javers = JaversBuilder.javers()
+            .withListCompareAlgorithm(org.javers.core.diff.ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
+            .build();
+
+    @Override
+    public void configure() throws Exception {
+
+        // Endpoint to trigger the comparison
+        from("direct:performDiff")
+            .routeId("DataWeave-Diff-Mirror")
+            .process(this::handleDeepDiff)
+            .marshal().json() // Convert result to JSON
+            .log("Final Diff Report: ${body}");
+    }
+
+    private void handleDeepDiff(Exchange exchange) {
+        // 2. Extract inputs (Assuming body is a Map containing 'left' and 'right')
+        Map<String, Object> input = exchange.getIn().getBody(Map.class);
+        Object left = input.get("left");
+        Object right = input.get("right");
+
+        // 3. Perform Deep Comparison
+        Diff diff = javers.compare(left, right);
+
+        // 4. Transform Javers Diff into DataWeave Schema
+        Map<String, Object> dwReport = new LinkedHashMap<>();
+        dwReport.put("matches", !diff.hasChanges());
+        
+        List<Map<String, String>> diffsList = diff.getChanges().stream()
+            .map(change -> {
+                Map<String, String> item = new HashMap<>();
+                item.put("path", "(root)." + change.getAffectedLocalId());
+                
+                if (change instanceof ValueChange vc) {
+                    item.put("expected", String.valueOf(vc.getRight()));
+                    item.put("actual", String.valueOf(vc.getLeft()));
+                } else if (change instanceof MapChange mc) {
+                    item.put("expected", "entry present in right");
+                    item.put("actual", "was not present in left");
+                } else if (change instanceof ListChange lc) {
+                    item.put("expected", "List size matches");
+                    item.put("actual", "Size mismatch or item change");
+                }
+                return item;
+            })
+            .collect(Collectors.toList());
+
+        dwReport.put("diffs", diffsList);
+
+        exchange.getIn().setBody(dwReport);
+    }
+}
+
+output:
+
+{
+  "a": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).a"
+      }
+    ]
+  },
+  "b": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).ns0#a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).ns0#a"
+      }
+    ]
+  },
+  "c": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 0",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "d": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 3",
+        "actual": "was 0",
+        "path": "(root)"
+      }
+    ]
+  },
+  "e": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 4",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "f": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "1",
+        "actual": "2",
+        "path": "(root)[0].a"
+      }
+    ]
+  },
+  "g": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "3",
+        "actual": "2",
+        "path": "(root).a.@.c"
+      }
+    ]
+  },
+  "h": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "false",
+        "actual": "true",
+        "path": "(root)"
+      }
+    ]
+  },
+  "i": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "2",
+        "actual": "1",
+        "path": "(root)"
+      }
+    ]
+  },
+  "j": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "\"other test\"",
+        "actual": "\"test\"",
+        "path": "(root)"
+      }
+    ]
+  },
+  "k": {
+    "matches": true,
+    "diffs": []
+  },
+  "l": {
+    "matches": true,
+    "diffs": []
+  },
+  "m": {
+    "matches": true,
+    "diffs": []
+  },
+  "n": {
+    "matches": true,
+    "diffs": []
+  },
+  "o": {
+    "matches": true,
+    "diffs": []
+  },
+  "p": {
+    "matches": true,
+    "diffs": []
+  },
+  "q": {
+    "matches": true,
+    "diffs": []
+  },
+  "r": {
+    "matches": true,
+    "diffs": []
+  },
+  "s": {
+    "matches": true,
+    "diffs": []
+  },
+  "t": {
+    "matches": true,
+    "diffs": []
+  },
+  "u": {
+    "matches": true,
+    "diffs": []
+  }
+}
+
+
+
+

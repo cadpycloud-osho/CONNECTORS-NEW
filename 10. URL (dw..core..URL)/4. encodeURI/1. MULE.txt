@@ -1,0 +1,52 @@
+encodeURI:
+
+encodeURI(text: String): String
+
+encodeURI(text: String): String
+Encodes a URI with UTF-8 escape sequences.
+
+Applies up to four escape sequences for characters composed of two "surrogate" characters. The function assumes that the URI is a complete URI, so it does not encode reserved characters that have special meaning.
+
+The function does not encode these characters with UTF-8 escape sequences:
+
+
+
+Source
+%dw 2.0
+import * from dw::core::URL
+output application/json
+---
+{
+    "encodeURI" : encodeURI("http://asd/ text to decode /%/\"\\/text"),
+    "not_encoded": encodeURI("http://:;,/?:@&=\$_-_.!~*'()")
+}
+
+DataWeave
+Output
+{
+  "encodeURI": "http://asd/%20text%20to%20decode%20/%25/%22%5C/text",
+  "not_encoded": "http://:;,/?:@&=$_-_.!~*'()"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

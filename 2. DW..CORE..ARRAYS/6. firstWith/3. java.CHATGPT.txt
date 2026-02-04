@@ -1,0 +1,63 @@
+firstWith:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    static class User {
+        String name;
+        String lastName;
+
+        User(String name, String lastName) {
+            this.name = name;
+            this.lastName = lastName;
+        }
+
+        @Override
+        public String toString() {
+            return "{ \"name\": \"" + name + "\", \"lastName\": \"" + lastName + "\" }";
+        }
+    }
+
+    public static void main(String[] args) {
+
+        List<User> users = Arrays.asList(
+                new User("Mariano", "Achaval"),
+                new User("Ana", "Felisatti"),
+                new User("Mariano", "de Sousa")
+        );
+
+        // Equivalent of firstWith
+        User a = users.stream()
+                      .filter(u -> "Mariano".equals(u.name))
+                      .findFirst()
+                      .orElse(null);
+
+        User b = users.stream()
+                      .filter(u -> "Peter".equals(u.name))
+                      .findFirst()
+                      .orElse(null);
+
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b);
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": { "name": "Mariano", "lastName": "Achaval" },
+  "b": null
+}
+
+
+

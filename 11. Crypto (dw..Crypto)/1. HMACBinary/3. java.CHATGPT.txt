@@ -1,0 +1,44 @@
+HMACBinary:
+
+
+
+input:
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String hmacBinary(String message, String key, String algorithm) {
+        try {
+            Mac mac = Mac.getInstance(algorithm);
+            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm);
+            mac.init(secretKey);
+
+            byte[] rawBytes = mac.doFinal(message.getBytes(StandardCharsets.UTF_8));
+            return new String(rawBytes, StandardCharsets.UTF_8); // same as Mule DW
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("HMACBinary",
+                hmacBinary("confidential", "xxxxx", "HmacSHA512"));
+
+        System.out.println(result);
+    }
+}
+
+output:
+
+{HMACBinary=    ^h !3 ֎ 7    ` 8? jn7 bs;	 ƅ    x&g ~  % 7>1 K @ C   T  }W}
+
+

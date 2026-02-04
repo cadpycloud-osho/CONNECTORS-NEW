@@ -1,0 +1,48 @@
+writeLinesWith:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class WriteLinesRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:generateLines")
+            .routeId("Write-Lines-Route")
+            .process(exchange -> {
+                // 1. Logic: to(1, 10) map "Line $"
+                // We generate a range from 1 to 10 and map to "Line X"
+                String linesContent = IntStream.rangeClosed(1, 10)
+                        .mapToObj(i -> "Line " + i)
+                        // 2. Logic: writeLinesWith "UTF-8"
+                        // Joining with \n and adding a trailing \n to match DW behavior
+                        .collect(Collectors.joining("\n")) + "\n";
+
+                // 3. Construct the Map structure
+                Map<String, String> result = new HashMap<>();
+                result.put("lines", linesContent);
+
+                exchange.getIn().setBody(result);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "lines": "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10\n"
+}
+
+
+

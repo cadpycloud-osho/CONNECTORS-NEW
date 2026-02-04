@@ -1,0 +1,24 @@
+fromCharCode:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        int code = 117;
+        char character = (char) code;
+
+        System.out.println("{ \"fromCharCode\": \"" + character + "\" }");
+    }
+}
+
+
+
+output:
+
+
+{ "fromCharCode": "u" }
+
+

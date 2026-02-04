@@ -1,0 +1,208 @@
+orderBy:
+
+example 1:
+
+
+input:
+
+@GetMapping("/orderBy-letter")
+public List<Map<String, String>> orderByLetter() {
+    List<Map<String, String>> input = Arrays.asList(
+        Map.of("letter", "e"),
+        Map.of("letter", "d")
+    );
+    
+    return input.stream()
+        .sorted(Comparator.comparing(m -> m.get("letter")))
+        .collect(Collectors.toList());
+}
+
+
+output:
+
+[
+  {"letter": "d"},
+  {"letter": "e"}
+]
+
+
+
+-----------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+@GetMapping("/orderDescending")
+public Map<String, List<Integer>> orderDescending() {
+    List<Integer> input = Arrays.asList(3, 8, 1);
+    
+    List<Integer> sortedDesc = input.stream()
+        .sorted(Comparator.reverseOrder())
+        .collect(Collectors.toList());
+    
+    Map<String, List<Integer>> response = new HashMap<>();
+    response.put("orderDescending", sortedDesc);
+    
+    return response;
+}
+
+
+output:
+
+{
+  "orderDescending": [8, 3, 1]
+}
+
+
+
+----------------
+
+
+example 3:
+
+
+input:
+
+@GetMapping("/orderBy-numbers")
+public List<Integer> orderByNumbers() {
+    return Arrays.asList(3, 2, 3).stream()
+        .sorted(Comparator.naturalOrder())
+        .collect(Collectors.toList());
+}
+
+
+output:
+
+[2, 3, 3]
+
+
+
+----------------
+
+
+
+
+example 4:
+
+
+input:
+
+@GetMapping("/orderBy-age")
+public List<Map<String, Object>> orderByAge() {
+    List<Map<String, Object>> input = Arrays.asList(
+        Map.of("name", "Santiago", "age", 42),
+        Map.of("name", "Leandro", "age", 29),
+        Map.of("name", "Mariano", "age", 35)
+    );
+    
+    return input.stream()
+        .sorted(Comparator.comparingInt(m -> (Integer) m.get("age")))
+        .collect(Collectors.toList());
+}
+
+
+output:
+
+[
+  {"name": "Leandro", "age": 29},
+  {"name": "Mariano", "age": 35},
+  {"name": "Santiago", "age": 42}
+]
+
+
+
+----------------
+
+
+
+
+example 5:
+
+
+input:
+
+@GetMapping("/orderBy-dates")
+public List<String> orderByDates() {
+    List<String> input = Arrays.asList(
+        "2020-10-01T23:57:59.017Z",
+        "2022-12-22T12:12:12.011Z", 
+        "2020-10-01T12:40:10.012Z",
+        "2020-10-01T23:57:59.021Z"
+    );
+    
+    return input.stream()
+        .sorted((a, b) -> Long.compare(
+            Instant.parse(b).toEpochMilli(),
+            Instant.parse(a).toEpochMilli()
+        ))
+        .collect(Collectors.toList());
+}
+
+
+output:
+
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+
+
+----------------
+
+
+
+
+example 6:
+
+
+input:
+
+@GetMapping("/orderBy-type")
+public List<Map<String, Object>> orderByType() {
+    List<Map<String, Object>> input = Arrays.asList(
+        Map.of("AccountNumber", "987999321", "NameOnAccount", "QA", "Type", "AAAA",
+            "CDetail", Map.of("Status", "Open")),
+        Map.of("AccountNumber", "12399978", "NameOnAccount", "QA", "Type", "BBBB",
+            "CDetail", Map.of()),
+        Map.of("AccountNumber", "32199974", "NameOnAccount", "QA", "Type", "CCCC",
+            "CDetail", Map.of())
+    );
+    
+    return input.stream()
+        .sorted(Comparator.comparing((Map m) -> m.get("Type").toString())
+            .reversed())
+        .collect(Collectors.toList());
+}
+
+
+output:
+
+
+[
+  {"AccountNumber": "32199974", "NameOnAccount": "QA", "Type": "CCCC", "CDetail": {}},
+  {"AccountNumber": "12399978", "NameOnAccount": "QA", "Type": "BBBB", "CDetail": {}},
+  {"AccountNumber": "987999321", "NameOnAccount": "QA", "Type": "AAAA", "CDetail": {"Status": "Open"}}
+]
+
+
+----------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

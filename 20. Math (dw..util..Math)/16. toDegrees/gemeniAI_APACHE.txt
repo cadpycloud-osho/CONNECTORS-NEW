@@ -1,0 +1,37 @@
+toDegrees:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathToDegreesRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertToDegrees")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Conversion using Java's Math library
+                results.put("toDegrees0.17", Math.toDegrees(0.174));
+                results.put("toDegrees0", Math.toDegrees(0));
+                results.put("toDegrees-20", Math.toDegrees(-0.20));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "toDegrees0.17": 9.969465635276324,
+  "toDegrees0": 0.0,
+  "toDegrees-20": -11.459155902616464
+}
+

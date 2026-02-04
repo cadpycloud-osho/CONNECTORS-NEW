@@ -1,0 +1,62 @@
+toHex:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.math.BigInteger;
+import java.util.*;
+
+public class ToHexRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:toHex")
+            .process(exchange -> {
+                // Test cases matching DataWeave exactly
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // a: toHex(-1) → "-1"
+                result.put("a", toHexString(-1L));
+                
+                // b: massive BigInteger → exact hex digits
+                BigInteger huge = new BigInteger(
+                    "100000000000000000000000000000000000000000000000000000000000000");
+                result.put("b", huge.toString(16));
+                
+                // c: toHex(0) → "0"
+                result.put("c", toHexString(0L));
+                
+                // d: toHex(null) → null
+                result.put("d", null);
+                
+                // e: toHex(15) → "f"
+                result.put("e", toHexString(15L));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    // Handles long + negative → "-1" exactly like DataWeave
+    private String toHexString(long value) {
+        if (value == 0) return "0";
+        return (value < 0) ? "-" + Long.toUnsignedString(-value, 16) : Long.toHexString(value);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "-1",
+  "b": "3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "f"
+}
+
+
+
+

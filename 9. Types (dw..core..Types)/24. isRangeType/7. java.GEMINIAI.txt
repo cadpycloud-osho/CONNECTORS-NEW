@@ -1,0 +1,65 @@
+isRangeType:
+
+
+
+input:
+
+
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptual proxy class for the DataWeave 'Range' type.
+     */
+    private static final class RangeType {
+        private RangeType() {}
+    }
+
+    /**
+     * Helper method for conceptual equivalence to isRangeType(Type).
+     * We make it static so it can be called directly from the static main method.
+     */
+    private static boolean isRangeType(Class<?> type) {
+        // Checks if the given type is the RangeType class or a subclass/implementation of it.
+        return RangeType.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // DataWeave type ARange is an alias for Range (Conceptually RangeType in Java context)
+        Class<?> aRange = RangeType.class;
+        
+        // DataWeave type Range (Conceptually RangeType in Java context)
+        Class<?> rangeType = RangeType.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isRangeType(aRange);
+        boolean b = isRangeType(rangeType);
+        boolean c = isRangeType(stringType);
+
+        // Map the results to match the desired output structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        // Print the map directly to match the desired format: {a=true, b=true, c=false}
+        System.out.println(output);
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

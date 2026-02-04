@@ -1,0 +1,70 @@
+toRadixNumber:
+
+
+
+
+input:
+
+import java.lang.Integer;
+
+public class Main {
+
+    /**
+     * Converts a decimal integer to its string representation in a specified radix (base).
+     * This mimics the DataWeave 'toRadixNumber(number, radix)' function.
+     * @param number The decimal integer to convert.
+     * @param radix The target base of the number (e.g., 2 for binary, 16 for hexadecimal).
+     * @return The resulting string representation of the number in the given radix.
+     */
+    public static String convertToRadix(int number, int radix) {
+        // Integer.toString(int i, int radix) is the direct Java equivalent for base conversion
+        // Note: Java's toString(16) outputs lowercase (e.g., "ff"), matching the DW output.
+        return Integer.toString(number, radix);
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        
+        // a: toRadixNumber(2, 2) -> "10"
+        String a = convertToRadix(2, 2);
+
+        // b: toRadixNumber(255, 16) -> "ff"
+        String b = convertToRadix(255, 16);
+        
+        // Format the final JSON output
+        String jsonOutput = String.format(
+            "{\n  \"a\": \"%s\",\n  \"b\": \"%s\"\n}",
+            a,
+            b
+        );
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Result 'a' (Decimal 2 to Binary): " + a);
+        System.out.println("Result 'b' (Decimal 255 to Hex):  " + b);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+output:
+
+--- Intermediate Data (For Context) ---
+Result 'a' (Decimal 2 to Binary): 10
+Result 'b' (Decimal 255 to Hex):  ff
+---------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "a": "10",
+  "b": "ff"
+}
+

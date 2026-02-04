@@ -1,0 +1,37 @@
+orElse:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class TryOrElseRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .setBody(exchange -> {
+                // Mocking the input 'user' and 'otherUser'
+                java.util.Map<String, String> user = new java.util.HashMap<>();
+                java.util.Map<String, String> otherUser = java.util.Map.of("name", "DW");
+                
+                return java.util.Map.of("user", user, "otherUser", otherUser);
+            })
+            .transform().datasonnet(
+                "{ " +
+                "  a: ds.tryOrElse(payload.user.name, 'No User Name'), " +
+                "  b: ds.tryOrElse(payload.otherUser.name, 'No User Name') " +
+                "}"
+            );
+    }
+}
+
+
+output:
+
+from("direct:logic")
+    .setVariable("a", simple("${body.user?.name} ?: 'No User Name'"))
+    .setVariable("b", simple("${body.otherUser?.name} ?: 'No User Name'"))
+    .setBody(simple("{\"a\": \"${variable.a}\", \"b\": \"${variable.b}\"}"));
+
+

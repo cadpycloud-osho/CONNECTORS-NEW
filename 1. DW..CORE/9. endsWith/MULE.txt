@@ -1,0 +1,37 @@
+
+endsWith:
+
+
+endsWith(text: String, suffix: String): Boolean
+Returns true if a string ends with a provided substring, false if not.
+
+
+
+
+Example
+This example finds "no" (but not "to") at the end of "Mariano".
+
+Source
+%dw 2.0
+output application/json
+---
+[ "Mariano" endsWith "no", "Mariano" endsWith "to" ]
+
+Output:
+[ true, false ]
+
+JSON
+endsWith(text: Null, suffix: Any): false
+Helper function that enables endsWith to work with a null value.
+
+
+
+
+
+
+_________________________________________________
+
+endsWith(text: Null, suffix: Any): false
+Helper function that enables endsWith to work with a null value.
+
+Introduced in DataWeave version 2.4.0.

@@ -1,0 +1,74 @@
+to:
+
+example 1:
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // 1 to 10 inclusive [1,2,3,4,5,6,7,8,9,10]
+        List<Integer> range = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            range.add(i);
+        }
+        
+        // Manual JSON output
+        System.out.print("{\"myRange\":[");
+        for (int i = 0; i < range.size(); i++) {
+            System.out.print(range.get(i));
+            if (i < range.size() - 1) {
+                System.out.print(",");
+            }
+        }
+        System.out.println("]}");
+    }
+}
+
+
+output:
+{"myRange":[1,2,3,4,5,6,7,8,9,10]}
+
+
+-------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String myVar = "Hello World!";
+        
+        // indices2to6: myVar[2 to 6] -> "llo W" (indices 2,3,4,5,6)
+        String indices2to6 = myVar.substring(2, 7);  // end exclusive in Java
+        
+        // indicesFromEnd: myVar[6 to -1] -> "World!" (from index 6 to end)
+        String indicesFromEnd = myVar.substring(6);
+        
+        // reversal: myVar[11 to -0] -> "!dlroW olleH" (from end to start)
+        String reversal = new StringBuilder(myVar).reverse().toString();
+        
+        // Manual JSON output
+        System.out.println("{");
+        System.out.println("  \"indices2to6\": \"" + indices2to6 + "\",");
+        System.out.println("  \"indicesFromEnd\": \"" + indicesFromEnd + "\",");
+        System.out.println("  \"reversal\": \"" + reversal + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "indices2to6": "llo W",
+  "indicesFromEnd": "World!",
+  "reversal": "!dlroW olleH"
+}
+
+-------------------------------------------------

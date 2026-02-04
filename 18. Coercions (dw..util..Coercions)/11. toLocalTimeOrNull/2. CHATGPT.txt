@@ -1,0 +1,60 @@
+toLocalTimeOrNull:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class LocalTimeController {
+
+    @GetMapping("/localTime")
+    public Map<String, String> getLocalTimes() {
+
+        Map<String, String> result = new HashMap<>();
+
+        result.put("a", toLocalTimeOrNull("23:57:59", new String[]{
+                "HH:mm:ss.n",
+                "HH:mm:ss"
+        }));
+
+        result.put("b", toLocalTimeOrNull("23:57:59", new String[]{
+                "HH:mm:ss.n"
+        }));
+
+        return result;
+    }
+
+    private String toLocalTimeOrNull(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                LocalTime lt = LocalTime.parse(value, formatter);
+                return lt.toString(); // standard HH:mm:ss
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        return null; // return null if no format matches
+    }
+}
+
+
+output:
+
+{
+  "a": "23:57:59",
+  "b": null
+}
+
+
+

@@ -1,0 +1,53 @@
+dasherize:
+
+
+input:
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's dasherize() function.
+     * Converts a string to kebab-case (hyphenated lowercase).
+     */
+    public static String dasherizeString(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // 1. Replace one or more consecutive spaces or underscores with a hyphen
+        String temp = input.replaceAll("[\\s_]+", "-");
+        
+        // 2. Insert a hyphen before any uppercase letter that follows a lowercase letter (for camelCase)
+        // 3. Convert the entire string to lowercase
+        return temp
+            .replaceAll("([a-z])([A-Z])", "$1-$2") 
+            .toLowerCase();
+    }
+
+    public static void main(String[] args) {
+        String a = dasherizeString("customer");
+        String b = dasherizeString("customer_first_name");
+        String c = dasherizeString("customer NAME");
+        String d = dasherizeString("customerName");
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a + "\",");
+        System.out.println("  \"b\": \"" + b + "\",");
+        System.out.println("  \"c\": \"" + c + "\",");
+        System.out.println("  \"d\": \"" + d + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+
+

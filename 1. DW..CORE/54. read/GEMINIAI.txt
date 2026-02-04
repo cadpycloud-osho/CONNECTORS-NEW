@@ -1,0 +1,174 @@
+read:
+
+
+example 1:
+
+
+input:
+
+package com.example.conversion;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class JsonToXmlController {
+
+    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final XmlMapper xmlMapper;
+
+    public JsonToXmlController() {
+        this.xmlMapper = new XmlMapper();
+        // Configure to not write the XML declaration, to exactly match the DW output structure
+        this.xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, false); 
+    }
+
+    @GetMapping(value = "/json-to-xml", produces = MediaType.APPLICATION_XML_VALUE)
+    public String jsonToXml() throws Exception {
+        
+        String jsonString = "{ \"hello\" : \"world\" }";
+        
+        // 1. Read JSON into a Java Map
+        Map<String, String> jsonMap = jsonMapper.readValue(jsonString, Map.class);
+        
+        // 2. Write the Java Map to an XML string
+        // The default root tag for a Map serialized to XML by XmlMapper is <Map> (or similar).
+        // To match the DW output structure <hello>world</hello>, we must tell XmlMapper
+        // to use the root element from the Map content itself.
+        // The simplest way to handle this small case is to manually write the tag, 
+        // but for a general case, we rely on XmlMapper's default behavior, which produces:
+        // <ObjectNode><hello>world</hello></ObjectNode> or <Map><hello>world</hello></Map>
+        
+        // To precisely match the DW output, we wrap the conversion:
+        String xmlBody = xmlMapper.writeValueAsString(jsonMap)
+                                  .replace("<LinkedHashMap>", "")
+                                  .replace("</LinkedHashMap>", "");
+        
+        // This is a manual hack for precision; in production, you'd use a specific DTO or setup.
+        return "<?xml version='1.0' encoding='UTF-8'?>" + xmlBody;
+    }
+}
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?><hello>world</hello>
+-----------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+package com.example.conversion;
+
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class CsvToJsonController {
+
+    private final CsvMapper csvMapper = new CsvMapper();
+
+    @GetMapping(value = "/csv-to-json")
+    public Map<String, String> csvToJson() throws Exception {
+        
+        String myVar = "Some, Body";
+        
+        // 1. Define the CSV schema: no header (use index keys)
+        CsvSchema schema = CsvSchema.builder()
+            .setUseHeader(false) // Equivalent to {header:false}
+            .build();
+
+        // 2. Read CSV string into a list of Lists (List<List<String>>)
+        MappingIterator<List<String>> it = csvMapper
+            .readerForListOf(String.class)
+            .with(schema)
+            .readValues(myVar);
+            
+        List<List<String>> csvRecords = it.readAll();
+        
+        // 3. Process the first row and map it to the required JSON format (DW [0] logic)
+        List<String> firstRow = csvRecords.get(0);
+        
+        // Map the values to the DW default keys: { "column_0": "Some", "column_1": " Body" }
+        Map<String, String> result = Map.of(
+            "column_0", firstRow.get(0),
+            "column_1", firstRow.get(1)
+        );
+        
+        return result;
+    }
+}
+output:
+
+{
+  "column_0": "Some",
+  "column_1": " Body"
+}
+-----------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+
+package com.example.conversion;
+
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class XmlReadSpecificController {
+
+    private final XmlMapper xmlMapper;
+
+    public XmlReadSpecificController() {
+        this.xmlMapper = new XmlMapper();
+        this.xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+    }
+
+    @GetMapping(value = "/read-xml-specific", produces = MediaType.APPLICATION_XML_VALUE)
+    public Map<String, Object> readXmlSpecific() throws Exception {
+        
+        String inputXml = "<prices><basic>9.99</basic></prices>";
+        
+        // 1. Parse the XML string
+        @SuppressWarnings("unchecked")
+        Map<String, Object> parsedXml = xmlMapper.readValue(inputXml, Map.class);
+        
+        // 2. Access the specific element (Equivalent to DW ."prices")
+        Map<String, Object> pricesContent = (Map<String, Object>) parsedXml.get("prices");
+        
+        // 3. Wrap the content with the new root "XML" tag
+        // The key "XML" becomes the root tag when serialized to XML by Spring/Jackson.
+        return Map.of("XML", pricesContent);
+    }
+}
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<XML>
+  <basic>9.99</basic>
+</XML>
+-----------------------------------------------------------
+

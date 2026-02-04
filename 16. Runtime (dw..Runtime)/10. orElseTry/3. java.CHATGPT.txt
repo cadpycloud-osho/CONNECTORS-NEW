@@ -1,0 +1,91 @@
+orElseTry:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    static class TryResult<T> {
+        boolean success;
+        T result;
+        ErrorInfo error;
+
+        static class ErrorInfo {
+            String kind;
+            String message;
+            public ErrorInfo(String kind, String message) {
+                this.kind = kind;
+                this.message = message;
+            }
+        }
+
+        static <T> TryResult<T> success(T value) {
+            TryResult<T> tr = new TryResult<>();
+            tr.success = true;
+            tr.result = value;
+            return tr;
+        }
+
+        static <T> TryResult<T> failure(String kind, String message) {
+            TryResult<T> tr = new TryResult<>();
+            tr.success = false;
+            tr.error = new ErrorInfo(kind, message);
+            return tr;
+        }
+
+        @Override
+        public String toString() {
+            if (success) return "{success=true, result=" + result + "}";
+            else return "{success=false, error={kind=" + error.kind + ", message=" + error.message + "}}";
+        }
+    }
+
+    static class KeyNotFoundException extends RuntimeException {
+        public KeyNotFoundException(String msg) { super(msg); }
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> user = new HashMap<>();
+        Map<String, Object> otherUser = new HashMap<>();
+
+        Map<String, TryResult<Object>> result = new HashMap<>();
+
+        // a
+        try {
+            Object val = user.get("name");
+            if (val == null) throw new KeyNotFoundException("There is no key named 'name'");
+            result.put("a", TryResult.success(val));
+        } catch (KeyNotFoundException e1) {
+            try {
+                Object val2 = otherUser.get("name");
+                if (val2 == null) throw new KeyNotFoundException("There is no key named 'name'");
+                result.put("a", TryResult.success(val2));
+            } catch (KeyNotFoundException e2) {
+                result.put("a", TryResult.failure("KeyNotFoundException", e2.getMessage()));
+            }
+        }
+
+        // b
+        try {
+            Object val = user.get("name");
+            if (val == null) throw new KeyNotFoundException("There is no key named 'name'");
+            result.put("b", TryResult.success(val));
+        } catch (KeyNotFoundException e1) {
+            result.put("b", TryResult.success("No User Name"));
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a={success=false, error={kind=KeyNotFoundException, message=There is no key named 'name'}}, b={success=true, result=No User Name}}
+
+
+

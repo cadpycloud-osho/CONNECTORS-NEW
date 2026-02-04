@@ -1,0 +1,53 @@
+toDateOrNull:
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class ToDateOrNullSimulation {
+
+    public static void main(String[] args) {
+        String input = "2023-28-03";
+
+        // Define formatters
+        List<DateTimeFormatter> formattersA = List.of(
+                DateTimeFormatter.ofPattern("yyyy/MM/dd").withLocale(Locale.US),
+                DateTimeFormatter.ofPattern("yyyy-dd-MM").withLocale(Locale.US)
+        );
+
+        List<DateTimeFormatter> formattersB = List.of(
+                DateTimeFormatter.ofPattern("yyyy/MM/dd").withLocale(Locale.US)
+        );
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", parseOrNull(input, formattersA));
+        output.put("b", parseOrNull(input, formattersB));
+
+        System.out.println(output);
+    }
+
+    private static LocalDate parseOrNull(String value, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                return LocalDate.parse(value, fmt);
+            } catch (DateTimeParseException e) {
+                // ignore and try next
+            }
+        }
+        return null; // if no format succeeded
+    }
+}
+
+
+output:
+
+{
+  "a": "2023-03-28",
+  "b": null
+}
+
+
+

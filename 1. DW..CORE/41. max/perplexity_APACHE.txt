@@ -1,0 +1,33 @@
+max:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MaxRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:max")
+            .process(exchange -> {
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                result.put("a", Collections.max(Arrays.asList(1, 1000)));
+                result.put("b", Collections.max(Arrays.asList(1, 2, 3)));
+                result.put("c", Collections.max(Arrays.asList(1.5, 2.5, 3.5)));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "a": 1000, "b": 3, "c": 3.5 }
+
+
+

@@ -1,0 +1,64 @@
+toBoolean:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+
+public class DataWeaveToBooleanConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Mimics DataWeave's toBoolean(String) for strings using Java's standard function.
+     * Boolean.parseBoolean(s) returns 'true' if the string is "true" (case-insensitive), 
+     * and 'false' for all other inputs, which aligns with DataWeave's behavior for these cases.
+     */
+    private boolean toBoolean(String input) {
+        return Boolean.parseBoolean(input);
+    }
+
+    public String getBooleanJson() throws IOException {
+        // Apply the transformation logic using the Java equivalent
+        boolean a = toBoolean("true");
+        boolean b = toBoolean("false");
+        boolean c = toBoolean("FALSE");
+        boolean d = toBoolean("TrUe");
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson automatically converts Java boolean primitives to JSON boolean literals.
+        root.put("a", a);
+        root.put("b", b);
+        root.put("c", c);
+        root.put("d", d);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToBooleanConverter converter = new DataWeaveToBooleanConverter();
+        try {
+            String jsonOutput = converter.getBooleanJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : true,
+  "b" : false,
+  "c" : false,
+  "d" : true
+}
+

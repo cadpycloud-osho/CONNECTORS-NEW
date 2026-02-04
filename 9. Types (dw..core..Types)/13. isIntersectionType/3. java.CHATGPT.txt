@@ -1,0 +1,40 @@
+isIntersectionType:
+
+
+
+INPUT:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public interface IntersectionType {}
+
+    // Equivalent to AType = {name: String} & {age: Number}
+    public interface AType extends IntersectionType {
+        String getName();
+        int getAge();
+    }
+
+    public static boolean isIntersectionType(Class<?> type) {
+        return IntersectionType.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", isIntersectionType(AType.class));
+        result.put("b", isIntersectionType(Boolean.class));
+
+        System.out.println(result);
+    }
+}
+
+
+OUTPUT:
+
+
+{a=true, b=false}
+

@@ -1,0 +1,15 @@
+p:
+
+input:
+
+from("direct:simple")
+    .log("INFO", "${exchangeProperty.http.port}"); // or hardcoded "8081"
+
+
+output:
+
+
+
+
+simple flow starts → Logger fires → "INFO: 8081" logged to console
+

@@ -1,0 +1,40 @@
+substringBefore:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + substringBefore(null, "'") + ",");
+        System.out.println("  \"b\": \"" + substringBefore("", "-") + "\",");
+        System.out.println("  \"c\": \"" + substringBefore("abc", "b") + "\",");
+        System.out.println("  \"d\": \"" + substringBefore("abc", "c") + "\",");
+        System.out.println("  \"e\": \"" + substringBefore("abc", "d") + "\",");
+        System.out.println("  \"f\": \"" + substringBefore("abc", "") + "\"");
+        System.out.println("}");
+    }
+
+    private static String substringBefore(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null || delimiter.isEmpty()) return "";
+        int index = input.indexOf(delimiter);
+        return index == -1 ? "" : input.substring(0, index);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab",
+  "e": "",
+  "f": ""
+}
+
+

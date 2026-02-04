@@ -1,0 +1,55 @@
+evalUrl:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class RuntimeEvalController {
+
+    @GetMapping("/runtime-eval")
+    public Map<String, Object> runtimeEval() {
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        // Simulated evalUrl("example.dwl", payload)
+        Map<String, Object> executeOk = new LinkedHashMap<>();
+        executeOk.put("success", true);
+        executeOk.put("value", "Mariano");  // Extracted value from payload
+        executeOk.put("logs", new ArrayList<>());
+        response.put("execute_ok", executeOk);
+
+        // Simulated evalUrl("example.dwl", {}, payload)
+        Map<String, Object> executeOkWithValue = new LinkedHashMap<>();
+        executeOkWithValue.put("success", true);
+        executeOkWithValue.put("value", "Mariano");  // Extracted value
+        executeOkWithValue.put("logs", new ArrayList<>());
+        response.put("execute_ok_withValue", executeOkWithValue);
+
+        return response;
+    }
+}
+
+
+output:
+{
+   "execute_ok": {
+     "success": true,
+     "value": "Mariano",
+     "logs": []
+   },
+   "execute_ok_withValue": {
+     "success": true,
+     "value": "Mariano",
+     "logs": []
+   }
+}
+
+

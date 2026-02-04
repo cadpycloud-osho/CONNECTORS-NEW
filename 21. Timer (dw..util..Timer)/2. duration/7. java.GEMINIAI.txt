@@ -1,0 +1,103 @@
+duration:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // --- DataWeave Function Simulation ---
+
+    /**
+     * Replicates the logic of dw::Runtime::wait("My result", 100).
+     * This is the function whose execution time we will measure.
+     */
+    public static String myFunction() {
+        try {
+            // Simulate the 100ms wait
+            Thread.sleep(100);
+            return "My result";
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return "Error";
+        }
+    }
+
+    /**
+     * Replicates dw::util::Timer::duration(() -> expression).
+     * Measures the execution time of a Supplier and returns the result and time taken.
+     * * @param supplier The expression (function) to execute.
+     * @return A map containing "time" (Long, in milliseconds) and "result" (Object).
+     */
+    public static Map<String, Object> duration(Supplier<Object> supplier) {
+        // Use System.nanoTime() for high-precision measurement
+        long startTime = System.nanoTime();
+        
+        Object result = supplier.get();
+        
+        long endTime = System.nanoTime();
+        
+        // Calculate duration in milliseconds
+        long durationMs = (endTime - startTime) / 1_000_000;
+        
+        Map<String, Object> timerResult = new LinkedHashMap<>();
+        timerResult.put("time", durationMs);
+        timerResult.put("result", result);
+        return timerResult;
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    // Reused utility for formatting the final output without external libraries
+    @SuppressWarnings("unchecked")
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        // String and Number formatting needs care with quotes
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> toPrettyJson(v, indent + 1))
+                    .map(s -> s.contains("\n") ? s : next + s)
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Output Simulation ---");
+
+        // Execute the mapping function, referencing the local static method
+        Map<String, Object> output = duration(Main::myFunction);
+
+        // Output the map using the pure Java JSON printer
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+
+output:
+
+--- Pure Java Output Simulation ---
+{
+  "time": 101,
+  "result": "My result"
+}

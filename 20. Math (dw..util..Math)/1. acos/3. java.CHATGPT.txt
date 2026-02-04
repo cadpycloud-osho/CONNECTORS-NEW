@@ -1,0 +1,39 @@
+acos:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("acos0", acos(0));
+        result.put("acos13", acos(0.13));
+        result.put("acos-1", acos(-1));
+        result.put("acos1", acos(1));
+        result.put("acos1.1", acos(1.1));
+
+        System.out.println(result);
+    }
+
+    // Equivalent of DW acos()
+    private static Double acos(double value) {
+        double result = Math.acos(value);
+        return Double.isNaN(result) ? null : result;
+    }
+}
+
+
+output:
+
+{acos0=1.5707963267948966, acos13=1.440427347091751, acos-1=3.141592653589793, acos1=0.0, acos1.1=null}
+
+
+

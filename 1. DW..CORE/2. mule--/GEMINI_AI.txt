@@ -1,0 +1,143 @@
+--<S>(source: Array<S>, toRemove: Array<Any>): Array<S>
+
+INPUT:
+package com.example.dataconverter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+@RestController
+public class DataWeaveSetDifferenceController {
+
+    @GetMapping("/set-difference")
+    public Map<String, List<Integer>> performSetDifference() {
+        
+        // --- DW Logic: [0, 1, 1, 2] (The initial list) ---
+        // Using ArrayList because the remove() method is needed
+        List<Integer> initialList = new ArrayList<>(Arrays.asList(0, 1, 1, 2));
+        
+        // --- DW Logic: [1, 2] (The list of elements to remove) ---
+        List<Integer> elementsToRemove = Arrays.asList(1, 2);
+        
+        // --- DW Logic: initialList -- elementsToRemove (Set Difference) ---
+        // This simulates the DW set difference operation which removes ALL occurrences.
+        for (Integer element : elementsToRemove) {
+            while (initialList.remove(element)) {
+                // Keep removing the element until it is no longer found in the list
+            }
+        }
+        
+        // The resulting list is [0]
+        
+        // --- DW Logic: { "a" : resultingList } ---
+        Map<String, List<Integer>> outputMap = new HashMap<>();
+        outputMap.put("a", initialList);
+        
+        return outputMap;
+    }
+}
+
+OUTPUT:
+
+{
+  "a": [
+    0
+  ]
+}
+
+
+
+-------------------------------------------------------------------------
+--(source: Object, keys: Array<String>)
+
+INPUT:
+
+package com.example.dataconverter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+@RestController
+public class DataWeaveObjectDifferenceController {
+
+    @GetMapping("/object-difference")
+    public Map<String, String> filterObjectKeys() {
+        
+        // --- DW Logic: The initial Object (Map) ---
+        Map<String, String> initialMap = new HashMap<>();
+        initialMap.put("yes", "no");
+        initialMap.put("good", "bad");
+        initialMap.put("old", "new");
+        
+        // --- DW Logic: ["yes", "old"] (The list of keys to remove) ---
+        List<String> keysToRemove = Arrays.asList("yes", "old");
+        
+        // --- DW Logic: initialMap -- keysToRemove (Key Filter/Set Difference) ---
+        // Java's Map.keySet().removeAll() removes all entries whose keys are in the collection.
+        initialMap.keySet().removeAll(keysToRemove);
+        
+        // The resulting map is {"good" : "bad"}
+        
+        // --- Create the final output map ---
+        // Since the initial map was modified in place, it is the final output.
+        return initialMap;
+    }
+}
+
+OUTPUT:
+
+{
+  "good": "bad"
+}
+
+
+-------------------------------------------------------------
+--(source: Object, keys: Array<String>)
+Removes specified key-value pairs from an object.
+INPUT:
+
+package com.example.dataconverter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.HashMap;
+
+@RestController
+public class DataWeaveKeyRemovalController {
+
+    @GetMapping("/remove-key")
+    public Map<String, String> removeSpecificKey() {
+
+        // --- DW Logic: The initial Object (Map) ---
+        Map<String, String> initialMap = new HashMap<>();
+        initialMap.put("hello", "world");
+        initialMap.put("name", "DW");
+
+        // --- DW Logic: -- ["hello" as Key] (Remove the key "hello") ---
+        // Java's Map.remove(key) directly implements the required logic.
+        initialMap.remove("hello");
+
+        // The resulting map is {"name" : "DW"}
+
+        // --- Create the final output map ---
+        // The modified initialMap is the final output.
+        return initialMap;
+    }
+}
+
+OUTPUT:
+
+{
+  "name": "DW"
+}

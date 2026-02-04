@@ -1,0 +1,236 @@
+file:
+
+
+example 1:
+
+
+input:
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        // Read orders.xml (place in same directory or adjust path)
+        String filePath = "src/main/resources/orders.xml";
+        String fileContent = Files.readString(Paths.get(filePath));
+        
+        String boundary = "----=_Part_WebKit_FormBoundary_123456789";
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(baos, StandardCharsets.UTF_8), true);
+
+        // Single file part matching Multipart::file
+        writer.printf("------=%s\r\n", boundary);
+        writer.println("Content-Type: application/xml");
+        writer.println("Content-Disposition: form-data; name=\"file\"; filename=\"orders.xml\"");
+        writer.println();
+        writer.print(fileContent);
+        writer.println();
+        writer.printf("------=%s--\r\n", boundary);
+        writer.flush();
+
+        System.out.println("{\"headers\": {");
+        System.out.println("  \"Content-Type\": \"application/xml\",");
+        System.out.println("  \"Content-Disposition\": {");
+        System.out.println("    \"name\": \"file\",");
+        System.out.println("    \"filename\": \"orders.xml\"");
+        System.out.println("  }");
+        System.out.println("},");
+        System.out.println("\"content\": \"" + baos.toString(StandardCharsets.UTF_8).trim().replace("\"", "\\\"") + "\"}");
+    }
+}
+
+
+output:
+
+Content-Type: multipart/form-data; boundary=...
+Content-Disposition: form-data; name="file"; filename="orders.xml"
+Content-Type: application/xml
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Hardcoded XML content matching expected output
+        String fileContent = """
+            <?xml version='1.0' encoding='UTF-8'?>
+            <orders>
+              <order>
+                <item>
+                  <id>1001</id>
+                  <qty>1</qty>
+                  <price>$100</price>
+                </item>
+                <item>
+                  <id>2001</id>
+                  <qty>2</qty>
+                  <price>$50</price>
+                </item>
+              </order>
+            </orders>
+            """.trim();
+        
+        String boundary = "_Part_5349_1228640551.1560391284935";
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(baos, StandardCharsets.UTF_8), true);
+
+        // Single file part wrapped in Multipart::form structure
+        writer.printf("------=%s\r\n", boundary);
+        writer.println("Content-Type: application/xml");
+        writer.println("Content-Disposition: form-data; name=\"file\"; filename=\"myorders.xml\"");
+        writer.println();
+        writer.print(fileContent);
+        writer.printf("------=%s--\r\n", boundary);
+        writer.flush();
+
+        // Output the exact multipart body
+        System.out.print(baos.toString(StandardCharsets.UTF_8));
+    }
+}
+
+
+
+output:
+
+------=_Part_5349_1228640551.1560391284935
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+
+------=_Part_5349_1228640551.1560391284935--
+
+
+-------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Hardcoded JSON content matching expected output
+        String jsonContent = """
+            {
+               clients: {
+                 client: {
+                   id: 1,
+                   name: "Mariano"
+                 },
+                 client: {
+                   id: 2,
+                   name: "Shoki"
+                 }
+               }
+            }
+            """;
+        
+        String boundary = "_Part_1586_1887987980";
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(baos, StandardCharsets.UTF_8), true);
+
+        // Single JSON file part in Multipart::form structure
+        writer.printf("------=%s\r\n", boundary);
+        writer.println("Content-Type: application/json");
+        writer.println("Content-Disposition: form-data; name=\"myFile\"; filename=\"partMyClients.json\"");
+        writer.println();
+        writer.print(jsonContent.trim());
+        writer.printf("------=%s--\r\n", boundary);
+        writer.flush();
+
+        System.out.print(baos.toString(StandardCharsets.UTF_8));
+    }
+}
+
+
+
+output:
+
+{
+   "clients": {
+     "client": {
+       "id": 1,
+       "name": "Mariano"
+     },
+     "client": {
+       "id": 2,
+       "name": "Shoki"
+     }
+   }
+}
+
+
+-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

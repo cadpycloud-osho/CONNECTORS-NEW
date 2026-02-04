@@ -1,0 +1,62 @@
+compose:
+
+compose(parts: Array<String>, interpolation: Array<String>): String
+
+compose(parts: Array<String>, interpolation: Array<String>): String
+Uses a custom string interpolator to replace URL components with a encodeURIComponent result. You can call this function using the standard call, or a simplified version.
+
+
+Source
+%dw 2.0
+output application/json
+var urlPath = "content folder"
+import * from dw::core::URL
+---
+ { "encodedURL" : compose(["http://examplewebsite.com/", "/page.html"], ["$(urlPath)"]) }
+
+DataWeave
+Output
+{ "encodedURL" : "http://examplewebsite.com/content%20folder/page.html" }
+
+
+---------------------------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/json
+var urlPath = "content folder"
+import * from dw::core::URL
+---
+{ "encodedURL" : compose `http://examplewebsite.com/$(urlPath)/page.html`}
+
+DataWeave
+Output
+{ "encodedURL" : "http://examplewebsite.com/content%20folder/page.html" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

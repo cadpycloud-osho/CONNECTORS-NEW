@@ -1,0 +1,23 @@
+isOdd:
+
+
+input:
+from("direct:checkOdd")
+    .setBody(exchange -> {
+        // Logic: n % 2 != 0 determines if a number is odd
+        def results = [0, 1, 2 + 2].collect { n -> 
+            n % 2 != 0 
+        }
+        
+        // Return as a Map to match the JSON structure { "isOdd": [...] }
+        return ["isOdd": results]
+    })
+    .marshal().json() // Converts the Map to JSON
+    .to("mock:result");
+
+
+output:
+
+{
+  "isOdd": [ false, true, false ]
+}

@@ -1,0 +1,26 @@
+lower:
+
+
+
+input:
+
+import java.util.Locale;
+
+public class DataWeaveToJava {
+    public static void main(String[] args) {
+        // Equivalent Java code
+        String result = "MULESOFT".toLowerCase(Locale.ENGLISH);
+        String output = "{\"name\": \"" + result + "\"}";
+        
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+
+{"name": "mulesoft"}
+
+

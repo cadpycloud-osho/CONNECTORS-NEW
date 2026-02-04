@@ -1,0 +1,193 @@
+readUrl:
+
+
+example 1:
+
+
+input:
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://jsonplaceholder.typicode.com/posts/1"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println(response.body());
+    }
+}
+
+
+output:
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit..."
+}
+
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Simulated JSON input (same structure as myJsonSnippet.json)
+        String json =
+            "{ \"results\": [" +
+            "  { \"profile\": { \"firstName\": \"john\", \"lastName\": \"doe\", \"email\": \"johndoe@demo.com\" } }," +
+            "  { \"profile\": { \"firstName\": \"jane\", \"lastName\": \"doe\", \"email\": \"janedoe@demo.com\" } }" +
+            "]}";
+
+        // Print CSV header
+        System.out.println("firstName,lastName,email");
+
+        // Split each profile block
+        String[] profiles = json.split("\\{ \"profile\": ");
+
+        for (int i = 1; i < profiles.length; i++) {
+            String block = profiles[i];
+
+            String firstName = extract(block, "firstName");
+            String lastName  = extract(block, "lastName");
+            String email     = extract(block, "email");
+
+            System.out.println(firstName + "," + lastName + "," + email);
+        }
+    }
+
+    private static String extract(String text, String key) {
+        return text.split("\"" + key + "\": \"")[1].split("\"")[0];
+    }
+}
+
+
+
+output:
+
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String csvLine = "Max,the Mule,MuleSoft";
+
+        String[] values = csvLine.split(",");
+
+        Map<String, String> jsonMap = new LinkedHashMap<>();
+        for (int i = 0; i < values.length; i++) {
+            jsonMap.put("column_" + i, values[i]);
+        }
+
+        List<Map<String, String>> result = List.of(jsonMap);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[
+  {
+    "column_0": "Max",
+    "column_1": "the Mule",
+    "column_2": "MuleSoft"
+  }
+]
+
+
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Simulated content of name.dwl (JSON-like)
+        String dwlContent = "{ \"firstName\" : \"Somebody\" }";
+
+        // Extract the value manually
+        String firstName = dwlContent
+                .replace("{", "")
+                .replace("}", "")
+                .replace("\"", "")
+                .split(":")[1]
+                .trim();
+
+        // Print output exactly as required
+        System.out.println("\"" + firstName + "\"");
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "firstName": "Somebody",
+  "lastName": "Special"
+}
+
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,52 @@
+isNullType:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isNullType(Class<?> type) {
+        return type == null;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class NullTypeController {
+
+    @GetMapping("/isNullType")
+    public Map<String, Boolean> checkNullTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to "type ANull = Null"
+        Class<?> ANull = null;
+
+        result.put("a", TypeUtils.isNullType(ANull));
+        result.put("b", TypeUtils.isNullType(null));   // Null type
+        result.put("c", TypeUtils.isNullType(String.class));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

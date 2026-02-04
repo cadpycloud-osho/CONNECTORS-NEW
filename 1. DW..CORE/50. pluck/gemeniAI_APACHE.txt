@@ -1,0 +1,137 @@
+pluck:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class CamelPluckExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: {"a":"b","c":"d"}
+                        Map<String, String> input = new LinkedHashMap<>();
+                        input.put("a", "b");
+                        input.put("c", "d");
+
+                        List<Map<String, Object>> resultList = new ArrayList<>();
+                        AtomicInteger index = new AtomicInteger(0);
+
+                        // Equivalent to pluck (value, key, index)
+                        input.forEach((key, value) -> {
+                            int i = index.getAndIncrement();
+                            
+                            // Build the inner structure: { (value) : key }
+                            Map<String, String> valueKeyMap = Map.of(value, key);
+                            
+                            // Build the outer structure: { (index) : inner }
+                            Map<String, Object> indexMap = new HashMap<>();
+                            indexMap.put(String.valueOf(i), valueKeyMap);
+                            
+                            resultList.add(indexMap);
+                        });
+
+                        exchange.getIn().setBody(resultList);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  { "0": { "b": "a" } },
+  { "1": { "d": "c" } }
+]
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import java.util.*;
+
+public class CamelXmlPluckExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String xml = "<prices><basic>9.99</basic><premium>53.00</premium><vip>398.99</vip></prices>";
+                        
+                        // 1. Parse XML to Map
+                        XmlMapper xmlMapper = new XmlMapper();
+                        Map<String, Object> readXml = xmlMapper.readValue(xml, Map.class);
+                        
+                        // 2. Prepare Result Lists
+                        List<String> keys = new ArrayList<>();
+                        List<Double> values = new ArrayList<>();
+                        List<Integer> indices = new ArrayList<>();
+                        
+                        int i = 0;
+                        // Equivalent to pluck: $$ (key), $ (value), $$$ (index)
+                        for (Map.Entry<String, Object> entry : readXml.entrySet()) {
+                            keys.add(entry.getKey());
+                            values.add(Double.valueOf(entry.getValue().toString()));
+                            indices.add(i++);
+                        }
+
+                        // 3. Construct Final Object
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("keys", keys);
+                        result.put("values", values);
+                        result.put("indices", indices);
+
+                        exchange.getIn().setBody(Map.of("result", result));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "result": {
+    "keys": ["basic", "premium", "vip"],
+    "values": [9.99, 53.0, 398.99],
+    "indices": [0, 1, 2]
+  }
+}
+

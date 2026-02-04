@@ -1,0 +1,108 @@
+toTime:
+
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String input = "13:44:12.283-08:00";
+
+        OffsetTime resultA = parseWithMultipleFormats(input);
+        String errorMessageB = parseWithSingleFormat(input);
+
+        // Map.of() can throw NPE → use HashMap
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", resultA);
+        result.put("b", errorMessageB);
+
+        System.out.println(result);
+    }
+
+    private static OffsetTime parseWithMultipleFormats(String input) {
+
+        // First format: milliseconds
+        DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+        try {
+            return OffsetTime.parse(input, fmt1);
+        } catch (DateTimeParseException e) {
+
+            // Fallback: nanoseconds
+            DateTimeFormatter fmt2 = new DateTimeFormatterBuilder()
+                    .appendPattern("HH:mm:ss.")
+                    .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+                    .appendOffset("+HH:MM", "Z")
+                    .toFormatter();
+
+            return OffsetTime.parse(input, fmt2);
+        }
+    }
+
+    private static String parseWithSingleFormat(String input) {
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+            OffsetTime.parse(input, fmt);
+            return null; // DW-style success → null error
+        } catch (DateTimeParseException e) {
+            return "Could not find a valid formatter for '" + input + "'";
+        }
+    }
+}
+
+
+
+output:
+
+{a=13:44:12.283-08:00, b=Could not find a valid formatter for '13:44:12.283-08:00'}
+
+
+
+--------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: ISO default
+        OffsetTime timeA = OffsetTime.parse("23:57:59Z");
+        result.put("a", timeA.toString());
+
+        // b: custom pattern
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("HH:mm:ss.nxxx");
+        OffsetTime timeB = OffsetTime.parse("13:44:12.283-08:00", formatterB);
+        result.put("b", formatterB.format(timeB));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=23:57:59Z, b=13:44:12.000000283-08:00}
+
+--------------------------------------------------------------
+

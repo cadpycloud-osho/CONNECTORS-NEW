@@ -1,0 +1,48 @@
+isLowerCase:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isLowerCaseDW(String input) {
+        if (input == null || input.isEmpty()) return false;
+
+        // Unicode lowercase check — no digits, spaces, symbols
+        if (!input.matches("^[\\p{Ll}]+$")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", isLowerCaseDW(null));
+        result.put("b", isLowerCaseDW(""));
+        result.put("c", isLowerCaseDW(" "));
+        result.put("d", isLowerCaseDW("abc"));
+        result.put("e", isLowerCaseDW("aBC"));
+        result.put("f", isLowerCaseDW("a c"));
+        result.put("g", isLowerCaseDW("a1c"));
+        result.put("h", isLowerCaseDW("a/c"));
+        result.put("i", isLowerCaseDW("mulesöft"));
+        result.put("j", isLowerCaseDW("mulesÖft"));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=false, b=false, c=false, d=true, e=false, f=false, g=false, h=false, i=true, j=false}
+
+

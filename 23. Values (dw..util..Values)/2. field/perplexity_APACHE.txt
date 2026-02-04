@@ -1,0 +1,43 @@
+field:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class FieldSelectorMetadataRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getFieldMetadata")
+            .routeId("Field-Selector-Route")
+            .process(exchange -> {
+                // 1. Define the metadata parameters
+                String namespaceUri = "http://acme.com/foo";
+                String fieldName = "myFieldName";
+
+                // 2. Build the metadata map (Replicating the Selector Object)
+                Map<String, Object> metadata = new LinkedHashMap<>();
+                metadata.put("kind", "Object");
+                metadata.put("namespace", namespaceUri);
+                metadata.put("selector", fieldName);
+
+                exchange.getIn().setBody(metadata);
+            })
+            .marshal().json()
+            .log("Field Metadata: ${body}");
+    }
+}
+
+
+output:
+
+
+{
+  "kind": "Object",
+  "namespace": "http://acme.com/foo",
+  "selector": "myFieldName"
+}
+

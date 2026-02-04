@@ -1,0 +1,29 @@
+substring:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SubstringRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:extractSubstring")
+            .process(exchange -> {
+                String text = "hello world!";
+                
+                // Java's substring parameters: (inclusive, exclusive)
+                // Matches DataWeave logic exactly
+                String result = (text != null) ? text.substring(1, 5) : null;
+
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+
+output:
+
+
+"ello"
+

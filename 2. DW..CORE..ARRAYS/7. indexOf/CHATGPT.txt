@@ -1,0 +1,36 @@
+indexOf:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IndexOfController {
+
+    @GetMapping("/indexof")
+    public Map<String, Integer> indexOfExample() {
+
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+
+        int index = users.indexOf("Julian"); // Same as indexOf in DataWeave
+
+        Map<String, Integer> response = new HashMap<>();
+        response.put("index", index);
+
+        return response;
+    }
+}
+
+
+
+output:
+
+{
+  "index": 2
+}

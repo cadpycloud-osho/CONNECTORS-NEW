@@ -1,0 +1,98 @@
+lastIndexOf:
+
+example 1:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+@RestController
+public class LastIndexOfController {
+
+    /**
+     * Equivalent to DataWeave lastIndexOf on Arrays/Lists.
+     * Accessible at http://localhost:8080/list-last-index
+     */
+    @GetMapping("/list-last-index")
+    public Map<String, Integer> listLastIndexOf() {
+        // Data setup
+        List<String> list1 = Arrays.asList("a", "b", "c", "d");
+        List<String> list2 = Arrays.asList("x", "w", "x");
+        List<String> list3 = Arrays.asList("a", "b", "c", "c");
+
+        // Use List.lastIndexOf(Object o)
+        int present = list1.lastIndexOf("c");          // Output: 2 (c is at index 2)
+        int notPresent = list2.lastIndexOf("c");       // Output: -1 (c is not present)
+        int presentMoreThanOnce = list3.lastIndexOf("c"); // Output: 3 (the *last* c is at index 3)
+
+        // Construct the JSON output
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("present", present);
+        result.put("notPresent", notPresent);
+        result.put("presentMoreThanOnce", presentMoreThanOnce);
+
+        return result;
+    }
+
+    // ... String Last Index Method will go here ...
+}
+
+
+output:
+
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+____________________________________________________________________
+
+
+example 2:
+
+input:
+
+// ... inside the LastIndexOfController class ...
+
+    /**
+     * Equivalent to DataWeave lastIndexOf on Strings.
+     * Accessible at http://localhost:8080/string-last-index
+     */
+    @GetMapping("/string-last-index")
+    public Map<String, Integer> stringLastIndexOf() {
+        // Data setup
+        String string1 = "abcd";
+        String string2 = "xyz";
+        String string3 = "abcdc";
+
+        // Use String.lastIndexOf(String str)
+        int present = string1.lastIndexOf("c");           // Output: 2 (c is at index 2)
+        int notPresent = string2.lastIndexOf("c");        // Output: -1 (c is not present)
+        int presentMoreThanOnce = string3.lastIndexOf("c"); // Output: 4 (the *last* c is at index 4)
+
+        // Construct the JSON output
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("present", present);
+        result.put("notPresent", notPresent);
+        result.put("presentMoreThanOnce", presentMoreThanOnce);
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}

@@ -1,0 +1,38 @@
+repeat:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class RepeatStringRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:repeatChars")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons repeat matches DW's behavior for 0 and negative numbers
+                results.put("a", StringUtils.repeat("e", 0));
+                results.put("b", StringUtils.repeat("e", 3));
+                results.put("c", StringUtils.repeat("e", -2));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+{
+  "a": "",
+  "b": "eee",
+  "c": ""
+}

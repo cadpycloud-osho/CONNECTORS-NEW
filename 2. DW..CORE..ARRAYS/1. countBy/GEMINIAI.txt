@@ -1,0 +1,67 @@
+countBy:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class DataWeaveEquivalent {
+
+    public static void main(String[] args) {
+        // Input array of integers
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+
+        // DataWeave Logic: countBy ($ mod 2) == 0
+        // This counts how many elements satisfy the condition (are even)
+
+        long evenCount = numbers.stream()
+                .filter(n -> n % 2 == 0) // Filter for elements where the condition is TRUE (n mod 2 == 0)
+                .count();
+
+        // The expected output format is a JSON object: { "countBy": 2 }
+        System.out.println("{ \"countBy\": " + evenCount + " }");
+    }
+}
+
+
+output:
+
+{ "countBy": 2 }
+
+
+
+method 2:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class FullCountByLogic {
+
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+
+        // Group the elements by the result of the condition (n % 2 == 0)
+        // Key: Boolean (true for even, false for odd)
+        // Value: Count (Long)
+        Map<Boolean, Long> groupedCounts = numbers.stream()
+                .collect(Collectors.groupingBy(
+                    n -> n % 2 == 0, // The condition that determines the group (true or false)
+                    Collectors.counting() // The collector to count elements in each group
+                ));
+
+        // Outputting the full count map
+        System.out.println("Full grouping result:");
+        System.out.println(groupedCounts);
+    }
+}
+
+
+
+output:
+
+Full grouping result:
+{false=2, true=2}

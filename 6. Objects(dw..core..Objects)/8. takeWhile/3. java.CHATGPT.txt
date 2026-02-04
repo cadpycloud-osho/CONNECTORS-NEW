@@ -1,0 +1,43 @@
+
+
+takeWhile:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Integer> obj = new LinkedHashMap<>();
+        obj.put("a", 1);
+        obj.put("b", 2);
+        obj.put("c", 5);
+        obj.put("d", 1);
+
+        Map<String, Integer> result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Integer> entry : obj.entrySet()) {
+            if (entry.getValue() < 3) {
+                result.put(entry.getKey(), entry.getValue());
+            } else {
+                break; // stop taking entries when condition fails
+            }
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=1, b=2}
+
+
+

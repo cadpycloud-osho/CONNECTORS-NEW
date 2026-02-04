@@ -1,0 +1,92 @@
+isArrayType:
+
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Replicates dw::util::Tree::isArrayType(path)
+     * Returns true if the last path node has kind = "ARRAY_TYPE"
+     */
+    public static boolean isArrayType(List<Map<String, Object>> path) {
+        if (path == null || path.isEmpty()) {
+            return false;
+        }
+        Map<String, Object> lastNode = path.get(path.size() - 1);
+        return "ARRAY_TYPE".equals(lastNode.get("kind"));
+    }
+
+    public static void main(String[] args) {
+
+        // ---- pathA: ends with ATTRIBUTE_TYPE ----
+        List<Map<String, Object>> pathA = new ArrayList<>();
+
+        Map<String, Object> a1 = new HashMap<>();
+        a1.put("kind", "OBJECT_TYPE");
+        a1.put("selector", "user");
+        a1.put("namespace", null);
+
+        Map<String, Object> a2 = new HashMap<>();
+        a2.put("kind", "ATTRIBUTE_TYPE");
+        a2.put("selector", "name");
+        a2.put("namespace", null);
+
+        pathA.add(a1);
+        pathA.add(a2);
+
+        // ---- pathB: ends with ARRAY_TYPE ----
+        List<Map<String, Object>> pathB = new ArrayList<>();
+
+        Map<String, Object> b1 = new HashMap<>();
+        b1.put("kind", "OBJECT_TYPE");
+        b1.put("selector", "user");
+        b1.put("namespace", null);
+
+        Map<String, Object> b2 = new HashMap<>();
+        b2.put("kind", "ARRAY_TYPE");
+        b2.put("selector", 0);
+        b2.put("namespace", null);
+
+        pathB.add(b1);
+        pathB.add(b2);
+
+        // ---- pathC: single ARRAY_TYPE ----
+        List<Map<String, Object>> pathC = new ArrayList<>();
+
+        Map<String, Object> c1 = new HashMap<>();
+        c1.put("kind", "ARRAY_TYPE");
+        c1.put("selector", 0);
+        c1.put("namespace", null);
+
+        pathC.add(c1);
+
+        // ---- Output ----
+        Map<String, Boolean> output = new LinkedHashMap<>();
+        output.put("a", isArrayType(pathA));
+        output.put("b", isArrayType(pathB));
+        output.put("c", isArrayType(pathC));
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+
+
+

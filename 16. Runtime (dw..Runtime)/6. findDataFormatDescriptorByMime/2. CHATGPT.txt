@@ -1,0 +1,85 @@
+findDataFormatDescriptorByMime:
+
+
+input:
+
+package com.example.demo.model;
+
+public class DataFormatDescriptor {
+    private String name;
+    private String defaultMimeType;
+
+    public DataFormatDescriptor(String name, String defaultMimeType) {
+        this.name = name;
+        this.defaultMimeType = defaultMimeType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDefaultMimeType() {
+        return defaultMimeType;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.model.DataFormatDescriptor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DataFormatController {
+
+    @GetMapping("/dataFormats")
+    public Map<String, Map<String, String>> getDataFormats() {
+
+        DataFormatDescriptor jsonDF = findDataFormatDescriptorByMime("json");
+        DataFormatDescriptor unknownDF = findDataFormatDescriptorByMime(null);
+
+        Map<String, Map<String, String>> result = new HashMap<>();
+        result.put("json", simplify(jsonDF));
+        result.put("unknown", simplify(unknownDF));
+
+        return result;
+    }
+
+    private DataFormatDescriptor findDataFormatDescriptorByMime(String subtype) {
+        if ("json".equals(subtype)) {
+            return new DataFormatDescriptor("json", "application/json");
+        }
+        return null; // unknown
+    }
+
+    private Map<String, String> simplify(DataFormatDescriptor df) {
+        Map<String, String> simplified = new HashMap<>();
+        if (df != null) {
+            simplified.put("name", df.getName());
+            simplified.put("defaultMimeType", df.getDefaultMimeType());
+        } else {
+            simplified.put("name", "unknown");
+            simplified.put("defaultMimeType", "unknown");
+        }
+        return simplified;
+    }
+}
+
+output:
+
+{
+  "json": {
+    "name": "json",
+    "defaultMimeType": "application/json"
+  },
+  "unknown": {
+    "name": "unknown",
+    "defaultMimeType": "unknown"
+  }
+}
+
+
+

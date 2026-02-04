@@ -1,0 +1,81 @@
+trim:
+
+example 1:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class TrimExample1Controller {
+
+    @GetMapping("/trimExample1")
+    public Map<String, String> trimExample1() {
+        String input = "   my really long  text     ";
+        String trimmed = input.trim();
+
+        return Map.of("trim", trimmed);
+    }
+}
+
+
+
+output:
+
+{ "trim": "my really long  text" }
+
+
+
+----------------------------------------------------------------
+example 2:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class TrimExample2Controller {
+
+    @GetMapping("/trimExample2")
+    public Map<String, String> trimExample2() {
+        Map<String, String> results = new LinkedHashMap<>();
+
+        results.put("null", null); // null stays null
+
+        String empty = "";
+        results.put("empty", empty.trim());
+
+        String blank = "     ";
+        results.put("blank", blank.trim());
+
+        String noBlankSpaces = "abc";
+        results.put("noBlankSpaces", noBlankSpaces.trim());
+
+        String withSpaces = "    abc    ";
+        results.put("withSpaces", withSpaces.trim());
+
+        return results;
+    }
+}
+
+
+output:
+
+{
+  "null": null,
+  "empty": "",
+  "blank": "",
+  "noBlankSpaces": "abc",
+  "withSpaces": "abc"
+}
+
+
+
+

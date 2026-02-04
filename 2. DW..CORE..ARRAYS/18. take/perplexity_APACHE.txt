@@ -1,0 +1,32 @@
+take:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class TakeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:take")
+            .process(exchange -> {
+                List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+                
+                // take(users, 2) → first 2 elements
+                List<String> result = users.subList(0, Math.min(2, users.size()));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+["Mariano", "Leandro"]
+
+

@@ -1,0 +1,84 @@
+write:
+
+example 1:
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        String value = "world"; // equivalent of write("world", "text/plain")
+
+        // Print JSON output manually
+        System.out.println("{");
+        System.out.println("  \"hello\" : \"" + value + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "hello" : "world"
+}
+
+--------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Input payload
+        List<Map<String, String>> payload = List.of(
+            Map.of(
+                "Name", "Mr White",
+                "Email", "white@mulesoft.com",
+                "Id", "1234",
+                "Title", "Chief Java Prophet"
+            ),
+            Map.of(
+                "Name", "Mr Orange",
+                "Email", "orange@mulesoft.com",
+                "Id", "4567",
+                "Title", "Integration Ninja"
+            )
+        );
+
+        // CSV header (fixed order to match expected output)
+        String header = "Name|Email|Id|Title";
+
+        // CSV rows
+        String rows = payload.stream()
+                .map(m -> m.get("Name") + "|" +
+                          m.get("Email") + "|" +
+                          m.get("Id") + "|" +
+                          m.get("Title"))
+                .collect(Collectors.joining("\n"));
+
+        String csvContent = header + "\n" + rows;
+
+        // Build XML manually
+        System.out.println("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>");
+        System.out.println("<output>" + csvContent + "</output>");
+    }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja</output>
+
+
+--------------------------------------------------

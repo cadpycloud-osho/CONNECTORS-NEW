@@ -1,0 +1,48 @@
+charCodeAt:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class CharcodeController {
+
+    /**
+     * Equivalent to the DataWeave expression: 
+     * { "charCodeAt" : charCodeAt("MuleSoft", 1) }
+     * It gets the ASCII/Unicode value of the character at the specified index.
+     */
+    @GetMapping("/get-char-code-at")
+    public Map<String, Integer> getCharCodeAt() {
+        String inputString = "MuleSoft"; // The hardcoded input string
+        int index = 1;                   // The hardcoded index from the DataWeave example
+        
+        // Ensure the index is valid for the string length
+        if (inputString == null || index < 0 || index >= inputString.length()) {
+            // Handle error or return a specific error code/message if the index is out of bounds
+            // For this example, we'll return a simple error structure.
+            return Collections.singletonMap("error", -1); 
+        }
+
+        // 1. Get the character at the specified index
+        char charAtIndex = inputString.charAt(index);
+        
+        // 2. Casting the char to an int gives its ASCII/Unicode value
+        int charCodeValue = (int) charAtIndex; 
+        
+        // 3. Return the result in the desired JSON format: { "charCodeAt" : 117 }
+        return Collections.singletonMap("charCodeAt", charCodeValue);
+    }
+}
+
+
+output:
+
+
+{
+  "charCodeAt": 117
+}

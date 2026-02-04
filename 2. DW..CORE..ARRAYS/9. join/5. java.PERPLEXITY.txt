@@ -1,0 +1,140 @@
+join:
+
+
+
+
+input:
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class Main {
+    public static void main(String[] args) {
+        JSONArray users = new JSONArray();
+        users.put(new JSONObject().put("id", "1").put("name", "Mariano"));
+        users.put(new JSONObject().put("id", "2").put("name", "Leandro"));
+        users.put(new JSONObject().put("id", "3").put("name", "Julian"));
+        users.put(new JSONObject().put("id", "5").put("name", "Julian"));
+        
+        JSONArray products = new JSONArray();
+        products.put(new JSONObject().put("ownerId", "1").put("name", "DataWeave"));
+        products.put(new JSONObject().put("ownerId", "1").put("name", "BAT"));
+        products.put(new JSONObject().put("ownerId", "3").put("name", "DataSense"));
+        products.put(new JSONObject().put("ownerId", "4").put("name", "SmartConnectors"));
+        
+        JSONArray result = new JSONArray();
+        
+        // Nested loop join (inner join logic)
+        for (int i = 0; i < users.length(); i++) {
+            JSONObject user = users.getJSONObject(i);
+            for (int j = 0; j < products.length(); j++) {
+                JSONObject product = products.getJSONObject(j);
+                if (user.getString("id").equals(product.getString("ownerId"))) {
+                    JSONObject pair = new JSONObject();
+                    pair.put("l", user);
+                    pair.put("r", product);
+                    result.put(pair);
+                }
+            }
+        }
+        
+        System.out.println(result.toString(2));
+    }
+}
+
+
+
+output:
+
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional approach using Streams with flatMap to simulate the cross-join and filter matches.
+
+java
+
+
+
+public class Main {
+    public static void main(String[] args) {
+        String[] users = {
+            "{\"id\":\"1\",\"name\":\"Mariano\"}",
+            "{\"id\":\"2\",\"name\":\"Leandro\"}",
+            "{\"id\":\"3\",\"name\":\"Julian\"}",
+            "{\"id\":\"5\",\"name\":\"Julian\"}"
+        };
+        
+        String[] products = {
+            "{\"ownerId\":\"1\",\"name\":\"DataWeave\"}",
+            "{\"ownerId\":\"1\",\"name\":\"BAT\"}",
+            "{\"ownerId\":\"3\",\"name\":\"DataSense\"}",
+            "{\"ownerId\":\"4\",\"name\":\"SmartConnectors\"}"
+        };
+        
+        StringBuilder result = new StringBuilder("[\n");
+        boolean first = true;
+        
+        // Nested loop join (inner join logic)
+        for (String user : users) {
+            for (String product : products) {
+                if (user.contains("\"id\":\"" + getValue(product, "ownerId") + "\"")) {
+                    if (!first) result.append(",\n");
+                    result.append("  {\n")
+                          .append("    \"l\": ").append(user).append(",\n")
+                          .append("    \"r\": ").append(product).append("\n  }");
+                    first = false;
+                }
+            }
+        }
+        result.append("\n]");
+        System.out.println(result.toString());
+    }
+    
+    private static String getValue(String json, String key) {
+        int start = json.indexOf("\"" + key + "\":\"") + key.length() + 4;
+        int end = json.indexOf("\"", start);
+        return json.substring(start, end);
+    }
+}
+

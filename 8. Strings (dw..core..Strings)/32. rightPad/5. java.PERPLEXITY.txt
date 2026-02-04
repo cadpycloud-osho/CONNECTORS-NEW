@@ -1,0 +1,39 @@
+rightPad:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + rightPad(null, 3) + ",");
+        System.out.println("  \"b\": \"" + rightPad("", 3) + "\",");
+        System.out.println("  \"c\": \"" + rightPad("bat", 5) + "\",");
+        System.out.println("  \"d\": \"" + rightPad("bat", 3) + "\",");
+        System.out.println("  \"e\": \"" + rightPad("bat", -1) + "\"");
+        System.out.println("}");
+    }
+    
+    private static String rightPad(String input, int length) {
+        if (input == null) return null;
+        if (length <= input.length()) return input;
+        StringBuilder sb = new StringBuilder(input);
+        while (sb.length() < length) {
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}
+
+

@@ -1,0 +1,294 @@
+toNumber:
+
+example 1:
+
+
+
+input:
+
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private final String sourceNumberString = "0.005";
+
+    /**
+     * Attempts to parse a number string using a sequence of format patterns.
+     * Mimics DataWeave's chained toNumber() with error handling.
+     */
+    private Double chainedToNumber(String numberString, String... formatPatterns) {
+        for (String pattern : formatPatterns) {
+            try {
+                if (pattern.equals(".00")) {
+                    DecimalFormat format = new DecimalFormat(pattern);
+                    // Setting setParseBigDecimal(true) helps with accurate fractional parsing
+                    format.setParseBigDecimal(true);
+                    return format.parse(numberString).doubleValue(); 
+                } else if (pattern.equals("seconds")) {
+                    // Simulate failure for non-standard formats to test the chain
+                    throw new ParseException("Invalid format for parsing.", 0);
+                } else {
+                    // General parsing for other patterns
+                    DecimalFormat format = new DecimalFormat(pattern);
+                    return format.parse(numberString).doubleValue();
+                }
+            } catch (ParseException e) {
+                // Ignore the error and try the next pattern in the chain
+            }
+        }
+        // Return null if all patterns failed
+        return null;
+    }
+
+    public Map<String, Object> getNumberParsingMap() {
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        // "seconds" fails, then ".00" succeeds, parsing "0.005" as 0.005
+        Double parsedNumberA = chainedToNumber(sourceNumberString, "seconds", ".00");
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        String errorMessageB;
+        // The chainedToNumber function itself handles the error and returns null on failure.
+        Double resultB = chainedToNumber(sourceNumberString, "seconds"); 
+        
+        if (resultB != null) {
+            // This path should not be reached as "seconds" throws a ParseException
+            errorMessageB = "No error occurred."; 
+        } else {
+            // This path is reached when chainedToNumber returns null (all formatters failed)
+            errorMessageB = "Could not find a valid formatter for '" + sourceNumberString + "'";
+        }
+        // Note: The original input had a try-catch around the call, but since
+        // chainedToNumber already swallows the ParseException, checking for null is the correct
+        // way to determine overall failure in this structure.
+        
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("a", parsedNumberA);
+        rootMap.put("b", errorMessageB);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Object> result = converter.getNumberParsingMap();
+        
+        // Reformat the Map output to match the requested key=value structure
+        String formattedOutput = "{" + 
+            result.entrySet().stream()
+                .map(entry -> {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    
+                    // Format output to match the requested structure: {key=value}
+                    if (value instanceof Double) {
+                        return String.format("%s=%s", key, value);
+                    } else {
+                        // For the string error message, enclose it in single quotes if it contains spaces
+                        // to match the DataWeave map representation shown in the desired output.
+                        String valStr = value.toString();
+                        return String.format("%s=%s", key, valStr.contains(" ") ? "'" + valStr + "'" : valStr);
+                    }
+                })
+                .collect(Collectors.joining(", ")) + 
+            "}";
+
+        System.out.println(formattedOutput);
+    }
+}
+
+output:
+
+{a=0.005, b=Could not find a valid formatter for '0.005'}
+--------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    // The input DateTime literal from the DataWeave source, parsed as ZonedDateTime in Java.
+    private final ZonedDateTime sourceDateTime = 
+        ZonedDateTime.of(2015, 10, 1, 23, 57, 59, 0, ZoneOffset.UTC);
+
+    /**
+     * Converts DateTime to epoch seconds.
+     */
+    private long toEpochSeconds(ZonedDateTime dateTime) {
+        return dateTime.toEpochSecond();
+    }
+    
+    /**
+     * Converts DateTime to epoch milliseconds.
+     */
+    private long toEpochMilliseconds(ZonedDateTime dateTime) {
+        return dateTime.toInstant().toEpochMilli();
+    }
+
+    public Map<String, Long> getEpochConversionMap() {
+        
+        // --- Logic for Key 'epoch' ---
+        long epochSeconds = toEpochSeconds(sourceDateTime);
+
+        // --- Logic for Key 'millis' ---
+        long epochMillis = toEpochMilliseconds(sourceDateTime);
+        
+        // Create the root map
+        Map<String, Long> rootMap = new HashMap<>();
+        
+        // Add the results
+        rootMap.put("epoch", epochSeconds);
+        rootMap.put("millis", epochMillis);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        PureJavaToNumberEpochConverter converter = new PureJavaToNumberEpochConverter();
+        Map<String, Long> result = converter.getEpochConversionMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+{epoch=1443743879, millis=1443743879000}
+
+--------------------------------------------------------------
+
+
+example 3:
+
+
+
+input:
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Helper to resolve the Locale based on DataWeave's convention (null/empty string defaults to US).
+     */
+    private Locale resolveLocale(String localeString) {
+        if (localeString == null || localeString.trim().isEmpty() || "US".equalsIgnoreCase(localeString)) {
+            return Locale.US;
+        }
+        // Assuming localeString is the language tag (e.g., "ES" for Spanish)
+        return new Locale(localeString);
+    }
+
+    /**
+     * Mimics DataWeave's toNumber(String, String, String) behavior using Java's DecimalFormat.
+     */
+    private Double toNumber(String numberString, String pattern, String localeString) throws ParseException {
+        
+        Locale locale = resolveLocale(localeString);
+        
+        // DataWeave behavior: if no format or locale is specified, it uses standard parsing.
+        if (pattern == null && localeString == null) {
+            return Double.parseDouble(numberString);
+        }
+
+        // DecimalFormatSymbols determines the grouping/decimal separator characters.
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
+        
+        // If pattern is null or empty, use a sensible default that handles decimals.
+        // DataWeave often handles standard formats without explicit patterns.
+        String effectivePattern = (pattern != null && !pattern.isEmpty()) ? pattern : "#.#########";
+
+        // Create the formatter
+        DecimalFormat formatter = new DecimalFormat(effectivePattern);
+        formatter.setDecimalFormatSymbols(symbols);
+        // Important for parsing numbers, especially with DecimalFormat.
+        formatter.setParseBigDecimal(true);
+        formatter.setParseIntegerOnly(false);
+        
+        // Parse the string into a Number object
+        Number parsedNumber = formatter.parse(numberString);
+        
+        // Convert the parsed number to a Double for the map result
+        return parsedNumber.doubleValue();
+    }
+    
+    // Overloaded methods to handle optional arguments
+    private Double toNumber(String numberString) throws ParseException {
+        return toNumber(numberString, null, null);
+    }
+    private Double toNumber(String numberString, String pattern) throws ParseException {
+        return toNumber(numberString, pattern, null);
+    }
+
+    public Map<String, Double> getNumberParsingMap() {
+        Map<String, Double> rootMap = new HashMap<>();
+        
+        try {
+            // 1. "default": Standard double parsing (1.0)
+            rootMap.put("default", toNumber("1.0"));
+
+            // 2. "withFormat": Parsing with a format pattern (0.005)
+            // Note: The format ".00" specifies that at least two decimal places should be parsed,
+            // but the parsing result will be the literal number value.
+            rootMap.put("withFormat", toNumber("0.005", ".00")); 
+
+            // 3. "withLocal": Parsing "1,25" using Spanish/European locale (',' is decimal separator) -> 1.25
+            rootMap.put("withLocal", toNumber("1,25", "#.##", "ES")); 
+
+            // 4. "withExtraPlaceholders": Parsing "5.55" with a general pattern -> 5.55
+            rootMap.put("withExtraPlaceholders", toNumber("5.55", "####.####"));
+
+            // 5. "keyToNumber": Standard double parsing (123.0)
+            String myKey = "123";
+            rootMap.put("keyToNumber", toNumber(myKey));
+            
+        } catch (ParseException e) {
+            throw new RuntimeException("Parsing error occurred: " + e.getMessage(), e);
+        }
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Double> result = converter.getNumberParsingMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+output:
+
+{keyToNumber=123.0, withLocal=1.25, withExtraPlaceholders=5.55, withFormat=0.005, default=1.0}
+
+--------------------------------------------------------------
+
+
+

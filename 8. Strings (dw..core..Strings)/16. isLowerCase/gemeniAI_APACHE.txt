@@ -1,0 +1,63 @@
+isLowerCase:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsLowerCaseRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:validateLowerCase")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                results.put("a", isStrictLowerCase(null));
+                results.put("b", isStrictLowerCase(""));
+                results.put("c", isStrictLowerCase(" "));
+                results.put("d", isStrictLowerCase("abc"));
+                results.put("e", isStrictLowerCase("aBC"));
+                results.put("f", isStrictLowerCase("a c"));
+                results.put("g", isStrictLowerCase("a1c"));
+                results.put("h", isStrictLowerCase("a/c"));
+                results.put("i", isStrictLowerCase("mulesöft"));
+                results.put("j", isStrictLowerCase("mulesÖft"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic for strict lowercase alphabetic parity:
+     * 1. Check if empty or null (false)
+     * 2. Ensure every char is both alphabetic AND lowercase
+     */
+    private boolean isStrictLowerCase(String input) {
+        if (input == null || input.isEmpty()) return false;
+        
+        return input.chars().allMatch(c -> 
+            Character.isLetter(c) && Character.isLowerCase(c)
+        );
+    }
+}
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": true,
+  "j": false
+}
+

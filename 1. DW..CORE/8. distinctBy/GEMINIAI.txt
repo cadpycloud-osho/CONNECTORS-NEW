@@ -1,0 +1,225 @@
+distinctBy:
+
+
+1. DistinctController.java
+This controller exposes two endpoints: one for a simple array of integers and one for the book authors array, replicating the distinctBy logic using Java Streams.
+
+Java
+
+package com.example.distinctdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+@RestController
+public class DistinctController {
+
+    /**
+     * Replicates the first distinctBy example: 
+     * [0, 1, 2, 3, 3, 2, 1, 4] distinctBy (value) -> { "unique" : value }
+     * The simple `distinct()` on a stream is sufficient when the key is the value itself.
+     * @return The array with duplicates removed.
+     */
+    @GetMapping("/distinctNumbers")
+    public List<Integer> getDistinctNumbers() {
+        List<Integer> numbers = Arrays.asList(0, 1, 2, 3, 3, 2, 1, 4);
+
+        // Use Stream.distinct() to remove duplicates based on the element's value (the default behavior)
+        List<Integer> distinctNumbers = numbers.stream()
+                                               .distinct()
+                                               .collect(Collectors.toList());
+
+        return distinctNumbers;
+    }
+
+    /**
+     * Replicates the second distinctBy example: removing duplicate authors.
+     * The DataWeave expression 'record.author distinctBy $' is equivalent to 
+     * Java's Stream.distinct() on the list of strings.
+     * @return A map structure matching the DataWeave output JSON.
+     */
+    @GetMapping("/distinctAuthors")
+    public Map<String, Object> getDistinctAuthors() {
+        // Source Data (similar to the DataWeave 'var record')
+        List<String> allAuthors = Arrays.asList(
+            "James McGovern",
+            "Per Bothner",
+            "Kurt Cagle",
+            "James Linn",
+            "Kurt Cagle",
+            "Kurt Cagle",
+            "Kurt Cagle",
+            "Vaidyanathan Nagarajan"
+        );
+        
+        // DataWeave: 'record.author distinctBy $'
+        // Java: Stream.distinct()
+        List<String> distinctAuthors = allAuthors.stream()
+                                                 .distinct()
+                                                 .collect(Collectors.toList());
+
+        // Construct the output map matching the desired JSON structure
+        return Map.of(
+            "book", Map.of(
+                "title", "XQuery Kick Start",
+                "year", "2000",
+                "authors", distinctAuthors
+            )
+        );
+    }
+}
+
+
+
+2. DistinctDemoApplication.java
+Standard Spring Boot application entry point.
+
+Java
+
+package com.example.distinctdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DistinctDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DistinctDemoApplication.class, args);
+    }
+}
+
+
+Output
+Assuming your Spring Boot application runs on port 8080.
+
+1. Simple Numbers Example (/distinctNumbers)
+Request:
+
+GET http://localhost:8080/distinctNumbers
+Output (JSON):
+
+JSON
+
+[
+  0,
+  1,
+  2,
+  3,
+  4
+]
+2. Authors Example (/distinctAuthors)
+Request:
+
+GET http://localhost:8080/distinctAuthors
+Output (JSON):
+
+JSON
+
+{
+  "book": {
+    "title": "XQuery Kick Start",
+    "year": "2000",
+    "authors": [
+      "James McGovern",
+      "Per Bothner",
+      "Kurt Cagle",
+      "James Linn",
+      "Vaidyanathan Nagarajan"
+    ]
+  }
+}
+
+____________________________________________________________________
+distinctBy<K, V>(object: { (K)?: V }, criteria: (value: V, key: K) -> Any): Object
+Removes duplicate key-value pairs from an object.
+
+
+1. DistinctController.java (The Core Logic)This controller exposes two endpoints that replicate your DataWeave examples by using the Java Stream API's built-in distinct() method.Javapackage com.example.distinctdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+@RestController
+public class DistinctController {
+
+    /**
+     * Replicates the DataWeave array distinct: [0, 1, 2, 3, 3, 2, 1, 4] distinctBy (value) -> { "unique" : value }
+     * The simple Stream.distinct() is sufficient here.
+     */
+    @GetMapping("/distinctNumbers")
+    public List<Integer> getDistinctNumbers() {
+        List<Integer> numbers = Arrays.asList(0, 1, 2, 3, 3, 2, 1, 4);
+
+        // Java equivalent: Stream.distinct() uses element's value for uniqueness
+        return numbers.stream()
+                      .distinct()
+                      .collect(Collectors.toList());
+    }
+
+    /**
+     * Replicates the DataWeave authors example: record.author distinctBy $
+     */
+    @GetMapping("/distinctAuthors")
+    public Map<String, Object> getDistinctAuthors() {
+        // Source Data (The 'record.author' array)
+        List<String> allAuthors = Arrays.asList(
+            "James McGovern", "Per Bothner", "Kurt Cagle", "James Linn", 
+            "Kurt Cagle", "Kurt Cagle", "Kurt Cagle", "Vaidyanathan Nagarajan"
+        );
+        
+        // Java equivalent: Stream.distinct() to get unique authors
+        List<String> distinctAuthors = allAuthors.stream()
+                                                 .distinct()
+                                                 .collect(Collectors.toList());
+
+        // Construct the output map matching the desired JSON structure
+        return Map.of(
+            "book", Map.of(
+                "title", "XQuery Kick Start",
+                "year", "2000",
+                "authors", distinctAuthors
+            )
+        );
+    }
+}
+2. Spring Boot Application Entry Point (DistinctDemoApplication.java)Javapackage com.example.distinctdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DistinctDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DistinctDemoApplication.class, args);
+    }
+}
+Execution & Output
+
+Assuming your Spring Boot application runs on port 8080.1. Distinct Numbers 
+
+Example Request (URL)Output (JSON)GET http://localhost:8080/distinct Numbers[0, 1, 2, 3, 4]2. Distinct Authors
+
+ Example Request 
+
+(URL)Output (JSON)GET http://localhost:8080/distinctAuthorsjson 
+
+{ "book": { "title": "XQuery Kick Start", "year": "2000", "authors": [ "James McGovern", "Per Bothner", "Kurt Cagle", "James Linn", "Vaidyanathan Nagarajan" ] } } 
+
+
+
+
+_______________________________________________________________________-
+
+distinctBy(@StreamCapable items: Null, criteria: (item: Nothing, index: Nothing) -> Any): Null
+
+Helper function that enables distinctBy to work with a null value.

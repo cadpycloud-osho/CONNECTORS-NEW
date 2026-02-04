@@ -1,0 +1,36 @@
+isEven:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, List<Boolean>> result = Map.of(
+            "isEven", Arrays.asList(
+                isEven(0),
+                isEven(1),
+                isEven(1 + 1)
+            )
+        );
+        
+        System.out.println(result);
+    }
+    
+    // Java equivalent of DataWeave isEven()
+    public static boolean isEven(int number) {
+        return number % 2 == 0;
+    }
+}
+
+output:
+
+
+{isEven=[true, false, true]}
+
+
+

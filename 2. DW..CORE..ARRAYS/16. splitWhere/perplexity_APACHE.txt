@@ -1,0 +1,53 @@
+splitWhere:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class SplitWhereRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:splitWhere")
+            .process(exchange -> {
+                List<String> users = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+                
+                // Find FIRST index where item startsWith "Jul"
+                OptionalInt splitIndex = IntStream.range(0, users.size())
+                    .filter(i -> users.get(i).startsWith("Jul"))
+                    .findFirst();
+                
+                Map<String, List<String>> result = new LinkedHashMap<>();
+                
+                if (splitIndex.isPresent()) {
+                    int idx = splitIndex.getAsInt();
+                    result.put("l", users.subList(0, idx));           // [0, idx)
+                    result.put("r", users.subList(idx, users.size())); // [idx, end)
+                } else {
+                    // No match: l = all, r = empty
+                    result.put("l", users);
+                    result.put("r", new ArrayList<>());
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+
+{
+  "l": ["Mariano", "Leandro"],
+  "r": ["Julian", "Tomo"]
+}
+
+

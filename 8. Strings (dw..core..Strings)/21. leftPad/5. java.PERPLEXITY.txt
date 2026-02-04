@@ -1,0 +1,50 @@
+leftPad:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + jsonValue(leftPad(null, 3)) + ",");
+        System.out.println("  \"b\": \"" + leftPad("", 3) + "\",");
+        System.out.println("  \"c\": \"" + leftPad("bat", 5) + "\",");
+        System.out.println("  \"d\": \"" + leftPad("bat", 3) + "\",");
+        System.out.println("  \"e\": \"" + leftPad("bat", -1) + "\"");
+        System.out.println("}");
+    }
+    
+    private static String leftPad(String input, int length) {
+        if (input == null) {
+            return null;
+        }
+        if (length <= input.length()) {
+            return input;
+        }
+        StringBuilder sb = new StringBuilder();
+        int pads = length - input.length();
+        for (int i = 0; i < pads; i++) {
+            sb.append(" ");
+        }
+        sb.append(input);
+        return sb.toString();
+    }
+    
+    private static String jsonValue(String value) {
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}
+

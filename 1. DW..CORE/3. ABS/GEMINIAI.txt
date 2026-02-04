@@ -1,0 +1,38 @@
+abs(number: Number): Number
+Returns the absolute value of a number.
+
+INPUT:
+package com.example.dataconverter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.HashMap;
+
+@RestController
+public class DataWeaveKeyRemovalController {
+
+    @GetMapping("/remove-key")
+    public Map<String, String> removeSpecificKey() {
+
+        // --- DW Logic: The initial Object (Map) ---
+        Map<String, String> initialMap = new HashMap<>();
+        initialMap.put("hello", "world");
+        initialMap.put("name", "DW");
+
+        // --- DW Logic: -- ["hello" as Key] (Remove the key "hello") ---
+        // Java's Map.remove(key) directly implements the required logic.
+        initialMap.remove("hello");
+
+        // The resulting map is {"name" : "DW"}
+
+        // --- Create the final output map ---
+        // The modified initialMap is the final output.
+        return initialMap;
+    }
+}
+
+OUTPUT:
+{
+  "name": "DW"
+}

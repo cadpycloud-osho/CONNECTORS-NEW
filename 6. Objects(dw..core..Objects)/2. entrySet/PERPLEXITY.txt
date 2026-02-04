@@ -1,0 +1,95 @@
+entrySet:
+
+
+input:
+
+
+package com.example.xmltoentryset;
+
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+@SpringBootApplication
+public class XmlToEntrySetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(XmlToEntrySetApplication.class, args);
+    }
+}
+
+@RestController
+class XmlEntrySetController {
+
+    @GetMapping("/entry-set")
+    public Map<String, Object> getEntrySet() throws Exception {
+        String xml = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+
+        Element root = doc.getDocumentElement();
+
+        // Extract attributes of root
+        Map<String, String> attributes = new LinkedHashMap<>();
+        NamedNodeMap attrMap = root.getAttributes();
+        for (int i = 0; i < attrMap.getLength(); i++) {
+            Attr attr = (Attr) attrMap.item(i);
+            attributes.put(attr.getName(), attr.getValue());
+        }
+
+        // Extract child elements and their text content
+        Map<String, Object> valueMap = new LinkedHashMap<>();
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                String key = node.getNodeName();
+                String value = node.getTextContent();
+                valueMap.put(key, value);
+            }
+        }
+
+        // Build entrySet list with one entry containing key, value, attributes
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("key", root.getNodeName());
+        entry.put("value", valueMap);
+        entry.put("attributes", attributes);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("entrySet", Collections.singletonList(entry));
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+

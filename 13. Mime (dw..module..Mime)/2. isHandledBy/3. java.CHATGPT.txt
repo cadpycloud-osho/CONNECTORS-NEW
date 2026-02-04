@@ -1,0 +1,73 @@
+isHandledBy:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    static class MimeType {
+        String type;
+        String subtype;
+        Map<String, String> parameters;
+
+        MimeType(String type, String subtype, Map<String, String> parameters) {
+            this.type = type;
+            this.subtype = subtype;
+            this.parameters = parameters;
+        }
+    }
+
+    public static boolean isHandledBy(MimeType a, MimeType b) {
+
+        if (!b.type.equals("*") && !b.type.equalsIgnoreCase(a.type))
+            return false;
+
+        if (!b.subtype.equals("*")) {
+            if (b.subtype.contains("*+")) {
+                String suffix = b.subtype.substring(2);
+                if (!a.subtype.endsWith(suffix))
+                    return false;
+            } else if (!b.subtype.equalsIgnoreCase(a.subtype))
+                return false;
+        }
+
+        for (Map.Entry<String, String> e : b.parameters.entrySet()) {
+            if (!a.parameters.containsKey(e.getKey())) return false;
+            if (!a.parameters.get(e.getKey()).equals(e.getValue())) return false;
+        }
+
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        MimeType JSON = new MimeType("application", "json", Map.of());
+        MimeType MULTIPART = new MimeType("multipart", "form-data", Map.of("boundary", "my-boundary"));
+        MimeType ALL = new MimeType("*", "*", Map.of());
+
+        result.put("a", isHandledBy(JSON, JSON));
+        result.put("b", isHandledBy(new MimeType("*", "json", Map.of()), JSON));
+        result.put("c", isHandledBy(new MimeType("application", "*", Map.of()), JSON));
+        result.put("d", isHandledBy(ALL, MULTIPART));
+        result.put("e", isHandledBy(MULTIPART, ALL));
+        result.put("f", isHandledBy(JSON, MULTIPART));
+        result.put("g", isHandledBy(
+                new MimeType("application", "*+xml", Map.of()),
+                new MimeType("application", "soap+xml", Map.of())
+        ));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=true, d=true, e=false, f=false, g=true}
+

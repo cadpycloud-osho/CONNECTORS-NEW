@@ -1,0 +1,49 @@
+singularize:
+
+singularize(text: String): String
+
+singularize(text: String): String
+Converts a plural string to its singular form.
+
+If the input is already singular (for example, "box"), the output will match the input.
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{ "singularize" : singularize("boxes") }
+
+
+DataWeave
+Output
+{ "singularize" : "box" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

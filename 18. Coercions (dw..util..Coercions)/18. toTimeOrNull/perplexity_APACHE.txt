@@ -1,0 +1,67 @@
+toTimeOrNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToTimeOrNullRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    String inputTime = "13:44:12.283-08:00";
+                    
+                    // a: Multiple format fallback
+                    DateTimeFormatter[] formatsA = {
+                        DateTimeFormatter.ofPattern("HH:mm:ss.SSSX"),
+                        DateTimeFormatter.ofPattern("HH:mm:ss.nXXX")
+                    };
+                    result.put("a", parseTimeOrNull(inputTime, formatsA));
+                    
+                    // b: Single format only
+                    DateTimeFormatter[] formatsB = {
+                        DateTimeFormatter.ofPattern("HH:mm:ss.SSSX")
+                    };
+                    result.put("b", parseTimeOrNull(inputTime, formatsB));
+                    
+                    exchange.getIn().setBody(result);
+                }
+                
+                private String parseTimeOrNull(String timeStr, DateTimeFormatter[] formatters) {
+                    for (DateTimeFormatter formatter : formatters) {
+                        try {
+                            OffsetTime parsed = OffsetTime.parse(timeStr, formatter);
+                            return parsed.format(DateTimeFormatter.ofPattern("HH:mm:ss.nxxx"));
+                        } catch (DateTimeParseException ignored) {
+                            // Try next format
+                        }
+                    }
+                    return null;
+                }
+            });
+    }
+}
+
+
+output:
+
+{
+  "a": "13:44:12.000000283-08:00",
+  "b": null
+}
+
+
+
+

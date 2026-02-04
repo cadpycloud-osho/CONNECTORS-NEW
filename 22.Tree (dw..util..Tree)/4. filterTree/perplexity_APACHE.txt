@@ -1,0 +1,87 @@
+filterTree:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class FilterTreeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:filterTree")
+            .process(exchange -> {
+                // Scenario A: Remove non-empty strings
+                Map<String, Object> aInput = new LinkedHashMap<>();
+                aInput.put("name", "");
+                aInput.put("lastName", "Achaval");
+                aInput.put("friends", Arrays.asList(
+                    new HashMap<>(Map.of("id", "", "test", true)),
+                    Map.of("age", 123),
+                    ""
+                ));
+
+                // Scenario C: Remove empty arrays
+                List<Map<String, Object>> cInput = Arrays.asList(
+                    new HashMap<>(Map.of("name", "Mariano", "friends", new ArrayList<>())),
+                    Map.of("test", List.of(1, 2, 3)),
+                    Map.of("dw", "")
+                );
+
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // Logic A: filterTree (if String, must not be empty)
+                result.put("a", filterTree(aInput, val -> 
+                    !(val instanceof String) || !((String) val).isEmpty()));
+
+                // Logic C: filterTree (if Array, must not be empty)
+                result.put("c", filterTree(cInput, val -> 
+                    !(val instanceof List) || !((List<?>) val).isEmpty()));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private Object filterTree(Object node, java.util.function.Predicate<Object> predicate) {
+        if (node instanceof Map) {
+            Map<Object, Object> filteredMap = new LinkedHashMap<>();
+            ((Map<?, ?>) node).forEach((k, v) -> {
+                Object processed = filterTree(v, predicate);
+                if (processed != null && predicate.test(processed)) {
+                    filteredMap.put(k, processed);
+                }
+            });
+            return filteredMap;
+        } else if (node instanceof List) {
+            return ((List<?>) node).stream()
+                .map(item -> filterTree(item, predicate))
+                .filter(item -> item != null && predicate.test(item))
+                .collect(Collectors.toList());
+        }
+        return node;
+    }
+}
+
+output:
+
+{
+  "a": {
+    "lastName": "Achaval",
+    "friends": [
+      { "test": true },
+      { "age": 123 }
+    ]
+  },
+  "b": null,
+  "c": [
+    { "name": "Mariano" },
+    { "test": [1, 2, 3] },
+    { "dw": "" }
+  ]
+}
+
+

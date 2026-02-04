@@ -1,0 +1,40 @@
+fail:
+
+
+input:
+
+import java.util.List;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        try {
+            checkData();
+        } catch (EmptyDataException e) {
+            // Matches DataWeave ERROR output
+            System.err.println("ERROR " + e.getMessage());
+        }
+    }
+    
+    static void checkData() {
+        List<String> result = List.of(); // Empty list matching DataWeave var result = []
+        
+        // Matches: if(sizeOf(result) <= 0) fail('Data was empty') else result
+        if (result.size() <= 0) {
+            throw new EmptyDataException("Data was empty");
+        }
+        System.out.println(result);
+    }
+}
+
+class EmptyDataException extends RuntimeException {
+    public EmptyDataException(String message) {
+        super(message);
+    }
+}
+
+
+output:
+
+ERROR Data was empty
+

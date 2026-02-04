@@ -1,0 +1,53 @@
+matches:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * DataWeave equivalent logic: 
+     * [ 
+     * "admin123" matches /a.*\d+/, 
+     * "admin123" matches /^b.+/ 
+     * ]
+     * Output:
+     * [ true, false ]
+     */
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input string
+        String inputString = "admin123";
+
+        // --- Condition 1: ("admin123" matches /a.*\d+/) ---
+        // Regex: /a.*\d+/ checks for: starts with 'a', followed by any characters, and ends with one or more digits.
+        String regex1 = "a.*\\d+"; 
+        boolean result1 = inputString.matches(regex1); // TRUE
+
+        // --- Condition 2: ("admin123" matches /^b.+/) ---
+        // Regex: /^b.+/ checks for: starts with 'b', followed by one or more characters.
+        String regex2 = "b.+"; 
+        boolean result2 = inputString.matches(regex2); // FALSE
+
+        // 2. Combine the results into a list of Booleans
+        List<Boolean> results = Arrays.asList(result1, result2);
+
+        // 3. Manually construct the final JSON array string
+        String joinedResults = results.stream()
+            .map(Object::toString) // Convert boolean to string "true" or "false"
+            .collect(Collectors.joining(", "));
+        
+        String outputJson = "[ " + joinedResults + " ]";
+        
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+[ true, false ]
+

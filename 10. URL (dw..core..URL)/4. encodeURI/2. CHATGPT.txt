@@ -1,0 +1,77 @@
+encodeURI:
+
+
+input:
+
+package com.example.demo.util;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+public class UrlUtils {
+
+    public static String encodeURI(String input) {
+        if (input == null) return null;
+        try {
+            // encode using UTF-8
+            String encoded = URLEncoder.encode(input, "UTF-8");
+
+            // URLEncoder encodes spaces as '+' and encodes reserved characters, 
+            // DataWeave encodeURI leaves reserved characters unencoded
+            // so we decode the reserved characters back
+            encoded = encoded.replaceAll("\\+", "%20")
+                             .replaceAll("%21", "!")
+                             .replaceAll("%27", "'")
+                             .replaceAll("%28", "(")
+                             .replaceAll("%29", ")")
+                             .replaceAll("%7E", "~")
+                             .replaceAll("%3A", ":")
+                             .replaceAll("%2F", "/")
+                             .replaceAll("%3F", "?")
+                             .replaceAll("%23", "#")
+                             .replaceAll("%5B", "[")
+                             .replaceAll("%5D", "]")
+                             .replaceAll("%40", "@")
+                             .replaceAll("%24", "\\$")
+                             .replaceAll("%26", "&")
+                             .replaceAll("%2C", ",")
+                             .replaceAll("%3B", ";")
+                             .replaceAll("%3D", "=");
+            return encoded;
+        } catch (UnsupportedEncodingException e) {
+            return input; // fallback
+        }
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.UrlUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class UrlController {
+
+    @GetMapping("/encodeURI")
+    public Map<String, String> encodeURIExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("encodeURI", UrlUtils.encodeURI("http://asd/ text to decode /%/\"\\/text"));
+        result.put("not_encoded", UrlUtils.encodeURI("http://:;,/?:@&=$_-_.!~*'()"));
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "encodeURI": "http://asd/%20text%20to%20decode%20/%25/%22%5C/text",
+  "not_encoded": "http://:;,/?:@&=$_-_.!~*'()"
+}
+
+

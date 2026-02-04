@@ -1,0 +1,197 @@
+now:
+
+
+example 1:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        // Register JavaTimeModule for correct ZonedDateTime serialization
+        mapper.registerModule(new JavaTimeModule());
+
+        // 1. Capture the current time once (Equivalent to calling now() once)
+        ZonedDateTime currentTime = ZonedDateTime.now();
+        
+        // 2. Perform the operations
+        
+        // nowCalled: Default ZonedDateTime representation (with system's default timezone)
+        ZonedDateTime result1 = currentTime;
+
+        // nowCalledSpecificTimeZone: Shift to "America/New_York" (>> operator)
+        ZoneId newYorkZone = ZoneId.of("America/New_York");
+        ZonedDateTime result2 = currentTime.withZoneSameInstant(newYorkZone);
+
+        // 3. Assemble the final JSON object
+        ObjectNode outputObject = mapper.createObjectNode();
+        
+        // DataWeave's output format is similar to ISO 8601, which ZonedDateTime naturally provides.
+        outputObject.putPOJO("nowCalled", result1);
+        outputObject.putPOJO("nowCalledSpecificTimeZone", result2);
+
+        // 4. Output the result
+        String outputJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputObject);
+        
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+{
+  "nowCalled" : "2025-12-15T05:31:06.123-05:00",
+  "nowCalledSpecificTimeZone" : "2025-12-15T05:31:06.123-05:00"
+}
+
+--------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.IsoFields;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // Use a standard Map to represent the output JSON object
+        Map<String, Object> outputMap = new HashMap<>();
+
+        // 1. Capture the hardcoded time sample for reproducible output
+        ZonedDateTime currentTime = ZonedDateTime.parse("2025-12-15T15:01:06.123456789+05:30");
+
+        // DataWeave "now()" output (ISO 8601 format)
+        outputMap.put("now", currentTime.toString()); 
+
+        // 2. Accessors and Conversions
+
+        // epochTime : now() as Number (Seconds since Epoch)
+        long epochTime = currentTime.toEpochSecond();
+        outputMap.put("epochTime", epochTime);
+
+        // nanoseconds: now().nanoseconds (Fractional part)
+        int nanos = currentTime.getNano();
+        outputMap.put("nanoseconds", nanos);
+        
+        // milliseconds: now().milliseconds (Fractional part)
+        int millis = currentTime.get(ChronoField.MILLI_OF_SECOND);
+        outputMap.put("milliseconds", millis);
+
+        // seconds: now().seconds (0-59)
+        outputMap.put("seconds", currentTime.getSecond());
+
+        // minutes: now().minutes (0-59)
+        outputMap.put("minutes", currentTime.getMinute());
+
+        // hour: now().hour (0-23)
+        outputMap.put("hour", currentTime.getHour());
+        
+        // day: now().day (Day of month, 1-31)
+        outputMap.put("day", currentTime.getDayOfMonth());
+
+        // month: now().month (Month, 1-12)
+        outputMap.put("month", currentTime.getMonthValue());
+
+        // year: now().year
+        outputMap.put("year", currentTime.getYear());
+
+        // quarter: now().quarter (1-4). Uses IsoFields.QUARTER_OF_YEAR
+        outputMap.put("quarter", currentTime.get(IsoFields.QUARTER_OF_YEAR));
+
+        // dayOfWeek: now().dayOfWeek (1=Monday, 7=Sunday)
+        outputMap.put("dayOfWeek", currentTime.getDayOfWeek().getValue()); 
+
+        // dayOfYear: now().dayOfYear (1-366)
+        outputMap.put("dayOfYear", currentTime.getDayOfYear());
+
+        // offsetSeconds: now().offsetSeconds (Offset from UTC in seconds)
+        long offsetSeconds = currentTime.getOffset().getTotalSeconds();
+        outputMap.put("offsetSeconds", offsetSeconds);
+
+        // 3. Formatting
+        
+        // formattedDate: now() as String {format: "y-MM-dd"}
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("y-MM-dd");
+        String formattedDate = currentTime.format(dateFormatter);
+        outputMap.put("formattedDate", formattedDate);
+
+        // formattedTime: now() as String {format: "hh:m:s"}
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:m:s");
+        String formattedTime = currentTime.format(timeFormatter);
+        outputMap.put("formattedTime", formattedTime);
+
+        // 4. Manually format the result into the required JSON string (pretty printed)
+        String outputJson = formatMapAsPrettyJson(outputMap);
+        
+        System.out.println(outputJson);
+    }
+
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     * This replaces the functionality of mapper.writerWithDefaultPrettyPrinter().
+     */
+    private static String formatMapAsPrettyJson(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        int count = 0;
+        int total = map.size();
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            sb.append("  \"").append(entry.getKey()).append("\" : ");
+            
+            Object value = entry.getValue();
+            if (value instanceof String) {
+                sb.append("\"").append(value).append("\"");
+            } else {
+                sb.append(value);
+            }
+
+            count++;
+            if (count < total) {
+                sb.append(",\n");
+            } else {
+                sb.append("\n");
+            }
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+}
+output:
+
+{
+  "now" : "2025-12-15T15:01:06.123456789+05:30",
+  "epochTime" : 1734245466,
+  "nanoseconds" : 123456789,
+  "milliseconds" : 123,
+  "seconds" : 6,
+  "minutes" : 1,
+  "hour" : 15,
+  "day" : 15,
+  "month" : 12,
+  "year" : 2025,
+  "quarter" : 4,
+  "dayOfWeek" : 1,
+  "dayOfYear" : 349,
+  "offsetSeconds" : 19800,
+  "formattedDate" : "2025-12-15",
+  "formattedTime" : "03:1:6"
+}
+
+--------------------------------------------------------

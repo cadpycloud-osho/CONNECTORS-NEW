@@ -1,0 +1,229 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "items": {
+        "$ref": "#/definitions/PriceBookEntryExt"
+      },
+      "type": "array"
+    },
+    "PriceBookEntryExt": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "productId",
+        "customerId",
+        "quoteId",
+        "quantity"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_2"
+        },
+        "quoteId": {
+          "type": "string"
+        },
+        "minRequiredQuantity": {
+          "$ref": "#/definitions/default_5"
+        },
+        "productId": {
+          "type": "string"
+        },
+        "unitListPrice": {
+          "$ref": "#/definitions/default_6"
+        },
+        "product": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "minRequiredOrderValue": {
+          "$ref": "#/definitions/default_7"
+        },
+        "productName": {
+          "type": "string"
+        },
+        "isActive": {
+          "$ref": "#/definitions/default_4"
+        },
+        "maxRequiredOrderValue": {
+          "$ref": "#/definitions/default_1"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "useStandardPrice": {
+          "$ref": "#/definitions/default"
+        },
+        "quantityUOM": {
+          "type": "string"
+        },
+        "servicePeriodCount": {
+          "$ref": "#/definitions/default_3"
+        },
+        "netUnitPrice": {
+          "type": "string"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "taxAmount": {
+          "type": "string"
+        },
+        "additionalDiscount": {
+          "type": "string"
+        },
+        "discountValidationResponse": {
+          "type": "string"
+        }
+      }
+    },
+    "AuditInfo": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "isDeleted",
+        "createdBy",
+        "updatedBy",
+        "updatedDate",
+        "createdDate"
+      ],
+      "properties": {
+        "createdDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "isDeleted": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "default": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_1": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_2": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_3": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_4": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_5": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_6": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_7": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

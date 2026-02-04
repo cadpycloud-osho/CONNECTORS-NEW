@@ -1,0 +1,66 @@
+toLocalTimeOrNull:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class LocalTimeOrNullApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LocalTimeOrNullApp.class, args);
+    }
+
+    @GetMapping("/local-time-or-null")
+    public Map<String, Object> parseLocalTimeOrNull() {
+        String input = "23:57:59";
+        
+        // Equivalent to DataWeave 'a' - tries HH:mm:ss.n first, falls back to HH:mm:ss
+        LocalTime resultA = parseWithMultipleFormats(input);
+        
+        // Equivalent to DataWeave 'b' - only HH:mm:ss.n (strict, no fallback)
+        LocalTime resultB = parseWithSingleFormat(input);
+        
+        return Map.of(
+            "a", resultA,
+            "b", resultB
+        );
+    }
+    
+    private LocalTime parseWithMultipleFormats(String input) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+            .appendPattern("HH:mm:ss")
+            .optionalStart()
+            .appendLiteral('.')
+            .appendFraction(LocalTime.NANO_OF_SECOND, 1, 9, true)
+            .optionalEnd()
+            .toFormatter();
+        
+        try {
+            return LocalTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+    
+    private LocalTime parseWithSingleFormat(String input) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.n");
+            return LocalTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null; // Like DataWeave toLocalTimeOrNull
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": "23:57:59",
+  "b": null
+}
+
+
+

@@ -1,0 +1,104 @@
+toBinary:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class DwToBinaryTest {
+
+    // Simulate dw::util::Coercions::toBinary(String, String) -> Binary with Base64 encoding
+    static byte[] toBinary(String text, String encoding) {
+        Charset charset;
+        switch (encoding.toUpperCase()) {
+            case "UTF-16":
+            case "UTF16":
+            case "UNICODEBIG":
+                charset = StandardCharsets.UTF_16BE;
+                break;
+            case "UTF-32":
+            case "UTF_32":
+                charset = java.nio.charset.Charset.forName("UTF-32BE");
+                break;
+            default:
+                charset = StandardCharsets.UTF_8;
+        }
+        return text.getBytes(charset);
+    }
+
+    // Convert byte[] to DataWeave-style Base64 representation
+    static String toBase64(byte[] bytes) {
+        return java.util.Base64.getEncoder().encodeToString(bytes);
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToBinaryRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToBinaryRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+
+                        // UTF-16Ex: toBinary("DW", "UTF-16")
+                        byte[] utf16 = toBinary("DW", "UTF-16");
+                        result.put("UTF-16Ex", toBase64(utf16));
+
+                        // utf16Ex: toBinary("DW", "utf16")
+                        result.put("utf16Ex", toBase64(utf16));
+
+                        // UnicodeBigEx: toBinary("DW", "UnicodeBig")
+                        result.put("UnicodeBigEx", toBase64(utf16));
+
+                        // UTF-32Ex: toBinary("DW", "UTF-32")
+                        byte[] utf32 = toBinary("DW", "UTF-32");
+                        result.put("UTF-32Ex", toBase64(utf32));
+
+                        // UTF_32Ex: toBinary("DW", "UTF_32")
+                        result.put("UTF_32Ex", toBase64(utf32));
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "UTF-16Ex" : "/v8ARABX",
+  "utf16Ex" : "/v8ARABX", 
+  "UnicodeBigEx" : "/v8ARABX",
+  "UTF-32Ex" : "AAAARAAAAFc=",
+  "UTF_32Ex" : "AAAARAAAAFc="
+}
+
+
+
+

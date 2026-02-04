@@ -1,0 +1,102 @@
+filterTree:
+
+filterTree(value: Any, criteria: (value: Any, path: Path) -> Boolean): Any
+
+filterTree(value: Any, criteria: (value: Any, path: Path) -> Boolean): Any
+Filters the value or path of nodes in an input based on a specified criteria.
+
+The function iterates through the nodes in the input. The criteria can apply to the value or path in the input. If the criteria evaluates to true, the node remains in the output. If false, the function filters out the node.
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Tree
+output application/dw
+---
+{
+    a: {
+          name : "",
+          lastName @(foo: ""): "Achaval",
+          friends @(id: 123): [{id: "", test: true}, {age: 123}, ""]
+        } filterTree ((value, path) ->
+            value match  {
+                            case s is String -> !isEmpty(s)
+                            else -> true
+                          }
+    ),
+    b: null filterTree ((value, path) -> value is String),
+    c: [
+            {name: "Mariano", friends: []},
+            {test: [1,2,3]},
+            {dw: ""}
+        ] filterTree ((value, path) ->
+            value match  {
+                            case a is Array ->  !isEmpty(a as Array)
+                            else -> true
+                        })
+}
+
+DataWeave
+Output
+{
+  a: {
+    lastName: "Achaval",
+    friends @(id: 123): [
+      {
+        test: true
+      },
+      {
+        age: 123
+      }
+    ]
+  },
+  b: null,
+  c: [
+    {
+      name: "Mariano"
+    },
+    {
+      test: [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      dw: ""
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

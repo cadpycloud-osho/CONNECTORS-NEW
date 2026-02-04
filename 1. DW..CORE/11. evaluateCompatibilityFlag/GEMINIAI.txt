@@ -1,0 +1,71 @@
+evaluateCompatibilityFlag:
+
+INPUT:
+
+
+1. Spring Boot Configuration (application.properties)
+
+
+# application.properties
+# This property simulates the value retrieved by evaluateCompatibilityFlag
+com.mulesoft.dw.xml_reader.honourMixedContentStructure=true
+
+
+
+package com.example.flagdemo;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class CompatibilityFlagController {
+
+    // 1. Inject the value of the property key, simulating the lookup.
+    // The key here is the exact string passed to the DataWeave function.
+    @Value("${com.mulesoft.dw.xml_reader.honourMixedContentStructure}")
+    private Boolean honourMixedContentStructure;
+
+    /**
+     * Replicates the DataWeave transformation that retrieves a flag value:
+     * { "com.mulesoft.dw.xml_reader.honourMixedContentStructure": evaluateCompatibilityFlag(...) }
+     * @return A map structure matching the DataWeave output JSON.
+     */
+    @GetMapping("/getCompatibilityFlag")
+    public Map<String, Boolean> getCompatibilityFlagValue() {
+        
+        // 2. Return the result in the required JSON format.
+        // We use Collections.singletonMap for concise map creation.
+        String flagKey = "com.mulesoft.dw.xml_reader.honourMixedContentStructure";
+        
+        return Collections.singletonMap(flagKey, honourMixedContentStructure);
+    }
+}
+
+
+Spring Boot Application Entry Point (FlagDemoApplication.java)
+
+
+package com.example.flagdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FlagDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FlagDemoApplication.class, args);
+    }
+}
+
+
+OUTPUT:
+
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}
+
+

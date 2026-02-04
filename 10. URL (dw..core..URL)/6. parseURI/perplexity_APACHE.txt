@@ -1,0 +1,62 @@
+parseURI:
+
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+public class ParseURIProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String rawUri = "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+        
+        URI uri;
+        try {
+            uri = new URI(rawUri);
+        } catch (URISyntaxException e) {
+            exchange.getIn().setBody("{\"composition\":{\"isValid\":false}}");
+            return;
+        }
+        
+        String result = "{ \"composition\": { " +
+            "\"isValid\": true, " +
+            "\"raw\": \"" + rawUri + "\"," +
+            "\"host\": \"" + uri.getHost() + "\"," +
+            "\"authority\": \"" + uri.getAuthority() + "\"," +
+            "\"fragment\": \"" + (uri.getFragment() != null ? uri.getFragment() : "") + "\"," +
+            "\"path\": \"" + uri.getPath() + "\"," +
+            "\"scheme\": \"" + uri.getScheme() + "\"," +
+            "\"isAbsolute\": " + uri.isAbsolute() + "," +
+            "\"isOpaque\": " + uri.isOpaque() +
+            "}}";
+            
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:parseURI")
+    .process(new ParseURIProcessor())
+    .log("${body}");
+
+
+output:
+
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+
+

@@ -1,0 +1,36 @@
+substring:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class SubstringController {
+
+    @GetMapping("/substring-conversion")
+    public Map<String, String> convertDataWeaveSubstring() {
+        
+        String text = "hello world!";
+        
+        // --- Core DataWeave Logic Equivalent ---
+        // DW substring(text, 1, 5) -> "ello"
+        // Java substring(1, 5) -> starts at index 1 ('e'), ends before index 5 (' ')
+        String result = text.substring(1, 5);
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot automatically converts to the required JSON
+        return Map.of(
+            "result", result
+        );
+    }
+}
+
+output:
+
+{
+  "result": "ello"
+}
+

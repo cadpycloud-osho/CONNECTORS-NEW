@@ -1,0 +1,66 @@
+fromHex:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class HexToDecimalRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertHex")
+            .routeId("Hex-To-Decimal-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Replicating the DataWeave source logic
+                results.put("a", parseHex("-1"));
+                results.put("b", parseHex("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000"));
+                results.put("c", parseHex("0"));
+                results.put("d", parseHex(null));
+                results.put("e", parseHex("f"));
+
+                exchange.getIn().setBody(results);
+            })
+            // Output as application/json
+            .marshal().json()
+            .log("Hex Conversion Result: ${body}");
+    }
+
+    /**
+     * Helper to replicate dw::core::Numbers::fromHex
+     */
+    private Object parseHex(Object input) {
+        if (input == null) return null;
+        
+        String strInput = String.valueOf(input);
+        try {
+            // BigInteger constructor with radix 16 handles hex conversion
+            // It automatically supports the leading '-' sign.
+            return new BigInteger(strInput, 16);
+        } catch (NumberFormatException e) {
+            return null; 
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": -1,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 15
+}
+
+
+
+
+

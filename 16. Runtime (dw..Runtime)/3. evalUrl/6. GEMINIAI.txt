@@ -1,0 +1,103 @@
+evalUrl:
+
+<dependency>
+    <groupId>org.mule.weave</groupId>
+    <artifactId>runtime-core</artifactId>
+    <version>X.Y.Z</version> </dependency>
+
+
+%dw 2.0
+output application/dw
+---
+payload.name
+
+input:
+
+import org.mule.weave.v2.runtime.WeaveRuntime;
+import org.mule.weave.v2.runtime.WeaveRuntimeService;
+import org.mule.weave.v2.runtime.logging.SystemLogger;
+import org.mule.weave.v2.runtime.utils.ResourceResolver;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Optional;
+
+@Service
+public class EvalUrlService {
+
+    private final WeaveRuntime runtime;
+    private final ResourceLoader resourceLoader;
+
+    private static final String SCRIPT_PATH = "classpath:org/mule/weave/v2/engine/runtime_evalUrl/example.dwl";
+    private static final String SCRIPT_ID = "example.dwl"; // ID used internally by DW
+
+    // --- Data Definition (Simulating the 'jsonValue' variable) ---
+    private static final Map<String, Object> JSON_VALUE = Map.of(
+        "value", "{\"name\": \"Mariano\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8),
+        "encoding", "UTF-8",
+        "properties", Map.of(),
+        "mimeType", "application/json"
+    );
+
+    public EvalUrlService(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+        // Initialize the Weave Runtime
+        this.runtime = WeaveRuntimeService.service().createRuntime(
+            ResourceResolver.empty(), new SystemLogger(), Optional.empty()
+        );
+    }
+
+    /**
+     * Executes the DW script loaded from the classpath, replicating evalUrl().
+     * @param payloadInput The input payload for the script.
+     * @return The execution result (a WeaveResult object).
+     */
+    public Object executeScriptFromUrl(Object payloadInput) throws IOException {
+        // 1. Read the script content from the classpath (The "Url" part of evalUrl)
+        String scriptContent;
+        try (InputStream is = resourceLoader.getResource(SCRIPT_PATH).getInputStream()) {
+            scriptContent = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+        // 2. Prepare the resources map (containing the main script)
+        Map<String, String> resources = Map.of(SCRIPT_ID, scriptContent);
+        
+        // 3. Prepare the input variables (the DW context)
+        Map<String, Object> variables = Map.of("payload", payloadInput);
+
+        // 4. Execute the script synchronously
+        return runtime.execute(SCRIPT_ID, resources, variables);
+    }
+
+    // --- Replication of the DataWeave Execution ---
+    public Map<String, Object> runEvalUrlTests() throws IOException {
+        Map<String, Object> results = new HashMap<>();
+
+        // Test 1: execute_ok (Input is the JSON_VALUE structure, which DW parses)
+        results.put("execute_ok", executeScriptFromUrl(JSON_VALUE));
+
+        // Test 2: execute_ok_withValue (Input is a Map, which DW uses directly)
+        results.put("execute_ok_withValue", executeScriptFromUrl(Map.of("name", "Mariano")));
+
+        return results;
+    }
+}
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "Mariano", // String output of payload.name
+    "logs": []
+  },
+  "execute_ok_withValue": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  }
+}

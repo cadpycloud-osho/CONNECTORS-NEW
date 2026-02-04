@@ -1,0 +1,39 @@
+parseURI:
+
+
+
+input:
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, Object> composition = new HashMap<>();
+        String uriString = "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+        
+        URI uri = URI.create(uriString);
+        composition.put("isValid", true);
+        composition.put("raw", uriString);
+        composition.put("host", uri.getHost());
+        composition.put("authority", uri.getAuthority());
+        composition.put("fragment", uri.getFragment());
+        composition.put("path", uri.getPath());
+        composition.put("scheme", uri.getScheme());
+        composition.put("isAbsolute", uri.isAbsolute());
+        composition.put("isOpaque", uri.isOpaque());
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("composition", composition);
+        System.out.println(result);
+    }
+}
+
+output:
+
+{composition={isValid=true, raw=https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer, host=en.wikipedia.org, authority=en.wikipedia.org, fragment=footer, path=/wiki/Uniform_Resource_Identifier, scheme=https, isAbsolute=true, isOpaque=false}}
+
+
+

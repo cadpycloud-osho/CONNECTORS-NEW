@@ -1,0 +1,63 @@
+try:
+
+try<T>(delegate: () -> T): TryResult<T>
+
+try<T>(delegate: () -> T): TryResult<T>
+Evaluates the delegate function and returns an object with success: true and result if the delegate function succeeds, or an object with success: false and error if the delegate function throws an exception.
+
+The orElseTry and orElse functions will also continue processing if the try function fails. See the orElseTry and orElse documentation for more complete examples of handling failing try function expressions.
+
+Note: Instead of using the orElseTry and orElse functions, based on the output of the try function, you can add conditional logic to execute when the result is success: true or success: false.
+
+
+
+Source
+%dw 2.0
+import try, fail from dw::Runtime
+output application/json
+fun randomNumber() =
+if(random() > 0.5)
+  fail("This function is failing")
+ else
+  "OK"
+---
+try(() -> randomNumber())
+DataWeave
+Output
+When randomNumber fails, the output is:
+
+{
+  "success": false,
+  "error": {
+    "kind": "UserException",
+    "message": "This function is failing",
+    "location": "Unknown location",
+    "stack": [
+      "fail (anonymous:0:0)",
+      "myFunction (anonymous:1:114)",
+      "main (anonymous:1:179)"
+    ]
+  }
+}
+
+
+When randomNumber succeeds, the output is:
+
+{
+  "success": true,
+  "result": "OK"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

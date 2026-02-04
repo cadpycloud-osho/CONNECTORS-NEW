@@ -1,0 +1,46 @@
+leftPad:
+
+
+input:
+
+import java.util.*;
+
+public class LeftPadConverter {
+    public static String leftPad(String input, int size) {
+        if (input == null) return null;
+        if (size <= input.length()) return input;
+        
+        int padsNeeded = size - input.length();
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < padsNeeded; i++) {
+            result.append(" ");
+        }
+        result.append(input);
+        return result.toString();
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", leftPad(null, 3));
+        result.put("b", leftPad("", 3));
+        result.put("c", leftPad("bat", 5));
+        result.put("d", leftPad("bat", 3));
+        result.put("e", leftPad("bat", -1));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}
+
+

@@ -1,0 +1,225 @@
+then:
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+
+@SpringBootApplication
+public class CombinedDataWeaveEquivalentsApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(CombinedDataWeaveEquivalentsApplication.class, args);
+    }
+
+    // --- Helper for DWL scan() logic ---
+    private List<List<String>> scanMultiple(String input, String regex) {
+        List<List<String>> allMatches = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            List<String> currentMatch = new ArrayList<>();
+            currentMatch.add(matcher.group(0)); 
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                currentMatch.add(matcher.group(i));
+            }
+            allMatches.add(currentMatch);
+        }
+        return allMatches;
+    }
+
+    // --- Helper for DWL sizeOf() logic (for demonstration purposes only) ---
+    private int sizeOf(Object value) {
+        if (value instanceof List) return ((List<?>) value).size();
+        if (value instanceof Map) return ((Map<?, ?>) value).size();
+        if (value instanceof String) return ((String) value).length();
+        if (value instanceof Number) return String.valueOf(value).length();
+        if (value instanceof ZonedDateTime) return ((ZonedDateTime) value).toString().length();
+        if (value instanceof LocalDateTime) return ((LocalDateTime) value).toString().length();
+        // Fallback for DWL quirks like sizeOf("123" as Number) -> 1 or sizeOf(123) -> 1
+        return 1; 
+    }
+
+    // --- Helper for DWL flatten(scan) logic ---
+    private List<String> scanAndFlatten(String input, String regex) {
+        List<String> results = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            results.add(matcher.group(0)); 
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                results.add(matcher.group(i));
+            }
+        }
+        return results;
+    }
+
+    // =========================================================================
+    //                            RUNNER METHOD
+    // =========================================================================
+    @Override
+    public void run(String... args) {
+        System.out.println("=================================================");
+        System.out.println("  DWL Function Equivalents in Java Spring Boot   ");
+        System.out.println("=================================================");
+
+        // --- 1. REPLACE / REGEX ---
+        System.out.println("\n--- 1. String Replace/Regex ---");
+        String r1_str1 = "123-456-7890";
+        String r1_result1_str = r1_str1.replaceAll(".*-", "");
+        Integer r1_result1 = Integer.parseInt(r1_result1_str); 
+        String r1_str2 = "abc123def";
+        String r1_result2 = r1_str2.replaceAll("[b13e]", "-"); 
+        System.out.println("Example 1: " + Arrays.asList(r1_result1, r1_result2)); 
+        String r2_result = "admin123".replaceAll("123", "ID");
+        System.out.println("Example 2: { \"replace\": \"" + r2_result + "\" }"); 
+
+
+        // --- 2. ROUND ---
+        System.out.println("\n--- 2. Round ---");
+        long round1 = Math.round(1.2); 
+        long round2 = Math.round(4.6); 
+        long round3 = Math.round(3.5); 
+        System.out.println("Output: " + Arrays.asList(round1, round2, round3)); 
+
+
+        // --- 3. SCAN / REGEX GROUPING ---
+        System.out.println("\n--- 3. Scan / Regex Grouping ---");
+        String s1_input = "www.mulesoft.com";
+        String s1_regex = "([w]*)\\.([a-z]*)\\.([a-z]*)";
+        List<String> s1_output = scanAndFlatten(s1_input, s1_regex);
+        System.out.println("Example 1 (Flatten): " + s1_output);
+        
+        String s2_input = "anypt@mulesoft.com,max@mulesoft.com";
+        String s2_regex = "([a-z]*)@([a-z]*)\\.com"; 
+        List<List<String>> s2_output = scanMultiple(s2_input, s2_regex);
+        System.out.println("Example 2 (Multiple): " + s2_output);
+        
+
+        // --- 4. SIZE OF / LENGTH ---
+        System.out.println("\n--- 4. SizeOf / Length ---");
+        List<String> so1_array = Arrays.asList("a", "b", "c");
+        System.out.println("SizeOf Array: " + so1_array.size());
+        Map<String, Integer> so2_object = new LinkedHashMap<>();
+        so2_object.put("a", 1);
+        so2_object.put("b", 2);
+        System.out.println("SizeOf Object: " + so2_object.size());
+        System.out.println("SizeOf String: " + "abc".length());
+        
+        // Complex example for demonstration
+        Map<String, Object> temporalSizes = new LinkedHashMap<>();
+        temporalSizes.put("DateTimeSize", sizeOf(ZonedDateTime.parse("2025-07-13T18:06:59.314033Z")));
+        temporalSizes.put("NumberSize", sizeOf(123.45));
+        System.out.println("SizeOf Complex: " + temporalSizes);
+
+
+        // --- 5. SPLIT BY ---
+        System.out.println("\n--- 5. SplitBy ---");
+        String input5 = "192.88.99.0/24";
+        String regex5 = "[./]"; 
+        System.out.println("Regex Split: " + Arrays.asList(input5.split(regex5)));
+        String input6 = "a1b2c3d4A1B2C3D";
+        String[] temp6 = input6.split("[0-9A-Z]", -1);
+        System.out.println("Complex Split: " + Arrays.asList(Arrays.copyOf(temp6, temp6.length - 1)));
+        String input7 = "192.88.99.0";
+        System.out.println("Dot Split: " + Arrays.asList(input7.split(Pattern.quote("."))));
+
+        
+        // --- 6. SQRT ---
+        System.out.println("\n--- 6. Square Root (sqrt) ---");
+        List<Integer> sqrtOutput = Arrays.asList(
+            (int) Math.sqrt(4), 
+            (int) Math.sqrt(25), 
+            (int) Math.sqrt(100)
+        );
+        System.out.println("Output: " + sqrtOutput); 
+        
+        
+        // --- 7. STARTS WITH ---
+        System.out.println("\n--- 7. StartsWith ---");
+        String baseString = "Mari";
+        List<Boolean> startsWithOutput = Arrays.asList(
+            baseString.startsWith("Mar"), 
+            baseString.startsWith("Em") 
+        );
+        System.out.println("Output: " + startsWithOutput); 
+
+        
+        // --- 8. SUM ---
+        System.out.println("\n--- 8. Sum ---");
+        List<Integer> sumInput = Arrays.asList(1, 2, 3);
+        int sumResult = sumInput.stream().mapToInt(Integer::intValue).sum();
+        System.out.println("Output: " + sumResult); 
+        
+        
+        // --- 9. REDUCE THEN CHAIN ---
+        System.out.println("\n--- 9. Reduce / Then Chain ---");
+        List<String> chainInput = Arrays.asList("mariano", "de Achaval");
+        // Reduce part: Concatenate strings
+        String reducedString = chainInput.stream().collect(Collectors.joining());
+        // Then part: sizeOf(result)
+        int chainResult = reducedString.length();
+        System.out.println("chainResult: " + chainResult);
+
+        // Reference part
+        List<String> mappedList = chainInput.stream().map(String::toUpperCase).collect(Collectors.toList()); 
+        Map<String, Object> referenceResult = new LinkedHashMap<>();
+        referenceResult.put("name", mappedList.get(0));
+        referenceResult.put("lastName", mappedList.get(1));
+        referenceResult.put("length", mappedList.size());
+        System.out.println("referenceResult: " + referenceResult);
+
+        System.out.println("\n=================================================");
+    }
+}
+
+
+output:
+--- 1. String Replace/Regex ---
+Example 1: [7890, a-c-2-d-f]
+Example 2: { "replace": "adminID" }
+
+--- 2. Round ---
+Output: [1, 5, 4]
+
+--- 3. Scan / Regex Grouping ---
+Example 1 (Flatten): [www.mulesoft.com, www, mulesoft, com]
+Example 2 (Multiple): [[anypt@mulesoft.com, anypt, mulesoft], [max@mulesoft.com, max, mulesoft]]
+
+--- 4. SizeOf / Length ---
+SizeOf Array: 3
+SizeOf Object: 2
+SizeOf String: 3
+SizeOf Complex: {DateTimeSize=27, NumberSize=6}
+
+--- 5. SplitBy ---
+Regex Split: [192, 88, 99, 0, 24]
+Complex Split: [a, b, c, d]
+Dot Split: [192, 88, 99, 0]
+
+--- 6. Square Root (sqrt) ---
+Output: [2, 5, 10]
+
+--- 7. StartsWith ---
+Output: [true, false]
+
+--- 8. Sum ---
+Output: 6
+
+--- 9. Reduce / Then Chain ---
+chainResult: 17
+referenceResult: {name=MARIANO, lastName=DE ACHAVAL, length=2}
+
+=================================================

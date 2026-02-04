@@ -1,0 +1,45 @@
+log10:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathLog10Route extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateLog10")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Log10 of 10 is 1.0
+                results.put("log1010", Math.log10(10));
+                
+                // Log10 of 0.13
+                results.put("log1013", Math.log10(0.13));
+
+                // Java's Math.log10(-20) returns Double.NaN
+                // We map this to 'null' to match DataWeave output
+                double logVal = Math.log10(-20);
+                results.put("log10-20", (Double.isNaN(logVal) || Double.isInfinite(logVal)) ? null : logVal);
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+
+output:
+
+{
+  "log1010": 1.0,
+  "log1013": -0.8860566476931632,
+  "log10-20": null
+}

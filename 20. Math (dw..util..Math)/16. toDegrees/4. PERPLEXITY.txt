@@ -1,0 +1,65 @@
+toDegrees:
+
+
+
+input:
+
+
+@SpringBootApplication
+public class DataWeaveMathToDegreesApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveMathToDegreesApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/math/toDegrees")
+@RequiredArgsConstructor
+class ToDegreesController {
+    
+    private final MathService mathService;
+    
+    @GetMapping("/test")
+    public Map<String, Double> testToDegrees() {
+        return mathService.executeToDegreesTests();
+    }
+}
+
+@Service
+class MathService {
+    
+    public Map<String, Double> executeToDegreesTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("toDegrees0.17", toDegrees(0.174));
+        result.put("toDegrees0", toDegrees(0.0));
+        result.put("toDegrees-20", toDegrees(-0.20));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave toDegrees() equivalent:
+     * Converts radians to degrees: degrees = radians * (180/π)
+     */
+    public Double toDegrees(double radians) {
+        return Math.toDegrees(radians);
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+{
+  "toDegrees0.17": 9.969465635276324,
+  "toDegrees0": 0.0,
+  "toDegrees-20": -11.459155902616464
+}
+
+

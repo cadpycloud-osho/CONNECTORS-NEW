@@ -1,0 +1,193 @@
+distinctBy:
+
+// DistinctByController.java
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class DistinctByController {
+
+    @GetMapping("/distinct-numbers")
+    public List<Integer> distinctNumbers() {
+        List<Integer> numbers = Arrays.asList(0, 1, 2, 3, 3, 2, 1, 4);
+        return numbers.stream()
+                     .distinct()
+                     .collect(Collectors.toList());
+    }
+
+    @GetMapping("/distinct-authors")
+    public Map<String, Object> distinctAuthors() {
+        List<String> authors = Arrays.asList(
+            "James McGovern", "Per Bothner", "Kurt Cagle", "James Linn",
+            "Kurt Cagle", "Kurt Cagle", "Kurt Cagle", "Vaidyanathan Nagarajan"
+        );
+        
+        Map<String, Object> book = new HashMap<>();
+        book.put("title", "XQuery Kick Start");
+        book.put("year", "2000");
+        book.put("authors", authors.stream()
+                                   .distinct()
+                                   .collect(Collectors.toList()));
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("book", book);
+        return response;
+    }
+}
+
+
+Outputs:
+
+GET /distinct-numbers:
+
+json
+[0, 1, 2, 3, 4]
+GET /distinct-authors:
+
+
+
+json\OUTPUT:
+{
+  "book": {
+    "title": "XQuery Kick Start",
+    "year": "2000",
+    "authors": [
+      "James McGovern",
+      "Per Bothner",
+      "Kurt Cagle",
+      "James Linn",
+      "Vaidyanathan Nagarajan"
+    ]
+  }
+}
+
+
+_____________________________________________________________________-
+distinctBy<K, V>(object: { (K)?: V }, criteria: (value: V, key: K) -> Any): Object
+Removes duplicate key-value pairs from an object.
+
+
+java
+// DistinctByController.java
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class DistinctByController {
+
+    @GetMapping("/distinct-by-object")
+    public List<Map<String, Integer>> distinctByObject() {
+        List<Map<String, Integer>> numbers = Arrays.asList(
+            new HashMap<String, Integer>() {{ put("unique", 0); }},
+            new HashMap<String, Integer>() {{ put("unique", 1); }},
+            new HashMap<String, Integer>() {{ put("unique", 2); }},
+            new HashMap<String, Integer>() {{ put("unique", 3); }},
+            new HashMap<String, Integer>() {{ put("unique", 3); }},
+            new HashMap<String, Integer>() {{ put("unique", 2); }},
+            new HashMap<String, Integer>() {{ put("unique", 1); }},
+            new HashMap<String, Integer>() {{ put("unique", 4); }}
+        );
+        
+        return numbers.stream()
+                     .collect(Collectors.toMap(
+                         item -> item.get("unique"), 
+                         item -> item,
+                         (existing, replacement) -> existing
+                     ))
+                     .values()
+                     .stream()
+                     .collect(Collectors.toList());
+    }
+
+    @GetMapping("/distinct-authors")
+    public Map<String, Object> distinctAuthors() {
+        List<String> authors = Arrays.asList(
+            "James McGovern", "Per Bothner", "Kurt Cagle", "James Linn",
+            "Kurt Cagle", "Kurt Cagle", "Kurt Cagle", "Vaidyanathan Nagarajan"
+        );
+        
+        Map<String, Object> book = new HashMap<>();
+        book.put("title", "XQuery Kick Start");
+        book.put("year", "2000");
+        book.put("authors", authors.stream()
+                                   .distinct()
+                                   .collect(Collectors.toList()));
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("book", book);
+        return response;
+    }
+}
+Outputs:
+
+GET /distinct-by-object:
+
+json
+[
+  {"unique": 0},
+  {"unique": 1}, 
+  {"unique": 2},
+  {"unique": 3},
+  {"unique": 4}
+]
+GET /distinct-authors:
+
+json
+{
+  "book": {
+    "title": "XQuery Kick Start",
+    "year": "2000",
+    "authors": [
+      "James McGovern",
+      "Per Bothner", 
+      "Kurt Cagle",
+      "James Linn",
+      "Vaidyanathan Nagarajan"
+    ]
+  }
+}
+
+
+_______________________________________________________________________-
+
+distinctBy(@StreamCapable items: Null, criteria: (item: Nothing, index: Nothing) -> Any): Null
+
+Helper function that enables distinctBy to work with a null value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

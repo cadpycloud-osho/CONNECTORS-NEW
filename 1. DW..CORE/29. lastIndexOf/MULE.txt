@@ -1,0 +1,83 @@
+lastIndexOf:
+
+lastIndexOf(array: Array, value: Any): Number
+
+lastIndexOf(array: Array, value: Any): Number
+Returns the index of the last occurrence of the specified element in a given array or -1 if the array does not contain the element.
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  present: ["a","b","c","d"] lastIndexOf "c",
+  notPresent: ["x","w","x"] lastIndexOf "c",
+  presentMoreThanOnce: ["a","b","c","c"] lastIndexOf "c",
+}
+
+
+DataWeave
+Output
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+
+____________________________________________________________________
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  present: "abcd" lastIndexOf "c",
+  notPresent: "xyz" lastIndexOf "c",
+  presentMoreThanOnce: "abcdc" lastIndexOf "c",
+}
+
+
+DataWeave
+Output
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

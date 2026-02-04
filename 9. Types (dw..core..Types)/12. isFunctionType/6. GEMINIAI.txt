@@ -1,0 +1,81 @@
+isFunctionType:
+
+
+
+INPUT:
+
+
+package com.example.typecheck.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class FunctionTypeCheckService {
+
+    // Define indicators for function and non-function types
+    private static final String FUNCTION_TYPE_INDICATOR = "->";
+    private static final String PRIMITIVE_BOOLEAN = "Boolean";
+
+    /**
+     * Helper method to simulate DataWeave's isFunctionType() function.
+     * Checks if the given type name/representation is a function type.
+     */
+    private boolean isFunctionType(String typeRepresentation) {
+        // In this emulation, we check if the string representation contains the function structure indicator "->"
+        // AFunction representation: "(String) -> String" (or a derived name)
+        // Boolean representation: "Boolean"
+        return typeRepresentation.contains(FUNCTION_TYPE_INDICATOR);
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, Boolean> checkTypes() {
+        
+        // Emulating the type definitions and uses from the DW script:
+        // AFunction is a function type
+        final String AFunction_Representation = "(String) -> String"; 
+        final String Builtin_Boolean = PRIMITIVE_BOOLEAN;
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: isFunctionType(AFunction), b: isFunctionType(Boolean) }
+        return Map.of(
+            "a", isFunctionType(AFunction_Representation),
+            "b", isFunctionType(Builtin_Boolean)
+        );
+    }
+}
+
+package com.example.typecheck.controller;
+
+import com.example.typecheck.service.FunctionTypeCheckService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final FunctionTypeCheckService functionTypeCheckService;
+
+    public DataWeaveController(FunctionTypeCheckService functionTypeCheckService) {
+        this.functionTypeCheckService = functionTypeCheckService;
+    }
+
+    // Maps to http://localhost:8080/check-function-type
+    @GetMapping("/check-function-type")
+    public Map<String, Boolean> checkFunctionType() {
+        // Calls the service method that holds the transformation logic
+        return functionTypeCheckService.checkTypes();
+    }
+}
+
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+

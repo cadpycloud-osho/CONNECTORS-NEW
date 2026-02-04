@@ -1,0 +1,290 @@
+mask:
+
+example 1:
+
+
+input:
+
+public class UserSource {
+    private String name;
+    private String password; // Original password
+
+    // Constructor, Getters, and Setters
+    public UserSource(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
+    // ... (Getters/Setters omitted for brevity)
+    public String getName() { return name; }
+    public String getPassword() { return password; }
+    public void setName(String name) { this.name = name; }
+    public void setPassword(String password) { this.password = password; }
+}
+
+public class UserOutput {
+    private String name;
+    private String password; // Masked password
+
+    // Constructor, Getters, and Setters
+    // ... (Omitted for brevity, follows standard JavaBean pattern)
+    public String getName() { return name; }
+    public String getPassword() { return password; }
+    public void setName(String name) { this.name = name; }
+    public void setPassword(String password) { this.password = password; }
+}
+
+
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class UserTransformationService {
+
+    private static final String MASKED_VALUE = "*****";
+
+    /**
+     * Transforms a list of UserSource objects into UserOutput objects, masking the password.
+     * This mimics the DataWeave mapping logic.
+     */
+    public List<UserOutput> maskUserPasswords(List<UserSource> users) {
+        return users.stream()
+            .map(sourceUser -> {
+                UserOutput outputUser = new UserOutput();
+                outputUser.setName(sourceUser.getName());
+                // The core DataWeave transformation: setting a fixed, masked value
+                outputUser.setPassword(MASKED_VALUE); 
+                return outputUser;
+            })
+            .collect(Collectors.toList());
+    }
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+public class DataWeaveController {
+
+    private final UserTransformationService service;
+
+    public DataWeaveController(UserTransformationService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/masked-users")
+    public List<UserOutput> getMaskedUsers() {
+        // Sample Source Data (The input to the transformation)
+        List<UserSource> sourceData = Arrays.asList(
+            new UserSource("Peter Parker", "spidey123"),
+            new UserSource("Bruce Wayne", "batcave456")
+        );
+        
+        // Apply the transformation
+        return service.maskUserPasswords(sourceData);
+    }
+}
+output:
+
+[
+  {
+    "name": "Peter Parker",
+    "password": "*****"
+  },
+  {
+    "name": "Bruce Wayne",
+    "password": "*****"
+  }
+]
+
+
+--------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+public class UserSource {
+    private String name;
+    private String password; // Original password
+
+    // Constructor, Getters, and Setters (needed for Jackson/Spring)
+    public UserSource() {}
+    public UserSource(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
+    public String getName() { return name; }
+    public String getPassword() { return password; }
+    public void setName(String name) { this.name = name; }
+    public void setPassword(String password) { this.password = password; }
+}
+
+public class UserOutput {
+    private String name;
+    private String password; // Masked password
+
+    // Constructor, Getters, and Setters
+    public UserOutput() {}
+    public String getName() { return name; }
+    public String getPassword() { return password; }
+    public void setName(String name) { this.name = name; }
+    public void setPassword(String password) { this.password = password; }
+}
+
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class UserTransformationService {
+
+    private static final String MASKED_VALUE = "*****";
+
+    /**
+     * Transforms a list of UserSource objects into UserOutput objects, masking the password.
+     * This directly implements the DataWeave 'mask' operator logic.
+     */
+    public List<UserOutput> maskUserPasswords(List<UserSource> users) {
+        return users.stream()
+            .map(sourceUser -> {
+                UserOutput outputUser = new UserOutput();
+                outputUser.setName(sourceUser.getName());
+                // DataWeave Masking operation: set fixed value
+                outputUser.setPassword(MASKED_VALUE); 
+                return outputUser;
+            })
+            .collect(Collectors.toList());
+    }
+}
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class UserTransformationService {
+
+    private static final String MASKED_VALUE = "*****";
+
+    /**
+     * Transforms a list of UserSource objects into UserOutput objects, masking the password.
+     * This directly implements the DataWeave 'mask' operator logic.
+     */
+    public List<UserOutput> maskUserPasswords(List<UserSource> users) {
+        return users.stream()
+            .map(sourceUser -> {
+                UserOutput outputUser = new UserOutput();
+                outputUser.setName(sourceUser.getName());
+                // DataWeave Masking operation: set fixed value
+                outputUser.setPassword(MASKED_VALUE); 
+                return outputUser;
+            })
+            .collect(Collectors.toList());
+    }
+}
+output:
+
+
+
+[
+  {
+    "name": "Peter Parker",
+    "password": "*****"
+  },
+  {
+    "name": "Bruce Wayne",
+    "password": "*****"
+  }
+]
+
+
+--------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class ArrayMaskingService {
+
+    private static final int TARGET_INDEX = 1;
+    private static final Boolean MASK_VALUE = false;
+
+    /**
+     * Transforms a list of inner lists, masking the element at the target index.
+     * This mimics the DataWeave 'mask 1 with false' logic.
+     */
+    public List<List<Object>> maskInnerArrays(List<List<Object>> sourceData) {
+        
+        return sourceData.stream()
+            .map(innerList -> {
+                // Create a mutable copy to modify the element
+                List<Object> maskedList = new ArrayList<>(innerList);
+                
+                // Check if the target index is valid for the inner list
+                if (maskedList.size() > TARGET_INDEX) {
+                    // DataWeave masking operation: replace the value at the index
+                    maskedList.set(TARGET_INDEX, MASK_VALUE);
+                }
+                return maskedList;
+            })
+            .collect(Collectors.toList());
+    }
+}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+public class DataWeaveController {
+
+    private final ArrayMaskingService service;
+
+    public DataWeaveController(ArrayMaskingService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/masked-arrays")
+    public List<List<Object>> getMaskedArrays() {
+        
+        // Sample Source Data: List of Lists containing Integer and Boolean
+        List<List<Object>> sourceData = Arrays.asList(
+            Arrays.asList(123, true),
+            Arrays.asList(456, true)
+        );
+        
+        // Apply the transformation/masking
+        return service.maskInnerArrays(sourceData);
+    }
+}
+
+output:
+
+
+[
+  [
+    123,
+    false
+  ],
+  [
+    456,
+    false
+  ]
+]
+
+
+--------------------------------------------------------------------------

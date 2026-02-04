@@ -1,0 +1,68 @@
+duration:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+public class DurationRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:duration")
+            .process(exchange -> {
+                ZonedDateTime base = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // dayAfterDateTime: + duration({days: 1})
+                result.put("dayAfterDateTime", base.plusDays(1).toString());
+                
+                // dayAndHourBeforeDateTime: - duration({days: 1, hours: 1})
+                result.put("dayAndHourBeforeDateTime", base.minusDays(1).minusHours(1).toString());
+                
+                // pointInTimeBefore: - duration({days: 1, hours: 1, minutes: 20, seconds: 10})
+                result.put("pointInTimeBefore", base.minusDays(1).minusHours(1).minusMinutes(20).minusSeconds(10).toString());
+                
+                // emptyDuration: duration({})
+                result.put("emptyDuration", "PT0S");
+                
+                // constructDuration: duration({days:4, hours:11, minutes:28}) → 4*24 + 11 = 107h
+                result.put("constructDuration", "PT107H28M");
+                
+                // selectHoursFromDuration: .hours → 11
+                result.put("selectHoursFromDuration", 11);
+                
+                // decimalAsPeriod: duration({seconds: 30.5})
+                result.put("decimalAsPeriod", "PT30.5S");
+                
+                // addNegativeValue: duration({minutes:1}) + duration({seconds:-1}) → 59s
+                result.put("addNegativeValue", 59);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+
+output:
+
+{
+  "dayAfterDateTime": "2020-10-06T20:22:34.385Z",
+  "dayAndHourBeforeDateTime": "2020-10-04T19:22:34.385Z",
+  "pointInTimeBefore": "2020-10-04T19:02:24.385Z",
+  "emptyDuration": "PT0S",
+  "constructDuration": "PT107H28M",
+  "selectHoursFromDuration": 11,
+  "decimalAsPeriod": "PT30.5S",
+  "addNegativeValue": 59
+}
+
+
+

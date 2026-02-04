@@ -1,0 +1,170 @@
+toDateTime:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DateTimeCoercionController {
+
+    @GetMapping("/datetime")
+    public Map<String, String> getDateTime() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: successful conversion using second formatter
+        result.put("a", toDateTime(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz",
+                        "uuuu-MM-dd HH:mm:ssz"
+                }
+        ));
+
+        // b: error message when formatter list fails
+        result.put("b", tryToDateTime(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz"
+                }
+        ));
+
+        return result;
+    }
+
+    private String toDateTime(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                ZonedDateTime zdt = ZonedDateTime.parse(value, formatter);
+                return zdt.toString(); // ISO-8601
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    private String tryToDateTime(String value, String[] formats) {
+        try {
+            return toDateTime(value, formats);
+        } catch (RuntimeException e) {
+            return e.getMessage();
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": "2003-10-01T23:57:59Z",
+  "b": "Could not find a valid formatter for '2003-10-01 23:57:59Z'"
+}
+
+
+
+
+----------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+    fromEpoch: toDateTime(1443743879),
+    fromMillis: toDateTime(1443743879000, "milliseconds")
+}
+
+
+DataWeave
+Output
+{
+  fromEpoch: |2015-10-01T23:57:59Z|,
+  fromMillis: |2015-10-01T23:57:59Z| as DateTime {unit: "milliseconds"}
+}
+
+convert this  mule code into  first spring boot
+ code and  second pure java code separately and give me output
+
+output:
+
+{
+  "fromEpoch": "2015-10-01T23:57:59Z",
+  "fromMillis": "2015-10-01T23:57:59Z"
+}
+
+
+----------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DateTimeController {
+
+    @GetMapping("/datetime/simple")
+    public Map<String, String> getDateTimes() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // a: ISO-8601 format (automatic parsing)
+        ZonedDateTime a = ZonedDateTime.parse("2015-10-01T23:57:59Z");
+
+        // b: custom formatter
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssz");
+        ZonedDateTime b =
+                ZonedDateTime.parse("2003-10-01 23:57:59Z", formatter);
+
+        result.put("a", a.toString());
+        result.put("b", b.toString());
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "2015-10-01T23:57:59Z",
+  "b": "2003-10-01T23:57:59Z"
+}
+
+
+
+

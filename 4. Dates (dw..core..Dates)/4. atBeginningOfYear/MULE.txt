@@ -1,0 +1,84 @@
+atBeginningOfYear:
+
+atBeginningOfYear(dateTime: DateTime): DateTime
+
+atBeginningOfYear(dateTime: DateTime): DateTime
+Takes a DateTime value as input and returns a DateTime value for the first day of the year specified in the input. It also sets the Time value to 00:00:00.
+
+The month, day, and time in the input changes to 01-01T00:00:00.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfYearDateTime: atBeginningOfYear(|2020-10-06T18:23:20.351-03:00|)
+}
+
+DataWeave
+Output
+{
+  "atBeginningOfYearDateTime": "2020-01-01T00:00:00.000-03:00"
+}
+
+
+-----------------------------------------------------------------
+
+atBeginningOfYear(localDateTime: LocalDateTime): LocalDateTime
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfYearLocalDateTime: atBeginningOfYear(|2020-10-06T18:23:20.351|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfYearLocalDateTime": "2020-01-01T00:00:00"
+}
+
+
+
+
+---------------------------------------------------------------
+
+atBeginningOfYear(date: Date): Date
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfYearDate: atBeginningOfYear(|2020-10-06|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfYearDate": "2020-01-01"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

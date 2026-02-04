@@ -1,0 +1,67 @@
+leftPad:
+
+leftPad(text: String, size: Number, padText: String = " "): String
+
+leftPad(text: String, size: Number, padText: String = " "): String
+The specified text is left-padded to the size using the padText. By default padText is " ".
+
+Returns left-padded String or original String if no padding is necessary.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+   "a": leftPad(null, 3),
+   "b": leftPad("", 3),
+   "c": leftPad("bat", 5),
+   "d": leftPad("bat", 3),
+   "e": leftPad("bat", -1)
+}
+
+
+DataWeave
+Output
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

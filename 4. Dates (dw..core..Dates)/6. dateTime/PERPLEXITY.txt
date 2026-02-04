@@ -1,0 +1,32 @@
+dateTime:
+
+
+
+input:
+
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/create-date-time")
+    public Map<String, String> createNewDateTime() {
+        LocalDateTime dateTime = LocalDateTime.of(2012, 10, 11, 12, 30, 40);
+        ZoneOffset zoneOffset = ZoneOffset.of("-03:00");
+        ZonedDateTime newDateTime = dateTime.atOffset(zoneOffset).toZonedDateTime();
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("newDateTime", newDateTime.toString());
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "newDateTime": "2012-10-11T12:30:40-03:00"
+}
+
+

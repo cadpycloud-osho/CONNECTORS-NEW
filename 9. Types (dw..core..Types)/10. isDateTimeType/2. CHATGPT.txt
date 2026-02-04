@@ -1,0 +1,56 @@
+isDateTimeType:
+
+
+
+INPUT:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static boolean isDateTimeType(Class<?> type) {
+        return type == java.time.LocalDateTime.class ||
+               type == java.time.ZonedDateTime.class ||
+               type == java.time.OffsetDateTime.class ||
+               type == java.time.Instant.class;
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class DateTimeTypeController {
+
+    @GetMapping("/isDateTimeType")
+    public Map<String, Boolean> checkDateTimeTypes() {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to "type ADateTime = DateTime" → LocalDateTime alias
+        Class<?> ADateTime = LocalDateTime.class;
+
+        result.put("a", TypeUtils.isDateTimeType(ADateTime));
+        result.put("b", TypeUtils.isDateTimeType(LocalDateTime.class));
+        result.put("c", TypeUtils.isDateTimeType(String.class));
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

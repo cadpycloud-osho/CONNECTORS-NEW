@@ -1,0 +1,41 @@
+isObjectType:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // This class represents the DataWeave type AType = {name: String}
+    static class AType {
+        String name;
+    }
+
+    public static boolean isObjectType(Class<?> type) {
+        return !(type.isPrimitive() ||
+                 type.equals(Boolean.class) ||
+                 type.equals(Integer.class) ||
+                 type.equals(Double.class) ||
+                 type.equals(String.class));
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", isObjectType(AType.class));
+        result.put("b", isObjectType(Boolean.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=true, b=false}
+
+

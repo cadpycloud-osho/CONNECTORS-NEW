@@ -1,0 +1,46 @@
+valuesOf:
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
+
+@SpringBootApplication
+public class ValuesOfExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ValuesOfExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        // Java Map representing the DWL Object {a: true, b: 1}
+        Map<String, Object> inputObject = new LinkedHashMap<>();
+        inputObject.put("a", true);
+        inputObject.put("b", 1);
+        
+        // Java equivalent of DWL valuesOf(): Map.values()
+        // This returns a Collection of the map's values.
+        Collection<Object> values = inputObject.values();
+        
+        // Convert the Collection to a List to match the JSON array output
+        List<Object> valuesList = List.copyOf(values);
+        
+        // Map to mimic the final JSON object structure { "valuesOf" : [...] }
+        Map<String, List<Object>> outputMap = new LinkedHashMap<>();
+        outputMap.put("valuesOf", valuesList);
+        
+        System.out.println("--- DWL valuesOf Equivalent Output ---");
+        System.out.println(outputMap); 
+    }
+}
+
+
+output:
+
+{valuesOf=[true, 1]}

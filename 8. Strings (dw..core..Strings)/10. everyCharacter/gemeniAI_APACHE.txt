@@ -1,0 +1,29 @@
+everyCharacter:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class EveryCharacterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:validateString")
+            .process(exchange -> {
+                String input = "12 34  56";
+
+                // Java streams 'allMatch' checks the predicate against every char
+                boolean isValid = input.chars()
+                    .allMatch(c -> c == ' ' || Character.isDigit((char) c));
+
+                exchange.getIn().setBody(isValid);
+            });
+    }
+}
+
+
+output:
+
+true
+

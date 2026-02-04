@@ -1,0 +1,102 @@
+isArrayType:
+
+
+
+input:
+
+
+@SpringBootApplication
+public class DataWeaveTreeIsArrayTypeApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTreeIsArrayTypeApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/tree")
+@RequiredArgsConstructor
+class TreeController {
+    
+    private final TreeService treeService;
+    
+    @GetMapping("/isArrayType")
+    public Map<String, Boolean> isArrayType() {
+        return treeService.executeIsArrayTypeTests();
+    }
+}
+
+@Service
+class TreeService {
+    
+    public Map<String, Boolean> executeIsArrayTypeTests() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // a: [OBJECT_TYPE(user), ATTRIBUTE_TYPE(name)] → false
+        List<TreeNode> pathA = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("a", TreeTypeChecker.isArrayType(pathA));
+        
+        // b: [OBJECT_TYPE(user), ARRAY_TYPE(0)] → true
+        List<TreeNode> pathB = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ARRAY_TYPE", "0", null)
+        );
+        result.put("b", TreeTypeChecker.isArrayType(pathB));
+        
+        // c: [ARRAY_TYPE(0)] → true
+        List<TreeNode> pathC = Arrays.asList(
+            new TreeNode("ARRAY_TYPE", "0", null)
+        );
+        result.put("c", TreeTypeChecker.isArrayType(pathC));
+        
+        return result;
+    }
+    
+    public static class TreeNode {
+        private final String kind;
+        private final String selector;
+        private final String namespace;
+        
+        public TreeNode(String kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+        
+        public String getKind() { return kind; }
+        public String getSelector() { return selector; }
+        public String getNamespace() { return namespace; }
+    }
+}
+
+class TreeTypeChecker {
+    
+    /**
+     * DataWeave Tree.isArrayType() equivalent:
+     * Returns true if path contains ARRAY_TYPE node
+     */
+    public static boolean isArrayType(List<TreeService.TreeNode> path) {
+        return path.stream().anyMatch(node -> "ARRAY_TYPE".equals(node.getKind()));
+    }
+}
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+
+
+
+

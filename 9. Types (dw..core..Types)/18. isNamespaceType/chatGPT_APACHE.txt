@@ -1,0 +1,72 @@
+isNamespaceType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelNamespaceTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type ANamespace = Namespace (alias simulation)
+                        Class<?> ANamespace = Namespace.class;
+
+                        // Simulating DataWeave isNamespaceType
+                        boolean a = isNamespaceType(ANamespace);
+                        boolean b = isNamespaceType(Namespace.class);
+                        boolean c = isNamespaceType(String.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + ",\n" +
+                                "  \"c\": " + c + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave isNamespaceType
+    private static boolean isNamespaceType(Class<?> clazz) {
+        return clazz == Namespace.class;
+    }
+
+    // Simulating DataWeave Namespace type
+    interface Namespace {
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

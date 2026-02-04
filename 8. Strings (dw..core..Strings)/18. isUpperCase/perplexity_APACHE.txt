@@ -1,0 +1,44 @@
+isUpperCase:
+
+input:
+
+import java.util.*;
+
+public class IsUpperCaseConverter {
+    public static boolean isUpperCase(String input) {
+        if (input == null || input.isEmpty()) return false;
+        
+        return input.chars()
+                   .allMatch(Character::isUpperCase);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isUpperCase(null));
+        result.put("b", isUpperCase(""));
+        result.put("c", isUpperCase("  "));
+        result.put("d", isUpperCase("ABC"));
+        result.put("e", isUpperCase("aBC"));
+        result.put("f", isUpperCase("A C"));
+        result.put("g", isUpperCase("A1C"));
+        result.put("h", isUpperCase("A/C"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}
+
+

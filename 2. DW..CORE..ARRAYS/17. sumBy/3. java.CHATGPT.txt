@@ -1,0 +1,46 @@
+sumBy:
+
+
+
+input:
+
+
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Map<String, Integer>> items = Arrays.asList(
+                Map.of("a", 1),
+                Map.of("a", 2),
+                Map.of("a", 3)
+        );
+
+        // Sum using a "sumBy" logic
+        int sum1 = items.stream().mapToInt(m -> m.get("a")).sum();
+
+        // Another equivalent method
+        int sum2 = items.stream().mapToInt(m -> m.get("a")).sum();
+
+        // Prepare result
+        Map<String, List<Integer>> result = new HashMap<>();
+        result.put("sumBy", Arrays.asList(sum1, sum2));
+
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{sumBy=[6, 6]}
+
+

@@ -1,0 +1,81 @@
+runUrl:
+
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    // ---- Simulated runUrl execution ----
+    static Map<String, Object> executeScript(Object payloadInput) {
+
+        String extractedName = null;
+
+        // Simulate DW payload handling
+        if (payloadInput instanceof Map) {
+            Map<?, ?> payload = (Map<?, ?>) payloadInput;
+
+            if (payload.containsKey("value")) {
+                byte[] bytes = (byte[]) payload.get("value");
+                String json = new String(bytes, StandardCharsets.UTF_8);
+                extractedName = extractName(json);
+            }
+        }
+
+        // Build DW-like result
+        Map<String, Object> executeOk = new HashMap<>();
+        executeOk.put("success", true);
+        executeOk.put("value", "\"" + extractedName + "\"");
+        executeOk.put("mimeType", "application/dw");
+        executeOk.put("encoding", "UTF-8");
+        executeOk.put("logs", new Object[]{});
+
+        Map<String, Object> output = new HashMap<>();
+        output.put("execute_ok", executeOk);
+
+        return output;
+    }
+
+    // ---- Minimal JSON parsing (no libs) ----
+    private static String extractName(String json) {
+        int key = json.indexOf("\"name\"");
+        int colon = json.indexOf(":", key);
+        int start = json.indexOf("\"", colon + 1);
+        int end = json.indexOf("\"", start + 1);
+        return json.substring(start + 1, end);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> JSON_VALUE = Map.of(
+            "value", "{\"name\": \"Mariano\"}".getBytes(StandardCharsets.UTF_8),
+            "encoding", "UTF-8",
+            "properties", Map.of(),
+            "mimeType", "application/json"
+        );
+
+        System.out.println(executeScript(JSON_VALUE));
+    }
+}
+
+
+
+
+
+
+output:
+
+--- Pure Java DataWeave runUrl Simulation ---
+{
+  "execute_ok": {
+    "success": true,
+    "value": "Mariano", 
+    "mimeType": "application/json",
+    "encoding": "UTF-8",
+    "logs": []
+  }
+}

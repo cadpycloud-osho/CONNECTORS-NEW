@@ -1,0 +1,63 @@
+isInteger:
+
+
+
+input:
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    // Equivalent of DataWeave isInteger()
+    private static boolean isInteger(Object value) {
+
+        if (value == null) {
+            return false;
+        }
+
+        // Integer types
+        if (value instanceof Integer || value instanceof Long
+                || value instanceof Short || value instanceof Byte) {
+            return true;
+        }
+
+        // Floating-point numbers
+        if (value instanceof Double || value instanceof Float) {
+            double d = ((Number) value).doubleValue();
+            return d % 1 == 0;
+        }
+
+        // String values
+        if (value instanceof String) {
+            try {
+                BigDecimal bd = new BigDecimal((String) value);
+                return bd.stripTrailingZeros().scale() <= 0;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        List<Boolean> result = Arrays.asList(
+                isInteger(1),
+                isInteger(2.0),
+                isInteger(2.2),
+                isInteger("1")
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, true, false, true]
+
+

@@ -1,0 +1,24 @@
+indexWhere:
+
+
+input:
+
+
+@GetMapping("/indexWhere")
+public int indexWhereExample() {
+
+    List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+
+    for (int i = 0; i < users.size(); i++) {
+        if (users.get(i).startsWith("Jul")) {
+            return i;  // return the index like DataWeave indexWhere
+        }
+    }
+
+    return -1; // if no match found (same behavior concept)
+}
+
+
+output:
+
+2

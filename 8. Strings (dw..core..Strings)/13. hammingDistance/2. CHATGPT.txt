@@ -1,0 +1,57 @@
+hammingDistance:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static int hammingDistance(String s1, String s2) {
+        if (s1.length() != s2.length()) {
+            throw new IllegalArgumentException("Strings must be same length");
+        }
+
+        int distance = 0;
+        for (int i = 0; i < s1.length(); i++) {
+            if (s1.charAt(i) != s2.charAt(i)) {
+                distance++;
+            }
+        }
+        return distance;
+    }
+}
+
+Spring Boot Controller:
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class HammingController {
+
+    @GetMapping("/hamming")
+    public Map<String, Integer> getHamming() {
+        Map<String, Integer> result = new HashMap<>();
+
+        int distance = StringUtils.hammingDistance("holu", "chau");
+
+        result.put("hammingDistance", distance);
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "hammingDistance": 3
+}
+

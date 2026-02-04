@@ -1,0 +1,80 @@
+try:
+
+
+input:
+
+import java.util.*;
+
+public class TryFailSimulation {
+
+    static Map<String, Object> runtimeTry(SupplierWithException supplier) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        try {
+            Object value = supplier.get();
+            result.put("success", true);
+            result.put("result", value);
+        } catch (RuntimeException e) {
+            Map<String, Object> error = new LinkedHashMap<>();
+            error.put("kind", "UserException");
+            error.put("message", e.getMessage());
+            error.put("location", "Unknown location");
+
+            error.put("stack", List.of(
+                    "fail (anonymous:0:0)",
+                    "randomNumber (anonymous:1:114)",
+                    "main (anonymous:1:179)"
+            ));
+
+            result.put("success", false);
+            result.put("error", error);
+        }
+
+        return result;
+    }
+
+    static Object randomNumber() {
+        if (Math.random() > 0.5) {
+            throw new RuntimeException("This function is failing");
+        }
+        return "OK";
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> output =
+                runtimeTry(TryFailSimulation::randomNumber);
+
+        System.out.println(output);
+    }
+
+    @FunctionalInterface
+    interface SupplierWithException {
+        Object get();
+    }
+}
+
+
+output:
+
+{
+  "success": false,
+  "error": {
+    "kind": "UserException",
+    "message": "This function is failing",
+    "location": "Unknown location",
+    "stack": [
+      "fail (anonymous:0:0)",
+      "randomNumber (anonymous:1:114)",
+      "main (anonymous:1:179)"
+    ]
+  }
+}
+
+
+
+{
+  "success": true,
+  "result": "OK"
+}
+

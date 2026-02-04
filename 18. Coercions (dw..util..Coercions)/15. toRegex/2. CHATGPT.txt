@@ -1,0 +1,43 @@
+toRegex:
+
+
+input:
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+@RestController
+public class RegexController {
+
+    @GetMapping("/regex")
+    public Map<String, String> getRegex() {
+
+        Map<String, String> result = new HashMap<>();
+
+        // Equivalent of DW toRegex
+        Pattern toRegexEx1 = Pattern.compile("a-Z");
+        Pattern toRegexEx2 = Pattern.compile("0-9+");
+
+        // For JSON output, we return the pattern strings
+        result.put("toRegexEx1", toRegexEx1.pattern());
+        result.put("toRegexEx2", toRegexEx2.pattern());
+
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "toRegexEx1": "a-Z",
+  "toRegexEx2": "0-9+"
+}
+
+

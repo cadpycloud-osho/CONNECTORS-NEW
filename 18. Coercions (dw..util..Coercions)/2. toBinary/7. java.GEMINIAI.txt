@@ -1,0 +1,78 @@
+toBinary:
+
+
+
+input:
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    private final String sourceString = "DW";
+
+    /**
+     * Utility method to encode the string to a byte array and then to Base64.
+     */
+    private String toBinaryBase64(String charsetName) {
+        try {
+            // Use StandardCharsets for reliability where possible, or String constructor
+            byte[] bytes;
+            if (charsetName.equals("UTF-16")) {
+                // Use "UTF-16" to get the BOM (FF FE) needed for the expected Base64 output: /v8ARABX
+                bytes = sourceString.getBytes("UTF-16");
+            } else {
+                // Get the byte array using the specified character set
+                bytes = sourceString.getBytes(charsetName);
+            }
+            
+            // Encode the byte array to Base64
+            return Base64.getEncoder().encodeToString(bytes);
+        } catch (UnsupportedEncodingException e) {
+            // Should not happen for standard charsets like UTF-16, UTF-16BE, UTF-32BE
+            System.err.println("Unsupported Encoding: " + charsetName);
+            return null;
+        }
+    }
+
+    public Map<String, String> getBinaryMap() {
+        // Base64 encoded values
+        
+        // Use "UTF-16" to match the expected Base64 output, which includes the BOM (FF FE)
+        String utf16Base64 = toBinaryBase64("UTF-16"); 
+        
+        // UTF-32BE does not include a BOM
+        String utf32Base64 = toBinaryBase64("UTF-32BE");
+
+        // Create the root object (Map in Java)
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results to the map
+        rootMap.put("UTF-16Ex", utf16Base64);
+        rootMap.put("utf16Ex", utf16Base64);
+        rootMap.put("UnicodeBigEx", utf16Base64);
+        rootMap.put("UTF-32Ex", utf32Base64);
+        rootMap.put("UTF_32Ex", utf32Base64);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, String> result = converter.getBinaryMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+{UTF-32Ex=AAAARAAAAFc=, UTF-16Ex=/v8ARABX, UnicodeBigEx=/v8ARABX, UTF_32Ex=AAAARAAAAFc=, utf16Ex=/v8ARABX}
+

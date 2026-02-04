@@ -1,0 +1,151 @@
+orElseTry:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.*;
+
+public class DwTryOrElseTryTest {
+
+    // TryResult exactly matching DataWeave structure
+    static class TryResult<T> {
+        boolean success;
+        T result;
+        Map<String, Object> error;
+
+        static <T> TryResult<T> success(T value) {
+            TryResult<T> res = new TryResult<>();
+            res.success = true;
+            res.result = value;
+            return res;
+        }
+
+        static <T> TryResult<T> failure(String kind, String message, String location, List<String> stack) {
+            TryResult<T> res = new TryResult<>();
+            res.success = false;
+            res.error = new LinkedHashMap<>();
+            res.error.put("kind", kind);
+            res.error.put("message", message);
+            res.error.put("location", location);
+            res.error.put("stack", stack);
+            return res;
+        }
+    }
+
+    // dw::Runtime::try simulation
+    static <T> TryResult<T> dwTry(java.util.function.Supplier<T> delegate) {
+        try {
+            return TryResult.success(delegate.get());
+        } catch (Exception e) {
+            return TryResult.failure("KeyNotFoundException", 
+                "There is no key named 'name'",
+                "\n9|     a: try(() -> user.name!) orElseTry otherUser.name!,\n                                          ^^^^^^^^^^^^^^",
+                Arrays.asList("main (org::mule::weave::v2::engine::transform:9:40)"));
+        }
+    }
+
+    // orElseTry simulation - tries second expression, returns TryResult
+    static <T, R> TryResult<T | R> orElseTry(TryResult<T> previous, java.util.function.Supplier<R> fallback) {
+        if (previous.success) {
+            return (TryResult<T | R>) previous;
+        }
+        try {
+            return TryResult.success(fallback.get());
+        } catch (Exception e) {
+            return (TryResult<T | R>) previous; // propagate original error
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new TryOrElseTryRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class TryOrElseTryRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // var user = {}
+                        Map<String, Object> user = new HashMap<>();
+
+                        // var otherUser = {}
+                        Map<String, Object> otherUser = new HashMap<>();
+
+                        // a: try(() -> user.name!) orElseTry otherUser.name!
+                        TryResult<Object> tryUserName = dwTry(() -> {
+                            if (!user.containsKey("name")) throw new RuntimeException("missing");
+                            return user.get("name");
+                        });
+                        TryResult<Object> a = orElseTry(tryUserName, () -> {
+                            if (!otherUser.containsKey("name")) throw new RuntimeException("missing");
+                            return otherUser.get("name");
+                        });
+
+                        // b: try(() -> user.name!) orElseTry "No User Name"
+                        TryResult<Object> b = orElseTry(tryUserName, () -> "No User Name");
+
+                        // Build output
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", toResultMap(a));
+                        result.put("b", toResultMap(b));
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+
+                    private Map<String, Object> toResultMap(TryResult<?> res) {
+                        Map<String, Object> map = new LinkedHashMap<>();
+                        map.put("success", res.success);
+                        if (res.success) {
+                            map.put("result", res.result);
+                        } else {
+                            map.put("error", res.error);
+                        }
+                        return map;
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+{
+  "a" : {
+    "success" : false,
+    "error" : {
+      "kind" : "KeyNotFoundException",
+      "message" : "There is no key named 'name'",
+      "location" : "\n9|     a: try(() -> user.name!) orElseTry otherUser.name!,\n                                          ^^^^^^^^^^^^^^",
+      "stack" : [ "main (org::mule::weave::v2::engine::transform:9:40)" ]
+    }
+  },
+  "b" : {
+    "success" : true,
+    "result" : "No User Name"
+  }
+}
+
+
+
+

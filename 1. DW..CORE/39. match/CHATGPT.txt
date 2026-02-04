@@ -1,0 +1,97 @@
+match:
+
+EXAMPLE 1:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
+@SpringBootApplication
+@RestController
+public class RegexController1 {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RegexController1.class, args);
+    }
+
+    @GetMapping("/example1")
+    public List<String> getMatchResult() {
+        String input = "me@mulesoft.com";
+        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+        Matcher matcher = pattern.matcher(input);
+
+        List<String> result = new ArrayList<>();
+        if (matcher.find()) {
+            result.add(matcher.group(0)); // Full match
+            result.add(matcher.group(1)); // First group
+            result.add(matcher.group(2)); // Second group
+        }
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+[
+  "me@mulesoft.com",
+  "me",
+  "mulesoft"
+]
+
+____________________________________________________________________
+
+EXAMPLE 2:
+
+INPUT:
+
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+@RestController
+public class RegexController2 {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RegexController2.class, args);
+    }
+
+    @GetMapping("/example2")
+    public List<String> filterIPs() {
+        List<String> ips = Arrays.asList("192.88.99.0/24", "192.168.0.0/16", "192.175.48.0/24");
+
+        Pattern regex = Pattern.compile(".*4$"); // match ending with 4 before end
+        return ips.stream()
+                .filter(ip -> regex.matcher(ip).find())
+                .collect(Collectors.toList());
+    }
+}
+
+OUTPUT:
+
+[
+  "192.88.99.0/24",
+  "192.175.48.0/24"
+]
+

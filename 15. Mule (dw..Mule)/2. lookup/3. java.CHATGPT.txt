@@ -1,0 +1,40 @@
+lookup:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Equivalent of flow2
+    public static String flow2(Map<String, Object> payload) {
+        String result = payload.get("test") + "world";
+        System.out.println("LOG: " + result); // Logger
+        return result;
+    }
+
+    // Equivalent of flow1
+    public static String flow1() {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("test", "hello ");
+
+        // Mule::lookup("flow2", payload)
+        return flow2(payload);
+    }
+
+    public static void main(String[] args) {
+        String response = flow1();
+        System.out.println(response);
+    }
+}
+
+
+output:
+
+
+LOG: hello world
+hello world
+
+

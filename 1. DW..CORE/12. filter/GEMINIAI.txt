@@ -1,0 +1,507 @@
+filter:
+
+
+INPUT:
+
+package com.example.filterdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class FilterController {
+
+    /**
+     * Replicates the DataWeave expression: [9,2,3,4,5] filter (value, index) -> (value > 2)
+     * @return The list containing only elements greater than 2.
+     */
+    @GetMapping("/filterNumbers")
+    public List<Integer> filterNumbers() {
+        // The source array
+        List<Integer> numbers = Arrays.asList(9, 2, 3, 4, 5);
+
+        // DataWeave 'filter' equivalent using Java Streams:
+        List<Integer> filteredList = numbers.stream()
+                // The Predicate (value > 2) is applied to each element
+                .filter(value -> value > 2)
+                .collect(Collectors.toList());
+
+        return filteredList;
+    }
+}
+
+
+
+package com.example.filterdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FilterDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FilterDemoApplication.class, args);
+    }
+}
+
+OUTPUT:
+
+
+[
+  9,
+  3,
+  4,
+  5
+]
+
+
+_____________________________________________________________________
+
+
+INPUT:
+
+package com.example.filterobjectdemo;
+
+// Records are concise classes for data carriers (Java 16+)
+// If using an older Java version, use a traditional class with constructor, getters, and setters
+public record Person(String name, int age) {
+    // Lombok equivalent: @Data @AllArgsConstructor
+}
+
+package com.example.filterobjectdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class FilterObjectController {
+
+    /**
+     * Replicates the DataWeave expression: filter ((value, index) -> value.age >= 30)
+     * @return The list containing only Person objects with age >= 30.
+     */
+    @GetMapping("/filterByAge")
+    public List<Person> filterByAge() {
+        
+        // The source list of objects
+        List<Person> people = Arrays.asList(
+            new Person("Mariano", 37), 
+            new Person("Shoki", 30), 
+            new Person("Tomo", 25), 
+            new Person("Ana", 29)
+        );
+
+        // DataWeave 'filter' equivalent using Java Streams:
+        List<Person> filteredList = people.stream()
+                // The Predicate (value.age >= 30) is applied to each Person object
+                .filter(person -> person.age() >= 30)
+                .collect(Collectors.toList());
+
+        return filteredList;
+    }
+}
+
+
+package com.example.filterobjectdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FilterObjectDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FilterObjectDemoApplication.class, args);
+    }
+}
+
+OUTPUT:
+
+[
+  {
+    "name": "Mariano",
+    "age": 37
+  },
+  {
+    "name": "Shoki",
+    "age": 30
+  }
+]
+
+
+
+____________________________________________________________
+INPUT:
+
+
+package com.example.indexedfilterdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@RestController
+public class IndexedFilterController {
+
+    /**
+     * Replicates the DataWeave expression: [9, 2, 3, 4, 5] filter (($$ > 1) and ($ < 5))
+     * $ (value) < 5
+     * $$ (index) > 1
+     * @return The list of filtered numbers.
+     */
+    @GetMapping("/filterByIndexAndValue")
+    public List<Integer> filterByIndexAndValue() {
+        
+        // The source list
+        List<Integer> numbers = Arrays.asList(9, 2, 3, 4, 5);
+
+        // Replicating the filter logic using IntStream to track the index
+        List<Integer> filteredList = IntStream.range(0, numbers.size())
+                .filter(index -> {
+                    int value = numbers.get(index);
+                    
+                    // The combined DataWeave condition: ($$ > 1) and ($ < 5)
+                    boolean indexCondition = index > 1;
+                    boolean valueCondition = value < 5;
+                    
+                    return indexCondition && valueCondition;
+                })
+                // Map the filtered index back to the actual value
+                .mapToObj(numbers::get)
+                .collect(Collectors.toList());
+
+        return filteredList;
+    }
+}
+
+
+package com.example.indexedfilterdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class IndexedFilterDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IndexedFilterDemoApplication.class, args);
+    }
+}
+
+
+OUTPUT:
+[
+  3,
+  4
+]
+
+
+
+
+
+______________________________________________________________________
+
+INPUT:
+
+package com.example.filtercomplexdemo;
+
+// Represents the nested "user" object
+public record User(String name, String lastName) { }
+
+// Represents the main object structure in the list
+public record UserRecord(User user, String error) { 
+    // The 'error' field is String, which can be null in Java.
+}
+
+package com.example.filtercomplexdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class FilterComplexController {
+
+    /**
+     * Replicates the DataWeave expression: users filter ((item, index) -> item.error == null)
+     * @return The list containing only UserRecord objects where 'error' is null.
+     */
+    @GetMapping("/filterByErrorNull")
+    public List<UserRecord> filterByErrorNull() {
+        
+        // The source list of complex objects
+        List<UserRecord> users = Arrays.asList(
+            new UserRecord(new User("123", "Smith"), "That name doesn't exists"), 
+            new UserRecord(new User("John", "Johnson"), null) // This one will be kept
+        );
+
+        // DataWeave 'filter' equivalent using Java Streams:
+        List<UserRecord> filteredList = users.stream()
+                // The Predicate: check if the 'error' field is null
+                .filter(item -> item.error() == null)
+                .collect(Collectors.toList());
+
+        return filteredList;
+    }
+}
+
+package com.example.filtercomplexdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FilterComplexDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FilterComplexDemoApplication.class, args);
+    }
+}
+
+OUTPUT:
+
+[
+  {
+    "user": {
+      "name": "John",
+      "lastName": "Johnson"
+    },
+    "error": null
+  }
+]
+
+
+
+
+_______________________________________________________________
+
+
+
+INPUT:
+
+
+1. Java Object Model (InputPayload.java)
+We define records to model the nested input JSON structure.
+
+Java
+
+package com.example.datamappingdemo;
+
+import java.util.List;
+
+// Represents the phone entry object
+public record PhoneEntry(
+    String activeInd,
+    String type,
+    String primaryInd,
+    String number
+) {}
+
+// Represents the nested 'base' object
+public record BaseProfile(
+    String username,
+    String activeInd,
+    List<PhoneEntry> phone
+) {}
+
+// Represents the 'profile' object
+public record Profile(
+    BaseProfile base
+) {}
+
+// Represents the entire input payload structure
+public record InputPayload(
+    String Id,
+    String marketCode,
+    String languageCode,
+    Profile profile
+) {}
+2. Output Model (OutputData.java)
+We define the record for the desired output structure.
+
+Java
+
+package com.example.datamappingdemo;
+
+import java.util.List;
+
+public record OutputData(
+    String id,
+    String markCode,
+    String languageCode,
+    String username,
+    List<String> phoneNumber
+) {}
+3. Spring Boot Controller (DataMappingController.java)
+This controller defines the input and performs the filtering/mapping transformation using the Stream API.
+
+Java
+
+package com.example.datamappingdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class DataMappingController {
+
+    private final InputPayload samplePayload;
+
+    public DataMappingController() {
+        // Construct the exact input payload as provided in the DataWeave source
+        List<PhoneEntry> phones = Arrays.asList(
+            new PhoneEntry("Y", "mobile", "Y", "230678123"),
+            new PhoneEntry("N", "mobile", "N", ""),
+            new PhoneEntry("Y", "mobile", "Y", "154896523")
+        );
+        BaseProfile base = new BaseProfile("TheMule", "R", phones);
+        Profile profile = new Profile(base);
+        this.samplePayload = new InputPayload(
+            "1184001100000000517",
+            "US",
+            "en-US",
+            profile
+        );
+    }
+
+    /**
+     * Replicates the complex DataWeave transformation logic.
+     * phoneNumber: (payload.profile.base.phone filter ($.activeInd == "Y" and $.primaryInd== "Y")).number default []
+     * @return The transformed OutputData object.
+     */
+    @GetMapping("/transformData")
+    public OutputData transformData() {
+        
+        // --- 1. Replicate the Filter and Map operation on the phone list ---
+        List<String> phoneNumbers = samplePayload.profile().base().phone().stream()
+                // DataWeave filter: $.activeInd == "Y" and $.primaryInd == "Y"
+                .filter(p -> "Y".equals(p.activeInd()) && "Y".equals(p.primaryInd()))
+                // DataWeave map to: .number
+                .map(PhoneEntry::number)
+                // DataWeave default [] is handled by the initial List<String> which is empty if the stream is empty.
+                .collect(Collectors.toList());
+
+        // --- 2. Replicate the direct field mappings ---
+        return new OutputData(
+            samplePayload.Id(),
+            samplePayload.marketCode(),
+            samplePayload.languageCode(),
+            samplePayload.profile().base().username(),
+            phoneNumbers
+        );
+    }
+}
+4. Spring Boot Application Entry Point (DataMappingDemoApplication.java)
+Java
+
+package com.example.datamappingdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DataMappingDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataMappingDemoApplication.class, args);
+    }
+}
+
+
+
+OUTPUT:
+
+{
+  "id": "1184001100000000517",
+  "markCode": "US",
+  "languageCode": "en-US",
+  "username": "TheMule",
+  "phoneNumber": [
+    "230678123",
+    "154896523"
+  ]
+}
+
+
+
+
+__________________________________________________________________________________
+
+INPUT:
+
+package com.example.stringfilterdemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.stream.IntStream;
+import java.util.Map;
+import java.util.Collections;
+
+@RestController
+public class StringFilterController {
+
+    /**
+     * Replicates the DataWeave expression: "hello world" filter ($$ mod 2) == 0
+     * It keeps characters at even indices (0, 2, 4, 6, 8, 10).
+     * @return A map containing the resulting filtered string.
+     */
+    @GetMapping("/filterStringByIndex")
+    public Map<String, String> filterStringByIndex() {
+        
+        // The source string
+        String source = "hello world";
+
+        // Replicating the filter logic using IntStream:
+        String filteredString = IntStream.range(0, source.length())
+                // Filter by the index ($$ mod 2) == 0
+                .filter(index -> index % 2 == 0)
+                // Map the resulting index to the actual character
+                .mapToObj(source::charAt)
+                // Collect the characters into a new String
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
+
+        // DataWeave output is just the string, but returning it as a simple JSON map 
+        // ensures a clean Spring Boot JSON response.
+        return Collections.singletonMap("output", filteredString);
+    }
+}
+
+package com.example.stringfilterdemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class StringFilterDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(StringFilterDemoApplication.class, args);
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "output": "hlowrd"
+}
+
+
+

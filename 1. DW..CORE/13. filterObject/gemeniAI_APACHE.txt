@@ -1,0 +1,182 @@
+filterObject:
+
+
+example 1:
+
+
+input:
+from("direct:filterObject")
+    .setBody().groovy("request.body.findAll { key, value -> value == 'apple' }")
+    .marshal().json()
+    .to("mock:result");
+import java.util.Map;
+import java.util.stream.Collectors;
+
+from("direct:filterObject")
+    .process(exchange -> {
+        Map<String, String> inputMap = exchange.getIn().getBody(Map.class);
+        
+        Map<String, String> filteredMap = inputMap.entrySet().stream()
+            .filter(entry -> "apple".equals(entry.getValue()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            
+        exchange.getIn().setBody(filteredMap);
+    })
+    .marshal().json();
+
+<route>
+    <from uri="direct:filterObject"/>
+    <transform>
+        <groovy>
+            request.body.findAll { it.value == 'apple' }
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+</route>
+
+output:
+
+{
+  "a": "apple"
+}
+
+------------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:filterByKeys")
+    .setBody().groovy("request.body.findAll { key, value -> key.startsWith('letter') }")
+    .marshal().json()
+    .to("mock:result");
+
+<route>
+    <from uri="direct:filterByKeys"/>
+    <transform>
+        <groovy>
+            request.body.findAll { k, v -> k.startsWith('letter') }
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+</route>
+
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+from("direct:filterByKeys")
+    .process(exchange -> {
+        Map<String, Object> inputMap = exchange.getIn().getBody(Map.class);
+        
+        Map<String, Object> filteredMap = inputMap.entrySet().stream()
+            .filter(entry -> entry.getKey().startsWith("letter"))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            
+        exchange.getIn().setBody(filteredMap);
+    })
+    .marshal().json();
+
+
+output:
+
+{
+  "letter1": "a",
+  "letter2": "b"
+}
+
+------------------------------------------------------
+
+example 3:
+
+
+input:
+
+from("direct:filterByIndex")
+    .setBody().groovy("""
+        request.body.findAllWithIndex { entry, index -> 
+            index < 1 
+        }
+    """)
+    .marshal().json()
+    .to("mock:result");
+<route>
+    <from uri="direct:filterByIndex"/>
+    <transform>
+        <groovy>
+            request.body.findAllWithIndex { item, i -> i < 1 }
+        </groovy>
+    </transform>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+</route>
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+from("direct:filterByIndex")
+    .process(exchange -> {
+        Map<String, Object> input = exchange.getIn().getBody(Map.class);
+        
+        // Using limit(1) to simulate index < 1
+        Map<String, Object> filtered = input.entrySet().stream()
+            .limit(1) 
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, 
+                Map.Entry::getValue, 
+                (e1, e2) -> e1, 
+                LinkedHashMap::new
+            ));
+            
+        exchange.getIn().setBody(filtered);
+    })
+    .marshal().json();
+output:
+
+{
+  "1": "a"
+}
+
+------------------------------------------------------
+
+example 4:
+
+
+input:
+
+// Camel Route: Replicating filterObject $ != null
+
+from('direct:start')
+    // 1. Unmarshal: Parse incoming JSON to a JavaScript Object
+    .unmarshal().json()
+
+    // 2. Transform: The DataWeave 'filterObject' equivalent
+    // We use a simple script to filter the object keys
+    .process(exchange => {
+        const body = exchange.getIn().getBody();
+        const filtered = Object.fromEntries(
+            Object.entries(body).filter(([key, value]) => value !== null)
+        );
+        exchange.getIn().setBody(filtered);
+    })
+
+    // 3. Marshal: Convert back to JSON string
+    .marshal().json();
+
+output:
+
+{
+  "str1": "String 1",
+  "str2": "String 2",
+  "str3": null,
+  "str4": "String 4"
+}
+
+------------------------------------------------------
+

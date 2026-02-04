@@ -1,0 +1,58 @@
+orElse:
+
+
+input:
+
+import java.util.Optional;
+
+// Data Transfer Object representing the user structure
+public class User {
+    private final String name;
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    // Returns an Optional<String> to handle the possibility of a missing name
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
+    }
+}
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class TryOrElseService {
+
+    public Map<String, String> executeTryOrElseLogic() {
+        // --- Replicate DW variables ---
+        // var user = {} (Field 'name' is null/missing)
+        User user = new User(null); 
+        
+        // var otherUser = {name: "DW"}
+        User otherUser = new User("DW"); 
+
+        // --- Replicate DW Expression 'a' ---
+        // DW: try(() -> user.name!) orElse "No User Name"
+        String resultA = user.getName()
+                             .orElse("No User Name"); 
+        // user.getName() is Optional.empty(), so .orElse is used.
+        
+        // --- Replicate DW Expression 'b' ---
+        // DW: try(() -> otherUser.name) orElse "No User Name"
+        String resultB = otherUser.getName()
+                                  .orElse("No User Name"); 
+        // otherUser.getName() is Optional.of("DW"), so the value "DW" is returned.
+
+        return Map.of("a", resultA, "b", resultB);
+    }
+}
+output:
+
+{
+  "a": "No User Name",
+  "b": "DW"
+}
+
+

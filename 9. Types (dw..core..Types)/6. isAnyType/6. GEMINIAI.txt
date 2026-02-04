@@ -1,0 +1,79 @@
+isAnyType:
+
+
+
+input:
+package com.example.typecheck.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class TypeCheckService {
+
+    // Define the constant for the DataWeave 'Any' type representation
+    private static final String DW_ANY_TYPE = "Any";
+
+    /**
+     * Helper method to simulate DataWeave's isAnyType() function.
+     * Checks if the given type name is equivalent to the 'Any' type.
+     */
+    private boolean isAnyType(String typeName) {
+        // In DW, a type alias (AAny) is still considered the base type (Any)
+        return typeName.equals(DW_ANY_TYPE);
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, Boolean> checkTypes() {
+        
+        // Emulating the type definitions and uses from the DW script:
+        // type AAny = Any (used as "Any" in the check)
+        final String AAny_Type = "Any"; 
+        final String Builtin_Any = "Any";
+        final String Builtin_String = "String";
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: isAnyType(AAny), b: isAnyType(Any), c: isAnyType(String) }
+        return Map.of(
+            "a", isAnyType(AAny_Type),
+            "b", isAnyType(Builtin_Any),
+            "c", isAnyType(Builtin_String)
+        );
+    }
+}
+
+
+package com.example.typecheck.controller;
+
+import com.example.typecheck.service.TypeCheckService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final TypeCheckService typeCheckService;
+
+    public DataWeaveController(TypeCheckService typeCheckService) {
+        this.typeCheckService = typeCheckService;
+    }
+
+    // Maps to http://localhost:8080/check-any-type
+    @GetMapping("/check-any-type")
+    public Map<String, Boolean> checkAnyType() {
+        // Calls the service method that holds the transformation logic
+        return typeCheckService.checkTypes();
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

@@ -1,0 +1,106 @@
+concatWith:
+
+
+
+input:
+
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
+
+public class Main {
+
+    /**
+     * Converts a hexadecimal string into a byte array.
+     * This mimics the DataWeave 'as Binary {base: "16"}' operation.
+     */
+    public static byte[] hexStringToByteArray(String hexString) {
+        // The length of the hex string must be even (2 hex chars per byte)
+        if (hexString.length() % 2 != 0) {
+            throw new IllegalArgumentException("Hex string must have an even length.");
+        }
+
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            // Parse two characters at a time as a byte
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                                 + Character.digit(hexString.charAt(i+1), 16));
+        }
+        return data;
+    }
+
+    // ... (Other methods will be placed here)
+}
+
+
+output:
+
+yv6rzQ==
+
+
+
+2. Binary Concatenation and Output (DW: concatWith and as Binary {base: "64"})
+The main logic involves performing the hex-to-byte conversion, concatenating the two byte arrays, and then Base64 encoding the final result.
+
+Java
+
+import java.util.Arrays;
+import java.util.Base64;
+import java.io.UnsupportedEncodingException; // Not strictly needed for Base64, but included from input
+
+public class Main {
+
+    /**
+     * Converts a hexadecimal string into a byte array.
+     * This mimics the DataWeave 'as Binary {base: "16"}' operation.
+     */
+    public static byte[] hexStringToByteArray(String hexString) {
+        // Ensure the hex string is always uppercase for consistent processing
+        String normalizedHex = hexString.toUpperCase();
+
+        if (normalizedHex.length() % 2 != 0) {
+            throw new IllegalArgumentException("Hex string must have an even length.");
+        }
+
+        int len = normalizedHex.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            // Parse two characters at a time as a byte
+            data[i / 2] = (byte) ((Character.digit(normalizedHex.charAt(i), 16) << 4)
+                                 + Character.digit(normalizedHex.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    /**
+     * Performs the full DataWeave operation in Java:
+     * 1. Converts Hex strings "CAFE" and "ABCD" to bytes.
+     * 2. Concatenates the byte arrays. (CAFEABCD)
+     * 3. Base64 encodes the result.
+     */
+    public static String concatenateAndEncode() {
+        // 1. Convert Hex Strings to Bytes (DW: "CAFE" as Binary {base: "16"})
+        byte[] bytes1 = hexStringToByteArray("CAFE"); // bytes1 = {0xCA, 0xFE}
+        byte[] bytes2 = hexStringToByteArray("ABCD"); // bytes2 = {0xAB, 0xCD}
+
+        // 2. Concatenate the Byte Arrays (DW: ++ or concatWith)
+        // Create a new array big enough for both.
+        byte[] combined = Arrays.copyOf(bytes1, bytes1.length + bytes2.length);
+        // Copy the second array starting at the end of the first array
+        System.arraycopy(bytes2, 0, combined, bytes1.length, bytes2.length);
+        // combined = {0xCA, 0xFE, 0xAB, 0xCD}
+
+        // 3. Output as Base64 (DW: as String {encoding: "base64"})
+        // Correct Base64 for 0xCAFEABCD is y/6rzQ==
+        String base64Output = Base64.getEncoder().encodeToString(combined);
+        
+        return base64Output;
+    }
+
+    public static void main(String[] args) {
+        String output = concatenateAndEncode();
+        System.out.print(output);
+    }
+}

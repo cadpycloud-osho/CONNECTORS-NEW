@@ -1,0 +1,43 @@
+arrayItem:
+
+
+input:
+
+import java.util.*;
+
+public class ArrayItemConverter {
+    // Simulates DataWeave type inference for arrayItem()
+    public static String arrayItem(Class<?> arrayType) {
+        if (arrayType == String[].class || arrayType == List.class) {
+            return "String";
+        } else if (arrayType == Double[].class || arrayType == Integer[].class) {
+            return "Number";
+        } else {
+            return "Any";
+        }
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", arrayItem(String[].class));  // ArrayOfString
+        result.put("b", arrayItem(Double[].class));  // ArrayOfNumber  
+        result.put("c", arrayItem(Object[].class));  // ArrayOfAny
+        result.put("d", arrayItem(Object[].class));  // ArrayOfAnyDefault
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "String",
+  "b": "Number", 
+  "c": "Any",
+  "d": "Any"
+}
+
+
+

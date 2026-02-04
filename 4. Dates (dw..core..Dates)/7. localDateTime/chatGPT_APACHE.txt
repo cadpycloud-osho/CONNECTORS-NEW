@@ -1,0 +1,29 @@
+localDateTime:
+
+
+input:
+
+from("direct:createLocalDateTime")
+.process(exchange -> {
+
+    // Create a LocalDateTime with specific date and time
+    java.time.LocalDateTime newLocalDateTime = java.time.LocalDateTime.of(
+        2012, 10, 11, // year, month, day
+        12, 30, 40    // hour, minute, second
+    );
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("newLocalDateTime", newLocalDateTime.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+
+{
+  "newLocalDateTime": "2012-10-11T12:30:40"
+}
+

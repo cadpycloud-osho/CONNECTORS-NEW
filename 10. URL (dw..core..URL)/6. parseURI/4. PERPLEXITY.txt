@@ -1,0 +1,56 @@
+parseURI:
+
+
+
+input:
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class ParseUriController {
+
+    @GetMapping("/parse-uri")
+    public Map<String, Object> parseUri() {
+        Map<String, Object> composition = new HashMap<>();
+        String uriString = "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+        
+        URI uri = URI.create(uriString);
+        composition.put("isValid", true);
+        composition.put("raw", uriString);
+        composition.put("host", uri.getHost());
+        composition.put("authority", uri.getAuthority());
+        composition.put("fragment", uri.getFragment());
+        composition.put("path", uri.getPath());
+        composition.put("scheme", uri.getScheme());
+        composition.put("isAbsolute", uri.isAbsolute());
+        composition.put("isOpaque", uri.isOpaque());
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("composition", composition);
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+
+
+

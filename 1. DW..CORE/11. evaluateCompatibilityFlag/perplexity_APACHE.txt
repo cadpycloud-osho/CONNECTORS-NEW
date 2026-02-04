@@ -1,0 +1,31 @@
+evaluateCompatibilityFlag:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import static org.apache.camel.builder.endpoint.StaticEndpointBuilders.direct;
+
+public class CompatibilityFlagRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from(direct("start"))
+            .setBody(constant("{\"com.mulesoft.dw.xml_reader.honourMixedContentStructure\": true}"))
+            .unmarshal().json(JsonLibrary.Jackson, true)
+            .marshal().json(JsonLibrary.Jackson)
+            .to(direct("output"));
+    }
+}
+
+
+
+
+output:
+
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}
+
+
+

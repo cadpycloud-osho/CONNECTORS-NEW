@@ -1,0 +1,33 @@
+version:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class VersionController {
+
+    @GetMapping("/dwVersion")
+    public Map<String, String> getDwVersion() {
+
+        // Simulating DataWeave version()
+        String version = "2.5";
+
+        return Collections.singletonMap("version", version);
+    }
+}
+
+
+output:
+
+{
+  "version": "2.5"
+}
+
+

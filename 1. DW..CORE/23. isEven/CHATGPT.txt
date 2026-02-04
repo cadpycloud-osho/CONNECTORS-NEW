@@ -1,0 +1,39 @@
+isEven:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsEvenController {
+
+    private boolean isEven(int num) {
+        return num % 2 == 0;
+    }
+
+    @GetMapping("/check-even")
+    public Map<String, List<Boolean>> checkEven() {
+
+        List<Boolean> results = List.of(
+                isEven(0),
+                isEven(1),
+                isEven(1 + 1)
+        );
+
+        Map<String, List<Boolean>> response = new LinkedHashMap<>();
+        response.put("isEven", results);
+
+        return response;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "isEven": [ true, false, true ]
+}

@@ -1,0 +1,68 @@
+mergeWith:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: { "a" : true, "b" : 1}
+        Map<String, Object> first = Map.of("a", true, "b", 1);
+        
+        // DataWeave equivalent: { "a" : false, "c" : "Test"}
+        Map<String, Object> second = Map.of("a", false, "c", "Test");
+        
+        // DataWeave equivalent: first mergeWith second (last value wins for duplicate keys)
+        Map<String, Object> result = mergeWith(first, second);
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"mergeWith\": " + mapToJson(result));
+        System.out.println("}");
+    }
+    
+    // DataWeave "obj1 mergeWith obj2" equivalent (right object wins on key conflicts)
+    public static Map<String, Object> mergeWith(Map<String, Object> left, Map<String, Object> right) {
+        Map<String, Object> result = new LinkedHashMap<>(left);
+        result.putAll(right);  // Overwrites with right values on duplicate keys
+        return result;
+    }
+    
+    // Utility to format map as JSON
+    private static String mapToJson(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder("{");
+        map.forEach((k, v) -> {
+            sb.append("\n    \"").append(k).append("\": ");
+            if (v instanceof Boolean) {
+                sb.append(v);
+            } else if (v instanceof Number) {
+                sb.append(v);
+            } else {
+                sb.append("\"").append(v).append("\"");
+            }
+            sb.append(",");
+        });
+        if (!map.isEmpty()) {
+            sb.setLength(sb.length() - 1); // Remove last comma
+        }
+        sb.append("\n  }");
+        return sb.toString();
+    }
+}
+
+
+
+output:
+
+{
+  "mergeWith": {
+    "a": false,
+    "b": 1,
+    "c": "Test"
+  }
+}
+
+
+
+

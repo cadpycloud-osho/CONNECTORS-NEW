@@ -1,0 +1,119 @@
+groupBy:
+
+groupBy<T, R>(items: Array<T>, criteria: (item: T, index: Number) -> R): {| (R): Array<T> |}
+
+Returns an object that groups items from an array based on specified criteria, such as an expression or matching selector.
+
+This version of groupBy groups the elements of an array using the criteria function. Other versions act on objects and handle null values.
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+["a","b","c"] groupBy (item, index) -> index
+
+DataWeave
+Output
+{ "2": [ "c" ], "1": [ "b" ], "0": [ "a" ] }
+
+
+
+_________________________________________________________
+
+
+Source
+%dw 2.0
+var myArray = [
+   { "name": "Foo", "language": "Java" },
+   { "name": "Bar", "language": "Scala" },
+   { "name": "FooBar", "language": "Java" }
+]
+output application/json
+---
+myArray groupBy (item) -> item.language
+
+DataWeave
+Output
+{
+  "Scala": [
+    { "name": "Bar", "language": "Scala" }
+  ],
+  "Java": [
+    { "name": "Foo", "language": "Java" },
+    { "name": "FooBar", "language": "Java" }
+  ]
+}
+
+
+
+_________________________________________________________
+
+
+Source
+%dw 2.0
+var myVar = { menu: {
+    header: "Move Items",
+    items: [
+        {"id": "internal"},
+        {"id": "left", "label": "Move Left"},
+        {"id": "right", "label": "Move Right"},
+        {"id": "up", "label": "Move Up"},
+        {"id": "down", "label": "Move Down"}
+    ]
+}}
+output application/json
+---
+(myVar.menu.items.*label groupBy "myLabels")
+
+DataWeave
+Output
+{ "myLabels": [ "Move Left", "Move Right", "Move Up", "Move Down" ] }
+
+_________________________________________________________
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+"hello world!" groupBy (not isEmpty($ find /[aeiou]/))
+
+DataWeave
+Output
+{
+  "false": "hll wrld!",
+  "true": "eoo"
+}
+_________________________________________________________
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "a" : "b", "c" : "d"} groupBy upper($)
+
+DataWeave
+Output
+{ "D": { "c": "d" }, "B": { "a": "b" } }
+_________________________________________________________
+
+
+
+Source
+%dw 2.0
+var myRead =
+read("<prices><price>9.99</price><price>10.99</price></prices>","application/xml")
+output application/json
+---
+myRead.prices groupBy "costs"
+
+DataWeave
+Output
+{ "costs" : { "price": "9.99", "price": "10.99" } }
+_________________________________________________________
+
+

@@ -1,0 +1,89 @@
+eval:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("execute_ok", ok());
+        result.put("logs", logs());
+        result.put("grant", grant());
+        result.put("library", library());
+        result.put("timeout", true);
+        result.put("execFail", execFail());
+        result.put("parseFail", parseFail());
+        result.put("writerFail", writerFail());
+        result.put("defaultOutput", defaultOutput());
+        result.put("onExceptionFail", false);
+        result.put("customLogger", customLogger());
+
+        System.out.println(result);
+    }
+
+    static Map<String, Object> ok() {
+        return Map.of("success", true, "value", "{ a: 1 }");
+    }
+
+    static Map<String, Object> logs() {
+        return Map.of("success", true, "logs", List.of("1"));
+    }
+
+    static Map<String, Object> grant() {
+        return Map.of(
+            "success", false,
+            "message", "The given required permissions: `Resource` are not being granted for this execution."
+        );
+    }
+
+    static Map<String, Object> library() {
+        return Map.of("success", true, "value", 3);
+    }
+
+    static Map<String, Object> execFail() {
+        return Map.of("success", false, "message", "My Bad");
+    }
+
+    static Map<String, Object> parseFail() {
+        return Map.of("success", false, "message", "Invalid input \"1 + \"");
+    }
+
+    static Map<String, Object> writerFail() {
+        return Map.of("success", true, "value", 2);
+    }
+
+    static Map<String, Object> defaultOutput() {
+        return Map.of(
+            "success", true,
+            "value", Map.of("name", "Mariano", "lastName", "achaval")
+        );
+    }
+
+    static Map<String, Object> customLogger() {
+        return Map.of("success", true, "value", 1234);
+    }
+}
+
+
+output:
+
+{
+ execute_ok={success=true, value={ a: 1 }},
+ logs={success=true, logs=[1]},
+ grant={success=false, message=The given required permissions: `Resource` are not being granted for this execution.},
+ library={success=true, value=3},
+ timeout=true,
+ execFail={success=false, message=My Bad},
+ parseFail={success=false, message=Invalid input "1 + "},
+ writerFail={success=true, value=2},
+ defaultOutput={success=true, value={name=Mariano, lastName=achaval}},
+ onExceptionFail=false,
+ customLogger={success=true, value=1234}
+}
+
+

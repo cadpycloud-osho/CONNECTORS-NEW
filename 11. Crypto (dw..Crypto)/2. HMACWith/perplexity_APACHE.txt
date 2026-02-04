@@ -1,0 +1,49 @@
+HMACWith:
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
+public class HMACWithProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        byte[] key = "secret_key".getBytes(StandardCharsets.UTF_8);
+        byte[] data = "Some value to hash".getBytes(StandardCharsets.UTF_8);
+        
+        Mac mac = Mac.getInstance("HmacSHA256");
+        SecretKeySpec keySpec = new SecretKeySpec(key, "HmacSHA256");
+        mac.init(keySpec);
+        
+        byte[] hmacResult = mac.doFinal(data);
+        
+        // Convert to lowercase hex string (matches DataWeave HMACWith output)
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hmacResult) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        
+        String result = "{ \"HMACWith\": \"" + hexString.toString() + "\" }";
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:hmacWith")
+    .process(new HMACWithProcessor())
+    .log("${body}");
+
+
+output:
+
+{ "HMACWith": "b51b4fe8c4e37304605753272b5b4321f9644a9b09cb1179d7016c25041d1747" }
+
+
+

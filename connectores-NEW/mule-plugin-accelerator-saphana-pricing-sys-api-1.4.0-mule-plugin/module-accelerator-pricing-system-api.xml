@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="Accelerator Pricing System API"
+        prefix="accelerator-pricing-system-api"
+        namespace="http://www.mulesoft.org/schema/mule/accelerator-pricing-system-api"
+        doc:description="SAP S/4HANA System API for working with PriceBookEntry/SalesPricingCondition"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <property name="property_host" displayName="host" type="string"  summary="Host for consuming API"/>
+    <property name="property_port" displayName="port" type="string"  summary="Port for consuming API"/>
+    <property name="property_basePath" displayName="basePath" type="string" defaultValue="/" summary="Basepath for consuming API"/>
+    <property name="property_protocol" displayName="protocol" type="string"  summary="Protocol for consuming API"/>
+
+        <property name="property_proxyConfig" displayName="Proxy Config Reference" type="string" use="OPTIONAL" summary="Proxy config reference" tab="Proxy"/>
+        <property name="property_responseTimeout" displayName="Response timeout" type="string" defaultValue="10000" summary="Maximum time in milliseconds that the request element will block the execution of the flow waiting for the HTTP response."/>
+
+    
+    
+
+    <http:request-config
+name="accelerator-pricing-system-api-httpreq-config" xmlns:connection="true"
+responseTimeout="#[vars.property_responseTimeout]"
+basePath="#[vars.property_basePath]">
+<http:request-connection
+host="#[vars.property_host]"
+protocol="#[vars.property_protocol]"
+port="#[vars.property_port]"
+proxyConfig="#[vars.property_proxyConfig]"
+>
+</http:request-connection>
+</http:request-config>
+
+
+
+
+    <operation name="get-pings"  >
+        <parameters>
+                                        <parameter name="check-dependencies"
+                                        type="boolean"
+                                        use="OPTIONAL"                    doc:description="Set to true to check and report status of all dependencies, such as system connections and downstream APIs; default is false"/>
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-pricing-system-api-httpreq-config"
+              path="/ping"
+              method="GET"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PRICING-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PRICING-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PRICING-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PRICING-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PRICING-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PRICING-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PRICING-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PRICING-SYSTEM-API:RETRY_EXHAUSTED" />
+        
+            <http:headers>
+            <![CDATA[#[ { 'Accept': 'application/json' } filterObject $ != null ]]]>
+        </http:headers>
+                    <http:query-params>
+            <![CDATA[#[ { 'checkDependencies': vars['check-dependencies'] } filterObject $ != null ]]]>
+        </http:query-params>
+    </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="get-pings-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="get-prices"  >
+        <parameters>
+                                        <parameter name="offset"
+                                        type="number"
+                    defaultValue="0"                    use="OPTIONAL"                    doc:description="Include results starting at this index position in the overall result set; the index of the first result is zero"/>
+                            <parameter name="limit"
+                                        type="number"
+                    defaultValue="20"                    use="OPTIONAL"                    doc:description="Include at most this many items in the response"/>
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-pricing-system-api-httpreq-config"
+              path="/prices"
+              method="GET"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PRICING-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PRICING-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PRICING-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PRICING-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PRICING-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PRICING-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PRICING-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PRICING-SYSTEM-API:RETRY_EXHAUSTED" />
+        
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                    <http:query-params>
+            <![CDATA[#[ ( { 'offset': vars['offset'] } ++ { 'limit': vars['limit'] } ) filterObject $ != null ]]]>
+        </http:query-params>
+    </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="get-prices-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="create-price"  >
+        <parameters>
+                            <parameter name="create-price-request-data" type="create-price-request-type" use="REQUIRED" role="PRIMARY" />
+                                        <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-pricing-system-api-httpreq-config"
+              path="/prices"
+              method="POST"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PRICING-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PRICING-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PRICING-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PRICING-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PRICING-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PRICING-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PRICING-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PRICING-SYSTEM-API:RETRY_EXHAUSTED" />
+                <http:body>
+            <![CDATA[#[output application/json --- vars['create-price-request-data']]
+]]>
+        </http:body>
+    
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+            </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="create-price-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="get-price-by-price-id"  >
+        <parameters>
+                                        <parameter name="price-id"
+                                        type="string"
+                                        use="REQUIRED"                    />
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-pricing-system-api-httpreq-config"
+              path="/prices/{priceId}"
+              method="GET"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PRICING-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PRICING-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PRICING-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PRICING-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PRICING-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PRICING-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PRICING-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PRICING-SYSTEM-API:RETRY_EXHAUSTED" />
+        
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                <http:uri-params>
+            <![CDATA[#[ { 'priceId': vars['price-id'] } filterObject $ != null ]]]>
+        </http:uri-params>
+        </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="get-price-by-price-id-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="update-price-by-price-id"  >
+        <parameters>
+                            <parameter name="update-price-by-price-id-request-data" type="update-price-by-price-id-request-type" use="REQUIRED" role="PRIMARY" />
+                                        <parameter name="price-id"
+                                        type="string"
+                                        use="REQUIRED"                    />
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-pricing-system-api-httpreq-config"
+              path="/prices/{priceId}"
+              method="PUT"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PRICING-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PRICING-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PRICING-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PRICING-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PRICING-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PRICING-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PRICING-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PRICING-SYSTEM-API:RETRY_EXHAUSTED" />
+                <http:body>
+            <![CDATA[#[output application/json --- vars['update-price-by-price-id-request-data']]
+]]>
+        </http:body>
+    
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                <http:uri-params>
+            <![CDATA[#[ { 'priceId': vars['price-id'] } filterObject $ != null ]]]>
+        </http:uri-params>
+        </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="update-price-by-price-id-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+    <operation name="create-sales-price"  >
+        <parameters>
+                            <parameter name="create-sales-price-request-data" type="create-sales-price-request-type" use="REQUIRED" role="PRIMARY" />
+                                        <parameter name="offset"
+                                        type="number"
+                    defaultValue="0"                    use="OPTIONAL"                    doc:description="Include results starting at this index position in the overall result set; the index of the first result is zero"/>
+                            <parameter name="limit"
+                                        type="number"
+                    defaultValue="20"                    use="OPTIONAL"                    doc:description="Include at most this many items in the response"/>
+                            <parameter name="x-correlation-id"
+                                        type="string"
+                                        use="OPTIONAL"                    />
+                                    <parameter name="request-streaming-mode" displayName="Request streaming mode" type="request-streaming-mode-enum" use="OPTIONAL" tab="Advanced" />
+        </parameters>
+        <body>
+                <http:request config-ref="accelerator-pricing-system-api-httpreq-config"
+              path="/prices/salesPrice"
+              method="POST"
+              requestStreamingMode='#[vars["request-streaming-mode"]]'
+>
+                <mule:error-mapping sourceType="HTTP:PARSING" targetType="ACCELERATOR-PRICING-SYSTEM-API:PARSING" />
+            <mule:error-mapping sourceType="HTTP:TIMEOUT" targetType="ACCELERATOR-PRICING-SYSTEM-API:TIMEOUT" />
+            <mule:error-mapping sourceType="HTTP:SECURITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:SECURITY" />
+            <mule:error-mapping sourceType="HTTP:CONNECTIVITY" targetType="ACCELERATOR-PRICING-SYSTEM-API:CONNECTIVITY" />
+            <mule:error-mapping sourceType="HTTP:BAD_REQUEST" targetType="ACCELERATOR-PRICING-SYSTEM-API:BAD_REQUEST" />
+            <mule:error-mapping sourceType="HTTP:UNAUTHORIZED" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNAUTHORIZED" />
+            <mule:error-mapping sourceType="HTTP:FORBIDDEN" targetType="ACCELERATOR-PRICING-SYSTEM-API:FORBIDDEN" />
+            <mule:error-mapping sourceType="HTTP:METHOD_NOT_ALLOWED" targetType="ACCELERATOR-PRICING-SYSTEM-API:METHOD_NOT_ALLOWED" />
+            <mule:error-mapping sourceType="HTTP:NOT_FOUND" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_FOUND" />
+            <mule:error-mapping sourceType="HTTP:NOT_ACCEPTABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:NOT_ACCEPTABLE" />
+            <mule:error-mapping sourceType="HTTP:UNSUPPORTED_MEDIA_TYPE" targetType="ACCELERATOR-PRICING-SYSTEM-API:UNSUPPORTED_MEDIA_TYPE" />
+            <mule:error-mapping sourceType="HTTP:TOO_MANY_REQUESTS" targetType="ACCELERATOR-PRICING-SYSTEM-API:TOO_MANY_REQUESTS" />
+            <mule:error-mapping sourceType="HTTP:INTERNAL_SERVER_ERROR" targetType="ACCELERATOR-PRICING-SYSTEM-API:INTERNAL_SERVER_ERROR" />
+            <mule:error-mapping sourceType="HTTP:SERVICE_UNAVAILABLE" targetType="ACCELERATOR-PRICING-SYSTEM-API:SERVICE_UNAVAILABLE" />
+            <mule:error-mapping sourceType="HTTP:RETRY_EXHAUSTED" targetType="ACCELERATOR-PRICING-SYSTEM-API:RETRY_EXHAUSTED" />
+                <http:body>
+            <![CDATA[#[output application/json --- vars['create-sales-price-request-data']]
+]]>
+        </http:body>
+    
+            <http:headers>
+            <![CDATA[#[ ( { 'Accept': 'application/json' } ++ { 'x-correlation-id': vars['x-correlation-id'] } ) filterObject $ != null ]]]>
+        </http:headers>
+                    <http:query-params>
+            <![CDATA[#[ ( { 'offset': vars['offset'] } ++ { 'limit': vars['limit'] } ) filterObject $ != null ]]]>
+        </http:query-params>
+    </http:request>
+    <mule:set-payload value="#[payload]" mimeType="application/json" />
+        </body>
+                    <output type="create-sales-price-response-type" />
+                <output-attributes type="java::org.mule.extension.http.api.HttpResponseAttributes" />
+
+        <errors>
+                            <error type="PARSING"/>
+                            <error type="TIMEOUT"/>
+                            <error type="SECURITY"/>
+                            <error type="CONNECTIVITY"/>
+                            <error type="BAD_REQUEST"/>
+                            <error type="UNAUTHORIZED"/>
+                            <error type="FORBIDDEN"/>
+                            <error type="METHOD_NOT_ALLOWED"/>
+                            <error type="NOT_FOUND"/>
+                            <error type="NOT_ACCEPTABLE"/>
+                            <error type="UNSUPPORTED_MEDIA_TYPE"/>
+                            <error type="TOO_MANY_REQUESTS"/>
+                            <error type="INTERNAL_SERVER_ERROR"/>
+                            <error type="SERVICE_UNAVAILABLE"/>
+                            <error type="RETRY_EXHAUSTED"/>
+                    </errors>
+    </operation>
+
+</module>

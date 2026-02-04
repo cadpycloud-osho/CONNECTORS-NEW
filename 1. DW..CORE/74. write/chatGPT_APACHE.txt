@@ -1,0 +1,77 @@
+write:
+
+example 1:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        // The plain text value
+        String value = "world";
+
+        // Wrap it in a Map to mimic the JSON structure
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+        result.put("hello", value);
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+{ "hello": "world" }
+
+
+-------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        // Sample JSON payload
+        List<Map<String, String>> payload = List.of(
+            Map.of(
+                "Name", "Mr White",
+                "Email", "white@mulesoft.com",
+                "Id", "1234",
+                "Title", "Chief Java Prophet"
+            ),
+            Map.of(
+                "Name", "Mr Orange",
+                "Email", "orange@mulesoft.com",
+                "Id", "4567",
+                "Title", "Integration Ninja"
+            )
+        );
+
+        // Convert JSON to CSV with header and pipe separator
+        StringBuilder csvBuilder = new StringBuilder();
+        // Add header
+        csvBuilder.append(String.join("|", payload.get(0).keySet())).append("\n");
+        // Add rows
+        for (Map<String, String> row : payload) {
+            csvBuilder.append(String.join("|", row.values())).append("\n");
+        }
+
+        // Wrap in XML
+        String xmlOutput = "<output>" + csvBuilder.toString().trim() + "</output>";
+
+        exchange.getIn().setBody(xmlOutput);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+<?xml version="1.0" encoding="US-ASCII"?>
+<output>
+Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja
+</output>
+
+
+-------------------------------------------

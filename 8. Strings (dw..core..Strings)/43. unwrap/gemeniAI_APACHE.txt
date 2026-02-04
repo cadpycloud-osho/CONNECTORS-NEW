@@ -1,0 +1,46 @@
+unwrap:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UnwrapStringRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:unwrapText")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides perfect parity
+                results.put("a", StringUtils.unwrap(null, ""));
+                results.put("b", StringUtils.unwrap(null, "\0"));
+                results.put("c", StringUtils.unwrap("'abc'", "'"));
+                results.put("d", StringUtils.unwrap("AABabcBAA", "A"));
+                results.put("e", StringUtils.unwrap("A", "#"));
+                results.put("f", StringUtils.unwrap("#A", "#"));
+                results.put("g", StringUtils.unwrap("A#", "#"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+   "a": null,
+   "b": null,
+   "c": "abc",
+   "d": "ABabcBA",
+   "e": "A",
+   "f": "#A",
+   "g": "A#"
+}
+

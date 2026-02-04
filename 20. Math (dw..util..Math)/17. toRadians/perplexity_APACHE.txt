@@ -1,0 +1,35 @@
+toRadians:
+
+
+input:
+
+import java.util.*;
+import static java.lang.Math.*;
+
+public class ToRadiansConverter {
+    public static double toRadians(double degrees) {
+        return degrees * (Math.PI / 180.0);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        result.put("toRadians10", toRadians(10));
+        result.put("toRadians013", toRadians(0.13));
+        result.put("toRadians-20", toRadians(-20));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+   "toRadians10": 0.1745329251994329576922222222222222,
+   "toRadians013": 0.002268928027592628449998888888888889,
+   "toRadians-20": -0.3490658503988659153844444444444444
+}
+
+
+

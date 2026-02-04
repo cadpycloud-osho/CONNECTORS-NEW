@@ -1,0 +1,68 @@
+toLocalDateTime:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.spi.DataFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DateTimeConversionRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // Equivalent to DataWeave 'a' - try multiple formats
+                    String inputDate = "2003-10-01 23:57:59";
+                    DateTimeFormatter[] formats = {
+                        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                    };
+                    
+                    LocalDateTime parsedDate = null;
+                    for (DateTimeFormatter formatter : formats) {
+                        try {
+                            parsedDate = LocalDateTime.parse(inputDate, formatter);
+                            break;
+                        } catch (DateTimeParseException e) {
+                            // Continue to next format
+                        }
+                    }
+                    result.put("a", parsedDate != null ? parsedDate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null);
+                    
+                    // Equivalent to DataWeave 'b' - try single format and capture error
+                    try {
+                        LocalDateTime singleFormatDate = LocalDateTime.parse(inputDate, 
+                            DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+                        result.put("b", "Success");
+                    } catch (DateTimeParseException e) {
+                        result.put("b", "Could not find a valid formatter for '" + inputDate + "'");
+                    }
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+output:
+
+{
+  "a": "2003-10-01T23:57:59",
+  "b": "Could not find a valid formatter for '2003-10-01 23:57:59'"
+}
+
+
+
+

@@ -1,0 +1,56 @@
+appendIfMissing:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class StringsController {
+
+    @GetMapping("/strings")
+    public Map<String, Object> getStrings() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        
+        // a: appendIfMissing(null, "") -> null
+        result.put("a", appendIfMissing(null, ""));
+        
+        // b: appendIfMissing("abc", "") -> "abc" 
+        result.put("b", appendIfMissing("abc", ""));
+        
+        // c: appendIfMissing("", "xyz") -> "xyz"
+        result.put("c", appendIfMissing("", "xyz"));
+        
+        // d: appendIfMissing("abc", "xyz") -> "abcxyz" (xyz not present)
+        result.put("d", appendIfMissing("abc", "xyz"));
+        
+        // e: appendIfMissing("abcxyz", "xyz") -> "abcxyz" (xyz already present)
+        result.put("e", appendIfMissing("abcxyz", "xyz"));
+        
+        return result;
+    }
+    
+    private static String appendIfMissing(String input, String suffix) {
+        if (input == null) return null;
+        if (suffix == null || suffix.isEmpty()) return input;
+        if (input.endsWith(suffix)) return input;
+        return input + suffix;
+    }
+}
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+
+

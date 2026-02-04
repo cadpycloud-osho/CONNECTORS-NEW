@@ -1,0 +1,83 @@
+isHandledBy:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Map;
+import java.util.HashMap;
+
+public class MimeIsHandledByProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        Map<String, Object> JSON = createMimeMap("application", "json", new HashMap<>());
+        Map<String, Object> MULTIPART = createMimeMap("multipart", "form-data", 
+            Map.of("boundary", "my-boundary"));
+        Map<String, Object> ALL = createMimeMap("*", "*", new HashMap<>());
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", isHandledBy(JSON, JSON));
+        result.put("b", isHandledBy(createMimeMap("*", "json", new HashMap<>()), JSON));
+        result.put("c", isHandledBy(createMimeMap("application", "*", new HashMap<>()), JSON));
+        result.put("d", isHandledBy(ALL, MULTIPART));
+        result.put("e", isHandledBy(MULTIPART, ALL));
+        result.put("f", isHandledBy(JSON, MULTIPART));
+        result.put("g", isHandledBy(
+            createMimeMap("application", "*+xml", new HashMap<>()),
+            createMimeMap("application", "soap+xml", new HashMap<>())
+        ));
+        
+        exchange.getIn().setBody(result);
+    }
+    
+    private Map<String, Object> createMimeMap(String type, String subtype, Map<String, String> params) {
+        Map<String, Object> mime = new HashMap<>();
+        mime.put("type", type);
+        mime.put("subtype", subtype);
+        mime.put("parameters", params);
+        return mime;
+    }
+    
+    private boolean isHandledBy(Map<String, Object> handler, Map<String, Object> mimeType) {
+        String handlerType = (String) handler.get("type");
+        String handlerSubtype = (String) handler.get("subtype");
+        String mimeTypeStr = (String) mimeType.get("type");
+        String mimeSubtype = (String) mimeType.get("subtype");
+        
+        // Type matching: exact or "*"
+        if (!handlerType.equals("*") && !handlerType.equals(mimeTypeStr)) {
+            return false;
+        }
+        
+        // Subtype matching: exact, "*" or structured syntax "*+suffix"
+        if (!handlerSubtype.equals("*") && !handlerSubtype.equals(mimeSubtype)) {
+            if (handlerSubtype.endsWith("+*") && mimeSubtype.endsWith(handlerSubtype.substring(0, handlerSubtype.length() - 2))) {
+                return true; // Structured syntax match
+            }
+            return false;
+        }
+        
+        return true;
+    }
+}
+
+from("direct:mimeIsHandledBy")
+    .process(new MimeIsHandledByProcessor())
+    .log("${body}");
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": true
+}
+
+
+
+
+

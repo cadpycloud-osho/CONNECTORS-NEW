@@ -1,0 +1,32 @@
+matches:
+
+INPUT:
+
+// MatchesRegexApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class MatchesRegexApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MatchesRegexApp.class, args);
+
+        String testString = "admin123";
+
+        boolean match1 = testString.matches("a.*\\d+");
+        boolean match2 = testString.matches("^b.+");
+
+        List<Boolean> result = Arrays.asList(match1, match2);
+        System.out.println(result);  // Output: [true, false]
+    }
+}
+
+
+OUTPUT:
+
+[true, false]

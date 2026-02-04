@@ -1,0 +1,59 @@
+toNumberOrNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Map;
+
+public class NumberOrNullRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceNumberOrNull")
+            .process(exchange -> {
+                String input = "0.005";
+
+                // List A: Contains a valid numeric pattern as fallback
+                List<String> formatsA = List.of("seconds", ".000");
+                
+                // List B: Contains only an invalid or non-numeric pattern
+                List<String> formatsB = List.of("seconds");
+
+                exchange.getIn().setBody(Map.of(
+                    "a", parseNumberOrNull(input, formatsA),
+                    "b", parseNumberOrNull(input, formatsB)
+                ));
+            });
+    }
+
+    private Double parseNumberOrNull(String input, List<String> patterns) {
+        for (String pattern : patterns) {
+            try {
+                // Handle semantic formats or standard numeric masks
+                if (pattern.equals("seconds")) {
+                    // Logic for 'seconds' usually fails in a standard double parse
+                    throw new NumberFormatException();
+                }
+                DecimalFormat df = new DecimalFormat(pattern);
+                return df.parse(input).doubleValue();
+            } catch (Exception ignored) {
+                // Try next pattern
+            }
+        }
+        return null; // Equivalent to toNumberOrNull
+    }
+}
+
+
+output:
+
+
+{
+  a: 0.005 as Number {format: ".00"},
+  b: null
+}
+
+

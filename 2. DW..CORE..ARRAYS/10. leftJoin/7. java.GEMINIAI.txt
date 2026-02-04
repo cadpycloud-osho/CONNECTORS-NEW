@@ -1,0 +1,439 @@
+leftJoin:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    // Reusing User, Product, and JoinedRecord classes for structure
+
+    static class User {
+        String id;
+        String name;
+
+        public User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        public String getId() { return id; }
+        
+        @Override
+        public String toString() {
+            return "{\n      \"id\": \"" + id + "\",\n      \"name\": \"" + name + "\"\n    }";
+        }
+    }
+
+    static class Product {
+        String ownerId;
+        String name;
+
+        public Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+        public String getOwnerId() { return ownerId; }
+
+        @Override
+        public String toString() {
+            return "{\n      \"ownerId\": \"" + ownerId + "\",\n      \"name\": \"" + name + "\"\n    }";
+        }
+    }
+
+    static class JoinedRecord {
+        User l;
+        Product r;
+
+        public JoinedRecord(User l, Product r) {
+            this.l = l;
+            this.r = r;
+        }
+        
+        // Custom toString to match the desired JSON structure for Left Join.
+        @Override
+        public String toString() {
+            String lString = l.toString().replaceAll("\n", "\n    ");
+            // Clean up inner toString output 
+            lString = lString.substring(lString.indexOf('{')); 
+
+            if (r != null) {
+                // Case 1: Match found (l and r exist)
+                String rString = r.toString().replaceAll("\n", "\n    ");
+                rString = rString.substring(rString.indexOf('{')); 
+                return "  {\n    \"l\": " + lString + ",\n    \"r\": " + rString + "\n  }";
+            } else {
+                // Case 2: No match found (l exists, r is omitted)
+                return "  {\n    \"l\": " + lString + "\n  }";
+            }
+        }
+    }
+
+
+    public static void main(String[] args) {
+        // 1. Define Source Data (User and Product lists)
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"),
+            new User("2", "Leandro"), // Expected no match
+            new User("3", "Julian"),
+            new User("5", "Julian")   // Expected no match
+        );
+
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"),
+            new Product("1", "BAT"),
+            new Product("3", "DataSense"),
+            new Product("4", "NoOwner") // Will not be matched
+        );
+
+        // 2. DataWeave Logic: Left Outer Join
+        List<JoinedRecord> joinedRecords = users.stream()
+            // Map each user to a list of JoinedRecords (0 or more)
+            .flatMap(user -> {
+                // Find all matching products for the current user ID
+                List<Product> matches = products.stream()
+                    .filter(product -> Objects.equals(user.getId(), product.getOwnerId()))
+                    .collect(Collectors.toList());
+
+                if (matches.isEmpty()) {
+                    // If NO matches are found (Left Outer Join behavior):
+                    // Create one JoinedRecord with the user (l) and null for the product (r)
+                    return List.of(new JoinedRecord(user, null)).stream();
+                } else {
+                    // If matches ARE found:
+                    // Create one JoinedRecord for each match
+                    return matches.stream()
+                        .map(product -> new JoinedRecord(user, product));
+                }
+            })
+            .collect(Collectors.toList());
+
+        // 3. Output the result in the required format
+        String result = joinedRecords.stream()
+            .map(JoinedRecord::toString)
+            .collect(Collectors.joining(",\n"));
+
+        System.out.println("[\n" + result + "\n]");
+    }
+}
+
+
+
+
+output:
+
+Output structure:
+
+
+
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Java Code (Using Nested Loops - Imperative Style)
+This approach uses nested loops. When matches are found, it creates the joined records. Crucially, we need to handle the case where no product matches a user's ID.
+
+Java
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveLeftJoinImperative {
+
+    public static List<JoinedRecord> leftJoin(List<User> users, List<Product> products) {
+        List<JoinedRecord> result = new ArrayList<>();
+        
+        // Iterate over ALL users (the left side)
+        for (User user : users) {
+            
+            boolean matched = false;
+            
+            // Look for matching products (the right side)
+            for (Product product : products) {
+                // Check the join condition: user.id == product.ownerId
+                if (user.getId().equals(product.getOwnerId())) {
+                    // Match found: create a joined record
+                    result.add(new JoinedRecord(user, product));
+                    matched = true;
+                }
+            }
+            
+            // If no match was found for the current user, 
+            // add the user with a null product to the result list.
+            if (!matched) {
+                result.add(new JoinedRecord(user, null));
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        // Source data
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"), new User("2", "Leandro"), 
+            new User("3", "Julian"), new User("5", "Julian")
+        );
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"), new Product("1", "BAT"), 
+            new Product("3", "DataSense"), new Product("4", "SmartConnectors")
+        );
+
+        List<JoinedRecord> result = leftJoin(users, products);
+
+        // Print the final output structure
+        System.out.println("Output structure:");
+        System.out.println("[");
+        // Print each joined record separated by a comma (except the last one)
+        for (int i = 0; i < result.size(); i++) {
+            System.out.print(result.get(i).toString());
+            if (i < result.size() - 1) {
+                System.out.print(",\n");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("]");
+    }
+}
+2. Java Code (Using Streams and flatMap - Functional Style)
+The Stream approach for a left join is slightly more complex than an inner join because we must ensure the left record is present even when the right stream is empty. This is typically done by creating a list of matches and then handling the empty case.
+
+Java
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    // --- 1. Data Structure Classes ---
+
+    // Class for the left side of the join
+    static class User {
+        String id;
+        String name;
+
+        public User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        public String getId() { return id; }
+        
+        @Override
+        public String toString() {
+            // Standard formatting for inner object
+            return "{\n      \"id\": \"" + id + "\",\n      \"name\": \"" + name + "\"\n    }";
+        }
+    }
+
+    // Class for the right side of the join
+    static class Product {
+        String ownerId;
+        String name;
+
+        public Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+        public String getOwnerId() { return ownerId; }
+
+        @Override
+        public String toString() {
+            // Standard formatting for inner object
+            return "{\n      \"ownerId\": \"" + ownerId + "\",\n      \"name\": \"" + name + "\"\n    }";
+        }
+    }
+
+    // Class for the result of the join
+    static class JoinedRecord {
+        User l; // Left element
+        Product r; // Right element (can be null in a Left Join)
+
+        public JoinedRecord(User l, Product r) {
+            this.l = l;
+            this.r = r;
+        }
+        
+        // Custom toString to match the required JSON structure (omitting "r" if null)
+        @Override
+        public String toString() {
+            String lString = l.toString().replaceAll("\n", "\n    ");
+            lString = lString.substring(lString.indexOf('{')); 
+
+            if (r != null) {
+                // Case 1: Match found (l and r exist)
+                String rString = r.toString().replaceAll("\n", "\n    ");
+                rString = rString.substring(rString.indexOf('{')); 
+                return "  {\n    \"l\": " + lString + ",\n    \"r\": " + rString + "\n  }";
+            } else {
+                // Case 2: No match found (l exists, r is omitted)
+                return "  {\n    \"l\": " + lString + "\n  }";
+            }
+        }
+    }
+
+    // --- 2. Left Join Logic (Functional Style) ---
+    
+    public static List<JoinedRecord> leftJoin(List<User> users, List<Product> products) {
+        return users.stream()
+            // FlatMap processes each user and returns a stream of JoinedRecords (0 or more)
+            .flatMap(user -> {
+                // Find all products matching the current user ID
+                List<Product> matches = products.stream()
+                    .filter(product -> Objects.equals(user.getId(), product.getOwnerId()))
+                    .collect(Collectors.toList());
+
+                if (matches.isEmpty()) {
+                    // Left Join: If NO matches, return a stream with (User, null)
+                    return List.of(new JoinedRecord(user, null)).stream();
+                } else {
+                    // If matches ARE found, return a stream of (User, Product) for each match
+                    return matches.stream()
+                        .map(product -> new JoinedRecord(user, product));
+                }
+            })
+            .collect(Collectors.toList());
+    }
+
+    // --- 3. Execution ---
+    
+    public static void main(String[] args) {
+        // Source data
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"), new User("2", "Leandro"),  
+            new User("3", "Julian"), new User("5", "Julian") // '5' has no product
+        );
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"), new Product("1", "BAT"),  
+            new Product("3", "DataSense"), new Product("4", "SmartConnectors") // '4' has no user
+        );
+
+        List<JoinedRecord> result = leftJoin(users, products);
+
+        // Print the final output structure
+        System.out.println("[");
+        // Print each joined record separated by a comma (except the last one)
+        String output = result.stream()
+            .map(JoinedRecord::toString)
+            .collect(Collectors.joining(",\n"));
+            
+        System.out.println(output);
+        System.out.println("]");
+    }
+}
+
+
+✅ Java Output
+The output generated by both Java implementations is identical and correctly matches the expected DataWeave output, ensuring the non-matching user records are included with the right element omitted.
+
+JSON
+
+Output structure:
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  }
+]

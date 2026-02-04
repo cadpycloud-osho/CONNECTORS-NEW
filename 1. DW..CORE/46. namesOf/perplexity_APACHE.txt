@@ -1,0 +1,37 @@
+namesOf:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class NamesOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:namesOf")
+            .setBody(exchange -> {
+                Map<String, Object> inputMap = new HashMap<>();
+                inputMap.put("a", true);
+                inputMap.put("b", 1);
+                return inputMap;
+            })
+            .process(exchange -> {
+                Map<String, Object> input = exchange.getIn().getBody(Map.class);
+                List<String> names = new ArrayList<>(input.keySet());
+                
+                Map<String, Object> result = new HashMap<>();
+                result.put("namesOf", names);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{ "namesOf": ["a", "b"] }
+
+

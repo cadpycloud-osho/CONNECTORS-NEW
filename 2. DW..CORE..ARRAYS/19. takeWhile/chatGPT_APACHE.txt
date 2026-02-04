@@ -1,0 +1,27 @@
+takeWhile:
+
+
+input:
+
+from("direct:takeWhileExample")
+.process(exchange -> {
+    List<Integer> arr = List.of(0, 1, 2, 1);
+
+    // Take elements while condition is true
+    List<Integer> result = arr.stream()
+                              .takeWhile(i -> i <= 1)
+                              .toList();
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+output:
+
+
+
+[
+  0,
+  1
+]

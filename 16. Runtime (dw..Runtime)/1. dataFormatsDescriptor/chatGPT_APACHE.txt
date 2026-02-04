@@ -1,0 +1,191 @@
+dataFormatsDescriptor:
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Map<String, Object>> dataFormats = new ArrayList<>();
+
+        // JSON Descriptor
+        Map<String, Object> json = new LinkedHashMap<>();
+        json.put("id", "json");
+        json.put("binary", false);
+        json.put("defaultEncoding", "UTF-8");
+        json.put("extensions", List.of(".json"));
+        json.put("defaultMimeType", "application/json");
+        json.put("acceptedMimeTypes", List.of("application/json"));
+
+        json.put("readerProperties", List.of(
+                Map.of(
+                        "name", "streaming",
+                        "optional", true,
+                        "defaultValue", false,
+                        "description", "Used for streaming input (use only if entries are accessed sequentially).",
+                        "possibleValues", List.of(true, false)
+                )
+        ));
+
+        json.put("writerProperties", List.of(
+                Map.of(
+                        "name", "writeAttributes",
+                        "optional", true,
+                        "defaultValue", false,
+                        "description", "Attributes written as child keys prefixed with @",
+                        "possibleValues", List.of(true, false)
+                ),
+                Map.of(
+                        "name", "skipNullOn",
+                        "optional", true,
+                        "defaultValue", "None",
+                        "description", "Skips null values",
+                        "possibleValues", List.of("arrays", "objects", "everywhere")
+                )
+        ));
+
+        // XML Descriptor
+        Map<String, Object> xml = new LinkedHashMap<>();
+        xml.put("id", "xml");
+        xml.put("binary", false);
+        xml.put("extensions", List.of(".xml"));
+        xml.put("defaultMimeType", "application/xml");
+        xml.put("acceptedMimeTypes", List.of("application/xml"));
+
+        xml.put("readerProperties", List.of(
+                Map.of(
+                        "name", "supportDtd",
+                        "optional", true,
+                        "defaultValue", true,
+                        "description", "Enable or disable DTD processing",
+                        "possibleValues", List.of(true, false)
+                ),
+                Map.of(
+                        "name", "streaming",
+                        "optional", true,
+                        "defaultValue", false,
+                        "description", "Used for streaming input",
+                        "possibleValues", List.of(true, false)
+                ),
+                Map.of(
+                        "name", "maxEntityCount",
+                        "optional", true,
+                        "defaultValue", 1,
+                        "description", "Max entity expansion count",
+                        "possibleValues", List.of()
+                )
+        ));
+
+        xml.put("writerProperties", List.of(
+                Map.of(
+                        "name", "writeDeclaration",
+                        "optional", true,
+                        "defaultValue", true,
+                        "description", "Write XML declaration",
+                        "possibleValues", List.of(true, false)
+                ),
+                Map.of(
+                        "name", "indent",
+                        "optional", true,
+                        "defaultValue", true,
+                        "description", "Indent XML output",
+                        "possibleValues", List.of(true, false)
+                )
+        ));
+
+        dataFormats.add(json);
+        dataFormats.add(xml);
+
+        System.out.println(dataFormats);
+    }
+}
+
+
+output:
+
+[
+  {
+    "id": "json",
+    "binary": false,
+    "defaultEncoding": "UTF-8",
+    "extensions": [".json"],
+    "defaultMimeType": "application/json",
+    "acceptedMimeTypes": ["application/json"],
+    "readerProperties": [
+      {
+        "name": "streaming",
+        "optional": true,
+        "defaultValue": false,
+        "description": "Used for streaming input (use only if entries are accessed sequentially).",
+        "possibleValues": [true, false]
+      }
+    ],
+    "writerProperties": [
+      {
+        "name": "writeAttributes",
+        "optional": true,
+        "defaultValue": false,
+        "description": "Attributes written as child keys prefixed with @",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "skipNullOn",
+        "optional": true,
+        "defaultValue": "None",
+        "description": "Skips null values",
+        "possibleValues": ["arrays", "objects", "everywhere"]
+      }
+    ]
+  },
+  {
+    "id": "xml",
+    "binary": false,
+    "extensions": [".xml"],
+    "defaultMimeType": "application/xml",
+    "acceptedMimeTypes": ["application/xml"],
+    "readerProperties": [
+      {
+        "name": "supportDtd",
+        "optional": true,
+        "defaultValue": true,
+        "description": "Enable or disable DTD processing",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "streaming",
+        "optional": true,
+        "defaultValue": false,
+        "description": "Used for streaming input",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "maxEntityCount",
+        "optional": true,
+        "defaultValue": 1,
+        "description": "Max entity expansion count",
+        "possibleValues": []
+      }
+    ],
+    "writerProperties": [
+      {
+        "name": "writeDeclaration",
+        "optional": true,
+        "defaultValue": true,
+        "description": "Write XML declaration",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "indent",
+        "optional": true,
+        "defaultValue": true,
+        "description": "Indent XML output",
+        "possibleValues": [true, false]
+      }
+    ]
+  }
+]
+
+
+

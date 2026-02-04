@@ -1,0 +1,43 @@
+yesterday
+
+
+
+input:
+
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class YesterdayExample {
+
+    /**
+     * DataWeave equivalent: yesterday()
+     * Calculates the date for the day preceding the current system date.
+     * @return The LocalDate for yesterday.
+     */
+    public static LocalDate getYesterdayDate() {
+        // 1. Get the current date
+        LocalDate today = LocalDate.now();
+        // 2. Subtract one day
+        return today.minusDays(1);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Yesterday's Date (yesterday()) Example ---");
+        
+        // 1. Call the Java function
+        LocalDate yesterday = getYesterdayDate();
+        
+        // 2. Format the output to match the DataWeave ISO 8601 format ("YYYY-MM-DD")
+        String formattedOutput = yesterday.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        // Note: The output date will be one day before the execution date.
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+output:
+
+2025-12-09
+
+

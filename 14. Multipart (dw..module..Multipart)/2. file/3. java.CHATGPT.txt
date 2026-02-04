@@ -1,0 +1,233 @@
+file:
+
+
+example 1:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // XML content (inline instead of reading a file)
+        String xmlContent =
+                "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<orders>\n" +
+                "  <order>\n" +
+                "    <item>\n" +
+                "      <id>1001</id>\n" +
+                "      <qty>1</qty>\n" +
+                "      <price>$100</price>\n" +
+                "    </item>\n" +
+                "    <item>\n" +
+                "      <id>2001</id>\n" +
+                "      <qty>2</qty>\n" +
+                "      <price>$50</price>\n" +
+                "    </item>\n" +
+                "  </order>\n" +
+                "</orders>";
+
+        // Build headers
+        Map<String, Object> headers = new LinkedHashMap<>();
+        headers.put("Content-Type", "application/xml");
+
+        Map<String, Object> contentDisposition = new LinkedHashMap<>();
+        contentDisposition.put("name", "file");
+        contentDisposition.put("filename", "orders.xml");
+
+        headers.put("Content-Disposition", contentDisposition);
+
+        // Final output
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("headers", headers);
+        output.put("content", xmlContent);
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+  headers={Content-Type=application/xml, 
+    Content-Disposition={name=file, filename=orders.xml}}, 
+  content=<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+}
+
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String boundary = "------=_Part_5349_1228640551";
+
+        // Inline XML content
+        String xmlContent =
+                "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<orders>\n" +
+                "  <order>\n" +
+                "    <item>\n" +
+                "      <id>1001</id>\n" +
+                "      <qty>1</qty>\n" +
+                "      <price>$100</price>\n" +
+                "    </item>\n" +
+                "    <item>\n" +
+                "      <id>2001</id>\n" +
+                "      <qty>2</qty>\n" +
+                "      <price>$50</price>\n" +
+                "    </item>\n" +
+                "  </order>\n" +
+                "</orders>";
+
+        StringBuilder multipart = new StringBuilder();
+
+        // File part
+        multipart.append(boundary).append("\n");
+        multipart.append("Content-Type: application/xml\n");
+        multipart.append("Content-Disposition: form-data; name=\"file\"; filename=\"myorders.xml\"\n\n");
+        multipart.append(xmlContent).append("\n");
+
+        // Close boundary
+        multipart.append(boundary).append("--");
+
+        System.out.println(multipart.toString());
+    }
+}
+
+
+output:
+
+
+------=_Part_5349_1228640551
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_5349_1228640551--
+
+-------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String boundary = "------=_Part_1586_1887987980";
+
+        // Inline JSON content
+        String jsonContent =
+                "{\n" +
+                "   clients: {\n" +
+                "     client: {\n" +
+                "       id: 1,\n" +
+                "       name: \"Mariano\"\n" +
+                "     },\n" +
+                "     client: {\n" +
+                "       id: 2,\n" +
+                "       name: \"Shoki\"\n" +
+                "     }\n" +
+                "   }\n" +
+                "}";
+
+        StringBuilder multipart = new StringBuilder();
+
+        // Part: file
+        multipart.append(boundary).append("\n");
+        multipart.append("Content-Type: application/json\n");
+        multipart.append("Content-Disposition: form-data; name=\"myFile\"; filename=\"partMyClients.json\"\n\n");
+        multipart.append(jsonContent).append("\n");
+
+        // Close boundary
+        multipart.append(boundary).append("--");
+
+        System.out.println(multipart.toString());
+    }
+}
+
+
+output:
+
+------=_Part_1586_1887987980
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+   clients: {
+     client: {
+       id: 1,
+       name: "Mariano"
+     },
+     client: {
+       id: 2,
+       name: "Shoki"
+     }
+   }
+}
+------=_Part_1586_1887987980--
+
+
+-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

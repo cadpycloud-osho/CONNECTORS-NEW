@@ -1,0 +1,33 @@
+arrayItem:
+
+
+
+input:
+
+@RestController
+public class TypeController {
+    
+    @GetMapping("/types")
+    public Map<String, String> getArrayTypes() {
+        Map<String, String> result = new HashMap<>();
+        result.put("a", "String");
+        result.put("b", "Number");
+        result.put("c", "Any");
+        result.put("d", "Any");
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": "String",
+  "b": "Number",
+  "c": "Any",
+  "d": "Any"
+}
+
+

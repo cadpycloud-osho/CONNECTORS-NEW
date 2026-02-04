@@ -1,0 +1,135 @@
+unzip:
+
+example 1:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.*;
+
+public class UnzipRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:unzip")
+            .process(exchange -> {
+                List<List<Object>> input = Arrays.asList(
+                    Arrays.asList(0, "a"),
+                    Arrays.asList(1, "b"), 
+                    Arrays.asList(2, "c"),
+                    Arrays.asList(3, "d")
+                );
+                
+                // unzip: transpose [[0,"a"], [1,"b"], ...] → [[0,1,2,3], ["a","b","c","d"]]
+                List<Integer> firsts = input.stream()
+                    .map(row -> (Integer) row.get(0))
+                    .collect(Collectors.toList());
+                List<String> seconds = input.stream()
+                    .map(row -> (String) row.get(1))
+                    .collect(Collectors.toList());
+                
+                List<List<?>> result = Arrays.asList(firsts, seconds);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[ [ 0, 1, 2, 3 ], [ "a", "b", "c", "d" ] ]
+
+
+-----------------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class UnzipUnevenRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:unzipUneven")
+            .process(exchange -> {
+                List<List<?>> input = Arrays.asList(
+                    Arrays.asList(0, "a"),
+                    Arrays.asList(1, "a", "foo"), 
+                    Arrays.asList(2),
+                    Arrays.asList(3, "a")
+                );
+                
+                // unzip uneven: only index 0 elements → [0,1,2,3]
+                List<Integer> result = IntStream.range(0, input.size())
+                    .mapToObj(i -> (Integer) input.get(i).get(0))
+                    .collect(Collectors.toList());
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[0, 1, 2, 3]
+
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.*;
+
+public class UnzipEvenRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:unzipEven")
+            .process(exchange -> {
+                List<List<String>> input = Arrays.asList(
+                    Arrays.asList("0", "a", "W"),
+                    Arrays.asList("1", "b", "X"), 
+                    Arrays.asList("2", "c", "Y"),
+                    Arrays.asList("3", "d", "Z")
+                );
+                
+                // unzip: transpose into 3 arrays (max length = 3)
+                List<List<String>> result = IntStream.range(0, 3)
+                    .mapToObj(col -> 
+                        IntStream.range(0, input.size())
+                            .mapToObj(row -> input.get(row).get(col))
+                            .collect(Collectors.toList())
+                    )
+                    .collect(Collectors.toList());
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+[
+  [0, 1, 2, 3],
+  ["a", "b", "c", "d"],
+  ["W", "X", "Y", "Z"]
+]
+
+
+
+-----------------------------------------------------------

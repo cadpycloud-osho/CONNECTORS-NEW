@@ -1,0 +1,87 @@
+isEmpty:
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+List<Boolean> output1 = Arrays.asList(
+    Collections.emptyList().isEmpty(),
+    Arrays.asList(1).isEmpty()
+);
+
+System.out.println(output1);
+
+
+output:
+
+[true, false]
+
+
+---------------------------------------------------------
+
+example 2:
+
+
+input:
+
+List<Boolean> output2 = Arrays.asList(
+    "".isEmpty(),
+    "DataWeave".isEmpty()
+);
+
+System.out.println(output2);
+
+
+output:
+
+[true, false]
+
+
+---------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+List<Boolean> output3 = Arrays.asList(
+    Collections.emptyMap().isEmpty(),
+    Map.of("name", "DataWeave").isEmpty()
+);
+
+System.out.println(output3);
+
+
+output:
+
+[true, false]
+
+
+---------------------------------------------------------
+
+example 4:
+
+
+input:
+
+import java.util.*;
+
+Map<String, Boolean> output4 = Map.of(
+    "nullValue", Objects.isNull(null)
+);
+
+System.out.println(output4);
+
+
+output:
+
+{nullValue=true}
+
+
+---------------------------------------------------------

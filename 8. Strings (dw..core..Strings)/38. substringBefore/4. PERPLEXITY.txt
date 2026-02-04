@@ -1,0 +1,43 @@
+substringBefore:
+
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class SubstringBeforeController {
+
+    @GetMapping("/substring-before")
+    public Map<String, Object> substringBeforeExamples() {
+        return Map.of(
+            "a", substringBefore(null, "'"),
+            "b", substringBefore("", "-"),
+            "c", substringBefore("abc", "b"),
+            "d", substringBefore("abc", "c"),
+            "e", substringBefore("abc", "d"),
+            "f", substringBefore("abc", "")
+        );
+    }
+
+    private String substringBefore(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null || delimiter.isEmpty()) return "";
+        int index = input.indexOf(delimiter);
+        return index == -1 ? "" : input.substring(0, index);
+    }
+}
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab",
+  "e": "",
+  "f": ""
+}
+

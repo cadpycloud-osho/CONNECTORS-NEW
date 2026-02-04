@@ -1,0 +1,63 @@
+isLocalTimeType:
+
+
+
+
+
+input:
+
+
+import java.time.LocalDateTime;
+import java.lang.String;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isLocalDateTimeType(Type).
+     * Checks if the provided type is LocalDateTime or a subclass/implementation.
+     */
+    public static boolean isLocalDateTimeType(Class<?> type) {
+        return LocalDateTime.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ALocalDateTime' (which is LocalDateTime)
+        Class<?> aLocalDateTimeClass = LocalDateTime.class;
+
+        // 2. Mimics the type 'LocalDateTime'
+        Class<?> localDateTimeClass = LocalDateTime.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isLocalDateTimeType(ALocalDateTime)
+        boolean a = isLocalDateTimeType(aLocalDateTimeClass); 
+
+        // b: isLocalDateTimeType(LocalDateTime)
+        boolean b = isLocalDateTimeType(localDateTimeClass); 
+        
+        // c: isLocalDateTimeType(String)
+        boolean c = isLocalDateTimeType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "CorrelationId": {
+      "type": "string"
+    },
+    "PopReceipt": {
+      "type": "string"
+    },
+    "DownloadLocation": {
+      "type": "string"
+    },
+    "IsDownLoadFileExist": {
+      "type": "boolean"
+    },
+    "FileDownLoadErrorMessage": {
+      "type": "string"
+    },
+    "LastDequeueDateTime": {}
+  }
+}

@@ -1,0 +1,166 @@
+mask:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+
+public class MaskPasswordProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Input array
+        List<Map<String, String>> users = Arrays.asList(
+            createMap("name", "Peter Parker", "password", "spiderman"),
+            createMap("name", "Bruce Wayne", "password", "batman")
+        );
+        
+        List<Map<String, String>> maskedUsers = new ArrayList<>();
+        
+        // mask field("password") with "*****" - mask ALL password fields
+        for (Map<String, String> user : users) {
+            Map<String, String> maskedUser = new HashMap<>(user);
+            maskedUser.put("password", "*****");
+            maskedUsers.add(maskedUser);
+        }
+        
+        exchange.getIn().setBody(maskedUsers);
+    }
+    
+    private Map<String, String> createMap(String key1, String val1, String key2, String val2) {
+        Map<String, String> map = new HashMap<>();
+        map.put(key1, val1);
+        map.put(key2, val2);
+        return map;
+    }
+}
+
+from("direct:maskPassword")
+    .process(new MaskPasswordProcessor())
+    .log("${body}");
+
+output:
+
+[
+  {
+    "name": "Peter Parker",
+    "password": "*****"
+  },
+  {
+    "name": "Bruce Wayne", 
+    "password": "*****"
+  }
+]
+
+
+-----------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+
+public class MaskPasswordStringSelector implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<Map<String, String>> users = Arrays.asList(
+            createMap("name", "Peter Parker", "password", "spiderman"),
+            createMap("name", "Bruce Wayne", "password", "batman")
+        );
+        
+        // DataWeave: mask "password" with "*****" 
+        // String selector "password" → targets ALL password fields
+        List<Map<String, String>> maskedUsers = new ArrayList<>();
+        for (Map<String, String> user : users) {
+            Map<String, String> masked = new HashMap<>(user);
+            masked.put("password", "*****");  // Direct string selector match
+            maskedUsers.add(masked);
+        }
+        
+        exchange.getIn().setBody(maskedUsers);
+    }
+    
+    private Map<String, String> createMap(String k1, String v1, String k2, String v2) {
+        Map<String, String> map = new HashMap<>();
+        map.put(k1, v1);
+        map.put(k2, v2);
+        return map;
+    }
+}
+
+
+output:
+
+[
+  {"name": "Peter Parker", "password": "*****"},
+  {"name": "Bruce Wayne", "password": "*****"}
+]
+
+
+-----------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+
+public class MaskArrayIndexProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Input: [[123, true], [456, true]]
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(123, true),
+            Arrays.asList(456, true)
+        );
+        
+        // DataWeave: mask 1 with false
+        // Index selector "1" → masks ALL elements at index 1
+        List<List<Object>> masked = new ArrayList<>();
+        for (List<Object> row : input) {
+            List<Object> maskedRow = new ArrayList<>(row);
+            maskedRow.set(1, false);  // Index 1 → false
+            masked.add(maskedRow);
+        }
+        
+        exchange.getIn().setBody(masked);
+    }
+}
+
+
+output:
+
+[
+  [123, false],
+  [456, false]
+]
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

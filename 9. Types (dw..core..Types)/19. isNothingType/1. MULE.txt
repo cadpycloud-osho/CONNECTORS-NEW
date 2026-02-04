@@ -1,0 +1,48 @@
+isNothingType:
+
+isNothingType(t: Type): Boolean
+
+isNothingType(t: Type): Boolean
+Returns true if the input is the Nothing type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ANothing = Nothing
+output application/json
+---
+{
+   a: isNothingType(ANothing),
+   b: isNothingType(Nothing),
+   c: isNothingType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,233 @@
+
+
+
+orderBy:
+
+example 1:
+
+
+input:
+
+@GetMapping("/orderby-letter")
+public List<Map<String, String>> orderByLetter() {
+    List<Map<String, String>> input = Arrays.asList(
+        Map.of("letter", "e"),
+        Map.of("letter", "d")
+    );
+
+    return input.stream()
+            .sorted(Comparator.comparing(x -> x.get("letter")))
+            .toList();
+}
+
+
+output:
+
+[
+  { "letter": "d" },
+  { "letter": "e" }
+]
+
+
+
+-----------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+@GetMapping("/orderby-descending-slice")
+public Map<String, List<Integer>> orderDescendingSlice() {
+    List<Integer> sorted = Stream.of(3, 8, 1)
+        .sorted()
+        .toList();
+
+    List<Integer> desc = Arrays.asList(sorted.get(2), sorted.get(1), sorted.get(0));
+
+    return Map.of("orderDescending", desc);
+}
+
+output:
+
+
+{ "orderDescending": [8, 3, 1] }
+
+
+----------------
+
+
+example 3:
+
+
+input:
+
+@GetMapping("/orderby-numbers")
+public List<Integer> orderByNumbers() {
+    return Stream.of(3, 2, 3)
+            .sorted()
+            .toList();
+}
+
+
+output:
+
+
+[2, 3, 3]
+
+
+----------------
+
+
+
+
+example 4:
+
+
+input:
+
+
+@GetMapping("/orderby-age")
+public List<Map<String, Object>> orderByAge() {
+    List<Map<String, Object>> input = Arrays.asList(
+        Map.of("name", "Santiago", "age", 42),
+        Map.of("name", "Leandro", "age", 29),
+        Map.of("name", "Mariano", "age", 35)
+    );
+
+    return input.stream()
+            .sorted(Comparator.comparing(person -> (Integer) person.get("age")))
+            .toList();
+}
+
+output:
+
+[
+  { "name": "Leandro", "age": 29 },
+  { "name": "Mariano", "age": 35 },
+  { "name": "Santiago", "age": 42 }
+]
+
+
+
+----------------
+
+
+
+
+example 5:
+
+
+input:
+
+@GetMapping("/orderby-datetime-desc")
+public List<String> orderByDateTimeDesc() {
+    List<String> dates = List.of(
+        "2020-10-01T23:57:59.017Z",
+        "2022-12-22T12:12:12.011Z",
+        "2020-10-01T12:40:10.012Z",
+        "2020-10-01T23:57:59.021Z"
+    );
+
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+    return dates.stream()
+            .map(Instant::parse)
+            .sorted(Comparator.reverseOrder())
+            .map(Instant::toString)
+            .toList();
+}
+
+
+output:
+
+
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+
+----------------
+
+
+
+
+example 6:
+
+
+input:
+
+
+@GetMapping("/orderby-type-slice")
+public List<Map<String, Object>> orderByTypeSlice() {
+    List<Map<String, Object>> input = Arrays.asList(
+        Map.of("AccountNumber", "987999321", "NameOnAccount", "QA", "Type", "AAAA", "CDetail", Map.of("Status", "Open")),
+        Map.of("AccountNumber", "12399978", "NameOnAccount", "QA", "Type", "BBBB", "CDetail", Map.of()),
+        Map.of("AccountNumber", "32199974", "NameOnAccount", "QA", "Type", "CCCC", "CDetail", Map.of())
+    );
+
+    List<Map<String, Object>> sorted = input.stream()
+            .sorted(Comparator.comparing(p -> p.get("Type").toString()))
+            .toList();
+
+    return Arrays.asList(sorted.get(2), sorted.get(1), sorted.get(0));
+}
+
+output:
+
+
+[
+  {
+    "AccountNumber": "32199974",
+    "NameOnAccount": "QA",
+    "Type": "CCCC",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "12399978",
+    "NameOnAccount": "QA",
+    "Type": "BBBB",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "987999321",
+    "NameOnAccount": "QA",
+    "Type": "AAAA",
+    "CDetail": {
+      "Status": "Open"
+    }
+  }
+]
+
+
+----------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

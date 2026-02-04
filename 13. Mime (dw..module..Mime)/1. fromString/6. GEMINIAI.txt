@@ -1,0 +1,98 @@
+fromString:
+
+
+example 1:
+
+
+input:
+
+// Replicates DataWeave: toString({type: "application", subtype: "json", parameters: {}})
+// MimeResult is a record/POJO: (String type, String subtype, Map<String, String> parameters)
+
+MimeResult input = new MimeResult("application", "json", Map.of());
+
+// Logic inside MimeService.toString(input):
+ParameterList paramList = new ParameterList();
+ContentType contentType = new ContentType(input.type(), input.subtype(), paramList);
+
+String output = contentType.toString(); 
+// Output: "application/json"
+
+output:
+{
+  "result": "application/json"
+}
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+// Replicates DataWeave: toString({type: "text", subtype: "plain", parameters: {charset: "UTF-8"}})
+MimeResult input = new MimeResult("text", "plain", Map.of("charset", "UTF-8"));
+
+// Logic inside MimeService.toString(input):
+ParameterList paramList = new ParameterList();
+paramList.set("charset", "UTF-8"); // Key-value pair added
+
+ContentType contentType = new ContentType(input.type(), input.subtype(), paramList);
+
+String output = contentType.toString(); 
+// Output: "text/plain; charset=UTF-8"
+
+output:
+
+{
+  "result": "text/plain; charset=UTF-8"
+}
+------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+// Replicates DataWeave: toString({type: "multipart", subtype: "form-data", parameters: {boundary: "the-boundary", version: "1.0"}})
+MimeResult input = new MimeResult("multipart", "form-data", 
+    Map.of("boundary", "the-boundary", "version", "1.0"));
+
+// Logic inside MimeService.toString(input):
+ParameterList paramList = new ParameterList();
+paramList.set("boundary", "the-boundary");
+paramList.set("version", "1.0");
+
+ContentType contentType = new ContentType(input.type(), input.subtype(), paramList);
+
+String output = contentType.toString(); 
+// Output: "multipart/form-data; boundary="the-boundary"; version="1.0""
+
+
+output:
+
+{
+  "result": "multipart/form-data; boundary=\"the-boundary\"; version=\"1.0\""
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

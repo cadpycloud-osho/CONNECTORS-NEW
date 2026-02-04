@@ -1,0 +1,217 @@
+outerJoin:
+
+
+input:
+
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class DataWeaveAllJoinsExample {
+
+    // --- Data Classes ---
+    static class User {
+        public String id;
+        public String name;
+        public User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        public String getKey() { return id; }
+    }
+
+    static class Product {
+        public String ownerId;
+        public String name;
+        public Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+        public String getKey() { return ownerId; }
+    }
+
+    // --- Result Class (Handles all join types; excludes null fields) ---
+    @JsonInclude(Include.NON_NULL)
+    static class JoinResult {
+        @JsonProperty("l")
+        public User left;
+        @JsonProperty("r")
+        public Product right;
+
+        public JoinResult(User left, Product right) {
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    // =========================================================================
+    // 1. Inner Join Equivalent (DataWeave 'join')
+    // =========================================================================
+    public static List<JoinResult> innerJoin(List<User> users, List<Product> products) {
+        List<JoinResult> joinedList = new ArrayList<>();
+        // Iterate through the left list
+        for (User user : users) {
+            // Check every element in the right list for a match
+            for (Product product : products) {
+                if (user.getKey().equals(product.getKey())) {
+                    joinedList.add(new JoinResult(user, product));
+                }
+            }
+        }
+        return joinedList;
+    }
+
+    // =========================================================================
+    // 2. Left Join Equivalent (DataWeave 'leftJoin')
+    // =========================================================================
+    public static List<JoinResult> leftJoin(List<User> users, List<Product> products) {
+        List<JoinResult> joinedList = new ArrayList<>();
+        for (User user : users) {
+            List<Product> matchingProducts = products.stream()
+                    .filter(product -> user.getKey().equals(product.getKey()))
+                    .collect(Collectors.toList());
+
+            if (matchingProducts.isEmpty()) {
+                // Case: No match found (Left item with null Right)
+                joinedList.add(new JoinResult(user, null));
+            } else {
+                // Case: One or more matches found
+                for (Product product : matchingProducts) {
+                    joinedList.add(new JoinResult(user, product));
+                }
+            }
+        }
+        return joinedList;
+    }
+
+    // =========================================================================
+    // 3. Full Outer Join Equivalent (DataWeave 'outerJoin')
+    // =========================================================================
+    public static List<JoinResult> outerJoin(List<User> users, List<Product> products) {
+        List<JoinResult> joinedList = new ArrayList<>();
+        Set<String> matchedProductKeys = new HashSet<>();
+
+        // --- Step A: Perform Left Join Logic (Matches + Unmatched Left) ---
+        for (User user : users) {
+            String userId = user.getKey();
+            List<Product> matchingProducts = products.stream()
+                    .filter(product -> userId.equals(product.getKey()))
+                    .collect(Collectors.toList());
+
+            if (matchingProducts.isEmpty()) {
+                // Case A: Unmatched Left
+                joinedList.add(new JoinResult(user, null));
+            } else {
+                // Case B: Matched (Inner Join results)
+                for (Product product : matchingProducts) {
+                    joinedList.add(new JoinResult(user, product));
+                    matchedProductKeys.add(product.getKey());
+                }
+            }
+        }
+        
+        // --- Step B: Add Unmatched Right Elements (Right Anti Join) ---
+        // Find all products whose keys were NOT matched (i.e., not in matchedProductKeys)
+        List<Product> unmatchedProducts = products.stream()
+                .filter(product -> !matchedProductKeys.contains(product.getKey()))
+                .collect(Collectors.toList());
+        
+        for (Product product : unmatchedProducts) {
+            // Case C: Unmatched Right
+            joinedList.add(new JoinResult(null, product));
+        }
+        
+        return joinedList;
+    }
+
+    // =========================================================================
+    // Main Method to Run All Examples
+    // =========================================================================
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        // Input Data (Same for all joins)
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"), new User("2", "Leandro"), 
+            new User("3", "Julian"), new User("5", "Julian")
+        );
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"), new Product("1", "BAT"), 
+            new Product("3", "DataSense"), new Product("4", "SmartConnectors")
+        );
+        
+        // --- Inner Join ---
+        List<JoinResult> innerResult = innerJoin(users, products);
+        System.out.println("1. DataWeave 'join' (Inner Join) Equivalent:");
+        System.out.println(mapper.writeValueAsString(innerResult) + "\n");
+        
+        // --- Left Join ---
+        List<JoinResult> leftResult = leftJoin(users, products);
+        System.out.println("2. DataWeave 'leftJoin' Equivalent:");
+        System.out.println(mapper.writeValueAsString(leftResult) + "\n");
+        
+        // --- Full Outer Join ---
+        List<JoinResult> outerResult = outerJoin(users, products);
+        System.out.println("3. DataWeave 'outerJoin' Equivalent:");
+        System.out.println(mapper.writeValueAsString(outerResult) + "\n");
+    }
+}
+
+output:
+
+
+[ {
+  "l" : {
+    "id" : "1",
+    "name" : "Mariano"
+  },
+  "r" : {
+    "ownerId" : "1",
+    "name" : "DataWeave"
+  }
+}, {
+  "l" : {
+    "id" : "1",
+    "name" : "Mariano"
+  },
+  "r" : {
+    "ownerId" : "1",
+    "name" : "BAT"
+  }
+}, {
+  "l" : {
+    "id" : "2",
+    "name" : "Leandro"
+  }
+}, {
+  "l" : {
+    "id" : "3",
+    "name" : "Julian"
+  },
+  "r" : {
+    "ownerId" : "3",
+    "name" : "DataSense"
+  }
+}, {
+  "l" : {
+    "id" : "5",
+    "name" : "Julian"
+  }
+}, {
+  "r" : {
+    "ownerId" : "4",
+    "name" : "SmartConnectors"
+  }
+} ]

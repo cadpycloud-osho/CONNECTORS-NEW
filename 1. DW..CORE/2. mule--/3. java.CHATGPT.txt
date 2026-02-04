@@ -1,0 +1,126 @@
+--:
+
+example 1:
+--<S>(source: Array<S>, toRemove: Array<Any>): Array<S>
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+class Main {
+
+    public static void main(String[] args) {
+
+        // Original list
+        List<Integer> list1 = Arrays.asList(0, 1, 1, 2);
+
+        // Elements to remove
+        List<Integer> list2 = Arrays.asList(1, 2);
+
+        // DataWeave '--' equivalent in Java
+        List<Integer> result = list1.stream()
+                .filter(e -> !list2.contains(e))
+                .collect(Collectors.toList());
+
+        // Output structure
+        Map<String, List<Integer>> output = new HashMap<>();
+        output.put("a", result);
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+{a=[0]}
+
+
+-----------------------------------------------------------------------
+
+example 2:
+
+input:
+
+
+import java.util.*;
+
+class Main {
+
+    public static void main(String[] args) {
+
+        // Original map
+        Map<String, String> data = new HashMap<>();
+        data.put("yes", "no");
+        data.put("good", "bad");
+        data.put("old", "new");
+
+        // Keys to remove
+        List<String> keysToRemove = Arrays.asList("yes", "old");
+
+        // Remove keys
+        keysToRemove.forEach(data::remove);
+
+        // Output
+        System.out.println(data);
+    }
+}
+
+Output
+
+{
+  "good": "bad"
+}
+
+
+-----------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+class Main {
+
+    public static void main(String[] args) {
+
+        // Create the original map
+        Map<String, String> data = new HashMap<>();
+        data.put("hello", "world");
+        data.put("name", "DW");
+
+        // Remove the key "hello"
+        data.remove("hello");
+
+        // Print the result
+        System.out.println(data);
+    }
+}
+
+
+
+
+output:
+
+
+{ "name": "DW" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

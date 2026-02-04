@@ -1,0 +1,126 @@
+keyset:
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+
+public class KeySetProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Example input map
+        Map<String, Object> myMap = new HashMap<>();
+        myMap.put("a", true);
+        myMap.put("b", 1);
+
+        // Get the keys
+        Set<String> keys = myMap.keySet();
+
+        // Set the result in the body
+        exchange.getIn().setBody(Map.of("keySet", keys));
+    }
+}
+
+from("direct:start")
+    .process(new KeySetProcessor())
+    .to("log:output");
+
+output:
+
+{
+  "keySet": ["a", "b"]
+}
+
+
+
+-----------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class XmlKeySetProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // Get XML payload as String
+        String xml = exchange.getIn().getBody(String.class);
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true); // important for namespaces
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+        // Get all <user> elements
+        NodeList userNodes = doc.getElementsByTagNameNS("http://test.com", "user");
+
+        List<Map<String, String>> userMaps = new ArrayList<>();
+        for (int i = 0; i < userNodes.getLength(); i++) {
+            Element user = (Element) userNodes.item(i);
+            Map<String, String> attrs = new HashMap<>();
+            NamedNodeMap attributes = user.getAttributes();
+            for (int j = 0; j < attributes.getLength(); j++) {
+                Attr attr = (Attr) attributes.item(j);
+                attrs.put(attr.getName(), attr.getValue());
+            }
+            userMaps.add(attrs);
+        }
+
+        // Build keySet example (flattened keys + attributes)
+        List<Object> keySetExample = new ArrayList<>();
+        for (Map<String, String> userMap : userMaps) {
+            keySetExample.addAll(userMap.keySet());
+            keySetExample.add(userMap); // add the map itself to mimic DW
+        }
+
+        // Set the output
+        Map<String, Object> output = new HashMap<>();
+        output.put("keySetExample", keySetExample);
+        output.put("nameSet", userMaps.stream()
+                                      .map(m -> null) // mimic DW nulls for nameSet
+                                      .collect(Collectors.toList()));
+
+        exchange.getIn().setBody(output);
+    }
+}
+
+from("direct:start")
+    .process(new XmlKeySetProcessor())
+    .to("log:output");
+
+
+output:
+
+{
+  "keySetExample": [
+    "name",
+    "lastName",
+    {"name": "Mariano", "lastName": "Achaval"},
+    "name",
+    "lastName",
+    {"name": "Stacey", "lastName": "Duke"}
+  ],
+  "nameSet": [null, null]
+}
+
+
+
+
+-----------------------------------------------
+
+
+

@@ -1,0 +1,36 @@
+toUri:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+import java.net.URI;
+import java.util.Map;
+
+public class ToUriApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ToUriApp.class, args);
+    }
+
+    @GetMapping("/to-uri")
+    public Map<String, String> toUri() {
+        // Equivalent to DataWeave toUri("[https://www.google.com/](https://www.google.com/)")
+        URI uri = URI.create("[https://www.google.com/](https://www.google.com/)");
+        return Map.of(
+            "toUriExample", uri.toString()
+        );
+    }
+}
+
+
+output:
+
+
+{
+  "toUriExample": "[https://www.google.com/](https://www.google.com/)"
+}
+
+

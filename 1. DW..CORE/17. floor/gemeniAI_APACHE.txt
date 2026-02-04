@@ -1,0 +1,33 @@
+floor:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class MathFloorRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:applyFloor")
+            // 1. Unmarshal JSON input [1.5, 2.2, 3] to a Java List
+            .unmarshal().json(JsonLibrary.Jackson)
+
+            // 2. The Pure Camel equivalent of floor()
+            // We use collect to apply Math.floor to every element in the list
+            .transform().groovy("body.collect { Math.floor(it).toInteger() }")
+
+            // 3. Marshal back to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Send to output
+            .to("log:output?showBody=true");
+    }
+}
+
+
+output:
+
+
+[1, 2, 3]
+

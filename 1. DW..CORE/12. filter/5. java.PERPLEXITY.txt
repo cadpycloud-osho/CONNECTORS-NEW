@@ -1,0 +1,224 @@
+filter:
+
+
+example 1:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(9, 2, 3, 4, 5);
+        List<Integer> result = numbers.stream()
+            .filter(value -> value > 2)
+            .collect(Collectors.toList());
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[9, 3, 4, 5]
+
+------------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        record Person(String name, int age) {}
+        
+        List<Person> people = Arrays.asList(
+            new Person("Mariano", 37),
+            new Person("Shoki", 30),
+            new Person("Tomo", 25),
+            new Person("Ana", 29)
+        );
+        
+        List<Person> result = people.stream()
+            .filter(person -> person.age() >= 30)
+            .collect(Collectors.toList());
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[{"name":"Mariano","age":37},{"name":"Shoki","age":30}]
+
+
+------------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(9, 2, 3, 4, 5);
+        List<Integer> result = IntStream.range(0, numbers.size())
+            .filter(index -> index > 1 && numbers.get(index) < 5)
+            .mapToObj(numbers::get)
+            .collect(Collectors.toList());
+        System.out.println(result);
+    }
+}
+
+
+
+
+
+output:
+
+[3, 4]
+
+------------------------------------------------------------------
+
+
+example 4:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        record User(Map<String, String> user, String error) {}
+        
+        List<User> users = Arrays.asList(
+            new User(Map.of("name", "123", "lastName", "Smith"), "That name doesn't exists"),
+            new User(Map.of("name", "John", "lastName", "Johnson"), null)
+        );
+        
+        List<User> result = users.stream()
+            .filter(user -> user.error() == null)
+            .collect(Collectors.toList());
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[{"user":{"name":"John","lastName":"Johnson"},"error":null}]
+
+
+------------------------------------------------------------------
+
+
+example 5:
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        record Phone(String activeInd, String primaryInd, String number) {}
+        record Base(String username, List<Phone> phone) {}
+        record Profile(Base base) {}
+        record Payload(String id, String marketCode, String languageCode, Profile profile) {}
+        
+        List<String> phoneNumbers = Arrays.asList("230678123", "154896523");
+        
+        Map<String, Object> result = Map.of(
+            "id", "1184001100000000517",
+            "markCode", "US",
+            "languageCode", "en-US",
+            "username", "TheMule",
+            "phoneNumber", phoneNumbers
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "id": "1184001100000000517",
+  "markCode": "US",
+  "languageCode": "en-US",
+  "username": "TheMule",
+  "phoneNumber": ["230678123", "154896523"]
+}
+
+
+------------------------------------------------------------------
+
+
+
+example 6:
+
+input:
+
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class Main {
+    public static void main(String[] args) {
+        String text = "hello world";
+        String result = IntStream.range(0, text.length())
+            .filter(index -> index % 2 == 0)
+            .mapToObj(i -> String.valueOf(text.charAt(i)))
+            .collect(Collectors.joining());
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+
+
+
+output:
+
+
+"hlowrd"
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

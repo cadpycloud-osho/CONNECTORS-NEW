@@ -1,0 +1,40 @@
+encodeURI:
+
+
+input:
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriUtils;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class EncodeUriController {
+
+    @GetMapping("/encode-uri")
+    public Map<String, String> encodeUri() {
+        Map<String, String> result = new HashMap<>();
+        
+        // encodeURI("http://asd/ text to decode /%/\"\\/text")
+        String text1 = "http://asd/ text to decode /%/\"\\/text";
+        String encoded1 = UriUtils.encode(text1, "UTF-8");
+        result.put("encodeURI", encoded1);
+        
+        // encodeURI("http://:;,/?:@&=\$_-_.!~*'()") - safe chars not encoded
+        String text2 = "http://:;,/?:@&=\$_-_.!~*'()";
+        String encoded2 = UriUtils.encode(text2, "UTF-8");
+        result.put("not_encoded", encoded2);
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "encodeURI": "http://asd/%20text%20to%20decode%20/%25/%22%5C/text",
+  "not_encoded": "http://:;,/?:@&=$_-_.!~*'()"
+}
+
+

@@ -1,0 +1,110 @@
+atBeginningOfMonth:
+
+
+example 1:
+
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.temporal.TemporalAdjusters;
+
+public class Main {
+    public static void main(String[] args) {
+
+        OffsetDateTime input =
+            OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+        OffsetDateTime result = input
+            .with(TemporalAdjusters.firstDayOfMonth())
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+2020-10-01T00:00-03:00
+
+
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+
+public class Main {
+    public static void main(String[] args) {
+
+        LocalDateTime input =
+            LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+        LocalDateTime result = input
+            .with(TemporalAdjusters.firstDayOfMonth())
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+2020-10-01T00:00
+
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+
+public class Main {
+    public static void main(String[] args) {
+
+        LocalDate input = LocalDate.parse("2020-10-06");
+
+        LocalDate result =
+            input.with(TemporalAdjusters.firstDayOfMonth());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+2020-10-01
+
+
+
+---------------------------------------------------------------
+
+
+
+
+
+

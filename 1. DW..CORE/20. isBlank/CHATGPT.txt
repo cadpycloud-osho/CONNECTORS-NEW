@@ -1,0 +1,55 @@
+isBlank:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsBlankCheckController {
+
+    private boolean isBlank(String str) {
+        return (str == null || str.trim().isEmpty());
+    }
+
+    @GetMapping("/check-blank")
+    public Map<String, Boolean> checkBlankValues() {
+
+        String someString = "something";
+        String nullString = null;
+        String nonExistingValue = null; // represents payload.nonExistingValue
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("emptyString", isBlank(""));
+        result.put("stringWithSpaces", isBlank("      "));
+        result.put("textString", isBlank(someString));
+        result.put("somePayloadValue", isBlank(nonExistingValue));
+        result.put("nullString", isBlank(nullString));
+
+        result.put("notEmptyTextString", !isBlank(" 1234"));
+        result.put("notEmptyTextStringTwo", !isBlank(""));
+
+        return result;
+    }
+}
+OUTPUT:
+
+{
+  "emptyString": true,
+  "stringWithSpaces": true,
+  "textString": false,
+  "somePayloadValue": true,
+  "nullString": true,
+  "notEmptyTextString": true,
+  "notEmptyTextStringTwo": false
+}
+
+
+
+
+
+

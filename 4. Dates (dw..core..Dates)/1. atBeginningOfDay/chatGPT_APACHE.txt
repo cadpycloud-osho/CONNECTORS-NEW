@@ -1,0 +1,72 @@
+atBeginningOfDay:
+
+example 1:
+
+input:
+
+from("direct:beginningOfDay")
+.process(exchange -> {
+
+    // Input DateTime
+    java.time.OffsetDateTime input =
+        java.time.OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+    // atBeginningOfDay equivalent
+    java.time.OffsetDateTime beginningOfDay =
+        input.toLocalDate()
+             .atStartOfDay()
+             .atOffset(input.getOffset());
+
+    // Prepare output
+    java.util.Map<String, Object> result = new java.util.HashMap<>();
+    result.put("atBeginningOfDayDateTime", beginningOfDay.toString());
+
+    exchange.getIn().setBody(result);
+});
+
+
+output:
+
+{
+  "atBeginningOfDayDateTime": "2020-10-06T00:00-03:00"
+}
+
+
+
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:atBeginningOfDayLocalDateTime")
+.process(exchange -> {
+
+    // Input LocalDateTime (no timezone)
+    java.time.LocalDateTime input =
+        java.time.LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+    // atBeginningOfDay equivalent
+    java.time.LocalDateTime beginningOfDay =
+        input.toLocalDate().atStartOfDay();
+
+    // Prepare output
+    java.util.Map<String, Object> result = new java.util.HashMap<>();
+    result.put("atBeginningOfDayLocalDateTime", beginningOfDay.toString());
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+output:
+
+{
+  "atBeginningOfDayLocalDateTime": "2020-10-06T00:00"
+}
+
+
+
+
+--------------------------------------------------------

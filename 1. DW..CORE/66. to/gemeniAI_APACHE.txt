@@ -1,0 +1,131 @@
+to:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class CamelRangeExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: 1 to 10
+                        // Java: rangeClosed(start, end) includes the end value
+                        List<Integer> range = IntStream.rangeClosed(1, 10)
+                                                       .boxed()
+                                                       .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(Map.of("myRange", range));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+
+{
+  "myRange": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+}
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelStringSlicing {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String myVar = "Hello World!";
+                        int len = myVar.length();
+                        Map<String, String> results = new LinkedHashMap<>();
+
+                        // 1. indices2to6: DW [2 to 6] is inclusive. 
+                        // Java substring(2, 7) gets indices 2,3,4,5,6.
+                        results.put("indices2to6", myVar.substring(2, 7));
+
+                        // 2. indicesFromEnd: DW [6 to -1]. 
+                        // -1 in DW means the last character. In Java, that is len.
+                        results.put("indicesFromEnd", myVar.substring(6, len));
+
+                        // 3. reversal: DW [11 to -0].
+                        // Java uses StringBuilder to reverse strings.
+                        results.put("reversal", new StringBuilder(myVar).reverse().toString());
+
+                        exchange.getIn().setBody(results);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "indices2to6": "llo W",
+  "indicesFromEnd": "World!",
+  "reversal": "!dlroW olleH"
+}
+
+
+
+--------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

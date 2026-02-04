@@ -1,0 +1,42 @@
+upper:
+
+upper(text: String): String
+
+upper(text: String): String
+Returns the provided string in uppercase characters.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "name" : upper("mulesoft") }
+
+DataWeave
+Output
+{ "name": "MULESOFT" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

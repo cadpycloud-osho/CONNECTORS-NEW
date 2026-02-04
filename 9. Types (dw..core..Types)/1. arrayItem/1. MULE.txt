@@ -1,0 +1,68 @@
+arrayItem:
+
+arrayItem(t: Type): Type
+
+arrayItem(t: Type): Type
+Returns the type of the given array. This function fails if the input is not an Array type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ArrayOfString = Array<String>
+type ArrayOfNumber = Array<Number>
+type ArrayOfAny = Array<Any>
+type ArrayOfAnyDefault = Array
+output application/json
+---
+{
+   a: arrayItem(ArrayOfString),
+   b: arrayItem(ArrayOfNumber),
+   c: arrayItem(ArrayOfAny),
+   d: arrayItem(ArrayOfAnyDefault)
+}
+
+
+DataWeave
+Output
+{
+  "a": "String",
+  "b": "Number",
+  "c": "Any",
+  "d": "Any"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

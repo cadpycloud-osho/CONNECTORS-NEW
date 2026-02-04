@@ -1,0 +1,258 @@
+filter:
+
+
+example 1:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> list = Arrays.asList(9, 2, 3, 4, 5);
+
+        List<Integer> result = list.stream()
+                                   .filter(value -> value > 2)
+                                   .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[9, 3, 4, 5]
+
+
+------------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+class Person {
+    String name;
+    int age;
+
+    Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "{name=" + name + ", age=" + age + "}";
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Person> people = Arrays.asList(
+                new Person("Mariano", 37),
+                new Person("Shoki", 30),
+                new Person("Tomo", 25),
+                new Person("Ana", 29)
+        );
+
+        List<Person> result = people.stream()
+                .filter(p -> p.age >= 30)
+                .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+[{name=Mariano, age=37}, {name=Shoki, age=30}]
+
+------------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> list = Arrays.asList(9, 2, 3, 4, 5);
+
+        List<Integer> result = IntStream.range(0, list.size())
+                .filter(index -> index > 1 && list.get(index) < 5)
+                .mapToObj(list::get)
+                .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[3, 4]
+
+
+------------------------------------------------------------------
+
+
+example 4:
+
+input:
+
+import java.util.*;
+import java.util.stream.*;
+
+class UserRecord {
+    String name;
+    String lastName;
+    String error;
+
+    UserRecord(String name, String lastName, String error) {
+        this.name = name;
+        this.lastName = lastName;
+        this.error = error;
+    }
+
+    @Override
+    public String toString() {
+        return "{name=" + name + ", lastName=" + lastName + ", error=" + error + "}";
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<UserRecord> users = Arrays.asList(
+                new UserRecord("123", "Smith", "That name doesn't exists"),
+                new UserRecord("John", "Johnson", null)
+        );
+
+        List<UserRecord> result = users.stream()
+                                       .filter(u -> u.error == null)
+                                       .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[{name=John, lastName=Johnson, error=null}]
+
+
+------------------------------------------------------------------
+
+
+example 5:
+
+input:
+
+
+import java.util.*;
+import java.util.stream.*;
+
+class Phone {
+    String activeInd;
+    String primaryInd;
+    String number;
+
+    Phone(String activeInd, String primaryInd, String number) {
+        this.activeInd = activeInd;
+        this.primaryInd = primaryInd;
+        this.number = number;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Phone> phones = Arrays.asList(
+                new Phone("Y", "Y", "230678123"),
+                new Phone("N", "N", ""),
+                new Phone("Y", "Y", "154896523")
+        );
+
+        List<String> phoneNumbers = phones.stream()
+                .filter(p -> "Y".equals(p.activeInd) && "Y".equals(p.primaryInd))
+                .map(p -> p.number)
+                .collect(Collectors.toList());
+
+        System.out.println(phoneNumbers);
+    }
+}
+
+
+output:
+
+[230678123, 154896523]
+
+
+------------------------------------------------------------------
+
+
+
+example 6:
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        String input = "hello world";
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < input.length(); i++) {
+            if (i % 2 == 0) {
+                result.append(input.charAt(i));
+            }
+        }
+
+        System.out.println(result.toString());
+    }
+}
+
+
+output:
+
+hlowrd
+
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

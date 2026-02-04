@@ -1,0 +1,54 @@
+
+
+asExpressionString:
+
+
+input:
+
+import java.util.*;
+
+public class PathElementSerializer {
+    public static String asExpressionString(List<Map<String, Object>> pathElements) {
+        StringBuilder path = new StringBuilder();
+        
+        for (Map<String, Object> element : pathElements) {
+            String kind = (String) element.get("kind");
+            String selector = (String) element.get("selector");
+            
+            switch (kind) {
+                case "OBJECT_TYPE":
+                    path.append(".").append(selector);
+                    break;
+                case "ATTRIBUTE_TYPE":
+                    path.append("@").append(selector);
+                    break;
+            }
+        }
+        
+        return path.toString();
+    }
+    
+    public static void main(String[] args) {
+        List<Map<String, Object>> path = Arrays.asList(
+            createElement("OBJECT_TYPE", "user", null),
+            createElement("ATTRIBUTE_TYPE", "name", null)
+        );
+        System.out.println(asExpressionString(path)); // ".user.@name"
+    }
+    
+    private static Map<String, Object> createElement(String kind, String selector, String namespace) {
+        Map<String, Object> element = new LinkedHashMap<>();
+        element.put("kind", kind);
+        element.put("selector", selector);
+        element.put("namespace", namespace);
+        return element;
+    }
+}
+
+
+
+output:
+
+".user.@name"
+
+

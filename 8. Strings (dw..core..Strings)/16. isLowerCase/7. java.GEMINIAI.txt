@@ -1,0 +1,76 @@
+isLowerCase:
+
+
+
+input:
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's isLowerCase(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY lowercase letters.
+     */
+    public static boolean isLowerCaseString(String input) {
+        // 1. DataWeave returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // 2. Check every character
+        for (char c : input.toCharArray()) {
+            // Must be a letter AND must be lowercase. 
+            // This ensures we reject spaces, digits, and punctuation.
+            if (!Character.isLetter(c) || !Character.isLowerCase(c)) {
+                return false;
+            }
+        }
+        // If the loop completes, all characters are lowercase letters.
+        return true;
+    }
+
+    public static void main(String[] args) {
+        // The input string for 'i' and 'j' requires the actual Unicode characters.
+        boolean a = isLowerCaseString(null);
+        boolean b = isLowerCaseString("");
+        boolean c = isLowerCaseString(" ");
+        boolean d = isLowerCaseString("abc");
+        boolean e = isLowerCaseString("aBC");
+        boolean f = isLowerCaseString("a c");
+        boolean g = isLowerCaseString("a1c");
+        boolean h = isLowerCaseString("a/c");
+        boolean i = isLowerCaseString("mulesöft"); // ö is U+00F6
+        boolean j = isLowerCaseString("mulesÖft"); // Ö is U+00D6
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c + ",");
+        System.out.println("  \"d\": " + d + ",");
+        System.out.println("  \"e\": " + e + ",");
+        System.out.println("  \"f\": " + f + ",");
+        System.out.println("  \"g\": " + g + ",");
+        System.out.println("  \"h\": " + h + ",");
+        System.out.println("  \"i\": " + i + ",");
+        System.out.println("  \"j\": " + j);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": true,
+  "j": false
+}
+

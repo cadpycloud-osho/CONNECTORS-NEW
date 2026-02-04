@@ -1,0 +1,42 @@
+prop:
+
+
+input:
+
+import java.util.Collections;
+import java.util.Map;
+
+public class Main {
+
+    private static final String PROPERTY_KEY = "user.timezone";
+
+    /**
+     * Replicates the DataWeave prop("user.timezone") function.
+     */
+    public static Map<String, String> getSystemTimezoneProperty() {
+        // Equivalent to: prop("user.timezone")
+        String timezoneValue = System.getProperty(PROPERTY_KEY);
+
+        // Map.of() throws NullPointerException if timezoneValue is null.
+        // We use Collections.singletonMap() (or a standard HashMap) which allows null values,
+        // simulating the DW output structure more accurately when a property is missing.
+        return Collections.singletonMap("props", timezoneValue);
+    }
+
+    public static void main(String[] args) {
+        // Set a default timezone property explicitly for predictable execution 
+        // if it's not set by the JVM environment.
+        if (System.getProperty(PROPERTY_KEY) == null) {
+            System.setProperty(PROPERTY_KEY, "Asia/Kolkata");
+        }
+
+        System.out.println("--- Pure Java System Property Simulation ---");
+        System.out.println(getSystemTimezoneProperty());
+    }
+}
+output:
+
+--- Pure Java System Property Simulation ---
+{props=Asia/Kolkata}
+// Output will vary based on the host system's 'user.timezone' setting.
+

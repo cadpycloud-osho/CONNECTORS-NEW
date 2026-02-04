@@ -1,0 +1,41 @@
+
+isFunctionType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.function.Function;
+
+public class TypeCheckRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkTypes")
+            .process(exchange -> {
+                // Define our samples
+                Object aFunction = (Function<String, String>) (s) -> s;
+                Object notAFunction = Boolean.TRUE;
+
+                // Create the response map
+                Map<String, Boolean> result = new HashMap<>();
+                
+                // Logic equivalent to isFunctionType
+                result.put("a", aFunction instanceof Function);
+                result.put("b", notAFunction instanceof Function);
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json() // Converts the Map to JSON
+            .to("mock:output");
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}

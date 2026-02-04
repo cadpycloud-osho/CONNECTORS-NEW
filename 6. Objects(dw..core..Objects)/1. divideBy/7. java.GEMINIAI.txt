@@ -1,0 +1,144 @@
+divideBy:
+
+
+input:
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+public class Main {
+
+    /**
+     * Simulates the DataWeave divideBy operator by chunking a list of key-value
+     * pairs into an array of maps (objects), each containing at most 'divisor' entries.
+     * @param inputEntries The ordered list of key-value pairs representing the DW object.
+     * @param divisor The maximum number of entries per output object.
+     * @return A list of Maps, where each Map is a chunk of the original entries.
+     */
+    public static List<Map<String, Object>> divideBy(
+            List<Entry<String, Object>> inputEntries, int divisor) {
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        
+        for (int i = 0; i < inputEntries.size(); i += divisor) {
+            // Determine the end index for the current chunk
+            int endIndex = Math.min(i + divisor, inputEntries.size());
+            
+            // Create a new Map (DW Object) for the current chunk, preserving order
+            Map<String, Object> chunkMap = new LinkedHashMap<>();
+            
+            // Iterate over the chunk slice of the input list
+            for (int j = i; j < endIndex; j++) {
+                Entry<String, Object> entry = inputEntries.get(j);
+                
+                // Add the key-value pair to the new object
+                // Note: If duplicate keys exist within a single chunk, this will overwrite,
+                // but based on the DW logic, the division ensures no duplicates per chunk 
+                // in this specific example. The key point is preserving the list sequence.
+                chunkMap.put(entry.getKey(), entry.getValue());
+            }
+            
+            resultList.add(chunkMap);
+        }
+        
+        return resultList;
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static void runDataWeaveTransformation() {
+        
+        // 1. Represent the source DW object as an ordered list of entries
+        // This is necessary to correctly model the DW behavior with duplicate keys.
+        List<Entry<String, Object>> sourceEntries = new ArrayList<>();
+        sourceEntries.add(new AbstractMap.SimpleEntry<>("a", 1));
+        sourceEntries.add(new AbstractMap.SimpleEntry<>("b", true));
+        sourceEntries.add(new AbstractMap.SimpleEntry<>("a", 2));
+        sourceEntries.add(new AbstractMap.SimpleEntry<>("b", false));
+        sourceEntries.add(new AbstractMap.SimpleEntry<>("c", 3));
+        
+        int divisor = 2; // The divisor in the DW code
+        
+        // 2. Apply the divideBy logic
+        List<Map<String, Object>> dividedResult = divideBy(sourceEntries, divisor);
+        
+        // 3. Format the final JSON output (simulating the array output)
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n  \"divideBy\": [\n");
+
+        for (int i = 0; i < dividedResult.size(); i++) {
+            Map<String, Object> chunk = dividedResult.get(i);
+            
+            // Convert Map to JSON string representation
+            sb.append("    {\n");
+            int entryCount = 0;
+            for (Entry<String, Object> entry : chunk.entrySet()) {
+                String valueStr = (entry.getValue() instanceof String) ? "\"" + entry.getValue() + "\"" : entry.getValue().toString();
+                
+                sb.append(String.format("      \"%s\": %s", entry.getKey(), valueStr));
+                if (entryCount < chunk.size() - 1) {
+                    sb.append(",\n");
+                } else {
+                    sb.append("\n");
+                }
+                entryCount++;
+            }
+            sb.append("    }");
+            
+            if (i < dividedResult.size() - 1) {
+                sb.append(",\n");
+            } else {
+                sb.append("\n");
+            }
+        }
+        
+        sb.append("  ]\n}");
+
+        System.out.println("--- DataWeave Transformation (divideBy) ---");
+        System.out.println("Input Entries Count: " + sourceEntries.size());
+        System.out.println("Divisor: " + divisor);
+        System.out.println("Output Chunks Count: " + dividedResult.size());
+        System.out.println("-------------------------------------------");
+        
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(sb.toString());
+    }
+
+    public static void main(String[] args) {
+        runDataWeaveTransformation();
+    }
+}
+
+output:
+
+
+--- DataWeave Transformation (divideBy) ---
+Input Entries Count: 5
+Divisor: 2
+Output Chunks Count: 3
+-------------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "divideBy": [
+    {
+      "a": 1,
+      "b": true
+    },
+    {
+      "a": 2,
+      "b": false
+    },
+    {
+      "c": 3
+    }
+  ]
+}
+
+

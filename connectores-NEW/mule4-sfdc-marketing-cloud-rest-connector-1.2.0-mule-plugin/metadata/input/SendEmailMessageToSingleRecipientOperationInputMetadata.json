@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "definitionKey",
+        "recipient"
+      ],
+      "properties": {
+        "definitionKey": {
+          "type": "string"
+        },
+        "recipient": {
+          "$ref": "#/definitions/recipient"
+        }
+      }
+    },
+    "recipient": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "contactKey"
+      ],
+      "properties": {
+        "contactKey": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

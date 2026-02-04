@@ -1,0 +1,15 @@
+ceil(number: Number): Number
+Rounds a number up to the nearest whole number.
+
+
+
+INPUT:
+%dw 2.0
+output application/json
+---
+
+[ ceil(1.5), ceil(2.1), ceil(3) ]
+
+OUTPUT:
+
+[ 2, 3, 3 ]

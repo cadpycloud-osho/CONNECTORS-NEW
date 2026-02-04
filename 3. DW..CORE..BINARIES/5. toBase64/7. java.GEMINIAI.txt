@@ -1,0 +1,131 @@
+toBase64:
+
+
+
+input:
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+// Required imports for logging
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Main {
+
+    // FIX: Reference Main.class instead of the undefined GravatarImageFetcher.class
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName()); 
+    
+    /**
+     * Converts a byte array (MD5 hash) into its hexadecimal string representation.
+     */
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            // "%02x" formats the byte as two hexadecimal digits, padded with leading zero if needed
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
+    }
+
+    /**
+     * Calculates the MD5 hash of a string and returns it as a hexadecimal string.
+     * This mimics the DataWeave 'Crypto::MD5(payload as Binary)' followed by the 
+     * implicit hex conversion needed for the Gravatar URL.
+     */
+    public static String calculateMD5Hex(String input) throws NoSuchAlgorithmException {
+        // The Gravatar standard requires the email to be trimmed and lowercased before hashing
+        String gravatarInput = input.trim().toLowerCase();
+        
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        // Hash the bytes of the email string
+        byte[] hashBytes = md.digest(gravatarInput.getBytes());
+        
+        // Convert the raw hash bytes to a hexadecimal string
+        return bytesToHex(hashBytes);
+    }
+    
+    /**
+     * Fetches binary content (image) from a URL.
+     * This mimics the DataWeave 'readUrl(..., "application/octet-stream")'.
+     */
+    public static byte[] fetchUrlContent(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        
+        // Use try-with-resources to ensure the InputStream is closed
+        try (InputStream is = url.openStream()) {
+            // Read all bytes from the input stream into a byte array
+            // NOTE: is.readAllBytes() is available from Java 9 onwards. 
+            // For older versions, manual reading would be required.
+            return is.readAllBytes();
+        }
+    }
+
+    /**
+     * Executes the full DataWeave transformation.
+     */
+    public static String runDataWeaveTransformation() {
+        try {
+            // 1. Define the email address
+            String email = "achaval@gmail.com";
+            
+            // 2. Calculate the MD5 checksum (DW: var emailChecksum = Crypto::MD5(...) )
+            String emailChecksumHex = calculateMD5Hex(email);
+            
+            // 3. Construct the Gravatar URL
+            String gravatarUrl = "https://www.gravatar.com/avatar/" + emailChecksumHex + "?d=404"; // Added ?d=404 to suppress default Gravatar if not found
+            LOGGER.log(Level.INFO, "Constructed Gravatar URL: {0}", gravatarUrl); 
+            
+            // 4. Fetch the image content (DW: var image = readUrl(...) )
+            byte[] imageBytes = fetchUrlContent(gravatarUrl);
+            LOGGER.log(Level.INFO, "Successfully fetched {0} bytes from URL.", imageBytes.length);
+            
+            // 5. Encode the image to Base64 (DW: toBase64(image) )
+            String base64Output = Base64.getEncoder().encodeToString(imageBytes);
+            
+            return base64Output;
+
+        } catch (NoSuchAlgorithmException e) {
+            return "ERROR: MD5 algorithm not found: " + e.getMessage();
+        } catch (IOException e) {
+            return "ERROR: Failed to fetch URL content: " + e.getMessage();
+        }
+    }
+
+    public static void main(String[] args) {
+        // Turn off system logger output for cleaner console result
+        LOGGER.setLevel(Level.SEVERE); 
+        
+        String base64Result = runDataWeaveTransformation();
+        
+        System.out.println("\nDataWeave Output in Java (Base64 Encoded Image):");
+        
+        // Print only the first part of the Base64 string for readability
+        if (base64Result.startsWith("ERROR")) {
+             System.out.println(base64Result);
+        } else {
+             // Gravatar images are usually JPEG (starts with /9j/) or PNG/GIF (starts with iVBORw0KGgoAAA or R0lGODlh), 
+             // ensuring the output looks like the expected binary data.
+             System.out.println(base64Result.substring(0, Math.min(base64Result.length(), 40)) + "...");
+        }
+    }
+}
+
+
+
+output:
+
+/9j/4AAQSkZJRgABAQEAYABgAAD//...
+
+
+
+
+
+
+
+
+
+

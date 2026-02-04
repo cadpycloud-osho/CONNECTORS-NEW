@@ -1,0 +1,68 @@
+isNothingType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelNothingTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type ANothing = Nothing (alias simulation)
+                        Class<?> ANothing = Nothing.class;
+
+                        // Simulating DataWeave isNothingType
+                        boolean a = isNothingType(ANothing);
+                        boolean b = isNothingType(Nothing.class);
+                        boolean c = isNothingType(String.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + ",\n" +
+                                "  \"c\": " + c + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave isNothingType
+    private static boolean isNothingType(Class<?> clazz) {
+        return clazz == Nothing.class;
+    }
+
+    // Simulating DataWeave Nothing type
+    interface Nothing {
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

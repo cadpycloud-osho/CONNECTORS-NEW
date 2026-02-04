@@ -1,0 +1,35 @@
+toUri:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URI;
+import java.util.Map;
+
+public class UriCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceUri")
+            .process(exchange -> {
+                // DataWeave: toUri("https://www.google.com/")
+                // java.net.URI is the standard representation
+                URI uri = URI.create("https://www.google.com/");
+
+                exchange.getIn().setBody(Map.of("toUriExample", uri.toString()));
+            })
+            .marshal().json();
+    }
+}
+
+
+
+output:
+{
+  "toUriExample": "https://www.google.com/"
+}
+
+
+
+

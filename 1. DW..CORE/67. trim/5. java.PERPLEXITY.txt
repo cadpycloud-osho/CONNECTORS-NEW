@@ -1,0 +1,63 @@
+trim:
+
+example 1:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String trimmed = "   my really long  text     ".trim();
+        
+        // Manual JSON output
+        System.out.println("{\"trim\":\"" + trimmed + "\"}");
+    }
+}
+
+output:
+
+{"trim":"my really long  text"}
+
+
+-----------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        // Manual JSON output for trim operations
+        System.out.println("{");
+        System.out.println("  \"null\" : null,");
+        System.out.println("  \"empty\" : \"" + "".trim() + "\",");
+        System.out.println("  \"blank\" : \"" + "     ".trim() + "\",");
+        System.out.println("  \"noBlankSpaces\" : \"" + "abc".trim() + "\",");
+        System.out.println("  \"withSpaces\" : \"" + "    abc    ".trim() + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "null": null,
+  "empty": "",
+  "blank": "",
+  "noBlankSpaces": "abc",
+  "withSpaces": "abc"
+}
+
+
+-----------------------------------------------------
+
+
+
+
+

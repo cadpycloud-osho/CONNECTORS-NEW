@@ -1,0 +1,155 @@
+contains:
+
+examples 1:
+
+
+input:
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
+import java.util.List;
+import java.util.ArrayList;
+
+public class ContainsExample1 {
+    public static void main(String[] args) throws Exception {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><order><items>155</items></order><order><items>30</items></order><order><items>15</items></order><order><items>5</items></order><order><items>4</items><items>7</items></order><order><items>1</items><items>3</items></order><order><null/></order></root>";
+        
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+        NodeList orders = doc.getElementsByTagName("order");
+        boolean containsItem = false;
+        
+        for (int i = 0; i < orders.getLength(); i++) {
+            NodeList items = ((Element)orders.item(i)).getElementsByTagName("items");
+            for (int j = 0; j < items.getLength(); j++) {
+                if ("3".equals(items.item(j).getTextContent().trim())) {
+                    containsItem = true;
+                    break;
+                }
+            }
+            if (containsItem) break;
+        }
+        
+        System.out.println("{\"ContainsRequestedItem\": " + containsItem + "}");
+    }
+}
+
+
+output:
+
+{"ContainsRequestedItem": true}
+---------------------------------------------------------------
+
+
+
+examples 2:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String text = "mulesoft";
+        boolean result = text.contains("mule");
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+true
+
+---------------------------------------------------------------
+
+
+
+
+examples 3:
+
+
+input:
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
+import java.io.ByteArrayInputStream;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><mystring>some string</mystring></root>";
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
+        String myString = doc.getElementsByTagName("mystring").item(0).getTextContent();
+        boolean result = myString.contains("me");
+        System.out.println("{\"ContainsString\": " + result + "}");
+    }
+}
+
+
+
+output:
+
+{"ContainsString": true}
+---------------------------------------------------------------
+
+
+
+
+
+examples 4:
+
+
+input:
+
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
+import java.util.regex.Pattern;
+import java.io.ByteArrayInputStream;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><mystring>A very long string</mystring></root>";
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
+        String myString = doc.getElementsByTagName("mystring").item(0).getTextContent();
+        
+        // /s[t|p]rin/ equivalent: s followed by t or p, then rin
+        Pattern pattern = Pattern.compile("s[t|p]rin");
+        boolean result = pattern.matcher(myString).find();
+        System.out.println("{\"ContainsString\": " + result + "}");
+    }
+}
+
+
+
+
+output:
+
+{"ContainsString": true}
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

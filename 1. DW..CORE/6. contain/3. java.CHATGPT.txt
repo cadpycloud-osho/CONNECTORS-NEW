@@ -1,0 +1,208 @@
+contains:
+
+examples 1:
+XML Input
+<root>
+    <order><items>155</items></order>
+    <order><items>30</items></order>
+    <order><items>15</items></order>
+    <order><items>5</items></order>
+    <order>
+        <items>4</items>
+        <items>7</items>
+    </order>
+    <order>
+        <items>1</items>
+        <items>3</items>
+    </order>
+    <order>null</order>
+</root>
+
+
+
+
+input:
+
+import java.util.*;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
+class Main {
+    public static void main(String[] args) throws Exception {
+
+        String xml =
+            "<root>" +
+            "<order><items>155</items></order>" +
+            "<order><items>30</items></order>" +
+            "<order><items>15</items></order>" +
+            "<order><items>5</items></order>" +
+            "<order><items>4</items><items>7</items></order>" +
+            "<order><items>1</items><items>3</items></order>" +
+            "<order>null</order>" +
+            "</root>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+        NodeList itemsList = doc.getElementsByTagName("items");
+
+        boolean contains3 = false;
+        for (int i = 0; i < itemsList.getLength(); i++) {
+            if ("3".equals(itemsList.item(i).getTextContent())) {
+                contains3 = true;
+                break;
+            }
+        }
+
+        System.out.println("{ \"ContainsRequestedItem\": " + contains3 + " }");
+    }
+}
+
+
+
+output:
+
+{ "ContainsRequestedItem": true }
+
+---------------------------------------------------------------
+
+
+
+examples 2:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        boolean result = "mulesoft".contains("mule");
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+
+true
+
+---------------------------------------------------------------
+
+
+
+
+examples 3:
+
+<root>
+    <mystring>some string</mystring>
+</root>
+
+input:
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+
+        String xml = "<root><mystring>some string</mystring></root>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(
+                new java.io.ByteArrayInputStream(xml.getBytes())
+        );
+
+        String value = doc.getElementsByTagName("mystring")
+                          .item(0)
+                          .getTextContent();
+
+        boolean contains = value.contains("me");
+
+        System.out.println("{ \"ContainsString\": " + contains + " }");
+    }
+}
+
+
+
+output:
+
+{ "ContainsString": true }
+
+---------------------------------------------------------------
+
+
+
+
+
+examples 4:
+
+<root>
+    <mystring>A very long string</mystring>
+</root>
+
+input:
+
+import java.util.regex.*;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+
+        String xml = "<root><mystring>A very long string</mystring></root>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(
+                new java.io.ByteArrayInputStream(xml.getBytes())
+        );
+
+        String value = doc.getElementsByTagName("mystring")
+                          .item(0)
+                          .getTextContent();
+
+        Pattern pattern = Pattern.compile("s[t|p]rin");
+        boolean matches = pattern.matcher(value).find();
+
+        System.out.println("{ContainsString: " + matches + "}");
+    }
+}
+
+output:
+{ "ContainsString": true }
+
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

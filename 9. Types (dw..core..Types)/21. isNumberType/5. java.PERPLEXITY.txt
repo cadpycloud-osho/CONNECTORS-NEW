@@ -1,0 +1,35 @@
+isNumberType:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isNumberType(Object value) {
+        return value instanceof Number;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Number aNumber = 123;      // ANumber
+        Number numberType = 456.78; // Number
+        String str = "test";       // String
+        
+        result.put("a", isNumberType(aNumber));
+        result.put("b", isNumberType(numberType));
+        result.put("c", isNumberType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=true, b=true, c=false}
+
+

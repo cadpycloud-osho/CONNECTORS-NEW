@@ -1,0 +1,50 @@
+toTimeZone:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToTimeZoneRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // toTimeZoneOffset: toTimeZone("-03:00")
+                    result.put("toTimeZoneOffset", ZoneOffset.of("-03:00").toString());
+                    
+                    // toTimeZoneAbbreviation: toTimeZone("Z")
+                    result.put("toTimeZoneAbbreviation", ZoneOffset.of("Z").toString());
+                    
+                    // toTimeZoneName: toTimeZone("America/Argentina/Buenos_Aires")
+                    result.put("toTimeZoneName", ZoneId.of("America/Argentina/Buenos_Aires").toString());
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+
+
+output:
+{
+  "toTimeZoneOffset": "-03:00",
+  "toTimeZoneAbbreviation": "Z",
+  "toTimeZoneName": "America/Argentina/Buenos_Aires"
+}
+
+
+

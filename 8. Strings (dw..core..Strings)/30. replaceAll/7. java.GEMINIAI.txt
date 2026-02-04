@@ -1,0 +1,61 @@
+replaceAll:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = replaceAll("Mariano", "a" , "A");
+        String b = replaceAll("AAAA", "AAA" , "B");
+        String c = replaceAll(null, "aria" , "A");
+        String d = replaceAll("Mariano", "j" , "Test");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        // We use a helper function to correctly format the values (handling null and quotes)
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s,\n  \"c\": %s,\n  \"d\": %s\n}",
+            formatJsonString(a), 
+            formatJsonString(b), 
+            formatJsonString(c), 
+            formatJsonString(d)
+        );
+
+        System.out.println(output);
+    }
+    
+    /**
+     * Replicates the dw::core::Strings::replaceAll function.
+     */
+    public static String replaceAll(String str, String search, String replacement) {
+        // DataWeave Rule for null input string.
+        if (str == null) {
+            return null;
+        }
+        
+        // String.replace() finds all occurrences (non-overlapping) of a literal
+        // target and replaces them.
+        return str.replace(search, replacement);
+    }
+
+    /**
+     * Helper to format the Java String result into a valid JSON string (with quotes)
+     * or the JSON literal 'null'.
+     */
+    private static String formatJsonString(String value) {
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+output:
+
+{
+  "a": "MAriAno",
+  "b": "BA",
+  "c": null,
+  "d": "Mariano"
+}

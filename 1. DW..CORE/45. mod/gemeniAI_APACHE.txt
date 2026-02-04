@@ -1,0 +1,51 @@
+mod:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.List;
+
+public class CamelModuloExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: (3 mod 2)
+                        double val1 = 3 % 2;
+                        
+                        // DataWeave: (4 mod 2)
+                        double val2 = 4 % 2;
+                        
+                        // DataWeave: (2.2 mod 2)
+                        double val3 = 2.2 % 2;
+
+                        // Create the list [ 1.0, 0.0, 0.2 ]
+                        List<Double> result = Arrays.asList(val1, val2, val3);
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[ 1.0, 0.0, 0.2 ]
+

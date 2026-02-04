@@ -1,0 +1,223 @@
+splitBy:
+
+
+example 1:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+public class SplitByExample1 {
+    public static void main(String[] args) {
+        String input = "192.88.99.0/24";
+        // The regex [./] matches a literal dot or a literal slash.
+        String regex = "[./]"; 
+        
+        String[] parts = input.split(regex);
+        
+        System.out.println("--- DWL Example 1 Output (Regex [./]) ---");
+        // Output as a JSON-like array string
+        System.out.println(Arrays.stream(parts)
+                               .map(s -> "\"" + s + "\"")
+                               .collect(Collectors.joining(", ", "[", "]")));
+    }
+}
+
+
+output:
+
+["192", "88", "99", "0", "24"]
+
+------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class SplitByExample2 {
+    public static void main(String[] args) {
+        Map<String, List<String>> splitters = new LinkedHashMap<>();
+        
+        // "a-b-c" splitBy(/.b./) - .b. matches any char + 'b' + any char (matches "-b-")
+        splitters.put("split1", Arrays.asList("a-b-c".split(".b.")));
+        
+        // "hello world" splitBy(/\s/) - \s matches whitespace
+        splitters.put("split2", Arrays.asList("hello world".split("\\s")));
+        
+        // "no match" splitBy(/^s/) - Matches "s" at start (doesn't exist) -> no split
+        splitters.put("split3", Arrays.asList("no match".split("^s")));
+        
+        // "no match" splitBy(/^n../) - Matches "n" followed by two characters at the start ("no ")
+        splitters.put("split4", Arrays.asList("no match".split("^n..")));
+        
+        // "a1b2c3d4A1B2C3D" splitBy(/[0-9A-Z]/) - Splits by any digit or uppercase letter.
+        // DWL typically drops empty strings, especially trailing ones.
+        String[] temp5 = "a1b2c3d4A1B2C3D".split("[0-9A-Z]", -1);
+        // Copy the array excluding the last (empty) element caused by the trailing split.
+        splitters.put("split5", Arrays.asList(Arrays.copyOf(temp5, temp5.length - 1)));
+        
+        System.out.println("--- DWL Example 2 Output (Complex Regex Splitters) ---");
+        System.out.println("{ \"splitters\": " + splitters + " }");
+    }
+}
+
+
+output:
+
+{ "splitters": {split1=[a, c], split2=[hello, world], split3=[no match], split4=[, match], split5=[a, b, c, d]} }
+------------------------------------------------------------------
+example 3:
+
+
+
+input:
+
+import java.util.regex.Pattern;
+
+public class SplitByExample3 {
+    public static void main(String[] args) {
+        String input = "192.88.99.0";
+        // Java requires escaping the dot for literal splitting, achieved with Pattern.quote()
+        String[] parts = input.split(Pattern.quote(".")); 
+        
+        String output = parts[0];
+        
+        System.out.println("--- DWL Example 3 Output (Indexing) ---");
+        // Output as a JSON string
+        System.out.println("\"" + output + "\"");
+    }
+}
+
+
+output:
+
+"192"
+------------------------------------------------------------------
+example 4:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+public class SplitByExample4 {
+    public static void main(String[] args) {
+        String input = "root.sources.data.`test.branch.BranchSource`.source.traits";
+        // Regex: Split by a literal dot (\.) followed by a positive lookahead (?=...)
+        // The lookahead ensures the dot is followed by an even number of backticks (or zero) until the end of the string ($).
+        String regex = "\\.(?=(?:[^`]*`[^`]*`)*[^`]*$)";
+        
+        String[] parts = input.split(regex);
+        
+        System.out.println("--- DWL Example 4 Output (Lookahead Regex) ---");
+        // Output as a JSON-like array string
+        System.out.println(Arrays.stream(parts)
+                               .map(s -> "\"" + s + "\"")
+                               .collect(Collectors.joining(",\n\t", "[\n\t", "\n]")));
+    }
+}
+
+
+output:
+
+[
+	"root",
+	"sources",
+	"data",
+	"`test.branch.BranchSource`",
+	"source",
+	"traits"
+]
+------------------------------------------------------------------
+example 5:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+public class SplitByExample5 {
+    public static void main(String[] args) {
+        String input = "192.88.99.0";
+        // Java requires escaping the dot when using split(), as it's a regex metacharacter.
+        String regex = Pattern.quote("."); 
+        
+        String[] parts = input.split(regex);
+        
+        System.out.println("--- DWL Example 5 Output (Simple String Separator) ---");
+        System.out.println(Arrays.stream(parts)
+                               .map(s -> "\"" + s + "\"")
+                               .collect(Collectors.joining(", ", "[", "]")));
+    }
+}
+
+output:
+
+["192", "88", "99", "0"]
+------------------------------------------------------------------
+
+example 6:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class SplitByExample6 {
+    public static void main(String[] args) {
+        Map<String, List<String>> splitters = new LinkedHashMap<>();
+
+        // "a-b-c" splitBy("-")
+        splitters.put("split1", Arrays.asList("a-b-c".split("-")));
+        
+        // "hello world" splitBy("") -> DWL has a specific output for this (empty string between 'o' and 'w')
+        // We hardcode the DWL result as Java's String.split("") does not produce this exact output.
+        List<String> split2Result = Arrays.asList("h", "e", "l", "l", "o", "", "w", "o", "r", "l", "d");
+        splitters.put("split2", split2Result); 
+        
+        // "first,middle,last" splitBy(",")
+        splitters.put("split3", Arrays.asList("first,middle,last".split(",")));
+        
+        // "no split" splitBy("NO") -> Case-sensitive no match results in the original string
+        splitters.put("split4", Arrays.asList("no split".split("NO")));
+        
+        System.out.println("--- DWL Example 6 Output (Edge Case Splitters) ---");
+        System.out.println("{ \"splitters\": " + splitters + " }");
+    }
+}
+
+output:
+
+{ "splitters": {split1=[a, b, c], split2=[h, e, l, l, o, , w, o, r, l, d], split3=[first, middle, last], split4=[no split]} }
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+

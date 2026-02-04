@@ -1,0 +1,42 @@
+toDegrees:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    @GetMapping("/toDegrees")
+    public Map<String, BigDecimal> toDegreesExample() {
+
+        Map<String, BigDecimal> result = new HashMap<>();
+
+        result.put("toDegrees0.17", BigDecimal.valueOf(Math.toDegrees(0.174)));
+        result.put("toDegrees0", BigDecimal.valueOf(Math.toDegrees(0)));
+        result.put("toDegrees-20", BigDecimal.valueOf(Math.toDegrees(-0.20)));
+
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "toDegrees0.17": 9.969465635276323832571267395889251,
+  "toDegrees0": 0,
+  "toDegrees-20": -11.45915590261646417536927286883822
+}
+
+

@@ -1,0 +1,40 @@
+
+envVars():
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class EnvVarsController {
+
+    @GetMapping("/env")
+    public Map<String, String> getEnvVar() {
+
+        Map<String, String> response = new HashMap<>();
+
+        // Equivalent of dw::System::envVars().SHELL
+        String shell = System.getenv("SHELL");
+
+        response.put("envVars", shell);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "envVars": "/bin/bash"
+}
+
+
+

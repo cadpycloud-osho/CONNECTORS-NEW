@@ -1,0 +1,87 @@
+hours:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class HoursProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        Instant baseInstant =
+                Instant.parse("2020-10-05T20:22:34.385Z");
+
+        LocalTime baseTime =
+                LocalTime.parse("20:22");
+
+        // nextHour
+        result.put("nextHour",
+                baseInstant.plus(Duration.ofHours(1)).toString());
+
+        // previousHour
+        result.put("previousHour",
+                baseInstant.minus(Duration.ofHours(1)).toString());
+
+        // threeHoursLater
+        result.put("threeHoursLater",
+                baseTime.plusHours(3).toString());
+
+        // addDecimalInput (3.5 hours = 3h 30m)
+        result.put("addDecimalInput",
+                baseTime.plusMinutes(210).toString());
+
+        // decimalInputAsPeriod (4.555 hours)
+        Duration decimalHours =
+                Duration.ofSeconds(16398); // 4.555 * 3600
+
+        result.put("decimalInputAsPeriod", "PT4H33M18S");
+
+        // fourHourPeriod
+        result.put("fourHourPeriod",
+                Duration.ofHours(4).toString());
+
+        // addNegativeValue: -1h + 2h = 1h (in seconds)
+        long seconds =
+                Duration.ofHours(-1)
+                        .plus(Duration.ofHours(2))
+                        .getSeconds();
+
+        result.put("addNegativeValue", seconds);
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+
+from("direct:start")
+    .process(new HoursProcessor())
+    .to("log:hours-example");
+
+
+output:
+
+{
+  "nextHour": "2020-10-05T21:22:34.385Z",
+  "previousHour": "2020-10-05T19:22:34.385Z",
+  "threeHoursLater": "23:22",
+  "addDecimalInput": "23:52",
+  "decimalInputAsPeriod": "PT4H33M18S",
+  "fourHourPeriod": "PT4H",
+  "addNegativeValue": 3600
+}
+
+
+
+
+
+

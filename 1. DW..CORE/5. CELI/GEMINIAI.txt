@@ -1,0 +1,38 @@
+ceil(number: Number): Number
+Rounds a number up to the nearest whole number.
+INPUT:
+package com.example.dataconverter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+@RestController
+public class DataWeaveCeilController {
+
+    @GetMapping("/ceil-values")
+    public List<Integer> calculateCeilValues() {
+        
+        // --- DW Logic: The input numbers ---
+        List<Double> inputNumbers = Arrays.asList(1.5, 2.1, 3.0);
+        
+        // --- DW Logic: [ ceil(1.5), ceil(2.1), ceil(3) ] ---
+        // Use the Stream API to apply Math.ceil() to each number and cast to int
+        List<Integer> resultList = inputNumbers.stream()
+                // Math.ceil returns a double, which must be cast to an integer
+                .map(d -> (int) Math.ceil(d)) 
+                .collect(Collectors.toList());
+        
+        // The resulting list is [2, 3, 3]
+        return resultList;
+    }
+}
+
+OUTPUT:
+[
+  2,
+  3,
+  3
+]

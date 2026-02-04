@@ -1,0 +1,58 @@
+fail:
+
+
+input:
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+// Note: Using @ResponseStatus is a simple way to map this exception to an HTTP status code
+@ResponseStatus(HttpStatus.BAD_REQUEST) 
+public class DataValidationException extends RuntimeException {
+    public DataValidationException(String message) {
+        super(message);
+    }
+}
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.List;
+
+@RestController
+public class ValidationController {
+
+    @GetMapping("/validate-data")
+    public ResponseEntity<List<String>> validateAndReturnData() {
+        // Replicates the 'result' variable being empty
+        List<String> result = Collections.emptyList(); 
+
+        // --- Replicates the DataWeave Logic ---
+        // if(sizeOf(result) <= 0) fail('Data was empty') else result
+        
+        if (result.isEmpty()) {
+            // Throw the custom exception with the specific message
+            throw new DataValidationException("Data was empty");
+        } else {
+            // Return the data if validation passes (not reached in this example)
+            return ResponseEntity.ok(result);
+        }
+    }
+    
+    // Note: The exception handling to return the error message is usually 
+    // done by a global @ControllerAdvice or Spring's default handler.
+    // For simplicity, we rely on @ResponseStatus in the exception class.
+}
+output:
+
+
+Status Code: 400 Bad Request
+Response Body:
+{
+    "timestamp": "...",
+    "status": 400,
+    "error": "Bad Request",
+    "message": "Data was empty", // The custom message from the fail() function
+    "path": "/validate-data"
+}

@@ -1,0 +1,150 @@
+read:
+
+example 1:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.json.JSONObject;
+import org.json.XML;
+
+@SpringBootApplication
+@RestController
+public class JsonToXmlController {
+
+    public static void main(String[] args) {
+        SpringApplication.run(JsonToXmlController.class, args);
+    }
+
+    @GetMapping(value = "/json-to-xml", produces = MediaType.APPLICATION_XML_VALUE)
+    public String convertJsonToXml() {
+        String json = "{ \"hello\" : \"world\" }";
+        JSONObject jsonObj = new JSONObject(json);
+        return XML.toString(jsonObj, "hello");
+    }
+}
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<hello>world</hello>
+
+
+-----------------------------------------------------------
+
+
+example 2:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class CsvToJsonController {
+
+    @GetMapping("/csv-to-json")
+    public Map<String, String> convertCsvToJson() {
+        String input = "Some, Body";
+        String[] parts = input.split(",");
+
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("column_0", parts[0]);
+        result.put("column_1", parts[1]);
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "column_0": "Some",
+  "column_1": " Body"
+}
+
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringReader;
+import javax.xml.parsers.*;
+import org.xml.sax.InputSource;
+
+@SpringBootApplication
+@RestController
+public class XmlWrapController {
+
+    public static void main(String[] args) {
+        SpringApplication.run(XmlWrapController.class, args);
+    }
+
+    @GetMapping(value = "/xml-wrap", produces = MediaType.APPLICATION_XML_VALUE)
+    public String wrapXml() {
+        try {
+            String xmlInput = "<prices><basic>9.99</basic></prices>";
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document inputDoc = builder.parse(new InputSource(n
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<XML>
+  <basic>9.99</basic>
+</XML>
+
+
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

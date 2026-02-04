@@ -1,0 +1,35 @@
+wrapWith:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + wrapWith(null, '\'') + ",");
+        System.out.println("  \"b\": \"" + wrapWith("", '\'') + "\",");
+        System.out.println("  \"c\": \"" + wrapWith("ab", 'x') + "\",");
+        System.out.println("  \"d\": \"" + wrapWith("'ab'", '\'') + "\",");
+        System.out.println("  \"e\": \"" + wrapWith("ab", '\'') + "\"");
+        System.out.println("}");
+    }
+    
+    private static String wrapWith(String input, char wrapper) {
+        if (input == null) return null;
+        return wrapper + input + wrapper;
+    }
+}
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}

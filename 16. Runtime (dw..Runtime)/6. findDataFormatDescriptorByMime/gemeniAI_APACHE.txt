@@ -1,0 +1,56 @@
+findDataFormatDescriptorByMime:
+
+
+input:
+Output:
+import org.apache.camel.CamelContext;
+import org.apache.camel.spi.DataFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataFormatService {
+
+    public Map<String, Object> getDescriptors(CamelContext context) {
+        Map<String, Object> response = new HashMap<>();
+
+        // 1. Find 'json' format
+        DataFormat jsonDF = context.resolveDataFormat("jackson"); // Usually mapped to JSON
+        response.put("json", simplify("json", "application/json", jsonDF));
+
+        // 2. Look for unknown/null format
+        DataFormat unknownDF = context.resolveDataFormat("unknown-format");
+        response.put("unknown", simplify("unknown", "unknown", unknownDF));
+
+        return response;
+    }
+
+    private Map<String, String> simplify(String name, String mimeType, DataFormat df) {
+        if (df != null) {
+            return Map.of(
+                "name", name,
+                "defaultMimeType", mimeType
+            );
+        } else {
+            return Map.of(
+                "name", "unknown",
+                "defaultMimeType", "unknown"
+            );
+        }
+    }
+}
+
+output:
+
+
+{
+  "json": {
+    "name": "json",
+    "defaultMimeType": "application/json"
+  },
+  "unknown": {
+    "name": "unknown",
+    "defaultMimeType": "unknown"
+  }
+}
+
+

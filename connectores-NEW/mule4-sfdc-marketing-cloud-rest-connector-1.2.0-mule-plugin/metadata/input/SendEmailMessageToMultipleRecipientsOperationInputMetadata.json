@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "requestId",
+        "errorcode",
+        "responses"
+      ],
+      "properties": {
+        "definitionKey": {
+          "type": "string"
+        },
+        "recipients": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/recipient"
+          }
+        },
+        "attributes": {
+          "type": "object"
+        }
+      }
+    },
+    "recipient": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "contactKey": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "messageKey": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

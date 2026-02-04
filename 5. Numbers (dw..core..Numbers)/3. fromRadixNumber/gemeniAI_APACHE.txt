@@ -1,0 +1,42 @@
+fromRadixNumber:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class RadixConversionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertRadix")
+            .routeId("Radix-Conversion-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // 1. Logic: fromRadixNumber("10", 2)
+                // Converts binary "10" to decimal 2
+                results.put("a", new BigInteger("10", 2));
+
+                // 2. Logic: fromRadixNumber("FF", 16)
+                // Converts hex "FF" to decimal 255
+                results.put("b", new BigInteger("FF", 16));
+
+                exchange.getIn().setBody(results);
+            })
+            // 3. Logic: output application/json
+            .marshal().json()
+            .log("Radix Result: ${body}");
+    }
+}
+
+output:
+
+{
+  "a": 2,
+  "b": 255
+}
+

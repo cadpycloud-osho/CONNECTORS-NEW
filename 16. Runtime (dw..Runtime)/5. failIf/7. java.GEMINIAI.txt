@@ -1,0 +1,121 @@
+failIf:
+
+examples 1:
+
+input:
+
+import java.util.Collections;
+import java.util.Map;
+
+// 1. Custom Exception
+class FailConditionException extends RuntimeException {
+    public FailConditionException(String message) {
+        super(message);
+    }
+}
+
+public class Main {
+
+    /**
+     * Replicates the functional 'failIf' behavior.
+     */
+    public static <T> T failIfCondition(T value, boolean condition, String message) {
+        if (condition) {
+            throw new FailConditionException(message);
+        }
+        return value;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Conditional Fail Simulation ---");
+        
+        // Data setup
+        Map<String, String> resultVar = Collections.emptyMap(); // Replicates var result = {}
+        String successValue = "SUCCESS";
+        
+        try {
+            // --- Replicates: { "result" : "SUCCESS" failIf (isEmpty(result)) } ---
+            String finalValue = failIfCondition(
+                successValue, 
+                resultVar.isEmpty(), // Condition: isEmpty(result)
+                "Failed"             // Implicit error message
+            );
+            
+            // This code block is not reached in this example
+            Map<String, String> finalOutput = Map.of("result", finalValue);
+            System.out.println("Output: " + finalOutput);
+
+        } catch (FailConditionException e) {
+            System.err.println("Caught FailConditionException:");
+            System.err.println("Message: \"" + e.getMessage() + "\"");
+        }
+    }
+}
+
+output:
+
+--- Pure Java Conditional Fail Simulation ---
+Caught FailConditionException:
+Message: "Failed"
+
+----------------------------------------------------------------
+
+
+
+examples 2:
+
+input:
+
+import java.util.Map;
+
+// 1. Custom Exception (Plain Java RuntimeException)
+class ValidationFailureException extends RuntimeException {
+    public ValidationFailureException(String message) {
+        super(message);
+    }
+}
+
+public class Main {
+
+    /**
+     * Replicates the functional 'failIf' (guard clause).
+     * @throws ValidationFailureException if the condition is true.
+     */
+    public static void failIf(boolean condition, String message) {
+        if (condition) {
+            throw new ValidationFailureException(message);
+        }
+    }
+
+    public static Map<String, Object> processData() {
+        // 1. Replicates 'var result = {"a":"test"}'
+        Map<String, String> resultVar = Map.of("a", "test");
+
+        // 2. Condition: isEmpty($) -> isEmpty(resultVar) is FALSE
+        boolean condition = resultVar.isEmpty(); 
+
+        // 3. Conditional execution:
+        // Since condition is FALSE, failIf does nothing.
+        failIf(condition, "Result data was empty");
+
+        // 4. Returns the final object structure
+        return Map.of("result", resultVar);
+    }
+    
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java FailIf Simulation ---");
+        
+        try {
+            Map<String, Object> output = processData();
+            System.out.println("Output: " + output);
+
+        } catch (ValidationFailureException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}
+
+output:
+
+--- Pure Java FailIf Simulation ---
+Output: {result={a=test}}

@@ -1,0 +1,206 @@
+splitBy:
+
+
+example 1:
+
+input:
+
+from("direct:start")
+    .setBody(constant("192.88.99.0/24"))
+    .process(exchange -> {
+        String input = exchange.getIn().getBody(String.class);
+        String[] parts = input.split("[./]");
+        exchange.getIn().setBody(java.util.Arrays.asList(parts));
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+["192", "88", "99", "0", "24"]
+
+
+
+-----------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String, java.util.List<String>> splitters = new java.util.LinkedHashMap<>();
+
+        // split1: "a-b-c" splitBy(/.b./)
+        splitters.put("split1", java.util.Arrays.asList("a-b-c".split(".b.")));
+
+        // split2: "hello world" splitBy(/\s/)
+        splitters.put("split2", java.util.Arrays.asList("hello world".split("\\s")));
+
+        // split3: "no match" splitBy(/^s/)
+        // No match, return the original string in a list
+        splitters.put("split3", java.util.Collections.singletonList("no match"));
+
+        // split4: "no match" splitBy(/^n../)
+        splitters.put("split4", java.util.Arrays.asList("no match".split("^n..")));
+
+        // split5: "a1b2c3d4A1B2C3D" splitBy(/[0-9A-Z]/)
+        splitters.put("split5", java.util.Arrays.asList("a1b2c3d4A1B2C3D".split("[0-9A-Z]")));
+
+        exchange.getIn().setBody(java.util.Collections.singletonMap("splitters", splitters));
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a", "c"],
+    "split2": ["hello", "world"],
+    "split3": ["no match"],
+    "split4": ["", "match"],
+    "split5": ["a", "b", "c", "d"]
+  }
+}
+
+
+
+-----------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:start")
+    .setBody(constant("192.88.99.0"))
+    .process(exchange -> {
+        String input = exchange.getIn().getBody(String.class);
+        String firstPart = input.split("\\.")[0];
+        exchange.getIn().setBody(firstPart);
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+"192"
+
+
+
+-----------------------------------------------------------
+
+example 4:
+
+input:
+
+from("direct:start")
+    .setBody(constant("root.sources.data.`test.branch.BranchSource`.source.traits"))
+    .process(exchange -> {
+        String input = exchange.getIn().getBody(String.class);
+
+        // Split by dot, ignoring dots inside backticks
+        String[] parts = input.split("\\.(?=(?:[^`]*`[^`]*`)*[^`]*$)");
+
+        exchange.getIn().setBody(java.util.Arrays.asList(parts));
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+[
+  "root",
+  "sources",
+  "data",
+  "`test.branch.BranchSource`",
+  "source",
+  "traits"
+]
+
+
+
+-----------------------------------------------------------
+
+
+example 5:
+
+input:
+
+
+from("direct:start")
+    .setBody(constant("192.88.99.0"))
+    .process(exchange -> {
+        String input = exchange.getIn().getBody(String.class);
+        String[] parts = input.split("\\.");
+        exchange.getIn().setBody(java.util.Arrays.asList(parts));
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+["192", "88", "99", "0"]
+
+
+
+
+-----------------------------------------------------------
+
+
+example 6:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String, java.util.List<String>> splitters = new java.util.LinkedHashMap<>();
+
+        // split1: "a-b-c" splitBy("-")
+        splitters.put("split1", java.util.Arrays.asList("a-b-c".split("-")));
+
+        // split2: "hello world" splitBy("") → split into individual characters
+        String str2 = "hello world";
+        java.util.List<String> chars = new java.util.ArrayList<>();
+        for (char c : str2.toCharArray()) {
+            chars.add(String.valueOf(c));
+        }
+        splitters.put("split2", chars);
+
+        // split3: "first,middle,last" splitBy(",")
+        splitters.put("split3", java.util.Arrays.asList("first,middle,last".split(",")));
+
+        // split4: "no split" splitBy("NO") → no match, return original string
+        splitters.put("split4", java.util.Collections.singletonList("no split"));
+
+        exchange.getIn().setBody(java.util.Collections.singletonMap("splitters", splitters));
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a","b","c"],
+    "split2": ["h","e","l","l","o","","w","o","r","l","d"],
+    "split3": ["first","middle","last"],
+    "split4": ["no split"]
+  }
+}
+
+
+
+-----------------------------------------------------------
+
+
+
+
+
+
+

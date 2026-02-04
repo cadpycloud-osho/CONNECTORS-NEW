@@ -1,0 +1,68 @@
+isObjectType:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = executeIsObjectTypeTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Boolean> executeIsObjectTypeTests() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // a: [OBJECT_TYPE(user), ATTRIBUTE_TYPE(name)] → false
+        List<TreeNode> pathA = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("a", isObjectType(pathA));
+        
+        // b: [OBJECT_TYPE(user), OBJECT_TYPE(name)] → true
+        List<TreeNode> pathB = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("OBJECT_TYPE", "name", null)
+        );
+        result.put("b", isObjectType(pathB));
+        
+        // c: [OBJECT_TYPE(user)] → true
+        List<TreeNode> pathC = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null)
+        );
+        result.put("c", isObjectType(pathC));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave Tree.isObjectType() equivalent:
+     * Returns true if path contains OBJECT_TYPE node
+     */
+    public static boolean isObjectType(List<TreeNode> path) {
+        return path.stream().anyMatch(node -> "OBJECT_TYPE".equals(node.kind));
+    }
+    
+    public static class TreeNode {
+        final String kind;
+        final String selector;
+        final String namespace;
+        
+        TreeNode(String kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+    }
+}
+
+
+output:
+
+{a=false, b=true, c=true}
+
+

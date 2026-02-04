@@ -1,0 +1,56 @@
+time:
+
+time(parts: TimeFactory): Time
+
+time(parts: TimeFactory): Time
+Creates a Time value from values specified for hour, minutes, seconds, and timezone fields.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  newTime: time({ hour: 12, minutes: 30, seconds: 40 , timeZone: |-03:00| })
+}
+
+DataWeave
+Output
+{
+   "newTime": "12:30:40-03:00"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

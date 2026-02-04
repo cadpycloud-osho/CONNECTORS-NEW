@@ -1,0 +1,61 @@
+baseTypeOf:
+
+
+
+input:
+
+package com.example.demo.types;
+
+public class AType {
+    private final Class<?> baseType = String.class;
+    private final String format = "YYYY-MM-dd";
+
+    public Class<?> getBaseType() {
+        return baseType;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+}
+
+package com.example.demo.util;
+
+public class TypeUtils {
+    public static String baseTypeOf(Class<?> clazz) {
+        return clazz.getSimpleName();
+    }
+}
+
+
+package com.example.demo.controller;
+
+import com.example.demo.types.AType;
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class BaseTypeController {
+
+    @GetMapping("/basetype")
+    public Map<String, String> getBaseType() {
+        AType aType = new AType();
+
+        String baseType = TypeUtils.baseTypeOf(aType.getBaseType());
+
+        return Collections.singletonMap("a", baseType);
+    }
+}
+
+output:
+
+
+{
+  "a": "String"
+}
+
+

@@ -1,0 +1,33 @@
+first:
+
+input:
+
+import java.util.*;
+
+public class FirstExample {
+
+    public static void main(String[] args) {
+
+        String input = "hello world!";
+
+        String result = first(input, 5);
+
+        System.out.println(result);
+    }
+
+    private static String first(String str, int n) {
+        if (str == null || str.isEmpty()) return str;
+        if (n <= 0) return "";
+        return str.length() <= n ? str : str.substring(0, n);
+    }
+}
+
+
+
+output:
+
+"hello"
+
+
+
+

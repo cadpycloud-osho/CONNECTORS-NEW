@@ -1,0 +1,68 @@
+namesOf:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // --- 1. Define the input object (DataWeave: { "a" : true, "b" : 1}) ---
+        // Using a standard Java Map to represent the input JSON object
+        Map<String, Object> inputObject = new HashMap<>();
+        inputObject.put("a", true);
+        inputObject.put("b", 1);
+        
+        // --- 2. Implement the 'namesOf' logic (get keys) ---
+        // Get the Set of keys and convert it directly to a List<String>
+        List<String> keys = new ArrayList<>(inputObject.keySet());
+        
+        // 'keys' now contains: ["a", "b"]
+
+        // --- 3. Assemble the final structure (DataWeave: { "namesOf" : ... }) ---
+        // Create a Map to represent the output JSON structure
+        Map<String, List<String>> outputMap = new HashMap<>();
+        outputMap.put("namesOf", keys);
+        
+        // --- 4. Manually format the result into the required JSON string ---
+        String outputJson = formatMapAsJson(outputMap);
+        
+        System.out.println(outputJson);
+    }
+
+    /**
+     * Helper method to manually convert the simple Map structure 
+     * (e.g., {"namesOf": ["a", "b"]}) into a JSON string.
+     */
+    private static String formatMapAsJson(Map<String, List<String>> map) {
+        if (map.isEmpty()) {
+            return "{}";
+        }
+
+        // We assume the map has only one entry: "namesOf" : ["a", "b"]
+        String key = map.keySet().iterator().next(); 
+        List<String> names = map.get(key);
+        
+        // 1. Format the names list into a JSON array string: ["a","b"]
+        String arrayString = names.stream()
+            // Wrap each string in double quotes
+            .map(s -> "\"" + s + "\"")
+            // Join them with commas, wrapped in brackets
+            .collect(Collectors.joining(",", "[", "]"));
+        
+        // 2. Combine into the final JSON object string: {"namesOf": ["a","b"]}
+        return String.format("{\"%s\":%s}", key, arrayString);
+    }
+}
+output:
+
+
+{
+  "namesOf" : [ "a", "b" ]
+}
+

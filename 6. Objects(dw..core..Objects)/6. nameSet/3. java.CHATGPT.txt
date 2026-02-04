@@ -1,0 +1,35 @@
+nameSet:
+
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // LinkedHashMap preserves insertion order like DW
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", true);
+        map.put("b", 1);
+
+        // Equivalent of nameSet()
+        List<String> keys = new ArrayList<>(map.keySet());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("nameSet", keys);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{ "nameSet" : ["a","b"] }

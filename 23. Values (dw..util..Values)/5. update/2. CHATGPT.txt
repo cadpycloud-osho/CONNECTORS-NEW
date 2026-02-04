@@ -1,0 +1,205 @@
+update:
+
+example 1:
+
+input:
+
+@RestController
+public class Example1Controller {
+
+    @GetMapping("/example1")
+    public Map<String, String> example1() {
+        Map<String, String> map = new HashMap<>();
+        map.put("name", "Mariano");
+
+        map.put("name", "Data Weave"); // update
+
+        return map;
+    }
+}
+
+
+output:
+
+{
+  "name": "Data Weave"
+}
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+@RestController
+@RequestMapping("/dw")
+public class UpdateExampleController {
+
+    @GetMapping("/example2")
+    public Map<String, String> updateFieldExample() {
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Mariano");
+
+        // Equivalent to: update field("name") with "Data Weave"
+        payload.put("name", "Data Weave");
+
+        return payload;
+    }
+}
+
+
+output:
+
+{
+  "name": "Data Weave"
+}
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+@RestController
+public class Example3Controller {
+
+    @GetMapping("/example3")
+    public List<Integer> example3() {
+        List<Integer> list = new ArrayList<>(List.of(1, 2, 3));
+
+        list.set(1, 5); // update index
+
+        return list;
+    }
+}
+
+
+output:
+[1,5,3]
+
+
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+@GetMapping("/example4")
+public List<Map<String, String>> example4() {
+    List<Map<String, String>> input = Arrays.asList(
+        Map.of("role", "a", "name", "spiderman"),
+        Map.of("role", "b", "name", "batman")
+    );
+    return input.stream().map(item -> {
+        Map<String, String> updated = new HashMap<>(item);
+        updated.put("role", "Super Hero");
+        return updated;
+    }).collect(Collectors.toList());
+}
+
+
+output:
+
+[{"role": "Super Hero", "name": "spiderman"}, {"role": "Super Hero", "name": "batman"}]
+
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+@RestController
+@RequestMapping("/dw")
+public class UpdateIndexController {
+
+    @GetMapping("/example5")
+    public List<Integer> updateIndexExample() {
+
+        List<Integer> payload = new ArrayList<>(List.of(1, 2, 3));
+
+        // Equivalent to: update index(1) with 5
+        payload.set(1, 5);
+
+        return payload;
+    }
+}
+
+
+output:
+
+[1, 5, 3]
+
+---------------------------------------------------------------
+
+
+
+
+example 6:
+
+input:
+
+@GetMapping("/example6")
+public Map<String, Object> example6() {
+    Map<String, Object> input = Map.of("user", Map.of("name", "Mariano"));
+    Map<String, Object> result = new HashMap<>(input);
+    Map<String, Object> user = new HashMap<>((Map<String, Object>) result.get("user"));
+    user.put("name", "Data Weave");
+    result.put("user", user);
+    return result;
+}
+
+
+output:
+
+{"user": {"name": "Data Weave"}}
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+input:
+
+@GetMapping("/example7")
+public Map<String, Object> example7() {
+    Map<String, Object> input = Map.of("users", Arrays.asList(
+        Map.of("name", "Phoebe", "language", "French"),
+        Map.of("name", "Joey", "language", "English")
+    ));
+    return Map.of("users", ((List<Map<String, Object>>) input.get("users")).stream().map(user -> {
+        Map<String, Object> updated = new HashMap<>(user);
+        if ("English".equals(updated.get("language"))) {
+            updated.put("language", "Gibberish");
+        }
+        return updated;
+    }).collect(Collectors.toList()));
+}
+
+
+output:
+
+{
+  "users": [
+    {"name": "Phoebe", "language": "French"},
+    {"name": "Joey", "language": "Gibberish"}
+  ]
+}
+
+
+---------------------------------------------------------------
+
+
+
+

@@ -1,0 +1,51 @@
+isLiteralType:
+
+
+
+INPUT:
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    private static final String LITERAL_TYPE_INDICATOR = "\"";
+
+    /**
+     * Pure Java method to mimic the DataWeave isLiteralType() function.
+     */
+    public static boolean checkIsLiteralType(String typeRepresentation) {
+        // Checks if the type representation starts and ends with a quote, indicating a string literal.
+        return typeRepresentation.startsWith(LITERAL_TYPE_INDICATOR) && 
+               typeRepresentation.endsWith(LITERAL_TYPE_INDICATOR);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Define the input types (mimicking the DW type aliases and built-in types)
+        final String ALiteralType_Representation = "\"Mariano\""; 
+        final String Builtin_Boolean = "Boolean";
+
+        // 2. Perform the transformation
+        boolean resultA = checkIsLiteralType(ALiteralType_Representation);
+        boolean resultB = checkIsLiteralType(Builtin_Boolean);
+
+        // 3. Structure the final output map: { "a": resultA, "b": resultB }
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", resultA);
+        output.put("b", resultB);
+
+        // 4. Print the result to the console
+        System.out.println("DataWeave Output Emulation:");
+        // Simple print of the Map structure (looks like JSON key-value pairs)
+        System.out.println(output.toString().replace("=", ": "));
+    }
+}
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+

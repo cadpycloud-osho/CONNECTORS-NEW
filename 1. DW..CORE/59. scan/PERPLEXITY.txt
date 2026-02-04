@@ -1,0 +1,101 @@
+scan:
+
+example 1:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class ScanFlattenController {
+
+    @GetMapping("/scan-flatten")
+    public List<String> scanAndFlatten() {
+        String input = "www.mulesoft.com";
+        Pattern pattern = Pattern.compile("([w]*)\\.([a-z]*)\\.([a-z]*)");
+        Matcher matcher = pattern.matcher(input);
+
+        List<String> result = new ArrayList<>();
+        if (matcher.find()) {
+            // Add full match and all groups (flatten)
+            result.add(matcher.group(0)); // full match
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                result.add(matcher.group(i));
+            }
+        }
+        return result;
+    }
+}
+
+
+output:
+
+["www.mulesoft.com", "www", "mulesoft", "com"]
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@RestController
+class ScanMultipleController {
+
+    @GetMapping("/scan-multiple")
+    public List<List<String>> scanMultiple() {
+        String input = "anypt@mulesoft.com,max@mulesoft.com";
+        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*).com");
+
+        Matcher matcher = pattern.matcher(input);
+        List<List<String>> resultList = new ArrayList<>();
+
+        while (matcher.find()) {
+            List<String> groups = new ArrayList<>();
+            groups.add(matcher.group(0)); // full match
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                groups.add(matcher.group(i));
+            }
+            resultList.add(groups);
+        }
+        return resultList;
+    }
+}
+
+
+output:
+
+[
+  ["anypt@mulesoft.com", "anypt", "mulesoft"],
+  ["max@mulesoft.com", "max", "mulesoft"]
+]
+
+
+---------------------------------------------------------------

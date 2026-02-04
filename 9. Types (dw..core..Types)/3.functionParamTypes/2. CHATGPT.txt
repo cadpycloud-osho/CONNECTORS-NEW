@@ -1,0 +1,86 @@
+functionParamTypes:
+
+
+
+
+input:
+
+package com.example.demo.types;
+
+@FunctionalInterface
+public interface AFunction {
+    Number apply(String s, Number n);
+}
+
+@FunctionalInterface
+public interface AFunction2 {
+    Number apply();
+}
+package com.example.demo.util;
+
+import java.lang.reflect.Method;
+import java.util.*;
+
+public class TypeUtils {
+
+    public static List<Map<String, Object>> functionParamTypes(Class<?> clazz) {
+        List<Map<String, Object>> params = new ArrayList<>();
+
+        // Get the one abstract method of a functional interface
+        Method method = clazz.getMethods()[0];
+
+        Class<?>[] paramTypes = method.getParameterTypes();
+
+        for (Class<?> param : paramTypes) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("paramType", param.getSimpleName());
+            map.put("optional", false);  // DW always false
+            params.add(map);
+        }
+
+        return params;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.types.AFunction;
+import com.example.demo.types.AFunction2;
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class FunctionTypeController {
+
+    @GetMapping("/functionParamTypes")
+    public Map<String, Object> getFunctionParamTypes() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("a", TypeUtils.functionParamTypes(AFunction.class));
+        result.put("b", TypeUtils.functionParamTypes(AFunction2.class));
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": [
+    {
+      "paramType": "String",
+      "optional": false
+    },
+    {
+      "paramType": "Number",
+      "optional": false
+    }
+  ],
+  "b": []
+}
+
+

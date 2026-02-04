@@ -1,0 +1,53 @@
+isNamespaceType:
+
+isNamespaceType(t: Type): Boolean
+
+isNamespaceType(t: Type): Boolean
+Returns true if the input is the Namespace type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ANamespace = Namespace
+output application/json
+---
+{
+   a: isNamespaceType(ANamespace),
+   b: isNamespaceType(Namespace),
+   c: isNamespaceType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+charCode:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class StringController {
+
+    @GetMapping("/charcode")
+    public Map<String, Object> getCharCode() {
+        Map<String, Object> result = new HashMap<>();
+
+        String input = "Mule";
+        int charCode = input.codePointAt(0);  // same as DataWeave charCode("Mule")
+
+        result.put("charCode", charCode);
+
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "charCode": 77
+}
+
+

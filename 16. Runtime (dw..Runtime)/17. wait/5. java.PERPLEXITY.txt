@@ -1,0 +1,28 @@
+wait:
+
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) throws InterruptedException {
+        // Matches: { "user" : 1 } wait 2000
+        Thread.sleep(2000); // 2000ms delay
+        
+        Map<String, Integer> result = Map.of("user", 1);
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{
+  "user": 1
+}
+

@@ -1,0 +1,289 @@
+orderBy:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class OrderByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:orderBy")
+            .process(exchange -> {
+                List<Map<String, String>> items = Arrays.asList(
+                    Map.of("letter", "e"),
+                    Map.of("letter", "d")
+                );
+                
+                // Sort by letter field ascending (d < e)
+                List<Map<String, String>> sorted = items.stream()
+                    .sorted(Comparator.comparing(m -> m.get("letter")))
+                    .collect(Collectors.toList());
+                
+                exchange.getIn().setBody(sorted);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  {
+    "letter": "d"
+  },
+  {
+    "letter": "e"
+  }
+]
+
+
+----------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class OrderDescendingRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:orderDescending")
+            .process(exchange -> {
+                List<Integer> numbers = Arrays.asList(3, 8, 1);
+                
+                // Sort ascending then reverse (matches DataWeave orderBy $ then [-1 to 0])
+                List<Integer> sortedDesc = numbers.stream()
+                    .sorted()
+                    .collect(Collectors.toList())
+                    .stream()
+                    .collect(Collectors.toCollection(LinkedList::new));
+                Collections.reverse(sortedDesc);
+                
+                // Alternative: direct descending sort
+                // List<Integer> sortedDesc = numbers.stream()
+                //     .sorted(Comparator.reverseOrder())
+                //     .collect(Collectors.toList());
+                
+                Map<String, List<Integer>> result = new HashMap<>();
+                result.put("orderDescending", sortedDesc);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "orderDescending": [8, 3, 1] }
+
+
+----------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class OrderByStableRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:orderBy")
+            .process(exchange -> {
+                List<Integer> numbers = Arrays.asList(3, 2, 3);
+                
+                // Stable ascending sort (matches DataWeave orderBy $)
+                List<Integer> sorted = numbers.stream()
+                    .sorted()
+                    .collect(Collectors.toList());
+                
+                exchange.getIn().setBody(sorted);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[2, 3, 3]
+
+
+----------------------------------------------------------
+
+example 4:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class OrderByAgeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:orderByAge")
+            .process(exchange -> {
+                List<Map<String, Object>> people = Arrays.asList(
+                    Map.of("name", "Santiago", "age", 42),
+                    Map.of("name", "Leandro", "age", 29),
+                    Map.of("name", "Mariano", "age", 35)
+                );
+                
+                // Sort by age ascending
+                List<Map<String, Object>> sorted = people.stream()
+                    .sorted(Comparator.comparingInt(p -> ((Number) p.get("age")).intValue()))
+                    .collect(Collectors.toList());
+                
+                exchange.getIn().setBody(sorted);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  {
+    "name": "Leandro",
+    "age": 29
+  },
+  {
+    "name": "Mariano", 
+    "age": 35
+  },
+  {
+    "name": "Santiago",
+    "age": 42
+  }
+]
+
+
+----------------------------------------------------------
+
+example 5:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.util.*;
+
+public class OrderByDateDescRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:orderByDateDesc")
+            .process(exchange -> {
+                List<ZonedDateTime> dates = Arrays.asList(
+                    ZonedDateTime.parse("2020-10-01T23:57:59.017Z"),
+                    ZonedDateTime.parse("2022-12-22T12:12:12.011Z"),
+                    ZonedDateTime.parse("2020-10-01T12:40:10.012Z"),
+                    ZonedDateTime.parse("2020-10-01T23:57:59.021Z")
+                );
+                
+                // Sort descending by epoch milliseconds (negative for descending)
+                List<ZonedDateTime> sorted = dates.stream()
+                    .sorted(Comparator.comparingLong(ZonedDateTime::toInstant)
+                        .reversed())
+                    .collect(Collectors.toList());
+                
+                exchange.getIn().setBody(sorted.stream()
+                    .map(ZonedDateTime::toString)
+                    .collect(Collectors.toList()));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+
+----------------------------------------------------------
+
+example 6:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class OrderByTypeDescRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:orderByTypeDesc")
+            .process(exchange -> {
+                List<Map<String, Object>> accounts = Arrays.asList(
+                    Map.of("AccountNumber", "987999321", "NameOnAccount", "QA", 
+                           "Type", "AAAA", "CDetail", Map.of("Status", "Open")),
+                    Map.of("AccountNumber", "12399978", "NameOnAccount", "QA", 
+                           "Type", "BBBB", "CDetail", new HashMap<>()),
+                    Map.of("AccountNumber", "32199974", "NameOnAccount", "QA", 
+                           "Type", "CCCC", "CDetail", new HashMap<>())
+                );
+                
+                // Sort ascending by Type, then reverse (matches [-1 to 0])
+                List<Map<String, Object>> sortedAsc = accounts.stream()
+                    .sorted(Comparator.comparing(m -> m.get("Type").toString()))
+                    .collect(Collectors.toList());
+                
+                Collections.reverse(sortedAsc); // [-1 to 0] equivalent
+                
+                exchange.getIn().setBody(sortedAsc);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  {
+    "AccountNumber": "32199974",
+    "NameOnAccount": "QA",
+    "Type": "CCCC",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "12399978",
+    "NameOnAccount": "QA",
+    "Type": "BBBB",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "987999321",
+    "NameOnAccount": "QA",
+    "Type": "AAAA",
+    "CDetail": {
+      "Status": "Open"
+    }
+  }
+]
+
+
+----------------------------------------------------------
+

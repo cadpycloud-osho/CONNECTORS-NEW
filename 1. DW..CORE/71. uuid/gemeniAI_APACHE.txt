@@ -1,0 +1,34 @@
+uuid:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import java.util.UUID;
+
+public class CamelUuidExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // Java native UUID.randomUUID() generates an RFC-4122 Variant
+                    .setBody(method(UUID.class, "randomUUID"))
+                    .convertBodyTo(String.class)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+"7cc64d24-f2ad-4d43-8893-fa24a0789a99"

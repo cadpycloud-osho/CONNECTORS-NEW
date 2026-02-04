@@ -1,0 +1,32 @@
+
+upper:
+
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        String input = "mulesoft";
+        
+        // --- 1. Define the operation ---
+        // Java: String.toUpperCase()
+        String result = input.toUpperCase(); // "MULESOFT"
+
+        // --- 2. Assemble the final JSON object using standard String formatting ---
+        // This replaces the complex Jackson logic to avoid compilation errors
+        String outputJson = String.format("{\n  \"name\" : \"%s\"\n}", result);
+        
+        // 3. Output the result
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+
+{
+  "name" : "MULESOFT"
+}

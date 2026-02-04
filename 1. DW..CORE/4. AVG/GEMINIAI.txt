@@ -1,0 +1,55 @@
+avg(values: Array<Number>): Number
+Returns the average of numbers listed in an array.
+
+An array that is empty or that contains a non-numeric value results in an error.
+
+INPUT:
+package com.example.dataconverter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+@RestController
+public class DataWeaveAvgController {
+
+    // Helper function to calculate the average of a list of Integers as a Double
+    private Double calculateAverage(List<Integer> list) {
+        // The DataWeave avg function operates on non-null numbers.
+        // We use the Stream API's average() function, which returns an OptionalDouble.
+        return list.stream()
+                   .mapToDouble(Integer::doubleValue) // Map Integers to doubles
+                   .average()
+                   .orElse(0.0); // Return 0.0 if the list is empty, though DW returns null for empty array.
+                                  // For non-empty arrays, this provides the average.
+    }
+
+    @GetMapping("/calculate-avg")
+    public Map<String, Double> calculateAverages() {
+        
+        // --- DW Logic: avg([1, 1000]) ---
+        List<Integer> listA = Arrays.asList(1, 1000);
+        Double avgA = calculateAverage(listA); // 500.5
+        
+        // --- DW Logic: avg([1, 2, 3]) ---
+        List<Integer> listB = Arrays.asList(1, 2, 3);
+        Double avgB = calculateAverage(listB); // 2.0
+        
+        // --- DW Logic: { a: avgA, b: avgB } ---
+        Map<String, Double> outputMap = new HashMap<>();
+        outputMap.put("a", avgA);
+        outputMap.put("b", avgB);
+        
+        return outputMap;
+    }
+}
+
+OUTPUT:
+{
+  "a": 500.5,
+  "b": 2.0
+}

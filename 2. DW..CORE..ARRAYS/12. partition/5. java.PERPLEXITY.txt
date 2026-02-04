@@ -1,0 +1,80 @@
+partition:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 3, 4, 5};
+
+        List<Integer> success = new ArrayList<>();
+        List<Integer> failure = new ArrayList<>();
+
+        for (int item : arr) {
+            if (item % 2 == 0) {      // isEven(item)
+                success.add(item);
+            } else {
+                failure.add(item);
+            }
+        }
+
+        // Print result in JSON-like form
+        System.out.println("{");
+        System.out.println("  \"success\": " + success + ",");
+        System.out.println("  \"failure\": " + failure);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "success": [0, 2, 4],
+  "failure": [1, 3, 5]
+}
+
+
+
+
+
+
+
+
+
+
+Java Streams version (functional style)
+java
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class PartitionStreamExample {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 3, 4, 5};
+
+        Map<Boolean, List<Integer>> partitioned =
+            Arrays.stream(arr)
+                  .boxed()
+                  .collect(Collectors.partitioningBy(item -> item % 2 == 0));
+
+        List<Integer> success = partitioned.get(true);   // evens
+        List<Integer> failure = partitioned.get(false);  // odds
+
+        System.out.println("{");
+        System.out.println("  \"success\": " + success + ",");
+        System.out.println("  \"failure\": " + failure);
+        System.out.println("}");
+    }
+}
+Output:
+
+text
+{
+  "success": [0, 2, 4],
+  "failure": [1, 3, 5]
+}

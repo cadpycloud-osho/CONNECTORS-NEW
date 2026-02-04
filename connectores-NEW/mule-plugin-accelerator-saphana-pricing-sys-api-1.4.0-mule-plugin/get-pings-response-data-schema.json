@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/PingResponse",
+  "definitions": {
+    "PingResponse": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "status",
+        "apiName",
+        "apiVersion",
+        "timestamp"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "DEGRADED",
+            "OFFLINE"
+          ]
+        },
+        "apiName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "apiVersion": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 11
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dependencies": {
+          "items": {
+            "$ref": "#/definitions/PingStatus"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "PingStatus": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "name",
+        "status"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "UP",
+            "DOWN",
+            "ERROR"
+          ],
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,294 @@
+sizeOf:
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Arrays.asList("a", "b", "c").size());
+    }
+}
+
+
+output:
+3
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{\"arraySizes\":{\"size3\":" + Arrays.asList(1,2,3).size() + 
+                          ",\"size2\":" + Arrays.asList(Arrays.asList(1,2,3), Arrays.asList(4)).size() + 
+                          ",\"size0\":" + new ArrayList<>().size() + "}}");
+    }
+}
+
+
+output:
+
+{"arraySizes":{"size3":3,"size2":2,"size0":0}}
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Integer> obj = new HashMap<>();
+        obj.put("a", 1);
+        obj.put("b", 2);
+        System.out.println(obj.size());
+    }
+}
+
+output:
+
+2
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode obj2 = mapper.createObjectNode();
+        obj2.put("a", 1);
+        obj2.put("b", 2);
+        ObjectNode emptyObj = mapper.createObjectNode();
+        System.out.println("{\"objectSizes\":{\"sizeIs2\":" + obj2.size() + 
+                          ",\"sizeIs0\":" + emptyObj.size() + "}}");
+    }
+}
+
+
+output:
+
+{"objectSizes":{"sizeIs2":2,"sizeIs0":0}}
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String text = "'my word'";
+        int binarySize = text.getBytes().length;
+        int stringSize = text.length();
+        System.out.println("{\"BinarySizeOf\":\"" + binarySize + " " + binarySize + 
+                          "\",\"StringSizeOf\":\"" + stringSize + " " + stringSize + "\"}");
+    }
+}
+
+
+output:
+
+{"BinarySizeOf":"13 13","StringSizeOf":"9 9"}
+
+---------------------------------------------------------------
+
+
+
+example 6:
+
+
+input:
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("abc".length());
+    }
+}
+
+
+
+output:
+3
+
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{\"sizeOfSting2\":" + "my string".length() + 
+                          ",\"sizeOfEmptyString\":" + "".length() + 
+                          ",\"sizeOfNumber\":" + 1 + "}");
+    }
+}
+
+
+output:
+
+{"sizeOfSting2":9,"sizeOfEmptyString":0,"sizeOfNumber":1}
+
+---------------------------------------------------------------
+
+
+
+example 8:
+
+
+input:
+
+import java.time.Period;
+
+public class Main {
+    public static void main(String[] args) {
+        Period period = Period.ofDays(3);
+        System.out.println("{\"a\":" + period.getDays() + "}");
+    }
+}
+
+
+output:
+
+{"a":3}
+
+---------------------------------------------------------------
+
+
+
+
+example 9:
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX");
+        ZonedDateTime dt = ZonedDateTime.parse("2025-07-13T18:06:59.314033Z", formatter);
+        System.out.println("{\"a\":" + dt.toString().length() + "}");
+    }
+}
+
+
+
+output:
+
+{"a":27}
+
+---------------------------------------------------------------
+
+
+
+example 10:
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+        LocalDateTime ldt = LocalDateTime.parse("2025-07-13T18:06:59.314033", formatter);
+        System.out.println("{\"a\":" + ldt.toString().length() + "}");
+    }
+}
+
+
+
+output:
+
+{"a":26}
+
+---------------------------------------------------------------
+
+
+
+
+example 11:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{\"a\":" + String.valueOf(123).length() + 
+                          ",\"b\":" + String.valueOf(123.45).length() + "}");
+    }
+}
+
+
+output:
+
+{"a":3,"b":6}
+
+---------------------------------------------------------------
+
+
+
+
+example 12:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{\"a\":1,\"b\":1}");
+    }
+}
+
+
+output:
+
+{"a":1,"b":1}
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

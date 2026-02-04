@@ -1,0 +1,181 @@
+run:
+
+<dependency>
+    <groupId>org.mule.weave</groupId>
+    <artifactId>runtime-core</artifactId>
+    <version>X.Y.Z</version> </dependency>
+
+input:
+
+import org.mule.weave.v2.runtime.security.DataWeaveSecurityManager;
+// Replicates the `securityManager: (grant, args) -> false` for `readUrl`
+public class DenyResourceAccessManager implements DataWeaveSecurityManager {
+    @Override
+    public boolean grant(String permission, Object args) {
+        // The readUrl function requires 'Resource' permission. We deny it.
+        if ("Resource".equals(permission)) {
+            return false;
+        }
+        return true; // Grant all other permissions
+    }
+}
+
+import org.mule.weave.v2.runtime.WeaveRuntime;
+import org.mule.weave.v2.runtime.WeaveRuntimeService;
+import org.mule.weave.v2.runtime.utils.ResourceResolver;
+import org.mule.weave.v2.runtime.logging.SystemLogger;
+import org.mule.weave.v2.runtime.variables.ExecutionContext;
+import org.mule.weave.v2.runtime.WeaveResult;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+@Service
+public class RuntimeFunctionService {
+
+    private final WeaveRuntime runtime;
+    private final SystemLogger logger;
+
+    // --- Data Definition (Replicates DW variable definition) ---
+    private static final byte[] JSON_BYTES = "{\"name\": \"Mariano\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    private static final byte[] JSON2_BYTES = "{\"name\": \"Mariano\", \"lastName\": \"achaval\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    private static final byte[] INVALID_JSON_BYTES = "{\"name\": \"Mariano".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+    private static final Map<String, Object> createInput(byte[] value, String mimeType) {
+        return Map.of(
+            "value", value,
+            "encoding", "UTF-8",
+            "properties", Map.of(),
+            "mimeType", mimeType
+        );
+    }
+    private static final Map<String, Object> jsonValue = createInput(JSON_BYTES, "application/json");
+    private static final Map<String, Object> jsonValue2 = createInput(JSON2_BYTES, "application/json");
+    private static final Map<String, Object> invalidJsonValue = createInput(INVALID_JSON_BYTES, "application/json");
+
+    public RuntimeFunctionService() {
+        this.logger = new SystemLogger();
+        // Initialize the Weave Runtime
+        this.runtime = WeaveRuntimeService.service().createRuntime(
+            ResourceResolver.empty(), this.logger, Optional.empty()
+        );
+    }
+
+    public Map<String, Object> executeAllRunTests() {
+        Map<String, Object> results = new HashMap<>();
+        Map<String, String> resources = new HashMap<>();
+        
+        // Define Utility library (used for 'library' test)
+        resources.put("/Utils.dwl", "fun sum(a,b) = a +b");
+
+        // --- 1. execute_ok (Simple run) ---
+        resources.put("main.dwl", "{a: 1}");
+        results.put("execute_ok", runtime.execute("main.dwl", resources, Map.of("payload", jsonValue)));
+
+        // --- 2. logs (Run with log function) ---
+        resources.put("main.dwl", "{a: log(1)}");
+        WeaveResult execResult = runtime.execute("main.dwl", resources, Map.of("payload", jsonValue));
+        results.put("logs", Map.of(
+            "m", execResult.getLogs().getMessages(),
+            "l", execResult.getLogs().getLevels()
+        ));
+
+        // --- 3. grant (Run with security manager failure) ---
+        resources.put("main.dwl", "{a: readUrl(`http://google.com`)}");
+        // Execution context setup to replicate `{ securityManager: (grant, args) -> false }`
+        ExecutionContext grantContext = ExecutionContext.builder()
+            .securityManager(new DenyResourceAccessManager())
+            .build();
+        results.put("grant", runtime.execute("main.dwl", resources, Map.of("payload", jsonValue), grantContext));
+        
+        // --- 4. library (Run with imported library) ---
+        resources.put("main.dwl", "Utils::sum(1,2)");
+        results.put("library", runtime.execute("main.dwl", resources, Map.of("payload", jsonValue)));
+        
+        // --- 5. timeout (Run with timeout failure) ---
+        resources.put("main.dwl", "(1 to 1000000000000) map $ + 1");
+        // Execution context setup to replicate `{timeOut: 2}`
+        ExecutionContext timeoutContext = ExecutionContext.builder()
+            .timeout(Duration.ofSeconds(2))
+            .build();
+        // The SDK returns success:false with a timeout error message on failure
+        WeaveResult timeoutResult = runtime.execute("main.dwl", resources, Map.of("payload", jsonValue), timeoutContext);
+        results.put("timeout", timeoutResult.isSuccess()); // Expects false
+
+        // --- 6. execFail (Run with dw::Runtime::fail) ---
+        resources.put("main.dwl", "dw::Runtime::fail('My Bad')");
+        results.put("execFail", runtime.execute("main.dwl", resources, Map.of("payload", jsonValue)));
+
+        // --- 7. parseFail (Run with syntax error) ---
+        resources.put("main.dwl", "(1 + ");
+        results.put("parseFail", runtime.execute("main.dwl", resources, Map.of("payload", jsonValue)));
+
+        // --- 8. writerFail (Run with writer error: outputting non-XML content as XML) ---
+        resources.put("main.dwl", "output application/xml --- 2");
+        results.put("writerFail", runtime.execute("main.dwl", resources, Map.of("payload", jsonValue)));
+        
+        // --- 9. readerFail (Run with reader error: invalid JSON input) ---
+        resources.put("main.dwl", "output application/xml --- payload");
+        results.put("readerFail", runtime.execute("main.dwl", resources, Map.of("payload", invalidJsonValue)));
+
+        // --- 10. defaultOutput (Run with custom writer properties) ---
+        resources.put("main.dwl", "payload");
+        ExecutionContext outputContext = ExecutionContext.builder()
+            .outputMimeType("application/csv")
+            .writerProperty("separator", "|")
+            .build();
+        results.put("defaultOutput", runtime.execute("main.dwl", resources, Map.of("payload", jsonValue2), outputContext));
+
+
+        return results;
+    }
+}
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "{\n  a: 1\n}",
+    "mimeType": "application/dw"
+  },
+  "logs": {
+    "m": ["1"],
+    "l": ["INFO"]
+  },
+  "grant": {
+    "success": false,
+    "message": "The given required permissions: `Resource` are not being granted..."
+  },
+  "library": {
+    "success": true,
+    "value": "3",
+    "mimeType": "application/dw"
+  },
+  "timeout": false,
+  "execFail": {
+    "success": false,
+    "message": "My Bad\nTrace:\n\tat fail..."
+  },
+  "parseFail": {
+    "success": false,
+    "message": "Invalid input \"1 + \", expected parameter or parenEnd..."
+  },
+  "writerFail": {
+    "success": false,
+    "message": "Trying to output non-whitespace characters outside main element tree..."
+  },
+  "readerFail": {
+    "success": false,
+    "message": "Unexpected end-of-input at payload@[1:18] (line:column)..."
+  },
+  "defaultOutput": {
+    "success": true,
+    "value": "name|lastName\nMariano|achaval\n",
+    "mimeType": "application/csv"
+  }
+}
+
+

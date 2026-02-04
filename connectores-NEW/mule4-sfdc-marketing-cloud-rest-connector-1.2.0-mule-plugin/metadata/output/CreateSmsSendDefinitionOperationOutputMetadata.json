@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "content",
+        "createdDate",
+        "definitionId",
+        "definitionKey",
+        "description",
+        "modifiedDate",
+        "name",
+        "requestId",
+        "status",
+        "subscriptions"
+      ],
+      "properties": {
+        "content": {
+          "$ref": "#/definitions/content"
+        },
+        "createdDate": {
+          "type": "string"
+        },
+        "definitionId": {
+          "type": "string"
+        },
+        "definitionKey": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "modifiedDate": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "subscriptions": {
+          "$ref": "#/definitions/subscriptions"
+        }
+      }
+    },
+    "content": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "subscriptions": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "autoAddSubscriber",
+        "keyword",
+        "shortCode"
+      ],
+      "properties": {
+        "autoAddSubscriber": {
+          "type": "boolean"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "shortCode": {
+          "type": "string"
+        },
+        "updateSubscriber": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+toString:
+
+toString(mimeType: MimeType): String
+
+toString(mimeType: MimeType): String
+Transforms a MimeType value to a string representation.
+
+
+
+Source
+%dw 2.0
+import * from dw::module::Mime
+output application/json
+---
+toString({'type': "application", subtype: "json", parameters: {}})
+
+DataWeave
+Output
+"application/json"
+
+
+------------------------------------------------------------------
+
+Source
+%dw 2.0
+import * from dw::module::Mime
+output application/json
+---
+toString({'type': "multipart", subtype: "form-data", parameters: {boundary: "my-boundary"}})
+
+DataWeave
+Output
+"multipart/form-data;boundary=my-boundary"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

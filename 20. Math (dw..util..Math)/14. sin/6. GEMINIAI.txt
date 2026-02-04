@@ -1,0 +1,49 @@
+sin:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the sin function.
+     * @return A map containing the results of the sine calculations.
+     */
+    @GetMapping("/calculateSin")
+    public Map<String, Double> calculateSin() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        // Helper function for sin (direct map to Java's Math.sin)
+        double sin(double x) {
+            // Math.sin takes an angle in radians and returns its sine.
+            return Math.sin(x);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("sin0", sin(0));
+        output.put("sin13", sin(0.13));
+        output.put("sin-1", sin(-1));
+
+        return output;
+    }
+}
+
+output:
+
+{
+  "sin0": 0.0,
+  "sin13": 0.12963414261969486,
+  "sin-1": -0.8414709848078965
+}
+
+

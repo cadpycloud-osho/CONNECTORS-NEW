@@ -1,0 +1,48 @@
+location:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+public class LocationDiscoveryBean {
+
+    public Map<String, Object> getFunctionLocation(Exchange exchange) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // Equivalent to finding the 'sqrt' function location
+            // In Java/Camel, we look up the Math.class or a specific Component
+            Class<?> clazz = Math.class; 
+            Method method = clazz.getMethod("sqrt", double.class);
+            
+            URL location = clazz.getProtectionDomain().getCodeSource().getLocation();
+
+            result.put("uri", location.toString());
+            result.put("nameIdentifier", clazz.getCanonicalName());
+            // Java Reflection does not provide line numbers for compiled code
+            // unless debug symbols are present and parsed via a library like ASM.
+            result.put("description", "Source found in standard library");
+            
+        } catch (Exception e) {
+            result.put("error", "Could not resolve location");
+        }
+        
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "uri": "jrt:/java.base/java/lang/Math.class",
+  "nameIdentifier": "java.lang.Math",
+  "description": "Source found in standard library"
+}
+
+

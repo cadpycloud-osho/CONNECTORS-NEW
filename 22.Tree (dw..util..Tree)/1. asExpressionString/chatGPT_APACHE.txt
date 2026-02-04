@@ -1,0 +1,49 @@
+asExpressionString:
+
+
+input:
+
+// Simulating DataWeave asExpressionString logic in Java
+import java.util.*;
+
+public class DWTreeConverter {
+
+    public static void main(String[] args) {
+        List<Map<String, Object>> tree = new ArrayList<>();
+
+        Map<String, Object> node1 = new LinkedHashMap<>();
+        node1.put("kind", "OBJECT_TYPE");
+        node1.put("selector", "user");
+        node1.put("namespace", null);
+
+        Map<String, Object> node2 = new LinkedHashMap<>();
+        node2.put("kind", "ATTRIBUTE_TYPE");
+        node2.put("selector", "name");
+        node2.put("namespace", null);
+
+        tree.add(node1);
+        tree.add(node2);
+
+        StringBuilder expr = new StringBuilder();
+        for (Map<String, Object> node : tree) {
+            String kind = (String) node.get("kind");
+            String selector = (String) node.get("selector");
+            if ("OBJECT_TYPE".equals(kind)) {
+                expr.append(".").append(selector);
+            } else if ("ATTRIBUTE_TYPE".equals(kind)) {
+                expr.append(".@").append(selector);
+            }
+        }
+
+        System.out.println(expr.toString());
+    }
+}
+
+
+
+output:
+
+.user.@name
+
+
+

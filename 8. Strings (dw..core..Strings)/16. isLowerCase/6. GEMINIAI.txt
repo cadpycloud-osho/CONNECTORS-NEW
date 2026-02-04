@@ -1,0 +1,74 @@
+isLowerCase:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class IsLowerCaseController {
+
+    /**
+     * Custom method to emulate DataWeave's isLowerCase(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY lowercase letters.
+     */
+    private boolean isLowerCaseString(String input) {
+        // DataWeave returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // Check if ALL characters in the string are lowercase AND letters.
+        return input.chars() // Get an IntStream of character codes
+                    .allMatch(c -> {
+                        char character = (char) c;
+                        // 1. Must be a lowercase character
+                        // 2. Must be a letter (to exclude spaces, digits, and punctuation)
+                        return Character.isLetter(character) && Character.isLowerCase(character);
+                    });
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/check-is-lowercase")
+    public Map<String, Boolean> checkIsLowerCaseExamples() {
+        // Use LinkedHashMap to preserve the output order
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Testing various inputs, including Unicode characters ö (lowercase) and Ö (uppercase)
+        result.put("a", isLowerCaseString(null));
+        result.put("b", isLowerCaseString(""));
+        result.put("c", isLowerCaseString(" "));   // Fails: space is not a letter
+        result.put("d", isLowerCaseString("abc")); // Passes
+        result.put("e", isLowerCaseString("aBC")); // Fails: contains uppercase B, C
+        result.put("f", isLowerCaseString("a c")); // Fails: space is not a letter
+        result.put("g", isLowerCaseString("a1c")); // Fails: 1 is not a letter
+        result.put("h", isLowerCaseString("a/c")); // Fails: / is not a letter
+        result.put("i", isLowerCaseString("mulesöft")); // Passes: ö is lowercase letter
+        result.put("j", isLowerCaseString("mulesÖft")); // Fails: Ö is uppercase letter
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": true,
+  "j": false
+}
+

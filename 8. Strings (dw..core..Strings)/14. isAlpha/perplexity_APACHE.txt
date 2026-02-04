@@ -1,0 +1,43 @@
+isAlpha:
+
+
+input:
+
+import java.util.*;
+import java.util.function.Predicate;
+
+public class IsAlphaConverter {
+    public static boolean isAlpha(String input) {
+        if (input == null || input.isEmpty()) return false;
+        
+        return input.chars()
+                   .allMatch(Character::isLetter);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isAlpha(null));
+        result.put("b", isAlpha(""));
+        result.put("c", isAlpha("  "));
+        result.put("d", isAlpha("abc"));
+        result.put("e", isAlpha("ab2c"));
+        result.put("f", isAlpha("ab-c"));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+

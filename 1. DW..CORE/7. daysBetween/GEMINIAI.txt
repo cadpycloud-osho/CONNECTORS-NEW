@@ -1,0 +1,73 @@
+daysBetween
+
+Copy link to clipboarddaysBetween(from: Date, to: Date): Number
+Returns the number of days between two dates.
+
+
+Source:
+
+1. DaysController.java
+This controller handles the HTTP request and performs the date calculation.
+
+Java
+
+package com.example.datedemo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class DaysController {
+
+    /**
+     * Calculates the number of calendar days between two ZonedDateTimes.
+     * Note: The ZonedDateTime class handles the ISO 8601 format with offset: 
+     * 'YYYY-MM-DDTHH:MM:SSTZ_OFFSET' (e.g., '2016-10-01T23:57:59-03:00')
+     * * @param start The starting date-time string.
+     * @param end The ending date-time string.
+     * @return A map containing the calculated days, matching the requested JSON format.
+     */
+    @GetMapping("/daysBetween")
+    public Map<String, Long> getDaysBetween(
+            @RequestParam("start") String start,
+            @RequestParam("end") String end) {
+
+        // 1. Parse the input strings into ZonedDateTime objects
+        ZonedDateTime startTime = ZonedDateTime.parse(start);
+        ZonedDateTime endTime = ZonedDateTime.parse(end);
+
+        // 2. Calculate the difference in calendar days
+        long daysDifference = ChronoUnit.DAYS.between(startTime, endTime);
+
+        // 3. Return the result in the required JSON format
+        return Collections.singletonMap("days", daysDifference);
+    }
+}
+
+
+
+2. DateDemoApplication.java
+Standard Spring Boot application entry point.
+
+Java
+
+package com.example.datedemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DateDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DateDemoApplication.class, args);
+    }
+
+}
+Output:
+{ "days" : 365 }

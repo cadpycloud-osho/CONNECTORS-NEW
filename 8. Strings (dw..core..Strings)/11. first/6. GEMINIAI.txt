@@ -1,0 +1,54 @@
+first:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class SubstringController {
+
+    /**
+     * Custom method to emulate DataWeave's first(text, length) function.
+     * Extracts the first 'length' characters of the input string.
+     */
+    private String getFirstCharacters(String input, int length) {
+        if (input == null || input.isEmpty() || length <= 0) {
+            return "";
+        }
+        
+        // Ensure the length does not exceed the string's actual length
+        int end = Math.min(input.length(), length);
+        
+        // Java's substring(0, end) extracts characters from index 0 up to (but not including) index 'end'
+        return input.substring(0, end);
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression: "hello world!" first 5
+     */
+    @GetMapping("/get-first-five")
+    public Map<String, String> getFirstFive() {
+        String inputString = "hello world!"; // The hardcoded input string
+        int length = 5;                        // The hardcoded length
+        
+        String result = getFirstCharacters(inputString, length);
+        
+        // Return the result in the desired JSON format
+        return Collections.singletonMap("first", result);
+    }
+}
+
+
+output:
+
+{
+  "first": "hello"
+}
+
+

@@ -1,0 +1,36 @@
+joinBy:
+
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // DataWeave Input: ["a","b","c"]
+        List<String> inputList = Arrays.asList("a", "b", "c");
+        
+        // DataWeave Separator: "-"
+        String separator = "-";
+
+        // --- DataWeave Expression equivalent ---
+        
+        // ["a","b","c"] joinBy "-"
+        // In Java, use the static String.join(delimiter, elements) method.
+        String joinedString = String.join(separator, inputList);
+
+        // --- Output Generation (Replicating the JSON structure) ---
+        System.out.println("--- DataWeave joinBy Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{ \"hyphenate\": \"" + joinedString + "\" }");
+    }
+}
+output:
+
+
+{ "hyphenate": "a-b-c" }

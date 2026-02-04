@@ -1,0 +1,36 @@
+field:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> output = new HashMap<>();
+        output.put("kind", "Object");
+        output.put("namespace", "http://acme.com/foo");
+        output.put("selector", "myFieldName");
+
+        System.out.println(output);
+    }
+}
+
+
+javac FieldExample.java
+java FieldExample
+
+
+output:
+
+
+{kind=Object, namespace=http://acme.com/foo, selector=myFieldName}
+
+
+
+

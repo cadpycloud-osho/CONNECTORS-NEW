@@ -1,0 +1,190 @@
+file:
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class FileMultipartController {
+
+    @GetMapping(value = "/multipart-file", produces = "application/json")
+    public Map<String, Object> getMultipartFile() throws IOException {
+
+        // Load file from resources (same as Mule)
+        ClassPathResource resource = new ClassPathResource("orders.xml");
+        String xmlContent = new String(resource.getInputStream().readAllBytes());
+
+        Map<String, Object> headers = new LinkedHashMap<>();
+        headers.put("Content-Type", "application/xml");
+
+        Map<String, Object> contentDisp = new LinkedHashMap<>();
+        contentDisp.put("name", "file");
+        contentDisp.put("filename", "orders.xml");
+        headers.put("Content-Disposition", contentDisp);
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("headers", headers);
+        output.put("content", xmlContent);
+
+        return output;
+    }
+}
+
+
+output:
+
+{
+  "headers": {
+    "Content-Type": "application/xml",
+    "Content-Disposition": {
+      "name": "file",
+      "filename": "orders.xml"
+    }
+  },
+  "content": "<?xml version='1.0' encoding='UTF-8'?>\n<orders>\n  <order>\n    <item>\n      <id>1001</id>\n      <qty>1</qty>\n      <price>$100</price>\n    </item>\n    <item>\n      <id>2001</id>\n      <qty>2</qty>\n      <price>$50</price>\n    </item>\n  </order>\n</orders>"
+}
+
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+@RestController
+public class MultipartFileController {
+
+    @GetMapping(value = "/file-multipart", produces = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> generateMultipart() throws IOException {
+
+        String filePath = "./orders.xml"; // same as DataWeave
+        FileSystemResource fileResource = new FileSystemResource(filePath);
+
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.APPLICATION_XML);
+        fileHeaders.setContentDispositionFormData("file", "myorders.xml");
+
+        HttpEntity<FileSystemResource> filePart = new HttpEntity<>(fileResource, fileHeaders);
+
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("file", filePart);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        return new ResponseEntity<>(parts, headers, HttpStatus.OK);
+    }
+}
+
+
+output:
+
+------=_Part_5349_1228640551
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_5349_1228640551--
+
+
+-------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+@RestController
+public class MultipartFileController {
+
+    @GetMapping(value = "/upload-clients", produces = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> uploadClients() throws IOException {
+
+        String fileName = "myClients.json";
+
+        // Read file from resources
+        ClassPathResource resource = new ClassPathResource(fileName);
+        byte[] fileBytes = resource.getInputStream().readAllBytes();
+        ByteArrayResource byteArrayResource =
+                new ByteArrayResource(fileBytes) {
+                    @Override
+                    public String getFilename() {
+                        return "partMyClients.json";  // DW output filename
+                    }
+                };
+
+        // Prepare multipart body
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        HttpHeaders fileHeader = new HttpHeaders();
+        fileHeader.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<ByteArrayResource> filePart =
+                new HttpEntity<>(byteArrayResource, fileHeader);
+
+        body.add("myFile", filePart);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
+}
+
+
+output:
+
+------=_Part_1586_1887987980
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+   clients: {
+     client: {
+       id: 1,
+       name: "Mariano"
+     },
+     client: {
+       id: 2,
+       name: "Shoki"
+     }
+   }
+}
+------=_Part_1586_1887987980--
+
+
+-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

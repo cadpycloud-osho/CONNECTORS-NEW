@@ -1,0 +1,41 @@
+nameSet:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.util.*;
+
+public class NameSetProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        // Input object (equivalent to DW object)
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("a", true);
+        input.put("b", 1);
+
+        // nameSet equivalent
+        List<String> nameSet = new ArrayList<>(input.keySet());
+
+        // Output structure
+        Map<String, Object> output = new HashMap<>();
+        output.put("nameSet", nameSet);
+
+        exchange.getIn().setBody(output);
+    }
+}
+
+
+
+output:
+
+{
+  "nameSet": ["a", "b"]
+}
+
+
+

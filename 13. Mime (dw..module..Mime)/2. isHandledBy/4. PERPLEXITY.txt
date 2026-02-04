@@ -1,0 +1,91 @@
+isHandledBy:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MimeIsHandledByController {
+    
+    @GetMapping("/mime/is-handled-by")
+    public Map<String, Boolean> isHandledByTest() {
+        // Define MIME types matching DataWeave vars
+        MimeType JSON = new MimeType("application", "json", new HashMap<>());
+        MimeType MULTIPART = new MimeType("multipart", "form-data", 
+            Map.of("boundary", "my-boundary"));
+        MimeType ALL = new MimeType("*", "*", new HashMap<>());
+        
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("a", MimeUtils.isHandledBy(JSON, JSON));
+        result.put("b", MimeUtils.isHandledBy(new MimeType("*", "json", new HashMap<>()), JSON));
+        result.put("c", MimeUtils.isHandledBy(new MimeType("application", "*", new HashMap<>()), JSON));
+        result.put("d", MimeUtils.isHandledBy(ALL, MULTIPART));
+        result.put("e", MimeUtils.isHandledBy(MULTIPART, ALL));
+        result.put("f", MimeUtils.isHandledBy(JSON, MULTIPART));
+        result.put("g", MimeUtils.isHandledBy(
+            new MimeType("application", "*+xml", new HashMap<>()),
+            new MimeType("application", "soap+xml", new HashMap<>())
+        ));
+        
+        return result;
+    }
+}
+
+// Helper classes
+class MimeType {
+    String type;
+    String subtype;
+    Map<String, String> parameters;
+    
+    public MimeType(String type, String subtype, Map<String, String> parameters) {
+        this.type = type;
+        this.subtype = subtype;
+        this.parameters = parameters;
+    }
+}
+
+class MimeUtils {
+    public static boolean isHandledBy(MimeType handler, MimeType candidate) {
+        // Type matching
+        if (!matches(handler.type, candidate.type)) return false;
+        
+        // Subtype matching
+        if (!matches(handler.subtype, candidate.subtype)) return false;
+        
+        // Parameters - handler params must be subset of candidate params
+        for (Map.Entry<String, String> entry : handler.parameters.entrySet()) {
+            String key = entry.getKey();
+            String expectedValue = entry.getValue();
+            String actualValue = candidate.parameters.get(key);
+            if (expectedValue != null && !expectedValue.equals(actualValue)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private static boolean matches(String pattern, String value) {
+        if ("*".equals(pattern)) return true;
+        return pattern.equals(value);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": true
+}
+
+

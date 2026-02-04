@@ -1,0 +1,236 @@
+map:
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
+import java.util.stream.Collectors;
+
+public class CamelMapIndexExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // The "map (value, index)" equivalent in Java/Camel
+                    .process(exchange -> {
+                        List<String> input = Arrays.asList("jose", "pedro", "mateo");
+                        
+                        // Use Java Streams to map index to value
+                        List<Map<String, String>> result = IntStream.range(0, input.size())
+                            .mapToObj(i -> Map.of(String.valueOf(i), input.get(i)))
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Marshal to JSON to match DataWeave output
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+[
+  { "0": "jose" },
+  { "1": "pedro" },
+  { "2": "mateo" }
+]
+
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class CamelMapIndexConcat {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Input: ['a', 'b', 'c']
+                        List<String> input = Arrays.asList("a", "b", "c");
+
+                        // Equivalent logic to: (index + 1) ++ '_' ++ value
+                        List<String> result = IntStream.range(0, input.size())
+                            .mapToObj(i -> (i + 1) + "_" + input.get(i))
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert the List to JSON Array
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[ "1_a", "2_b", "3_c" ]
+
+-------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class CamelShorthandMap {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: ['joe', 'pete', 'matt']
+                        List<String> input = Arrays.asList("joe", "pete", "matt");
+
+                        // Equivalent logic to: ( "$$" : $ )
+                        // $$ (index) becomes the key, $ (value) becomes the value
+                        List<Map<String, String>> result = IntStream.range(0, input.size())
+                            .mapToObj(i -> Map.of(String.valueOf(i), input.get(i)))
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Marshal the List of Maps into a JSON Array
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[
+  { "0": "joe" },
+  { "1": "pete" },
+  { "2": "matt" }
+]
+
+-------------------------------------------------------
+
+example 4:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.dataformat.csv.CsvDataFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class CamelMapToCsv {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                // Setup CSV format to include the header row
+                CsvDataFormat csv = new CsvDataFormat();
+                csv.setUseMaps(true); // Tells Camel the input is a List of Maps
+                csv.setHeader(new String[]{"age", "name"});
+
+                from("direct:start")
+                    .process(exchange -> {
+                        // Creating the input data (equivalent to your Source array)
+                        List<Map<String, Object>> list = new ArrayList<>();
+                        
+                        Map<String, Object> row1 = new LinkedHashMap<>();
+                        row1.put("age", 14); row1.put("name", "Claire");
+                        
+                        Map<String, Object> row2 = new LinkedHashMap<>();
+                        row2.put("age", 56); row2.put("name", "Max");
+                        
+                        Map<String, Object> row3 = new LinkedHashMap<>();
+                        row3.put("age", 89); row3.put("name", "John");
+                        
+                        list.add(row1); list.add(row2); list.add(row3);
+                        
+                        exchange.getIn().setBody(list);
+                    })
+                    // Marshal to CSV
+                    .marshal(csv)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+age,name
+14,Claire
+56,Max
+89,John
+
+
+-------------------------------------------------------
+

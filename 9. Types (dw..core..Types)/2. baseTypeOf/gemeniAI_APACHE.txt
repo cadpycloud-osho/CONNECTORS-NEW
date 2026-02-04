@@ -1,0 +1,42 @@
+baseTypeOf:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+
+public class BaseTypeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getBaseType")
+            .process(exchange -> {
+                // Imagine AType is a specialized class in Java
+                class AType extends StringWrapper { }
+                
+                Object myTypeInstance = new AType();
+                
+                // Getting the base type (superclass) in Java
+                String baseType = myTypeInstance.getClass()
+                                                .getSuperclass()
+                                                .getSimpleName();
+
+                exchange.getIn().setBody(Map.of("a", baseType));
+            })
+            .marshal().json();
+    }
+}
+
+// Simple base class for the example
+class StringWrapper { }
+
+output:
+
+{
+  "a": "String"
+}
+
+
+

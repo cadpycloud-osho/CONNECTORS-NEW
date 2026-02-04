@@ -1,0 +1,72 @@
+isNumeric:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class IsNumericController {
+
+    /**
+     * Custom method to emulate DataWeave's isNumeric(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY numeric digits.
+     */
+    private boolean isNumericString(String input) {
+        // DataWeave's isNumeric returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // Check if ALL characters in the string are digits.
+        return input.chars() // Get an IntStream of character codes
+                    // Character.isDigit() handles Unicode digits (like Devanagari, e.g., '१')
+                    .allMatch(Character::isDigit); 
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/check-is-numeric")
+    public Map<String, Boolean> checkIsNumericExamples() {
+        // Use LinkedHashMap to preserve the output order
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Testing various inputs:
+        result.put("a", isNumericString(null));
+        result.put("b", isNumericString(""));
+        result.put("c", isNumericString("  "));    // Fails: Contains space/non-breaking space
+        result.put("d", isNumericString("123"));   // Passes: Contains only standard digits
+        result.put("e", isNumericString("१२३"));  // Passes: Contains only Devanagari digits (Unicode)
+        result.put("f", isNumericString("12 3"));  // Fails: Contains space
+        result.put("g", isNumericString("ab2c"));  // Fails: Contains letters
+        result.put("h", isNumericString("12-3"));  // Fails: Contains hyphen
+        result.put("i", isNumericString("12.3"));  // Fails: Contains decimal point
+        result.put("j", isNumericString("-123"));  // Fails: Contains sign
+        result.put("k", isNumericString("+123"));  // Fails: Contains sign
+        
+        return result;
+    }
+}
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+

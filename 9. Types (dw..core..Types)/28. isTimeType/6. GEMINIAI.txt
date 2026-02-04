@@ -1,0 +1,60 @@
+isTimeType:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.OffsetTime; // The Java equivalent of DataWeave Time
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TimeCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isTimeType(Type).
+     */
+    private boolean isTimeType(Class<?> type) {
+        return OffsetTime.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/time-typecheck")
+    public Map<String, Boolean> checkTimeTypes() {
+        
+        // DataWeave type ATime is an alias for Time
+        Class<?> aTime = OffsetTime.class;
+        
+        // DataWeave type Time
+        Class<?> timeType = OffsetTime.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isTimeType(aTime);
+        boolean b = isTimeType(timeType);
+        boolean c = isTimeType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

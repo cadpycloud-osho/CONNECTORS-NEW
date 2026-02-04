@@ -1,0 +1,30 @@
+randomInt:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class RandomIntRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:randomInt")
+            .process(exchange -> {
+                // Random int [0, 999] - matches randomInt(1000)
+                int randomPrice = (int) (Math.random() * 1000);
+                
+                Map<String, Double> result = new HashMap<>();
+                result.put("price", (double) randomPrice); // Double for JSON serialization
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "price": 442.0 }
+
+

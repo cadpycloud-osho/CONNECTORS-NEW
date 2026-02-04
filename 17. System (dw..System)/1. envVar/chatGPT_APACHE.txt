@@ -1,0 +1,49 @@
+envVar:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.HashMap;
+import java.util.Map;
+
+public class EnvVarsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+                Map<String, Object> envVars = new HashMap<>();
+
+                // Read existing env variable
+                Map<String, String> realVar = new HashMap<>();
+                realVar.put("real", System.getenv("SHELL")); // e.g., "/bin/bash"
+                envVars.put("real", realVar);
+
+                // Read non-existing env variable
+                Map<String, String> fakeVar = new HashMap<>();
+                fakeVar.put("fake", System.getenv("FAKE_ENV_VAR")); // null
+                envVars.put("fake", fakeVar);
+
+                // Set as message body
+                exchange.getMessage().setBody(Map.of("envVars", new Map[]{realVar, fakeVar}));
+            });
+    }
+}
+
+
+
+
+output:
+
+{
+  "envVars": [
+    { "real": "/bin/bash" },
+    { "fake": null }
+  ]
+}
+
+
+
+

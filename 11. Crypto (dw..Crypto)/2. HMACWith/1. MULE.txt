@@ -1,0 +1,38 @@
+HMACWith:
+
+HMACWith(secret: Binary, content: Binary, @Since(version = "2.2.0") algorithm: String = "HmacSHA1"): String
+
+HMACWith(secret: Binary, content: Binary, @Since(version = "2.2.0") algorithm: String = "HmacSHA1"): String
+Computes an HMAC hash (with a secret cryptographic key) on input content, then transforms the result into a lowercase, hexadecimal string.
+
+
+
+
+Source
+%dw 2.0
+import dw::Crypto
+output application/json
+---
+{ "HMACWith" : Crypto::HMACWith("secret_key" as Binary, "Some value to hash" as Binary, "HmacSHA256") }
+
+DataWeave
+Output
+{ "HMACWith": "b51b4fe8c4e37304605753272b5b4321f9644a9b09cb1179d7016c25041d1747" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

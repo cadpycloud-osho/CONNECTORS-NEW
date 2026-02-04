@@ -1,0 +1,27 @@
+splitAt:
+
+splitAt<T>(array: Array<T>, n: Number): Pair<Array<T>, Array<T>>
+
+splitAt<T>(array: Array<T>, n: Number): Pair<Array<T>, Array<T>>
+Splits an array into two at a given position.
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var users = ["Mariano", "Leandro", "Julian"]
+---
+users splitAt 1
+
+DataWeave
+Output
+{
+  "l": [
+    "Mariano"
+  ],
+  "r": [
+    "Leandro",
+    "Julian"
+  ]
+}

@@ -1,0 +1,73 @@
+isAttributeType:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class TreeController {
+
+    public static class TreeNode {
+        public String kind;
+        public String selector;
+        public String namespace;
+
+        public TreeNode(String kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+    }
+
+    @GetMapping("/isAttributeType")
+    public Map<String, Boolean> checkAttributes() {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        // a
+        List<TreeNode> pathA = Arrays.asList(
+                new TreeNode("OBJECT_TYPE", "user", null),
+                new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("a", isAttributeType(pathA));
+
+        // b
+        List<TreeNode> pathB = Arrays.asList(
+                new TreeNode("OBJECT_TYPE", "user", null),
+                new TreeNode("ARRAY_TYPE", "name", null)
+        );
+        result.put("b", isAttributeType(pathB));
+
+        // c
+        List<TreeNode> pathC = Collections.singletonList(
+                new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("c", isAttributeType(pathC));
+
+        return result;
+    }
+
+    private boolean isAttributeType(List<TreeNode> path) {
+        if (path == null || path.isEmpty()) return false;
+        TreeNode last = path.get(path.size() - 1);
+        return "ATTRIBUTE_TYPE".equals(last.kind);
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false,
+  "c": true
+}
+
+

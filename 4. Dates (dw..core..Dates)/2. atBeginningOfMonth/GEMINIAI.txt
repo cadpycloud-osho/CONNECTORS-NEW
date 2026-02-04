@@ -1,0 +1,113 @@
+atBeginningOfMonth:
+
+
+example 1:
+
+
+input:
+
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
+public class DateTimeBeginningOfMonthExample {
+    
+    public static void main(String[] args) {
+        // DataWeave Input: |2020-10-06T18:23:20.351-03:00|
+        ZonedDateTime input = ZonedDateTime.of(
+            LocalDateTime.of(2020, 10, 6, 18, 23, 20, 351000000), 
+            ZoneOffset.of("-03:00") 
+        );
+        
+        // Java equivalent of atBeginningOfMonth: set day to 1, then truncate time
+        ZonedDateTime result = input
+            .withDayOfMonth(1)
+            .truncatedTo(ChronoUnit.DAYS);
+        
+        // Output formatting
+        String formattedOutput = result.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        System.out.println("Source Input: " + input.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+output:
+
+Source Input2020-10-06T18:23:20.351-03:00Result Output2020-10-01T00:00:00-03:00
+
+-------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
+public class LocalDateTimeBeginningOfMonthExample {
+
+    public static void main(String[] args) {
+        // DataWeave Input: |2020-10-06T18:23:20.351|
+        LocalDateTime input = LocalDateTime.of(2020, 10, 6, 18, 23, 20, 351000000);
+        
+        // Java equivalent of atBeginningOfMonth: set day to 1, then truncate time
+        LocalDateTime result = input
+            .withDayOfMonth(1)
+            .truncatedTo(ChronoUnit.DAYS);
+
+        // Output formatting
+        String formattedOutput = result.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+        System.out.println("Source Input: " + input.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+
+output:
+
+Source Input2020-10-06T18:23:20.351Result Output2020-10-01T00:00:00
+
+-------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class DateBeginningOfMonthExample {
+
+    public static void main(String[] args) {
+        // DataWeave Input: |2020-10-06|
+        LocalDate input = LocalDate.of(2020, 10, 6);
+        
+        // Java equivalent of atBeginningOfMonth: set day to 1
+        LocalDate result = input.withDayOfMonth(1);
+
+        // Output formatting
+        String formattedOutput = result.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+        System.out.println("Source Input: " + input.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+
+output:
+
+Source Input	2020-10-06
+Result Output	2020-10-01
+
+-------------------------------------------------------------------
+

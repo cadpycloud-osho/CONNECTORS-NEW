@@ -1,0 +1,56 @@
+atan:
+
+atan(angle: Number): Number
+
+atan(angle: Number): Number
+Returns an arc tangent value that can range from -pi/2 through pi/2.
+
+
+source
+%dw 2.0
+import * from dw::util::Math
+output application/json
+---
+{
+  "atan0":  atan(0),
+  "atan13": atan(0.13),
+  "atan-1": atan(-1)
+}
+
+
+
+DataWeave
+Output
+{
+   "atan0": 0.0,
+   "atan13": 0.12927500404814307,
+   "atan-1": -0.7853981633974483
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

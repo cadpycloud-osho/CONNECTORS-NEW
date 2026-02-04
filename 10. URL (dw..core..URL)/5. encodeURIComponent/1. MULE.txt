@@ -1,0 +1,58 @@
+encodeURIComponent:
+
+encodeURIComponent(text: String): String
+
+encodeURIComponent(text: String): String
+Escapes certain characters in a URI component using UTF-8 encoding.
+
+There can be only four escape sequences for characters composed of two "surrogate" * characters. encodeURIComponent escapes all characters except the following: alphabetic, decimal digits, - _ . ! ~ * ' ( ). Note that encodeURIComponent differs from encodeURI in that it encodes reserved characters and the Number sign # of encodeURI:
+
+
+
+Source
+%dw 2.0
+import * from dw::core::URL
+output application/json
+---
+{
+  "comparing_encode_functions_output" : {
+  	"encodeURIComponent" : encodeURI(" PATH/ TO /ENCODE "),
+  	"encodeURI" : encodeURI(" PATH/ TO /ENCODE "),
+  	"encodeURIComponent_to_hex" : encodeURIComponent(";,/?:@&="),
+  	"encodeURI_not_to_hex" : encodeURI(";,/?:@&="),
+  	"encodeURIComponent_not_encoded" : encodeURIComponent("-_.!~*'()"),
+  	"encodeURI_not_encoded" : encodeURI("-_.!~*'()")
+  }
+}
+
+DataWeave
+Output
+{
+  "comparing_encode_functions_output": {
+    "encodeURIComponent": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURI": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURIComponent_to_hex": "%3B%2C%2F%3F%3A%40%26%3D",
+    "encodeURI_not_to_hex": ";,/?:@&=",
+    "encodeURIComponent_not_encoded": "-_.!~*'()",
+    "encodeURI_not_encoded": "-_.!~*'()"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

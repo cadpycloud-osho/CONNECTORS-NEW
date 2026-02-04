@@ -1,0 +1,50 @@
+isTimeType:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class TimeTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkTime")
+            .process(exchange -> {
+                // Mapping the DataWeave source logic:
+                // a: The type definition ATime
+                // b: The Time keyword
+                // c: A different type (String)
+                Object refA = OffsetTime.class;
+                Object refB = OffsetTime.now(); // An OffsetTime instance
+                Object refC = "12:00:00Z";      // A String representation
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if it is the OffsetTime class or an instance of it
+                result.put("a", isTimeType(refA));
+                result.put("b", isTimeType(refB));
+                result.put("c", isTimeType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isTimeType(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the class reference (OffsetTime.class) or an actual instance
+        return obj instanceof OffsetTime || obj.equals(OffsetTime.class);
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

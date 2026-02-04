@@ -1,0 +1,130 @@
+map:
+
+example 1:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("jose", "pedro", "mateo");
+        List<Map<String, String>> result = new ArrayList<>();
+
+        for (int i = 0; i < names.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            map.put(String.valueOf(i), names.get(i));
+            result.add(map);
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[{0=jose}, {1=pedro}, {2=mateo}]
+
+
+-------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> letters = Arrays.asList("a", "b", "c");
+
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < letters.size(); i++) {
+            result.add((i + 1) + "_" + letters.get(i));
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[1_a, 2_b, 3_c]
+
+
+
+
+
+-------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("joe", "pete", "matt");
+        List<Map<String, String>> result = new ArrayList<>();
+
+        for (int i = 0; i < names.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            map.put(String.valueOf(i), names.get(i));
+            result.add(map);
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+[{0=joe}, {1=pete}, {2=matt}]
+
+
+-------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Map<String, Object>> people = new ArrayList<>();
+        people.add(Map.of("age", 14, "name", "Claire"));
+        people.add(Map.of("age", 56, "name", "Max"));
+        people.add(Map.of("age", 89, "name", "John"));
+
+        // CSV header
+        System.out.println("age,name");
+
+        // CSV rows
+        for (Map<String, Object> person : people) {
+            System.out.println(person.get("age") + "," + person.get("name"));
+        }
+    }
+}
+
+
+output:
+age,name
+14,Claire
+56,Max
+89,John
+
+
+-------------------------------------------------------------

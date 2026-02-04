@@ -1,0 +1,18 @@
+uuid:
+
+uuid(): String
+
+uuid(): String
+Returns a v4 UUID using random numbers as the source.
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+uuid()
+
+DataWeave
+dOutput
+"7cc64d24-f2ad-4d43-8893-fa24a0789a99"

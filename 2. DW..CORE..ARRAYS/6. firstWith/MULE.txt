@@ -1,0 +1,48 @@
+firstWith:
+
+firstWith<T>(array: Array<T>, condition: (item: T, index: Number) -> Boolean): T | Null
+
+firstWith<T>(array: Array<T>, condition: (item: T, index: Number) -> Boolean): T | Null
+Returns the first element that satisfies the condition, or returns null if no element meets the condition.
+
+
+
+Source
+%dw 2.0
+output application/json
+import firstWith from dw::core::Arrays
+var users = [{name: "Mariano", lastName: "Achaval"}, {name: "Ana", lastName: "Felisatti"}, {name: "Mariano", lastName: "de Sousa"}]
+---
+{
+  a: users firstWith ((user, index) -> user.name == "Mariano"),
+  b: users firstWith ((user, index) -> user.name == "Peter")
+}
+
+
+DataWeave
+Output
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

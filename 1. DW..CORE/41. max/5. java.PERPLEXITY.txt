@@ -1,0 +1,31 @@
+max:
+
+
+input:
+
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "admin123";
+        
+        // Pattern 1: starts with 'a', followed by any chars, ends with digit
+        Pattern pattern1 = Pattern.compile("a.*\\d+");
+        Matcher matcher1 = pattern1.matcher(input);
+        boolean match1 = matcher1.find();
+        
+        // Pattern 2: starts with 'b', followed by 1+ chars
+        Pattern pattern2 = Pattern.compile("^b.+");
+        Matcher matcher2 = pattern2.matcher(input);
+        boolean match2 = matcher2.find();
+        
+        System.out.println("[" + match1 + ", " + match2 + "]");
+    }
+}
+
+
+output:
+
+[true, false]
+
+

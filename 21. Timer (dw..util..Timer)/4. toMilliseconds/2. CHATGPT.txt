@@ -1,0 +1,38 @@
+toMilliseconds:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TimerController {
+
+    @GetMapping("/toMilliseconds")
+    public Map<String, Long> getMilliseconds() {
+
+        Instant instant = Instant.parse("2018-07-23T22:03:04.829Z");
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("toMilliseconds", instant.toEpochMilli());
+
+        return response;
+    }
+}
+
+
+output:
+
+
+{
+  "toMilliseconds": 1532383384829
+}
+

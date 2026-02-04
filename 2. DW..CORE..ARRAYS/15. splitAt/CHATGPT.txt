@@ -1,0 +1,40 @@
+splitAt:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class SplitAtController {
+
+    @GetMapping("/splitAt")
+    public Map<String, List<String>> splitAtExample() {
+
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+
+        int position = 1;
+
+        List<String> left = users.subList(0, position);
+        List<String> right = users.subList(position, users.size());
+
+        Map<String, List<String>> response = new HashMap<>();
+        response.put("l", left);
+        response.put("r", right);
+
+        return response;
+    }
+}
+
+output:
+
+{
+  "l": ["Mariano"],
+  "r": ["Leandro", "Julian"]
+}
+

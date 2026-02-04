@@ -1,0 +1,51 @@
+toArray:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class ToArrayController {
+
+    @GetMapping("/toArray")
+    public Map<String, List<String>> toArrayExample() {
+
+        Map<String, List<String>> result = new HashMap<>();
+
+        result.put("a", toArray(""));
+        result.put("b", toArray("hola"));
+
+        return result;
+    }
+
+    // Equivalent of dw::util::Coercions::toArray
+    private List<String> toArray(String value) {
+        List<String> list = new ArrayList<>();
+
+        if (value == null || value.isEmpty()) {
+            return list;
+        }
+
+        for (char c : value.toCharArray()) {
+            list.add(String.valueOf(c));
+        }
+        return list;
+    }
+}
+
+
+output:
+
+{"a":[],"b":["h","o","l","a"]}
+
+
+
+

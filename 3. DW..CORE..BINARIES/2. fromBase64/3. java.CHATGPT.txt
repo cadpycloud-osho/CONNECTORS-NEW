@@ -1,0 +1,32 @@
+fromBase64:
+
+
+
+input:
+
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Simulating Mule payload
+        String payload = "SGVsbG8gV29ybGQ=";
+
+        // Equivalent of DataWeave fromBase64(payload)
+        byte[] binaryData = Base64.getDecoder().decode(payload);
+
+        // Convert to String only for demonstration
+        String decodedText = new String(binaryData, StandardCharsets.UTF_8);
+
+        System.out.println(decodedText);
+    }
+}
+
+
+
+output:
+
+Hello World
+

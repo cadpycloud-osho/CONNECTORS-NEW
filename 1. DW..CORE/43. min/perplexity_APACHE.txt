@@ -1,0 +1,30 @@
+min:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MinRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:min")
+            .process(exchange -> {
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                result.put("a", Collections.min(Arrays.asList(1, 1000)));
+                result.put("b", Collections.min(Arrays.asList(1, 2, 3)));
+                result.put("c", Collections.min(Arrays.asList(1.5, 2.5, 3.5)));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "a": 1, "b": 1, "c": 1.5 }
+
+

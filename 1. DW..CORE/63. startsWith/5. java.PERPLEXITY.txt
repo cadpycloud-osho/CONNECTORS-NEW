@@ -1,0 +1,22 @@
+startsWith:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        boolean result1 = "Mari".startsWith("Mar");
+        boolean result2 = "Mari".startsWith("Em");
+        
+        // Output array format
+        System.out.println("[" + result1 + ", " + result2 + "]");
+    }
+}
+
+
+output:
+
+
+[true, false]
+

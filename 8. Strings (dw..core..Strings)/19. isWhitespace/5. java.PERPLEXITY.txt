@@ -1,0 +1,41 @@
+isWhitespace:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + isWhitespace(null) + ",");
+        System.out.println("  \"b\": " + isWhitespace("") + ",");
+        System.out.println("  \"c\": " + isWhitespace("  ") + ",");
+        System.out.println("  \"d\": " + isWhitespace("abc") + ",");
+        System.out.println("  \"e\": " + isWhitespace("ab2c") + ",");
+        System.out.println("  \"f\": " + isWhitespace("ab-c"));
+        System.out.println("}");
+    }
+    
+    private static boolean isWhitespace(String input) {
+        if (input == null) {
+            return false;
+        }
+        return input.chars().allMatch(Character::isWhitespace);
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+

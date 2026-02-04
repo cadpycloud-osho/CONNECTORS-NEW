@@ -1,0 +1,96 @@
+takeWhile:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 2, 1);
+        
+        // DataWeave Logic: arr takeWhile $ <= 1
+        // We use the Java 9+ Stream.takeWhile() method with a Predicate.
+        List<Integer> result = arr.stream()
+            .takeWhile(n -> n <= 1) // Keep taking elements as long as n <= 1
+            .collect(Collectors.toList());
+
+        // Output the result in the JSON array format
+        System.out.println("Output structure:");
+        System.out.println(result); 
+    }
+}
+
+output:
+
+
+[0, 1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Java Code (Using an Imperative Loop)
+This approach uses a loop to build the result list element by element until the condition fails, at which point it breaks the loop (short-circuiting).
+
+Java
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source data array (DataWeave 'arr' variable)
+        List<Integer> arr = Arrays.asList(0, 1, 2, 1);
+        
+        List<Integer> result = new ArrayList<>();
+        
+        // DataWeave Logic: arr takeWhile $ <= 1
+        // Loop through each number
+        for (int number : arr) {
+            // Check the condition
+            if (number <= 1) {
+                // Condition is true, take the element
+                result.add(number);
+            } else {
+                // Condition is false (at number 2), stop taking and exit the loop
+                break;
+            }
+        }
+
+        // Output the result in the JSON array format
+        System.out.println("Output structure:");
+        System.out.println(result);
+    }
+}
+
+
+Output for Both Java Codes
+The output for both the Java Stream and the Java Imperative approaches is identical, and correctly represents the DataWeave result:
+
+JSON
+
+[0, 1]

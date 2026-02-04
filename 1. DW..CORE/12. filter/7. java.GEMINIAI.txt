@@ -1,0 +1,295 @@
+filter:
+
+
+example 1:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: [9,2,3,4,5] filter (value > 2)
+        List<Integer> sourceList = Arrays.asList(9, 2, 3, 4, 5);
+
+        // Core Logic: Use Stream filter() with a lambda Predicate
+        List<Integer> filteredList = sourceList.stream()
+                                               .filter(value -> value > 2)
+                                               .collect(Collectors.toList());
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredList);
+    }
+}
+
+output:
+
+[9, 3, 4, 5]
+
+------------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Data Structure to represent the complex objects
+        List<Map<String, Object>> sourceList = Arrays.asList(
+            Map.of("name", "Mariano", "age", 37),
+            Map.of("name", "Shoki", "age", 30),
+            Map.of("name", "Tomo", "age", 25),
+            Map.of("name", "Ana", "age", 29)
+        );
+
+        // Core Logic: Use Stream filter() with a Predicate accessing the 'age' key
+        List<Map<String, Object>> filteredList = sourceList.stream()
+                                               .filter(item -> (int) item.get("age") >= 30)
+                                               .collect(Collectors.toList());
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredList);
+    }
+}
+
+
+output:
+[{name: Mariano, age: 37}, {name: Shoki, age: 30}]
+
+
+------------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: [9, 2, 3, 4, 5] filter (($$ > 1) and ($ < 5))
+        List<Integer> sourceList = Arrays.asList(9, 2, 3, 4, 5);
+        List<Integer> filteredList = new ArrayList<>();
+
+        // 1. Core Logic: Use a traditional loop to access the index (i) and value (v)
+        for (int i = 0; i < sourceList.size(); i++) {
+            int value = sourceList.get(i);
+            int index = i;
+
+            // Apply the combined criteria: (index > 1) AND (value < 5)
+            if ((index > 1) && (value < 5)) {
+                filteredList.add(value);
+            }
+        }
+        
+        // Index 0: 9 -> False
+        // Index 1: 2 -> False
+        // Index 2: 3 -> True (2 > 1 AND 3 < 5)
+        // Index 3: 4 -> True (3 > 1 AND 4 < 5)
+        // Index 4: 5 -> False
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredList);
+    }
+}
+
+output:
+
+[3, 4]
+
+------------------------------------------------------------------
+
+
+example 4:
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Data Structure to simulate the input JSON
+        // Using mutable HashMaps for flexibility and consistency, though Map.of works.
+        
+        // Item 1: Has an error
+        Map<String, Object> item1 = new HashMap<>();
+        item1.put("user", Map.of("name", "123", "lastName", "Smith"));
+        item1.put("error", "That name doesn't exists");
+        
+        // Item 2: Has a null error
+        Map<String, Object> item2 = new HashMap<>();
+        item2.put("user", Map.of("name", "John", "lastName", "Johnson"));
+        item2.put("error", null); // Explicitly setting the key to null value
+        
+        List<Map<String, Object>> sourceList = new ArrayList<>(List.of(item1, item2));
+
+        // Core Logic: Use Stream filter() checking for null
+        // item.get("error") returns null if the value is null OR if the key "error" is missing.
+        // For the purposes of this specific filter (where the key is guaranteed to be present 
+        // in the input structure), checking for value == null is correct.
+        List<Map<String, Object>> filteredList = sourceList.stream()
+                                                      .filter(item -> item.get("error") == null)
+                                                      .collect(Collectors.toList());
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredList);
+    }
+}
+
+output:
+
+[{user: {name: John, lastName: Johnson}, error: null}]
+
+------------------------------------------------------------------
+
+
+example 5:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // 1. Simulate the extraction of the phone array from the payload
+        List<Map<String, String>> phoneArray = Arrays.asList(
+            Map.of("activeInd", "Y", "type", "mobile", "primaryInd", "Y", "number", "230678123"),
+            Map.of("activeInd", "N", "type", "mobile", "primaryInd", "N", "number", ""),
+            Map.of("activeInd", "Y", "type", "mobile", "primaryInd", "Y", "number", "154896523")
+        );
+        
+        // 2. Core Logic: Combine filter (WHERE) and map (SELECT)
+        List<String> phoneNumbers = phoneArray.stream()
+            // FILTER: $.activeInd == "Y" and $.primaryInd == "Y"
+            .filter(phone -> "Y".equals(phone.get("activeInd")) && "Y".equals(phone.get("primaryInd")))
+            // MAP: .number (extract the 'number' field)
+            .map(phone -> phone.get("number"))
+            .collect(Collectors.toList());
+
+        // 3. Collect other fields (simulated for completeness)
+        String id = "1184001100000000517";
+        String markCode = "US";
+        String languageCode = "en-US";
+        String username = "TheMule";
+        
+        // 4. Construct the final output Map
+        Map<String, Object> output = Map.of(
+            "id", id,
+            "markCode", markCode,
+            "languageCode", languageCode,
+            "username", username,
+            "phoneNumber", phoneNumbers // The result of the filter/map operation
+        );
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{id: 1184001100000000517, markCode: US, languageCode: en-US, username: TheMule, phoneNumber: [230678123, 154896523]}
+
+------------------------------------------------------------------
+
+
+
+example 6:
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: "hello world" filter ($$ mod 2) == 0
+        String sourceString = "hello world";
+        StringBuilder filteredString = new StringBuilder();
+
+        // Core Logic: Loop through the characters by index
+        // Index 0 ('h'), 2 ('l'), 4 ('o'), 6 (' '), 8 ('o'), 10 ('l') -> h low d
+        // H e l l o   w o r l d
+        // 0 1 2 3 4 5 6 7 8 9 10 
+        
+        for (int i = 0; i < sourceString.length(); i++) {
+            // Check if the index is even (i mod 2 == 0)
+            if (i % 2 == 0) {
+                filteredString.append(sourceString.charAt(i));
+            }
+        }
+
+        // Print the output
+        System.out.println("Output:");
+        // The characters are h, l, o, (space), w, r, d
+        // Wait, "hello world" has 11 characters. 
+        // 0: h, 2: l, 4: o, 6: w, 8: r, 10: d.
+        // The output should be "hlowrd" (removing the space at index 5).
+        // Let's recheck the indices:
+        // h(0) e(1) l(2) l(3) o(4)  (5) w(6) o(7) r(8) l(9) d(10)
+        // Correct Indices (0, 2, 4, 6, 8, 10) are: h, l, o, w, r, d.
+        System.out.println("\"" + filteredString.toString() + "\"");
+    }
+}
+
+
+output:
+
+"hlowrd"
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

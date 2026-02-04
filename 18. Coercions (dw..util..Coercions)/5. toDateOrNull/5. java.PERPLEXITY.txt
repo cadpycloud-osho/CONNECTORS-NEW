@@ -1,0 +1,49 @@
+toDateOrNull:
+
+
+
+input:
+
+
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class Main {
+    public static void main(String[] args) {
+        LocalDate dateA = safeParse("2023/03/28", createMultiFormatter());
+        LocalDate dateB = safeParse("2023-28-03", DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        
+        System.out.println("{\"a\":\"" + (dateA != null ? dateA : null) + 
+                          "\",\"b\":" + (dateB != null ? "\"" + dateB + "\"" : "null") + "}");
+    }
+    
+    private static LocalDate safeParse(String input, DateTimeFormatter formatter) {
+        try {
+            return LocalDate.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+    
+    private static DateTimeFormatter createMultiFormatter() {
+        return new DateTimeFormatterBuilder()
+            .appendOptional(new DateTimeFormatterBuilder()
+                .appendPattern("yyyy/MM/dd")
+                .toFormatter())
+            .appendOptional(new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-dd-MM")
+                .toFormatter())
+            .toFormatter(Locale.US);
+    }
+}
+
+
+
+output:
+
+{"a":"2023-03-28","b":null}
+

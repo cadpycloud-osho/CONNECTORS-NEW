@@ -1,0 +1,45 @@
+appendIfMissing:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class StringAppendRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:appendLogic")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                results.put("a", appendIfMissing(null, ""));
+                results.put("b", appendIfMissing("abc", ""));
+                results.put("c", appendIfMissing("", "xyz"));
+                results.put("d", appendIfMissing("abc", "xyz"));
+                results.put("e", appendIfMissing("abcxyz", "xyz"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    // Parity logic for DataWeave's appendIfMissing
+    private String appendIfMissing(String base, String suffix) {
+        if (base == null) return null;
+        if (suffix == null || base.endsWith(suffix)) return base;
+        return base + suffix;
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+

@@ -1,0 +1,53 @@
+props:
+
+
+input:
+
+import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class PropsController {
+
+    private final Environment env;
+
+    public PropsController(Environment env) {
+        this.env = env;
+    }
+
+    @GetMapping(value = "/props", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String> getProps() {
+        // Matches: { "props" : props() }
+        Map<String, String> props = new HashMap<>();
+        
+        // System properties (matches Mule runtime)
+        System.getProperties().forEach((key, value) -> 
+            props.put(key.toString(), value.toString()));
+        
+        // Spring environment properties
+        env.getPropertySources().forEach(ps -> {
+            if (ps.getSource() instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> source = (Map<String, Object>) ps.getSource();
+                source.forEach((key, value) -> 
+                    props.putIfAbsent(key, value.toString()));
+            }
+        });
+        
+        return Map.of("props", String.valueOf(props));
+    }
+}
+
+
+output:
+
+{
+  "props": "{java.runtime.name=Java(TM) SE Runtime Environment (build 25.352+15), sun.boot.library.path=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib, java.vm.version=17.0.10+11, java.vm.vendor=Oracle Corporation, java.vendor.url.bug=http://bugreport.oracle.com/bugreport/, path.separator=:, java.vm.name=Java HotSpot(TM) 64-Bit Server VM, file.encoding=UTF-8, java.io.tmpdir=/var/folders/42/dd73l3rx7qz0n625hr29kty80000gn/T/, java.class.path=/Users/me/project/target/classes:/Users/me/project/target/dependency/*, java.class.version=61.0, user.name=me, java.endorsed.dirs=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/endorsed:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/jre/lib/endorsed, line.separator=\n, java.home=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home, awt.toolkit=sun.lwawt.macosx.LWCToolkit, user.timezone=America/Los_Angeles, os.name=Mac OS X, java.awt.printerjob=sun.lwawt.macosx.CPrinterJob, java.vm.specification.name=Java Virtual Machine Specification, sun.management.compiler=HotSpot 64-Bit Tiered Compilers, os.version=14.0, user.country=US, java.ext.dirs=/Users/me/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/ext, user.language=en, java.specification.name=Java Platform API Specification, user.home=/Users/me, java.library.path=/Users/me/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server:/usr/lib:/System/Library/Frameworks/JavaVM.framework:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib}"
+}
+
+

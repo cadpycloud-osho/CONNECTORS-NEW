@@ -1,0 +1,31 @@
+prop:
+
+
+input:
+
+
+import java.util.TimeZone;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Force timezone (Mule-style fixed configuration)
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
+
+        String timezone = System.getProperty("user.timezone");
+
+        if (timezone == null || timezone.isEmpty()) {
+            timezone = TimeZone.getDefault().getID();
+        }
+
+        System.out.println("{ props: \"" + timezone + "\" }");
+    }
+}
+
+
+output:
+
+{ props: "America/Los_Angeles" }
+
+

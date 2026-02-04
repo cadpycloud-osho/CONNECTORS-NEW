@@ -1,0 +1,58 @@
+time:
+
+
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+
+public class TimeWithOffsetCreationExample {
+
+    /**
+     * DataWeave equivalent: time({ hour: ..., timeZone: ...})
+     * Creates an OffsetTime object from component fields and a timezone offset.
+     * * @param hour The hour component (0 to 23).
+     * @param minute The minute component (0 to 59).
+     * @param second The second component (0 to 59).
+     * @param offsetId The timezone offset string (e.g., "-03:00").
+     * @return The resulting OffsetTime object.
+     */
+    public static OffsetTime createTimeWithOffset(int hour, int minute, int second, String offsetId) {
+        // 1. Create the LocalTime component
+        LocalTime localTime = LocalTime.of(hour, minute, second);
+        
+        // 2. Create the ZoneOffset component
+        ZoneOffset offset = ZoneOffset.of(offsetId);
+        
+        // 3. Combine them to create the OffsetTime
+        return OffsetTime.of(localTime, offset);
+    }
+
+    public static void main(String[] args) {
+        // 1. Define the input parameters from DataWeave
+        int hour = 12;
+        int minute = 30;
+        int second = 40;
+        String timeZoneOffset = "-03:00"; // |-03:00| in DW
+
+        System.out.println("--- Time With Offset Creation Example ---");
+        
+        // 2. Call the Java function
+        OffsetTime newTime = createTimeWithOffset(hour, minute, second, timeZoneOffset);
+        
+        // 3. Format the output to match the DataWeave ISO 8601 format
+        // DateTimeFormatter.ISO_OFFSET_TIME gives "HH:MM:SS-OFFSET"
+        String formattedOutput = newTime.format(DateTimeFormatter.ISO_OFFSET_TIME);
+        
+        System.out.println("Source Input (Components): {hour: 12, minutes: 30, seconds: 40, timeZone: " + timeZoneOffset + "}");
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+output:
+
+12:30:40-03:00

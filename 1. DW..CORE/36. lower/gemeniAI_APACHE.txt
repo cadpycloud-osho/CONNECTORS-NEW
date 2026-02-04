@@ -1,0 +1,41 @@
+lower:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Map;
+
+public class CamelLowerExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // The "lower()" equivalent in Camel Simple
+                    .setBody(simple("{\"name\": \"${body.toLower()}\"}"))
+                    
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        
+        // Sending the string "MULESOFT"
+        context.createProducerTemplate().sendBody("direct:start", "MULESOFT");
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{ "name": "mulesoft" }
+
+

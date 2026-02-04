@@ -1,0 +1,36 @@
+divideBy:
+
+divideBy(items: Object, amount: Number): Array<Object>
+
+divideBy(items: Object, amount: Number): Array<Object>
+Breaks up an object into sub-objects that contain the specified number of key-value pairs.
+
+If there are fewer key-value pairs in an object than the specified number, the function will fill the object with those pairs. If there are more pairs, the function will fill another object with the extra pairs.
+
+
+
+Source
+%dw 2.0
+import divideBy from dw::core::Objects
+output application/json
+---
+{ "divideBy" : {"a": 1, "b" : true, "a" : 2, "b" : false, "c" : 3} divideBy 2 }
+
+DataWeave
+Output
+{
+  "divideBy": [
+    {
+      "a": 1,
+      "b": true
+    },
+    {
+      "a": 2,
+      "b": false
+    },
+    {
+      "c": 3
+    }
+  ]
+}
+

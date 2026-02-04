@@ -1,0 +1,66 @@
+substringAfterLast:
+
+
+INPUT:
+
+
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String substringAfterLastDW(String input, String delimiter) {
+
+        // DW behavior:
+        if (input == null) return null;
+        if (delimiter == null) return null;
+        if (delimiter.equals("")) return null; // important DW rule
+
+        if (input.equals("")) return "";
+
+        int index = input.lastIndexOf(delimiter);
+
+        if (index == -1) return "";  // delimiter not found → empty string
+
+        return input.substring(index + delimiter.length());
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class SubstringAfterLastController {
+
+    @GetMapping("/substringAfterLast")
+    public Map<String, String> substringAfterLastExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.substringAfterLastDW(null, "'"));
+        result.put("b", StringUtils.substringAfterLastDW("", "-"));
+        result.put("c", StringUtils.substringAfterLastDW("abc", "b"));
+        result.put("d", StringUtils.substringAfterLastDW("abcba", "b"));
+        result.put("e", StringUtils.substringAfterLastDW("abc", "d"));
+        result.put("f", StringUtils.substringAfterLastDW("abc", ""));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "a",
+  "e": "",
+  "f": null
+}
+

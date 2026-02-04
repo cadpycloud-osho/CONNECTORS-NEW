@@ -1,0 +1,159 @@
+outerJoin:
+
+
+input:
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@SpringBootApplication
+public class OuterJoinDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OuterJoinDemoApplication.class, args);
+    }
+}
+
+class User {
+    public String id;
+    public String name;
+    public User(String id, String name) { this.id = id; this.name = name; }
+}
+
+class Product {
+    public String ownerId;
+    public String name;
+    public Product(String ownerId, String name) { this.ownerId = ownerId; this.name = name; }
+}
+
+@RestController
+class OuterJoinController {
+    
+    private List<Map<String, Object>> outerJoin(List<User> left, List<Product> right,
+                                              java.util.function.Function<User, String> leftKey,
+                                              java.util.function.Function<Product, String> rightKey) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        // Create lookup maps
+        Map<String, List<Product>> rightMap = new HashMap<>();
+        for (Product product : right) {
+            rightMap.computeIfAbsent(rightKey.apply(product), k -> new ArrayList<>()).add(product);
+        }
+        
+        Set<String> matchedRightKeys = new HashSet<>();
+        
+        // LEFT JOIN part (all left + matching right)
+        for (User user : left) {
+            String userId = leftKey.apply(user);
+            Map<String, Object> record = new HashMap<>();
+            record.put("l", user);
+            
+            List<Product> matchingProducts = rightMap.get(userId);
+            if (matchingProducts != null && !matchingProducts.isEmpty()) {
+                // Multiple matches
+                for (Product product : matchingProducts) {
+                    Map<String, Object> pair = new HashMap<>(record);
+                    pair.put("r", product);
+                    result.add(pair);
+                    matchedRightKeys.add(userId);
+                }
+            } else {
+                // No match: just left
+                result.add(record);
+            }
+        }
+        
+        // RIGHT JOIN part (unmatched right records only)
+        for (Product product : right) {
+            String productKey = rightKey.apply(product);
+            if (!matchedRightKeys.contains(productKey)) {
+                Map<String, Object> record = new HashMap<>();
+                record.put("r", product);
+                result.add(record);
+            }
+        }
+        
+        return result;
+    }
+    
+    @GetMapping("/outerJoin")
+    public List<Map<String, Object>> outerJoinExample() {
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"),
+            new User("2", "Leandro"),
+            new User("3", "Julian"),
+            new User("5", "Julian")
+        );
+        
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"),
+            new Product("1", "BAT"),
+            new Product("3", "DataSense"),
+            new Product("4", "SmartConnectors")
+        );
+        
+        return outerJoin(users, products,
+            user -> user.id,
+            product -> product.ownerId
+        );
+    }
+}
+
+
+output:
+
+
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  },
+  {
+    "r": {
+      "ownerId": "4",
+      "name": "SmartConnectors"
+    }
+  }
+]
+

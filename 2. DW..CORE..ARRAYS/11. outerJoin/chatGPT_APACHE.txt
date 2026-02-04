@@ -1,0 +1,80 @@
+outerJoin:
+
+
+input:
+
+from("direct:outerJoin")
+.process(exchange -> {
+
+    List<Map<String, Object>> users =
+            exchange.getIn().getHeader("users", List.class);
+
+    List<Map<String, Object>> products =
+            exchange.getIn().getHeader("products", List.class);
+
+    List<Map<String, Object>> result = new ArrayList<>();
+    Set<Integer> matchedProducts = new HashSet<>();
+
+    // LEFT part + matches
+    for (Map<String, Object> user : users) {
+
+        boolean matched = false;
+
+        for (int i = 0; i < products.size(); i++) {
+            Map<String, Object> product = products.get(i);
+
+            if (Objects.equals(user.get("id"), product.get("ownerId"))) {
+
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("l", user);
+                row.put("r", product);
+
+                result.add(row);
+                matchedProducts.add(i);
+                matched = true;
+            }
+        }
+
+        // user with no matching product
+        if (!matched) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("l", user);
+            result.add(row);
+        }
+    }
+
+    // RIGHT-only part (unmatched products)
+    for (int i = 0; i < products.size(); i++) {
+        if (!matchedProducts.contains(i)) {
+
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("r", products.get(i));
+
+            result.add(row);
+        }
+    }
+
+    exchange.getIn().setBody(result);
+});
+
+
+template.send("direct:outerJoin", exchange -> {
+    exchange.getIn().setHeader("users", usersList);
+    exchange.getIn().setHeader("products", productsList);
+});
+
+
+
+output:
+
+[
+  { "l": { "id": "1", "name": "Mariano" }, "r": { "ownerId": "1", "name": "DataWeave" } },
+  { "l": { "id": "1", "name": "Mariano" }, "r": { "ownerId": "1", "name": "BAT" } },
+  { "l": { "id": "2", "name": "Leandro" } },
+  { "l": { "id": "3", "name": "Julian" }, "r": { "ownerId": "3", "name": "DataSense" } },
+  { "l": { "id": "5", "name": "Julian" } },
+  { "r": { "ownerId": "4", "name": "SmartConnectors" } }
+]
+
+
+

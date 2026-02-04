@@ -1,0 +1,171 @@
+isLeapYear:
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LeapYearProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<LocalDateTime> input = exchange.getIn().getBody(List.class);
+        List<Boolean> result = new ArrayList<>();
+        
+        for (LocalDateTime date : input) {
+            int year = date.getYear();
+            result.add(Year.of(year).isLeap());
+        }
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+
+public class LeapYearRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .unmarshal().json(JsonLibrary.Jackson, List.class)
+            .process(new LeapYearProcessor())
+            .marshal().json()
+            .to("mock:output");
+    }
+}
+
+[
+  "2016-10-01T23:57:59",
+  "2017-10-01T23:57:59"
+]
+
+output:
+[true, false]
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LeapYearProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<LocalDate> input = exchange.getIn().getBody(List.class);
+        List<Boolean> result = new ArrayList<>();
+        
+        for (LocalDate date : input) {
+            int year = date.getYear();
+            result.add(Year.of(year).isLeap());
+        }
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class LeapYearRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .unmarshal().json(JsonLibrary.Jackson, List.class)
+            .process(new LeapYearProcessor())
+            .marshal().json()
+            .to("mock:output");
+    }
+}
+
+[
+  "2016-10-01",
+  "2017-10-01"
+]
+
+output:
+[true, false]
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.ZonedDateTime;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LeapYearProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<ZonedDateTime> input = exchange.getIn().getBody(List.class);
+        List<Boolean> result = new ArrayList<>();
+        
+        for (ZonedDateTime date : input) {
+            int year = date.getYear();
+            result.add(Year.of(year).isLeap());
+        }
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+
+public class LeapYearRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .unmarshal().json(JsonLibrary.Jackson, List.class)
+            .process(new LeapYearProcessor())
+            .marshal().json()
+            .to("mock:output");
+    }
+}
+
+[
+  "2016-10-01T23:57:59-03:00",
+  "2016-10-01T23:57:59Z"
+]
+
+output:
+
+[true, true]
+
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+

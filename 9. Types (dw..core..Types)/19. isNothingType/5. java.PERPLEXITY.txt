@@ -1,0 +1,34 @@
+isNothingType:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Simulate DataWeave's isNothingType
+    private static boolean isNothingType(Class<?> type) {
+        return type == Void.class;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+
+        // Treat ANothing = Void, Nothing = Void, String != Void
+        result.put("a", isNothingType(Void.class));      // ANothing
+        result.put("b", isNothingType(Void.class));      // Nothing
+        result.put("c", isNothingType(String.class));    // String
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+

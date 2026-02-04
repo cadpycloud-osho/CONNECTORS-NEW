@@ -1,0 +1,56 @@
+replaceAll:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class ReplaceAllController {
+
+    @GetMapping("/replace-conversion")
+    public Map<String, String> convertDataWeaveReplaceAll() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = replaceAll("Mariano", "a" , "A");
+        String b = replaceAll("AAAA", "AAA" , "B");
+        String c = replaceAll(null, "aria" , "A");
+        String d = replaceAll("Mariano", "j" , "Test");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'c' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d
+        );
+    }
+    
+    /**
+     * Replicates the dw::core::Strings::replaceAll function.
+     */
+    private String replaceAll(String str, String search, String replacement) {
+        // DataWeave Rule for null input string.
+        if (str == null) {
+            return null;
+        }
+        
+        // String.replace() finds all occurrences (non-overlapping) of a literal
+        // target and replaces them, matching the DW behavior precisely.
+        return str.replace(search, replacement);
+    }
+}
+
+output:
+
+{
+  "a": "MAriAno",
+  "b": "BA",
+  "c": null,
+  "d": "Mariano"
+}

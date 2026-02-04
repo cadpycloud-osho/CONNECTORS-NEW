@@ -1,0 +1,69 @@
+isUpperCase:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class IsUpperCaseController {
+
+    /**
+     * Custom method to emulate DataWeave's isUpperCase(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY uppercase letters.
+     */
+    private boolean isUpperCaseString(String input) {
+        // DataWeave returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // Check if ALL characters in the string are uppercase AND letters.
+        return input.chars() // Get an IntStream of character codes
+                    .allMatch(c -> {
+                        char character = (char) c;
+                        // 1. Must be a letter (to exclude spaces, digits, and punctuation)
+                        // 2. Must be an uppercase character
+                        return Character.isLetter(character) && Character.isUpperCase(character);
+                    });
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/check-is-uppercase")
+    public Map<String, Boolean> checkIsUpperCaseExamples() {
+        // Use LinkedHashMap to preserve the output order
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Testing various inputs:
+        result.put("a", isUpperCaseString(null));
+        result.put("b", isUpperCaseString(""));
+        result.put("c", isUpperCaseString("  "));   // Fails: space is not a letter
+        result.put("d", isUpperCaseString("ABC"));  // Passes
+        result.put("e", isUpperCaseString("aBC"));  // Fails: contains lowercase 'a'
+        result.put("f", isUpperCaseString("A C"));  // Fails: space is not a letter
+        result.put("g", isUpperCaseString("A1C"));  // Fails: 1 is not a letter
+        result.put("h", isUpperCaseString("A/C"));  // Fails: / is not a letter
+        
+        return result;
+    }
+}
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}
+

@@ -1,0 +1,33 @@
+lines:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class LinesRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:splitLines")
+            .process(exchange -> {
+                String input = "hello world\n\nhere   data-weave";
+                
+                // Regex matches: \n (Unix), \r (Mac), or \r\n (Windows)
+                String[] result = input.split("\\R");
+                
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+from("file:inbox")
+    .split().tokenize("\n")
+    .to("activemq:line-processor");
+
+output:
+
+[
+  "hello world",
+  "",
+  "here   data-weave"
+]
+

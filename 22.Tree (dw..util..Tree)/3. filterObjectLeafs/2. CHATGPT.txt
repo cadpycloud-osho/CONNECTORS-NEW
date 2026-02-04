@@ -1,0 +1,101 @@
+filterObjectLeafs:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class TreeFilterController {
+
+    @GetMapping("/treeFilter")
+    public Map<String, Object> filterTree() {
+
+        // Prepare myArray
+        Map<String, Object> firstFriend = new HashMap<>();
+        firstFriend.put("name", ""); // with attributes ignored in Java
+        firstFriend.put("id", "test");
+
+        Map<String, Object> secondFriend = new HashMap<>();
+        secondFriend.put("name", "Me");
+        secondFriend.put("id", null);
+
+        List<Map<String, Object>> myArray = Arrays.asList(firstFriend, secondFriend);
+
+        // Object a
+        Map<String, Object> a = new HashMap<>();
+        a.put("name", "Mariano");
+        a.put("lastName", null);
+        a.put("age", 123);
+        a.put("friends", myArray);
+
+        Map<String, Object> filteredA = filterObjectLeafs(a, value -> !(value == null || value instanceof String));
+
+        // Object b
+        Map<String, Object> b = new HashMap<>();
+        b.put("c", null);
+        b.put("d", "hello");
+
+        Map<String, Object> filteredB = filterObjectLeafs(b, (value) -> value == null);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", filteredA);
+        result.put("b", filteredB);
+
+        return result;
+    }
+
+    // Recursive filtering function
+    private Map<String, Object> filterObjectLeafs(Map<String, Object> map, java.util.function.Predicate<Object> predicate) {
+        Map<String, Object> filtered = new HashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                Map<String, Object> childFiltered = filterObjectLeafs((Map<String, Object>) value, predicate);
+                if (!childFiltered.isEmpty()) filtered.put(entry.getKey(), childFiltered);
+            } else if (value instanceof List) {
+                List<Object> listFiltered = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    if (item instanceof Map) {
+                        Map<String, Object> childFiltered = filterObjectLeafs((Map<String, Object>) item, predicate);
+                        listFiltered.add(childFiltered);
+                    } else if (predicate.test(item)) {
+                        listFiltered.add(item);
+                    } else {
+                        listFiltered.add(new HashMap<>()); // empty object
+                    }
+                }
+                filtered.put(entry.getKey(), listFiltered);
+            } else if (predicate.test(value)) {
+                filtered.put(entry.getKey(), value);
+            }
+        }
+        return filtered;
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "age": 123,
+    "friends": [
+      {},
+      {}
+    ]
+  },
+  "b": {
+    "c": null
+  }
+}
+
+
+
+

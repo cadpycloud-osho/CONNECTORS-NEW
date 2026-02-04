@@ -1,0 +1,46 @@
+HMACBinary:
+
+
+input:
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
+public class HMACBinaryProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // DataWeave: "confidential" as Binary, "xxxxx" as Binary
+        byte[] data = "confidential".getBytes(StandardCharsets.UTF_8);
+        byte[] key = "xxxxx".getBytes(StandardCharsets.UTF_8);
+        
+        Mac mac = Mac.getInstance("HmacSHA512");
+        SecretKeySpec keySpec = new SecretKeySpec(key, "HmacSHA512");
+        mac.init(keySpec);
+        
+        byte[] hmacResult = mac.doFinal(data);
+        
+        // Convert binary to JSON string representation (matches DataWeave output)
+        StringBuilder sb = new StringBuilder("\"");
+        for (byte b : hmacResult) {
+            sb.append(String.format("\\u%04x", (b & 0xFFFF)));
+        }
+        sb.append("\"");
+        
+        String result = "{ \"HMACBinary\": " + sb.toString() + " }";
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:hmacBinary")
+    .process(new HMACBinaryProcessor())
+    .log("${body}");
+
+output:
+
+{
+  "HMACBinary": "\ufffd\ufffd\ufffd\ufffd^h\ufffd!3\u0005\ufffd֎\u00017\ufffd\ufffd\ufffd`\ufffd8?\ufffdjn7\ufffdbs;\t\ufffdƅ\ufffd\ufffd\ufffdx&g\ufffd~\ufffd\ufffd%\ufffd7>1\ufffdK\u000e@\ufffdC\u0011\ufffdT\ufffd}W"
+}
+
+

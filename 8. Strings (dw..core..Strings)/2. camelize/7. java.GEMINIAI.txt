@@ -1,0 +1,72 @@
+camelize:
+
+
+
+input:
+
+public class Main {
+
+    /**
+     * Implements the logic equivalent to DataWeave's camelize.
+     * Converts a snake_case string (e.g., customer_first_name) to camelCase (e.g., customerFirstName).
+     */
+    public static String camelize(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // 1. Remove leading/trailing underscores and replace multiple underscores with a single one
+        String processed = input.replaceAll("_{2,}", "_").replaceAll("^_|_$", "");
+        
+        if (processed.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = false;
+
+        for (int i = 0; i < processed.length(); i++) {
+            char currentChar = processed.charAt(i);
+
+            if (currentChar == '_') {
+                capitalizeNext = true;
+            } else {
+                if (capitalizeNext) {
+                    result.append(Character.toUpperCase(currentChar));
+                    capitalizeNext = false;
+                } else {
+                    // Ensure the first character is lowercase (standard camelCase convention)
+                    if (result.length() == 0) {
+                        result.append(Character.toLowerCase(currentChar));
+                    } else {
+                        result.append(currentChar);
+                    }
+                }
+            }
+        }
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+        // Source cases:
+        String a = camelize("customer_first_name");
+        String b = camelize("_name_starts_with_underscore");
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a + "\",");
+        System.out.println("  \"b\": \"" + b + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": "customerFirstName",
+  "b": "nameStartsWithUnderscore"
+}
+
+
+

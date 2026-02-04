@@ -1,0 +1,33 @@
+
+endsWith:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class EndsWithRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:endsWith")
+            .process(exchange -> {
+                List<Boolean> results = Arrays.asList(
+                    "Mariano".endsWith("no"),   // true
+                    "Mariano".endsWith("to")    // false
+                );
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[true, false]
+
+
+

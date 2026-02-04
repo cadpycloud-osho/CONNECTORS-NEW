@@ -1,0 +1,26 @@
+yesterday:
+
+input:
+
+from("direct:getYesterday")
+.process(exchange -> {
+
+    // Get yesterday's date
+    java.time.LocalDate yesterday = java.time.LocalDate.now().minusDays(1);
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("yesterday", yesterday.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+
+
+
+{
+  "yesterday": "2021-05-14"
+}

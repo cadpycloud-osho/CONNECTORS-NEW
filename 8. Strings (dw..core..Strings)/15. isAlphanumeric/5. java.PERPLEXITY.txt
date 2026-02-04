@@ -1,0 +1,42 @@
+isAlphanumeric:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + isAlphanumeric(null) + ",");
+        System.out.println("  \"b\": " + isAlphanumeric("") + ",");
+        System.out.println("  \"c\": " + isAlphanumeric("  ") + ",");
+        System.out.println("  \"d\": " + isAlphanumeric("abc") + ",");
+        System.out.println("  \"e\": " + isAlphanumeric("ab c") + ",");
+        System.out.println("  \"f\": " + isAlphanumeric("ab2c") + ",");
+        System.out.println("  \"g\": " + isAlphanumeric("ab-c"));
+        System.out.println("}");
+    }
+    
+    private static boolean isAlphanumeric(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        return input.chars().allMatch(c -> Character.isLetterOrDigit((char) c));
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": true,
+  "g": false
+}
+

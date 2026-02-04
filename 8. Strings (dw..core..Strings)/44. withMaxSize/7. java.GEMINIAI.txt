@@ -1,0 +1,68 @@
+withMaxSize:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = StringUtil.withMaxSize("123", 10);
+        String b = StringUtil.withMaxSize("123", 3);
+        String c = StringUtil.withMaxSize("123", 2);
+        String d = StringUtil.withMaxSize("123", 0);
+        String e = StringUtil.withMaxSize(null, 23);
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s,\n  \"c\": %s,\n  \"d\": %s,\n  \"e\": %s\n}",
+            formatJsonString(a), 
+            formatJsonString(b), 
+            formatJsonString(c), 
+            formatJsonString(d), 
+            formatJsonString(e)
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class StringUtil {
+        public static String withMaxSize(String str, int maxSize) {
+            if (str == null) {
+                return null;
+            }
+            
+            // If maxSize <= 0 or string is already small enough, return original string.
+            if (maxSize <= 0 || str.length() <= maxSize) {
+                return str;
+            }
+
+            // Truncate
+            return str.substring(0, maxSize);
+        }
+    }
+
+    /**
+     * Helper to format the Java String result into a valid JSON string (with quotes)
+     * or the JSON literal 'null'.
+     */
+    private static String formatJsonString(String value) {
+        // If the Java String is null, return the JSON literal "null". Otherwise, quote the string value.
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+output:
+
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}

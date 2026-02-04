@@ -1,0 +1,125 @@
+replace:
+
+example 1:
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Operation 1: "123-456-7890" replace /.*-/ with("") ---
+        String text1 = "123-456-7890";
+        String regex1 = ".*-"; // Matches up to the last hyphen
+        String replacement1 = "";
+        
+        String result1Str = text1.replaceAll(regex1, replacement1); 
+        // DataWeave implicitly converts "7890" to a number (7890)
+        long result1 = Long.parseLong(result1Str); 
+
+        // --- Operation 2: "abc123def" replace /[b13e]/ with("-") ---
+        String text2 = "abc123def";
+        String regex2 = "[b13e]"; // Matches b, 1, 3, or e
+        String replacement2 = "-";
+
+        String result2 = text2.replaceAll(regex2, replacement2); 
+        // Result: "a-c-2-d-f"
+
+        // --- Assemble Output ---
+        
+        // DataWeave output: [ 7890, "a-c-2-d-f" ]
+        // Manually format the result into the required JSON array string.
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("[ ");
+        
+        // First element: Number (unquoted)
+        sb.append(result1); 
+        sb.append(", ");
+        
+        // Second element: String (quoted)
+        sb.append("\"").append(result2).append("\"");
+        
+        sb.append(" ]");
+        
+        String outputJson = sb.toString();
+
+        // 3. Output the result
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+[ 7890, "a-c-2-d-f" ]
+
+------------------------------------------------------------------------
+
+example 2:
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, String> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Assuming only one entry: "replace"
+        Map.Entry<String, String> entry = map.entrySet().iterator().next();
+        
+        // Output the key and the string value
+        sb.append("  \"").append(entry.getKey()).append("\" : \"").append(entry.getValue()).append("\"\n"); 
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // --- Operation: "admin123" replace "123" with("ID") ---
+        String text = "admin123";
+        String target = "123";  
+        String replacement = "ID"; 
+
+        // Java's String.replace() performs the literal replacement
+        String result = text.replace(target, replacement); // Result: "adminID"
+
+        // --- Assemble Output using standard Map ---
+        Map<String, String> outputMap = new LinkedHashMap<>();
+        
+        outputMap.put("replace", result);
+
+        // 3. Output the result
+        String outputJson = formatMapAsPrettyJson(outputMap);
+        
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+{
+  "replace" : "adminID"
+}
+
+------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

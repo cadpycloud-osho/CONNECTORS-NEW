@@ -1,0 +1,46 @@
+MD5:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
+public class Md5Route extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                byte[] input = "asd".getBytes(StandardCharsets.UTF_8);
+
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte[] digest = md.digest(input);
+
+                // Convert to HEX (matches DataWeave Crypto::MD5 output)
+                StringBuilder hex = new StringBuilder();
+                for (byte b : digest) {
+                    hex.append(String.format("%02x", b));
+                }
+
+                exchange.getMessage().setBody(
+                    "{ \"md5\" : \"" + hex + "\" }"
+                );
+            });
+    }
+}
+
+
+
+
+output:
+
+{
+  "md5": "7815696ecbf1c96e6894b779456d330e"
+}
+
+

@@ -1,0 +1,62 @@
+isLiteralType:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelLiteralTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // Simulating DataWeave isLiteralType
+                        boolean a = isLiteralType("Mariano");
+                        boolean b = isLiteralType(Boolean.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate literal type detection
+    private static boolean isLiteralType(Object value) {
+        return value instanceof String
+                || value instanceof Number
+                || value instanceof Boolean;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

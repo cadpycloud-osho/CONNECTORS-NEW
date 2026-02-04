@@ -1,0 +1,51 @@
+fromHex:
+
+
+
+input:
+
+
+import java.util.Base64;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String hex = "4D756C65";
+
+        // Convert HEX string to byte array
+        byte[] bytes = hexStringToByteArray(hex);
+
+        // Convert bytes to Base64 (like DataWeave Binary output)
+        String base64 = Base64.getEncoder().encodeToString(bytes);
+
+        System.out.println("{ hexToBinary: \"" + base64 + "\" }");
+    }
+
+    private static byte[] hexStringToByteArray(String hex) {
+        int len = hex.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) (
+                (Character.digit(hex.charAt(i), 16) << 4)
+              + Character.digit(hex.charAt(i + 1), 16)
+            );
+        }
+        return data;
+    }
+}
+
+
+
+
+
+output:
+
+
+{
+  "hexToBinary": "TXVsZQ=="
+}
+
+
+

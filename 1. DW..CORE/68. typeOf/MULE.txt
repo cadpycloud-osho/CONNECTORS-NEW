@@ -1,0 +1,61 @@
+typeOf:
+
+typeOf<T>(value: T): Type<T>
+
+typeOf<T>(value: T): Type<T>
+Returns the primitive data type of a value, such as String.
+
+A value’s type is taken from its runtime representation and is never one of the arithmetic types (intersection, union, Any, or Nothing) nor a type alias. If present, metadata of a value is included in the result of typeOf
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[ typeOf("A b"), typeOf([1,2]), typeOf(34), typeOf(true), typeOf({ a : 5 }) ]
+DataWeave
+Output
+[ "String", "Array", "Number", "Boolean", "Object" ]
+
+------------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+
+var x: String | Number = "clearly a string"
+var y: "because" = "because"
+---
+[typeOf(x), typeOf(y)]
+
+DataWeave
+Output
+["String", "String"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

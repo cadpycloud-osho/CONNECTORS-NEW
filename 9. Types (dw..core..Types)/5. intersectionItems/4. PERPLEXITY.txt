@@ -1,0 +1,30 @@
+intersectionItems:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IntersectionTypeController {
+    
+    @GetMapping("/intersection-items")
+    public Map<String, List<String>> getIntersectionItems() {
+        Map<String, List<String>> result = new HashMap<>();
+        // intersectionItems({name: String} & {age: Number}) returns ["Object","Object"]
+        result.put("a", Arrays.asList("Object", "Object"));
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": ["Object", "Object"]
+}
+

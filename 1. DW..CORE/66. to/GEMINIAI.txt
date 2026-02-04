@@ -1,0 +1,88 @@
+to:
+
+example 1:
+
+input:
+
+import java.util.stream.IntStream;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class RangeArrayExample {
+    public static void main(String[] args) {
+        
+        // Java Stream equivalent of 1 to 10 (inclusive)
+        List<Integer> myRange = IntStream.rangeClosed(1, 10)
+                                         .boxed()
+                                         .toList();
+
+        Map<String, List<Integer>> output = new LinkedHashMap<>();
+        output.put("myRange", myRange);
+        
+        System.out.println("--- DWL Example 1 Output (Range Array) ---");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+{myRange=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+-------------------------------------------------------------
+example 2:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class StringSliceExample {
+
+    // Helper method to implement DataWeave-style slicing with negative indices
+    private static String slice(String str, int startDWL, int endDWL) {
+        int len = str.length();
+        
+        // Convert DWL index (0 to N-1, -1 to -N) to Java index (0 to N)
+        int startJava = startDWL >= 0 ? startDWL : len + startDWL + 1;
+        int endJava = endDWL >= 0 ? endDWL + 1 : len + endDWL + 1; // +1 to convert inclusive DWL end to exclusive Java end
+
+        // If the start index is less than the end index, it's a regular forward slice
+        if (startJava <= endJava) {
+            return str.substring(startJava, endJava);
+        } else {
+            // It's a reversal slice. We take the substring and reverse it.
+            String forwardSlice = str.substring(endJava, startJava);
+            return new StringBuilder(forwardSlice).reverse().toString();
+        }
+    }
+
+    public static void main(String[] args) {
+        String myVar = "Hello World!";
+        
+        // indices2to6 : myVar[2 to 6] -> indices 2, 3, 4, 5, 6 ("llo W")
+        String indices2to6 = myVar.substring(2, 7); // Java end index is exclusive (2 to 6+1)
+
+        // indicesFromEnd : myVar[6 to -1] -> indices 6 to 11 ("World!")
+        String indicesFromEnd = slice(myVar, 6, -1); 
+
+        // reversal : myVar[11 to -0] -> reverse the whole string. 
+        // Note: The logic handles 11 to 0 (since -0 == 0) as a reverse slice.
+        String reversal = slice(myVar, 11, 0); 
+
+        Map<String, String> output = new LinkedHashMap<>();
+        output.put("indices2to6", indices2to6);
+        output.put("indicesFromEnd", indicesFromEnd);
+        output.put("reversal", reversal);
+        
+        System.out.println("--- DWL Example 2 Output (String Slicing) ---");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+{indices2to6=llo W, indicesFromEnd=World!, reversal=!dlroW olleH}

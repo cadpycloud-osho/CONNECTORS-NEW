@@ -1,0 +1,49 @@
+isLocalTimeType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LocalTimeTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkLocalTime")
+            .process(exchange -> {
+                // Equivalent references to the DataWeave source
+                Object refA = LocalTime.class;        // type ALocalTime
+                Object refB = LocalTime.now();        // LocalTime instance
+                Object refC = "12:30:00";             // String literal
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Verify if the object is an instance or the class of LocalTime
+                result.put("a", isLocalTime(refA));
+                result.put("b", isLocalTime(refB));
+                result.put("c", isLocalTime(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(); // Formats the Map as JSON
+    }
+
+    private boolean isLocalTime(Object obj) {
+        if (obj == null) return false;
+        // Check if it's the class definition or an actual time instance
+        return obj instanceof LocalTime || obj.equals(LocalTime.class);
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

@@ -1,0 +1,57 @@
+lastIndexOf:
+
+
+example 1:
+
+input:
+
+from("direct:lastIndexOfExample")
+    .setHeader("present", constant(List.of("a","b","c","d")))
+    .setHeader("notPresent", constant(List.of("x","w","x")))
+    .setHeader("presentMoreThanOnce", constant(List.of("a","b","c","c")))
+    .setBody(simple(
+        "{ " +
+        "\"present\": ${header.present.lastIndexOf('c')}," +
+        "\"notPresent\": ${header.notPresent.lastIndexOf('c')}," +
+        "\"presentMoreThanOnce\": ${header.presentMoreThanOnce.lastIndexOf('c')}" +
+        " }"
+    ));
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+
+
+
+
+---------------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:lastIndexOfString")
+.setBody(simple(
+    "{ " +
+    "\"present\": ${'abcd'.lastIndexOf('c')}," +
+    "\"notPresent\": ${'xyz'.lastIndexOf('c')}," +
+    "\"presentMoreThanOnce\": ${'abcdc'.lastIndexOf('c')}" +
+    " }"
+));
+
+
+output:
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}
+
+
+

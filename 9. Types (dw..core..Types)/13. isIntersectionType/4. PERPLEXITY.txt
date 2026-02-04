@@ -1,0 +1,37 @@
+isIntersectionType:
+
+
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class IntersectionTypeController {
+    
+    @GetMapping("/is-intersection-type")
+    public Map<String, Boolean> isIntersectionType() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // isIntersectionType(AType) where AType = {name: String} & {age: Number} -> true
+        result.put("a", true);
+        
+        // isIntersectionType(Boolean) -> false
+        result.put("b", false);
+        
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+
+

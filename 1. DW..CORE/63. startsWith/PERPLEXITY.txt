@@ -1,0 +1,54 @@
+startsWith:
+
+input:
+
+1. Check if "Mari" starts with "Mar"
+java
+@RestController
+class Example1_StartsWithMar {
+
+    @GetMapping("/startsWithMar")
+    public boolean startsWithMar() {
+        String input = "Mari";
+        return input.startsWith("Mar");
+    }
+}
+Output:
+true
+
+
+
+input:
+
+2. Check if "Mari" starts with "Em"
+java
+@RestController
+class Example2_StartsWithEm {
+
+    @GetMapping("/startsWithEm")
+    public boolean startsWithEm() {
+        String input = "Mari";
+        return input.startsWith("Em");
+    }
+}
+Output:
+false
+
+
+input:
+
+Bonus: Combined example returning both results as a list
+java
+@RestController
+class Example3_StartsWithCombined {
+
+    @GetMapping("/startsWithCombined")
+    public List<Boolean> startsWithCombined() {
+        String input = "Mari";
+        return List.of(input.startsWith("Mar"), input.startsWith("Em"));
+    }
+}
+Output:
+
+json
+[true, false]

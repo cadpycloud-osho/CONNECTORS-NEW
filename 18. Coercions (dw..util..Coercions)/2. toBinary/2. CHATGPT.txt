@@ -1,0 +1,41 @@
+toBinary:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class BinaryCoercionController {
+
+    @GetMapping("/binary")
+    public Map<String, String> getBinaryEncodings() {
+
+        Map<String, String> result = new HashMap<>();
+
+        result.put("UTF-16Ex", encode("DW", "UTF-16"));
+        result.put("utf16Ex", encode("DW", "utf16"));
+        re
+
+
+output:
+
+{
+  "UTF-16Ex": "/v8ARABX",
+  "utf16Ex": "/v8ARABX",
+  "UnicodeBigEx": "/v8ARABX",
+  "UTF-32Ex": "AAAARAAAAFc=",
+  "UTF_32Ex": "AAAARAAAAFc="
+}
+
+
+

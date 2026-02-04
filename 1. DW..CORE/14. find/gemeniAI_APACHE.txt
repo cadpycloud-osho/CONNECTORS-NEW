@@ -1,0 +1,64 @@
+find:
+
+
+example 1:
+
+input:
+
+from("direct:findInArray")
+    .setBody().groovy("""
+        def list = ["Bond", "James", "Bond"]
+        return list.findIndexValues { it == "Bond" }
+    """)
+    .marshal().json();
+
+
+output:
+
+[0, 2]
+
+-----------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:findRegex")
+    .setBody().groovy("""
+        def text = "I heart DataWeave"
+        def pattern = /\\w*ea\\w*(\\b)/
+        def matcher = (text =~ pattern)
+        def results = []
+        while (matcher.find()) {
+            results << [matcher.start(), matcher.end()]
+        }
+        return results
+    """)
+    .marshal().json();
+
+
+output:
+
+[ [2, 7], [8, 17] ]
+
+-----------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:findInString")
+    .setBody().groovy("""
+        def str = "aabccdbce"
+        return str.getChars().toList().findIndexValues { it == 'a' }
+    """)
+    .marshal().json();
+
+
+output:
+
+[0, 1]
+
+-----------------------------------------------------
+
+

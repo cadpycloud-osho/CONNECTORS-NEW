@@ -1,0 +1,40 @@
+countCharactersBy:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class CountNumericController {
+
+    @GetMapping("/count-numeric")
+    public Map<String, Object> countNumeric() {
+
+        String input = "42 = 11 * 2 + 20";
+
+        long count = input.chars()
+                .filter(ch -> Character.isDigit(ch))
+                .count();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("numericCount", count);
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "numericCount": 7
+}
+

@@ -1,0 +1,72 @@
+days:
+
+input:
+
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
+
+public class Main {
+    public static void main(String[] args) {
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        ZonedDateTime midnightDateTime = ZonedDateTime.parse("2020-10-05T00:00:00.000Z");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                                                       .withZone(ZoneOffset.UTC);
+
+        // 1. Date/DateTime Arithmetic
+        ZonedDateTime tomorrow = baseDateTime.plusDays(1);
+        String tomorrowOutput = tomorrow.format(formatter).replace(".000Z", "Z");
+
+        ZonedDateTime yesterday = baseDateTime.minusDays(1);
+        String yesterdayOutput = yesterday.format(formatter).replace(".000Z", "Z");
+
+        Duration quarterDay = Duration.ofDays(1).dividedBy(4);
+        ZonedDateTime plusQuarter = midnightDateTime.plus(quarterDay);
+        String plusQuarterOutput = plusQuarter.format(DateTimeFormatter.ISO_INSTANT).replace(".000Z", "Z");
+
+        Duration halfDay = Duration.ofDays(1).dividedBy(2);
+        ZonedDateTime plusHalf = midnightDateTime.plus(halfDay);
+        String plusHalfOutput = plusHalf.format(DateTimeFormatter.ISO_INSTANT).replace(".000Z", "Z");
+
+        Duration threeQuarterDay = quarterDay.multipliedBy(3);
+        ZonedDateTime plusThreeQuarters = midnightDateTime.plus(threeQuarterDay);
+        String plusThreeQuartersOutput = plusThreeQuarters.format(DateTimeFormatter.ISO_INSTANT).replace(".000Z", "Z");
+
+        // 2. Period Creation
+        Duration totalDuration = Duration.ofMillis((long) (4.555 * 24 * 60 * 60 * 1000));
+        String decimalInputAsPeriod = totalDuration.toString();
+
+        String fourDayPeriodOutput = "P4D";
+        String negativeValueOutput = "P-1D";
+
+        // Final JSON Output
+        System.out.println("{");
+        System.out.println("  \"tomorrow\": \"" + tomorrowOutput + "\",");
+        System.out.println("  \"yesterday\": \"" + yesterdayOutput + "\",");
+        System.out.println("  \"decimalDaysPlusQuarter\": \"" + plusQuarterOutput + "\",");
+        System.out.println("  \"decimalDaysPlusHalf\": \"" + plusHalfOutput + "\",");
+        System.out.println("  \"decimalDaysPlusThreeQuarters\": \"" + plusThreeQuartersOutput + "\",");
+        System.out.println("  \"decimalInputAsPeriod\": \"" + decimalInputAsPeriod + "\",");
+        System.out.println("  \"fourDayPeriod\": \"" + fourDayPeriodOutput + "\",");
+        System.out.println("  \"negativeValue\": \"" + negativeValueOutput + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+
+{
+  "tomorrow": "2020-10-06T20:22:34.385Z",
+  "yesterday": "2020-10-04T20:22:34.385Z",
+  "decimalDaysPlusQuarter": "2020-10-05T06:00:00Z",
+  "decimalDaysPlusHalf": "2020-10-05T12:00:00Z",
+  "decimalDaysPlusThreeQuarters": "2020-10-05T18:00:00Z",
+  "decimalInputAsPeriod": "PT109H19M12S",
+  "fourDayPeriod": "P4D",
+  "negativeValue": "P-1D"
+}

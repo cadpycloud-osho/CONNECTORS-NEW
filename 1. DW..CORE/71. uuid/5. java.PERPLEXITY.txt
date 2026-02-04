@@ -1,0 +1,37 @@
+uuid:
+
+
+
+input:
+
+import java.util.UUID;
+
+public class Main {
+    public static void main(String[] args) {
+        String uuid = UUID.randomUUID().toString();
+        System.out.println("{\"uuid\" : \"" + uuid + "\"}");
+    }
+}
+
+
+
+
+output:
+
+"7cc64d24-f2ad-4d43-8893-fa24a0789a99"
+
+
+
+
+
+
+Alternative without Jackson (raw output):
+
+java
+import java.util.UUID;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(UUID.randomUUID().toString());
+    }
+}

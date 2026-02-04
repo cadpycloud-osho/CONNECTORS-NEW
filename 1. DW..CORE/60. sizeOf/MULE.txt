@@ -1,0 +1,232 @@
+sizeOf:
+
+sizeOf(array: Array<Any>): Number
+
+Copy link to clipboardsizeOf(array: Array<Any>): Number
+Returns the number of elements in an array. It returns 0 if the array is empty.
+
+This version of sizeOf takes an array or an array of arrays as input. Other versions act on arrays of objects, strings, or binary values.
+
+
+Source
+%dw 2.0
+output application/json
+---
+sizeOf([ "a", "b", "c"])
+
+DataWeave
+Output
+3
+
+
+----------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  "arraySizes": {
+     size3: sizeOf([1,2,3]),
+     size2: sizeOf([[1,2,3],[4]]),
+     size0: sizeOf([])
+   }
+}
+
+DataWeave
+Output
+{
+   "arraySizes": {
+     "size3": 3,
+     "size2": 2,
+     "size0": 0
+   }
+}
+----------------------------------------------------------------------
+sizeOf(object: Object): Number
+
+
+Source
+%dw 2.0
+output application/json
+---
+sizeOf({a: 1, b: 2})
+
+DataWeave
+Output
+2
+----------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+{
+   objectSizes : {
+     sizeIs2: sizeOf({a:1,b:2}),
+     sizeIs0: sizeOf({})
+   }
+}
+
+DataWeave
+Output
+{
+  "objectSize": {
+    "sizeIs2": 2,
+    "sizeIs0": 0
+  }
+}
+
+----------------------------------------------------------------------
+
+sizeOf(binary: Binary): Number
+
+Source
+%dw 2.0
+output application/json
+---
+{
+
+BinarySizeOf: sizeOf("'my word'" as Binary) ++ " " ++ sizeOf("'my word'" as Binary),
+
+StringSizeOf: sizeOf("'my word'") ++ " " ++ sizeOf("'my word'")
+
+}
+
+DataWeave
+
+Output
+{
+
+"BinarySizeOf": "13 9",
+
+"StringSizeOf": "9 9"
+
+}
+
+----------------------------------------------------------------------
+sizeOf(text: String): Number
+
+Source
+%dw 2.0
+output application/json
+---
+sizeOf("abc")
+
+DataWeave
+Output
+3
+
+----------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  sizeOfSting2 : sizeOf("my string"),
+  sizeOfEmptyString: sizeOf(""),
+  sizeOfNumber : sizeOf("123" as Number)
+}
+
+DataWeave
+Output
+{
+  "sizeOfSting2": 9,
+  "sizeOfEmptyString": 0,
+  "sizeOfNumber": 1
+}
+
+
+----------------------------------------------------------------------
+
+
+sizeOf(value: Period): Number
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  a: sizeOf(|P3D|)
+}
+DataWeave
+Output
+{ "a": 3 }
+
+----------------------------------------------------------------------
+
+
+
+sizeOf(value: DateTime): Number
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  a: sizeOf(|2025-07-13T18:06:59.314033Z|)
+}
+
+
+DataWeave
+Output
+{ "a": 27 }
+
+
+
+
+
+---------------------------------------------------------------------
+
+
+sizeOf(value: LocalDateTime): Number
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  a: sizeOf(|2025-07-13T18:06:59.314033|)
+}
+
+DataWeave
+Output
+{ "a": 26 }
+
+
+
+---------------------------------------------------------------------
+
+sizeOf(number: Number): Number
+
+
+Source
+%dw 2.0
+output application/json
+---
+{
+  a: sizeOf(123),
+  b: sizeOf(123.45)
+}
+DataWeave
+Output
+{ "a": 3, "b": 6 }
+
+
+---------------------------------------------------------------------
+Source
+%dw 2.0
+output application/json
+---
+{
+  a: sizeOf(123)
+  b: sizeOf(123.45)
+}
+
+DataWeave
+Output
+{ "a": 1, "b": 1 }

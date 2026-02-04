@@ -1,0 +1,141 @@
+keyset:
+
+example 1:
+
+input:
+
+package com.example.simplekeyset;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@SpringBootApplication
+public class SimpleKeySetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SimpleKeySetApplication.class, args);
+    }
+}
+
+@RestController
+class SimpleKeySetController {
+
+    @GetMapping("/simple-keyset")
+    public Map<String, Object> getKeySet() {
+        Map<String, Object> simpleMap = new LinkedHashMap<>();
+        simpleMap.put("a", true);
+        simpleMap.put("b", 1);
+
+        List<String> keySet = new ArrayList<>(simpleMap.keySet());
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("keySet", keySet);
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "keySet": ["a", "b"]
+}
+
+
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+package com.example.xmlkeyset;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+@SpringBootApplication
+public class XmlKeySetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(XmlKeySetApplication.class, args);
+    }
+}
+
+@RestController
+class XmlKeySetController {
+
+    @GetMapping("/xml-keyset")
+    public Map<String, Object> getXmlKeySet() throws Exception {
+        String xml =
+                "<users xmlns=\"http://test.com\">" +
+                        "<user name=\"Mariano\" lastName=\"Achaval\"/>" +
+                        "<user name=\"Stacey\" lastName=\"Duke\"/>" +
+                        "</users>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+
+        Element root = doc.getDocumentElement();
+
+        String namespaceURI = root.getNamespaceURI();
+
+        NodeList userNodes = root.getElementsByTagNameNS(namespaceURI, "user");
+
+        // Prepare keySetExample - list with repeated namespace URI + attribute maps
+        List<Object> keySetExample = new ArrayList<>();
+        for (int i = 0; i < userNodes.getLength(); i++) {
+            keySetExample.add(namespaceURI);
+        }
+        for (int i = 0; i < userNodes.getLength(); i++) {
+            Element userElem = (Element) userNodes.item(i);
+            NamedNodeMap attrs = userElem.getAttributes();
+
+            Map<String, String> attrMap = new LinkedHashMap<>();
+            for (int j = 0; j < attrs.getLength(); j++) {
+                Attr attr = (Attr) attrs.item(j);
+                attrMap.put(attr.getName(), attr.getValue());
+            }
+            keySetExample.add(attrMap);
+        }
+
+        // Prepare nameSet - list of nulls matching keySetExample length
+        List<Object>
+
+
+output:
+
+{
+  "keySetExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "nameSet": [null, null, null, null]
+}
+

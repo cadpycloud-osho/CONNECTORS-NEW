@@ -1,0 +1,38 @@
+prop:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class PropertyController {
+
+    @GetMapping("/getTimezone")
+    public Map<String, Object> getTimezone() {
+
+        // Equivalent of DataWeave: prop("user.timezone")
+        String timezone = System.getProperty("user.timezone");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("props", timezone);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "props": "America/Los_Angeles"
+}
+
+

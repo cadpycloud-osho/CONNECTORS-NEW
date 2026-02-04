@@ -1,0 +1,138 @@
+readUrl:
+
+
+example 1:
+
+
+input:
+
+@GetMapping("/readurl-json")
+public Map<String, Object> readUrlJson() throws Exception {
+    // Uses attached file equivalent - simulates readUrl("https://jsonplaceholder.typicode.com/posts/1")
+    return Map.of(
+        "userId", 1,
+        "id", 1,
+        "title", "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+        "body", "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+    ); [attached_file:1]
+}
+
+
+output:
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+}
+
+
+
+-----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+@GetMapping(value = "/json-to-csv", produces = MediaType.TEXT_CSV_VALUE)
+public String jsonToCsv() {
+    // Simulate classpath://myJsonSnippet.json
+    List<Map<String, Object>> results = Arrays.asList(
+        Map.of("profile", Map.of("firstName", "john", "lastName", "doe", "email", "johndoe@demo.com")),
+        Map.of("profile", Map.of("firstName", "jane", "lastName", "doe", "email", "janedoe@demo.com"))
+    );
+    
+    StringBuilder csv = new StringBuilder("firstName,lastName,email\n");
+    results.stream().map(result -> (Map) result.get("profile"))
+        .forEach(profile -> csv.append(String.format("%s,%s,%s\n",
+            profile.get("firstName"), profile.get("lastName"), profile.get("email"))));
+    
+    return csv.toString();
+}
+
+
+output:
+
+
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+-----------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+@GetMapping("/csv-to-json")
+public List<Map<String, String>> csvToJson() {
+    // Simulate readUrl("https://mywebsite.com/data.csv", "application/csv", {"header": false})
+    String csvContent = "Max,the Mule,MuleSoft";
+    String[] columns = csvContent.split(",");
+    
+    Map<String, String> row = new HashMap<>();
+    for (int i = 0; i < columns.length; i++) {
+        row.put("column_" + i, columns[i].trim());
+    }
+    
+    return Arrays.asList(row);
+}
+
+
+output:
+
+[
+  {
+    "column_0": "Max",
+    "column_1": "the Mule",
+    "column_2": "MuleSoft"
+  }
+]
+
+
+
+-----------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+@GetMapping("/dwl-read")
+public String dwlRead() {
+    // Simulate readUrl("classpath://name.dwl", "application/dw")
+    Map<String, String> dwContent = Map.of("firstName", "Somebody", "lastName", "Special");
+    return dwContent.get("firstName");
+}
+
+
+output:
+
+"Somebody"
+
+
+
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+isRegexType:
+
+
+input:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class Main {
+
+    public static boolean isRegexType(Class<?> type) {
+        return Pattern.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ARegex = Pattern.class;
+
+        result.put("a", isRegexType(ARegex));
+        result.put("b", isRegexType(Pattern.class));
+        result.put("c", isRegexType(Boolean.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}

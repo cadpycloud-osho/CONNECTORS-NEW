@@ -1,0 +1,39 @@
+tan:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathTanRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateTan")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Java's Math.tan, like DataWeave, expects radians
+                results.put("tan0", Math.tan(0));
+                results.put("tan13", Math.tan(0.13));
+                results.put("tan-1", Math.tan(-1));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+   "tan0": 0.0,
+   "tan13": 0.13073731800446006,
+   "tan-1": -1.5574077246549023
+}
+
+

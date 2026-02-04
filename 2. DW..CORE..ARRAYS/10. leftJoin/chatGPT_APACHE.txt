@@ -1,0 +1,60 @@
+leftJoin:
+
+
+input:
+from("direct:manualLeftJoin")
+.process(exchange -> {
+
+    List<Map<String, Object>> users =
+            exchange.getIn().getHeader("users", List.class);
+
+    List<Map<String, Object>> products =
+            exchange.getIn().getHeader("products", List.class);
+
+    List<Map<String, Object>> output = new ArrayList<>();
+
+    for (Map<String, Object> user : users) {
+
+        boolean found = false;
+
+        for (Map<String, Object> product : products) {
+            if (Objects.equals(user.get("id"), product.get("ownerId"))) {
+
+                Map<String, Object> record = new LinkedHashMap<>();
+                record.put("l", user);
+                record.put("r", product);
+
+                output.add(record);
+                found = true;
+            }
+        }
+
+        // LEFT JOIN behavior when no match exists
+        if (!found) {
+            Map<String, Object> record = new LinkedHashMap<>();
+            record.put("l", user);
+            output.add(record);
+        }
+    }
+
+    exchange.getIn().setBody(output);
+});
+
+
+template.send("direct:manualLeftJoin", exchange -> {
+    exchange.getIn().setHeader("users", usersList);
+    exchange.getIn().setHeader("products", productsList);
+});
+
+
+output:
+
+[
+  { "l": { "id": "1", "name": "Mariano" }, "r": { "ownerId": "1", "name": "DataWeave" } },
+  { "l": { "id": "1", "name": "Mariano" }, "r": { "ownerId": "1", "name": "BAT" } },
+  { "l": { "id": "2", "name": "Leandro" } },
+  { "l": { "id": "3", "name": "Julian" }, "r": { "ownerId": "3", "name": "DataSense" } },
+  { "l": { "id": "5", "name": "Julian" } }
+]
+
+

@@ -1,0 +1,62 @@
+toNumberOrNull:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NumberCoercionController {
+
+    @GetMapping("/numberOrNull")
+    public Map<String, Double> getNumbers() {
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("a", toNumberOrNull("0.005", new String[]{ "seconds", ".00" }));
+        result.put("b", toNumberOrNull("0.005", new String[]{ "seconds" }));
+
+        return result;
+    }
+
+    private Double toNumberOrNull(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                switch (format) {
+                    case ".00":
+                        DecimalFormat df = new DecimalFormat();
+                        df.setMaximumFractionDigits(2);
+                        df.setParseBigDecimal(true);
+                        return df.parse(value).doubleValue();
+                    case "seconds":
+                        // Only parse if string is integer seconds
+                        if (value.matches("\\d+")) {
+                            return Double.parseDouble(value);
+                        }
+                        break;
+                    default:
+                        return Double.parseDouble(value);
+                }
+            } catch (ParseException | NumberFormatException ignored) {}
+        }
+        return null;
+    }
+}
+
+
+output:
+
+{
+  "a": 0.005,
+  "b": null
+}
+
+

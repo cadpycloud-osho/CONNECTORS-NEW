@@ -1,0 +1,44 @@
+namesOf:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class NamesOfController {
+    @GetMapping("/namesOf")
+    public Map<String, List<String>> getNamesOf() {
+        Map<String, Object> inputObject = new HashMap<>();
+        inputObject.put("a", true);
+        inputObject.put("b", 1);
+        
+        List<String> namesOf = new ArrayList<>(inputObject.keySet());
+        
+        Map<String, List<String>> response = new HashMap<>();
+        response.put("namesOf", namesOf);
+        
+        return response;
+    }
+}
+
+
+output:
+
+
+{
+  "namesOf": ["a", "b"]
+}
+

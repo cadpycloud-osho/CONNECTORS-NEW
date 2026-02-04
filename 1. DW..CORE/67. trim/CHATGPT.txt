@@ -1,0 +1,52 @@
+
+
+trim:
+
+example 1:
+
+input:
+@GetMapping("/trim1")
+public Map<String, String> trimExample1() {
+    Map<String, String> response = new HashMap<>();
+    response.put("trim", "   my really long  text     ".trim());
+    return response;
+}
+
+output:
+
+{
+  "trim": "my really long  text"
+}
+
+
+----------------------------------------------------------------
+example 2:
+
+input:
+
+@GetMapping("/trim2")
+public Map<String, String> trimExample2() {
+
+    Map<String, String> result = new HashMap<>();
+
+    result.put("null", null); // DW returns null
+    result.put("empty", "".trim());
+    result.put("blank", "     ".trim());
+    result.put("noBlankSpaces", "abc".trim());
+    result.put("withSpaces", "    abc    ".trim());
+
+    return result;
+}
+
+
+output:
+
+
+{
+  "null": null,
+  "empty": "",
+  "blank": "",
+  "noBlankSpaces": "abc",
+  "withSpaces": "abc"
+}
+

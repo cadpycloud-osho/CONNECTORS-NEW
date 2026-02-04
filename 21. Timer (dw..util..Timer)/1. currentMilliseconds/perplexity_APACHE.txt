@@ -1,0 +1,30 @@
+
+
+currentMilliseconds:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+public class CurrentMillisecondsProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        // dw::util::Timer::currentMilliseconds() equivalent
+        long currentMs = System.currentTimeMillis();
+        
+        exchange.getIn().setBody(
+            "{ \"currentMilliseconds\": " + currentMs + " }"
+        );
+    }
+}
+
+from("direct:currentMilliseconds")
+    .process(new CurrentMillisecondsProcessor())
+    .log("${body}");
+
+output:
+
+{ "currentMilliseconds": 1764168523000 }
+

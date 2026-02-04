@@ -1,0 +1,49 @@
+runUrl:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // DW input simulation
+        String jsonBinary = "{\"name\": \"Mariano\"}";
+        String encoding = "UTF-8";
+
+        // Extract "name" manually (simple DW-like case)
+        String extractedName = "\"" + extractName(jsonBinary) + "\"";
+
+        // Build DW-like response structure
+        Map<String, Object> executeOk = new HashMap<>();
+        executeOk.put("success", true);
+        executeOk.put("value", extractedName);
+        executeOk.put("mimeType", "application/dw");
+        executeOk.put("encoding", encoding);
+        executeOk.put("logs", new Object[]{});
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("execute_ok", executeOk);
+
+        System.out.println(response);
+    }
+
+    // Minimal JSON parsing (no libraries)
+    private static String extractName(String json) {
+        int keyIndex = json.indexOf("\"name\"");
+        int colon = json.indexOf(":", keyIndex);
+        int startQuote = json.indexOf("\"", colon + 1);
+        int endQuote = json.indexOf("\"", startQuote + 1);
+        return json.substring(startQuote + 1, endQuote);
+    }
+}
+
+
+output:
+
+{execute_ok={success=true, value="Mariano", mimeType=application/dw, encoding=UTF-8, logs=[]}}
+

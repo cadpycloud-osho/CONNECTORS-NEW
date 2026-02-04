@@ -1,0 +1,37 @@
+partition:
+
+partition<T>(array: Array<T>, condition: (item: T) -> Boolean): { success: Array<T>, failure: Array<T> }
+
+partition<T>(array: Array<T>, condition: (item: T) -> Boolean): { success: Array<T>, failure: Array<T> }
+Separates the array into the elements that satisfy the condition from those that do not.
+
+
+
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var arr = [0,1,2,3,4,5]
+---
+arr partition (item) -> isEven(item)
+
+
+DataWeave
+Output
+{
+  "success": [
+    0,
+    2,
+    4
+  ],
+  "failure": [
+    1,
+    3,
+    5
+  ]
+}

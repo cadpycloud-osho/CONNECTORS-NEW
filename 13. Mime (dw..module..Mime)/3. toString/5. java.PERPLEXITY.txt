@@ -1,0 +1,78 @@
+toString:
+
+example 1:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+class MimeUtils {
+    public static String toString(String type, String subtype, Map<String, String> parameters) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        
+        if (parameters != null && !parameters.isEmpty()) {
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                sb.append(";").append(entry.getKey()).append("=").append(entry.getValue());
+            }
+        }
+        
+        return sb.toString();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> parameters = new HashMap<>();
+        // parameters is empty
+        
+        String result = MimeUtils.toString("application", "json", parameters);
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+"application/json"
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("boundary", "my-boundary");
+        String result = MimeUtils.toString("multipart", "form-data", parameters);
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+class MimeUtils {
+    public static String toString(String type, String subtype, Map<String, String> parameters) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        
+        if (parameters != null && !parameters.isEmpty()) {
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                sb.append(";").append(entry.getKey()).append("=").append(entry.getValue());
+            }
+        }
+        
+        return sb.toString();
+    }
+}
+
+
+output:
+"multipart/form-data;boundary=my-boundary"

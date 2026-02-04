@@ -1,0 +1,57 @@
+toLocalDateTimeOrNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+public class LocalDateTimeOrNullRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceLocalOrNull")
+            .process(exchange -> {
+                String input = "2003-10-01 23:57:59";
+
+                // Formatters matching your source logic
+                List<DateTimeFormatter> listA = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss"),
+                    DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+                );
+
+                List<DateTimeFormatter> listB = List.of(
+                    DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss")
+                );
+
+                // Set body with the results
+                exchange.getIn().setBody(Map.of(
+                    "a", parseLocalOrNull(input, listA),
+                    "b", parseLocalOrNull(input, listB)
+                ));
+            });
+    }
+
+    private LocalDateTime parseLocalOrNull(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDateTime.parse(input, formatter);
+            } catch (Exception ignored) {
+                // Silently move to the next pattern
+            }
+        }
+        return null; // Equivalent to toLocalDateTimeOrNull
+    }
+}
+
+output:
+
+
+{
+  a: |2003-10-01T23:57:59| as LocalDateTime {format: "uuuu-MM-dd HH:mm:ss"},
+  b: null
+}
+

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "message",
+        "requestId",
+        "deletedDefinitionKey"
+      ],
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "deletedDefinitionKey": {
+          "type": "string"
+        },
+        "journey": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

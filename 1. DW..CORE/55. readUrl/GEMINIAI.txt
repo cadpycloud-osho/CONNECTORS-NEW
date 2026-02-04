@@ -1,0 +1,239 @@
+readUrl:
+
+
+example 1:
+
+
+input:
+
+package com.example.readurl;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import java.util.Map;
+
+@RestController
+public class HttpReadController {
+
+    private final WebClient webClient;
+
+    public HttpReadController(WebClient.Builder webClientBuilder) {
+        // Initialize WebClient for the external call
+        this.webClient = webClientBuilder.baseUrl("https://jsonplaceholder.typicode.com").build();
+    }
+
+    @GetMapping("/read-http-json")
+    public Map<String, Object> readHttpJson() {
+        
+        // Java Equivalent: Make an HTTP GET request to the URL
+        // The body is automatically mapped to a Java Map by Spring
+        Map<String, Object> responseBody = webClient.get()
+            .uri("/posts/1")
+            .retrieve()
+            .bodyToMono(Map.class)
+            .block(); // block() to make it synchronous for this simple controller example
+
+        return responseBody;
+    }
+}
+
+output:
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+}
+
+
+-----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+package com.example.readurl;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+public class ClasspathToCsvController {
+
+    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final CsvMapper csvMapper = new CsvMapper();
+    private final ResourceLoader resourceLoader;
+
+    public ClasspathToCsvController(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
+    @GetMapping(value = "/classpath-to-csv", produces = "text/csv")
+    public String readClasspathAndConvertToCsv() throws Exception {
+        
+        // 1. Read JSON from Classpath (Equivalent to DW readUrl("classpath://..."))
+        Resource resource = resourceLoader.getResource("classpath:myJsonSnippet.json");
+        Map<String, List<Map<String, Object>>> jsonRoot = jsonMapper.readValue(resource.getInputStream(), Map.class);
+        
+        // 2. Transformation Logic (Equivalent to DW myJsonSnippet.results map(item) -> item.profile)
+        List<Map<String, String>> profiles = jsonRoot.get("results").stream()
+            .map(item -> (Map<String, String>) item.get("profile"))
+            .collect(Collectors.toList());
+
+        // 3. Output to CSV (Equivalent to DW output application/csv)
+        // Define CSV schema using the keys of the profile map as headers
+        CsvSchema schema = CsvSchema.builder()
+            .addColumn("firstName")
+            .addColumn("lastName")
+            .addColumn("email")
+            .setUseHeader(true) // Headers required for the output format
+            .build();
+
+        return csvMapper.writer(schema).writeValueAsString(profiles);
+    }
+}
+
+output:
+
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+-----------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+package com.example.readurl;
+
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+public class CsvReadNoHeaderController {
+
+    private final CsvMapper csvMapper = new CsvMapper();
+
+    @GetMapping(value = "/read-csv-no-header")
+    public List<Map<String, String>> readCsvNoHeader() throws Exception {
+        
+        // Simulate reading the data from a remote URL or stream
+        String csvData = "Max,the Mule,MuleSoft";
+
+        // 1. Define CSV schema: no header, use default column names
+        CsvSchema schema = CsvSchema.builder()
+            .setUseHeader(false) // Equivalent to {"header" : false}
+            .addColumn("column_0")
+            .addColumn("column_1")
+            .addColumn("column_2")
+            .build();
+
+        // 2. Read the CSV data using the schema
+        MappingIterator<Map<String, String>> it = csvMapper
+            .readerFor(Map.class)
+            .with(schema)
+            .readValues(csvData);
+
+        return it.readAll();
+    }
+}
+
+output:
+
+
+[
+  {
+    "column_0": "Max",
+    "column_1": "the Mule",
+    "column_2": "MuleSoft"
+  }
+]
+
+-----------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+
+package com.example.readurl;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class ReadDwFileController {
+
+    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final ResourceLoader resourceLoader;
+
+    public ReadDwFileController(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
+    @GetMapping(value = "/read-dwl-field")
+    public String readDwlField() throws Exception {
+        
+        // 1. Read the DWL file content from the classpath
+        // Note: The file is treated as a simple text resource.
+        Resource resource = resourceLoader.getResource("classpath:name.dwl");
+        
+        // 2. Parse the content as JSON (Equivalent to DW read(..., "application/dw"))
+        Map<String, String> data = jsonMapper.readValue(resource.getInputStream(), Map.class);
+
+        // 3. Access the specific field (Equivalent to DW .firstName)
+        return data.get("firstName");
+    }
+}
+
+output:
+
+
+"Somebody"
+
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,47 @@
+replace:
+
+replace(text: String, matcher: Regex): ((Array<String>, Number) -> String) -> String
+
+replace(text: String, matcher: Regex): ((Array<String>, Number) -> String) -> String
+Performs string replacement.
+
+This version of replace accepts a Java regular expression for matching part of a string. It requires the use of the with helper function to specify a replacement string for the matching part of the input string.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+["123-456-7890" replace /.*-/ with(""), "abc123def" replace /[b13e]/ with("-")]
+
+DataWeave
+Output
+[ 7890, "a-c-2-d-f" ]
+
+
+---------------------------------------------------------------------------
+
+replace(text: String, matcher: String): ((Array<String>, Number) -> String) -> String
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "replace": "admin123" replace "123" with("ID") }
+
+
+DataWeave
+Output
+{ "replace": "adminID" }
+
+
+---------------------------------------------------------------------------
+
+
+
+
+

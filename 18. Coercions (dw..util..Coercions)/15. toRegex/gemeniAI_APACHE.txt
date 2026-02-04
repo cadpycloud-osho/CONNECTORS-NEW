@@ -1,0 +1,39 @@
+toRegex:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class RegexCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceRegex")
+            .process(exchange -> {
+                Map<String, Pattern> results = new LinkedHashMap<>();
+
+                // Case 1: "a-Z"
+                // Compiles the string into a Java Pattern object
+                results.put("toRegexEx1", Pattern.compile("a-Z"));
+
+                // Case 2: "0-9+"
+                results.put("toRegexEx2", Pattern.compile("0-9+"));
+
+                exchange.getIn().setBody(results);
+            });
+    }
+}
+
+output:
+
+{
+  toRegexEx1: /a-Z/,
+  toRegexEx2: /0-9+/
+}
+
+

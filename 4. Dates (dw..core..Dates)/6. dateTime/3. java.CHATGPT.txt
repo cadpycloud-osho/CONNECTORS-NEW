@@ -1,0 +1,35 @@
+dateTime:
+
+
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        OffsetDateTime newDateTime = OffsetDateTime.of(
+                2012,   // year
+                10,     // month
+                11,     // day
+                12,     // hour
+                30,     // minutes
+                40,     // seconds
+                0,      // nanoseconds
+                ZoneOffset.of("-03:00") // timezone offset
+        );
+
+        System.out.println(newDateTime);
+    }
+}
+
+
+
+output:
+2012-10-11T12:30:40-03:00
+
+
+

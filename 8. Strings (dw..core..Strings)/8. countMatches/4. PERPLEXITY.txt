@@ -1,0 +1,68 @@
+countMatches:
+
+
+example 1:
+
+
+
+input: 
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CountMatchesStringController {
+    
+    @GetMapping(value = "/count-matches-string", produces = MediaType.APPLICATION_JSON_VALUE)
+    public int countMatchesString() {
+        String text = "hello worlo!";
+        String pattern = "lo";
+        int count = 0;
+        int index = 0;
+        while ((index = text.indexOf(pattern, index)) != -1) {
+            count++;
+            index += pattern.length();
+        }
+        return count;
+    }
+}
+
+
+output:
+
+2
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+
+input: 
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.regex.Pattern;
+
+@RestController
+public class CountMatchesRegexController {
+    
+    @GetMapping(value = "/count-matches-regex", produces = MediaType.APPLICATION_JSON_VALUE)
+    public int countMatchesRegex() {
+        String text = "hello, ciao!";
+        Pattern regex = Pattern.compile("[aeiou]");
+        return (int) regex.matcher(text).results().count();
+    }
+}
+
+
+output:
+
+5

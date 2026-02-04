@@ -1,0 +1,127 @@
+atBeginningOfYear:
+
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/zoned-at-beginning-of-year")
+    public Map<String, String> getZonedBeginningOfYear() {
+        ZonedDateTime input = ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        ZonedDateTime beginning = input.toLocalDate()
+                                     .withDayOfYear(1)
+                                     .atStartOfDay(input.getZone());
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfYearDateTime", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfYearDateTime": "2020-01-01T00:00-03:00"
+}
+
+
+
+
+-----------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/local-at-beginning-of-year")
+    public Map<String, String> getLocalBeginningOfYear() {
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        LocalDateTime beginning = input.toLocalDate()
+                                      .withDayOfYear(1)
+                                      .atStartOfDay();
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfYearLocalDateTime", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfYearLocalDateTime": "2020-01-01T00:00"
+}
+
+
+
+
+-----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/date-at-beginning-of-year")
+    public Map<String, String> getDateBeginningOfYear() {
+        LocalDate input = LocalDate.parse("2020-10-06");
+        LocalDate beginning = input.withDayOfYear(1);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfYearDate", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfYearDate": "2020-01-01"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,323 @@
+orderBy:
+
+example 1:
+
+
+input:
+
+package com.example.sorting.examples;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+public class SortExample1Controller {
+
+    @GetMapping("/sort/by-letter")
+    public List<Map<String, String>> sortByLetter() {
+        List<Map<String, String>> list = List.of(
+            Map.of("letter", "e"),
+            Map.of("letter", "d")
+        );
+
+        // Java Equivalent: Use Comparator.comparing() to sort by the "letter" key
+        return list.stream()
+            .sorted(Comparator.comparing(item -> item.get("letter")))
+            .collect(Collectors.toList());
+    }
+}
+
+output:
+
+[
+  {
+    "letter": "d"
+  },
+  {
+    "letter": "e"
+  }
+]
+
+
+-----------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+package com.example.sorting.examples;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+public class SortExample2Controller {
+
+    @GetMapping("/sort/descending-numbers")
+    public Map<String, List<Integer>> sortDescendingNumbers() {
+        List<Integer> list = List.of(3, 8, 1);
+
+        // Java Equivalent: Use Comparator.reverseOrder()
+        List<Integer> sortedDescending = list.stream()
+            .sorted(Comparator.reverseOrder())
+            .collect(Collectors.toList());
+            
+        return Map.of("orderDescending", sortedDescending);
+    }
+}
+
+output:
+
+
+{
+  "orderDescending": [
+    8,
+    3,
+    1
+  ]
+}
+
+----------------
+
+
+example 3:
+
+
+input:
+
+package com.example.sorting.examples;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class SortExample3Controller {
+
+    @GetMapping("/sort/simple-numbers")
+    public List<Integer> sortSimpleNumbers() {
+        List<Integer> list = List.of(3, 2, 3);
+
+        // Java Equivalent: Use Stream.sorted() for natural order (ascending)
+        return list.stream()
+            .sorted()
+            .collect(Collectors.toList());
+    }
+}
+
+output:
+
+[
+  2,
+  3,
+  3
+]
+
+
+----------------
+
+
+
+
+example 4:
+
+
+input:
+
+package com.example.sorting.examples;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class SortExample4Controller {
+
+    // Helper Class
+    public static class Person {
+        public String name;
+        public int age;
+        
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+        // Getters for Jackson serialization
+        public String getName() { return name; }
+        public int getAge() { return age; }
+    }
+
+    @GetMapping("/sort/by-age")
+    public List<Person> sortByAge() {
+        List<Person> list = List.of(
+            new Person("Santiago", 42),
+            new Person("Leandro", 29),
+            new Person("Mariano", 35)
+        );
+
+        // Java Equivalent: Use Comparator.comparing(Person::getAge)
+        return list.stream()
+            .sorted(Comparator.comparing(Person::getAge))
+            .collect(Collectors.toList());
+    }
+}
+
+output:
+
+
+[
+  {
+    "name": "Leandro",
+    "age": 29
+  },
+  {
+    "name": "Mariano",
+    "age": 35
+  },
+  {
+    "name": "Santiago",
+    "age": 42
+  }
+]
+
+----------------
+
+
+
+
+example 5:
+
+
+input:
+
+package com.example.sorting.examples;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class SortExample5Controller {
+
+    @GetMapping("/sort/descending-dates")
+    public List<ZonedDateTime> sortDescendingDates() {
+        // Use ZonedDateTime to represent dates with time and timezone (Z for UTC/Zulu)
+        List<ZonedDateTime> list = List.of(
+            ZonedDateTime.parse("2020-10-01T23:57:59.017Z"),
+            ZonedDateTime.parse("2022-12-22T12:12:12.011Z"),
+            ZonedDateTime.parse("2020-10-01T12:40:10.012Z"),
+            ZonedDateTime.parse("2020-10-01T23:57:59.021Z")
+        );
+
+        // Java Equivalent: Use Comparator.reverseOrder() on ZonedDateTime's natural ordering
+        return list.stream()
+            .sorted(Comparator.reverseOrder())
+            .collect(Collectors.toList());
+    }
+}
+
+output:
+
+
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+----------------
+
+
+
+
+example 6:
+
+
+input:
+
+package com.example.sorting.examples;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+public class SortExample6Controller {
+
+    // Helper Class
+    public static class Account {
+        public String AccountNumber;
+        public String Type; // Key field for sorting
+        public Map<String, Object> CDetail;
+        // Getters for Jackson serialization
+        public String getAccountNumber() { return AccountNumber; }
+        public String getType() { return Type; }
+        public Map<String, Object> getCDetail() { return CDetail; }
+        // Note: NameOnAccount omitted for brevity, but would be included in a real model
+        
+        public Account(String num, String type, Map<String, Object> detail) {
+            this.AccountNumber = num;
+            this.Type = type;
+            this.CDetail = detail;
+        }
+    }
+
+    @GetMapping("/sort/complex-descending")
+    public List<Account> sortComplexDescending() {
+        List<Account> myInput = List.of(
+            new Account("987999321", "AAAA", Map.of("Status", "Open")),
+            new Account("12399978", "BBBB", Map.of()),
+            new Account("32199974", "CCCC", Map.of())
+        );
+
+        // Java Equivalent: Sort by 'Type' ascending, then reverse the result using .reversed()
+        return myInput.stream()
+            .sorted(Comparator.comparing(Account::getType).reversed())
+            .collect(Collectors.toList());
+    }
+}
+
+output:
+
+
+[
+  {
+    "AccountNumber": "32199974",
+    "Type": "CCCC",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "12399978",
+    "Type": "BBBB",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "987999321",
+    "Type": "AAAA",
+    "CDetail": {
+      "Status": "Open"
+    }
+  }
+]
+
+----------------

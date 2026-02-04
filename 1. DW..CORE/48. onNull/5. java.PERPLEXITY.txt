@@ -1,0 +1,75 @@
+onNull:
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Object> input = new ArrayList<>(); // Empty array (null equivalent in this context)
+        
+        // reduce equivalent: accumulator starts empty, no items to process
+        Object result = input.stream()
+            .reduce(
+                new ArrayList<>(), // initial accumulator
+                (accumulator, item) -> {
+                    ((List)accumulator).add(item);
+                    return accumulator;
+                }
+            );
+        
+        // onNull equivalent: check if result is empty/null-like
+        String finalResult = ((List<?>)result).isEmpty() ? "Empty Text" : 
+                            String.valueOf(((List<?>)result).size());
+        
+        // Output JSON format
+        System.out.println("{\"onNull\":\"" + finalResult + "\"}");
+    }
+}
+
+
+
+output:
+
+
+{"onNull":"Empty Text"}
+
+
+
+
+
+
+
+
+
+With non-empty input (for comparison):
+
+java
+import java.util.*;
+
+public class ReduceOnNullNonEmpty {
+    public static void main(String[] args) {
+        List<String> input = Arrays.asList("a", "b", "c");
+        
+        Object result = input.stream()
+            .reduce(
+                new ArrayList<>(),
+                (accumulator, item) -> {
+                    ((List)accumulator).add(item);
+                    return accumulator;
+                }
+            );
+        
+        String finalResult = ((List<?>)result).isEmpty() ? "Empty Text" : 
+                            String.valueOf(((List<?>)result).size());
+        
+        System.out.println("{\"onNull\":\"" + finalResult + "\"}");
+    }
+}
+Output (non-empty):
+
+text
+{"onNull":"3"}

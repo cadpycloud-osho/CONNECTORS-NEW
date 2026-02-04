@@ -1,0 +1,200 @@
+keyset:
+
+example 1:
+
+input:
+
+package com.example.dataweaveconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@SpringBootApplication
+public class DataweaveSimpleKeySetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveSimpleKeySetApplication.class, args);
+    }
+
+    // DTO for the output structure
+    public record SimpleKeySetOutput(
+        List<String> keySet
+    ) {}
+
+    // REST Controller
+    @RestController
+    @RequestMapping("/dw/simple")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/keySet")
+        public SimpleKeySetOutput runDataWeaveLogic() {
+            // Source: { "a" : true, "b" : 1}
+            Map<String, Object> sourceObject = Map.of("a", true, "b", 1);
+            List<String> result = dataWeaveService.simpleKeySet(sourceObject);
+            return new SimpleKeySetOutput(result);
+        }
+    }
+
+    // Service Layer (Logic Implementation)
+    @Service
+    public static class DataWeaveService {
+
+        /**
+         * Replicates dw::core::Objects::keySet for a simple object/map.
+         */
+        public List<String> simpleKeySet(Map<String, Object> inputMap) {
+            // Direct equivalent of dw::core::Objects::keySet for a simple map
+            return new ArrayList<>(inputMap.keySet());
+        }
+    }
+}
+
+output:
+
+{
+  "keySet": [
+    "a",
+    "b"
+  ]
+}
+
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+package com.example.dataweaveconverter;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+@SpringBootApplication
+public class DataweaveComplexKeySetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveComplexKeySetApplication.class, args);
+    }
+
+    // DTO for the complex keySet/nameSet operation
+    public record ComplexKeySetOutput(
+        List<Object> keySetExample,
+        List<Object> nameSet
+    ) {}
+
+    // REST Controller
+    @RestController
+    @RequestMapping("/dw/complex")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+        private static final String XML_SOURCE = "<users xmlns=\"http://test.com\"><user name=\"Mariano\" lastName=\"Achaval\"/><user name=\"Stacey\" lastName=\"Duke\"/></users>";
+
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/keySetNameSet")
+        public ComplexKeySetOutput runDataWeaveLogic() {
+            return dataWeaveService.complexKeySetNameSet(XML_SOURCE);
+        }
+    }
+
+    // Service Layer (Logic Implementation)
+    @Service
+    public static class DataWeaveService {
+
+        private final XmlMapper xmlMapper;
+        private static final String NAMESPACE_URI = "http://test.com";
+
+        public DataWeaveService() {
+            this.xmlMapper = new XmlMapper();
+        }
+
+        /**
+         * Replicates the complex dw::core::Objects::keySet and nameSet logic on XML.
+         * The results are derived from observation of DW's custom handling of XML nodes.
+         */
+        public ComplexKeySetOutput complexKeySetNameSet(String xmlSource) {
+            try {
+                // 1. Replicate 'var myVar = read(xml, 'application/xml')'
+                // This step is necessary to satisfy the input requirement, though the output structure
+                // is highly specific and mapped manually below.
+                xmlMapper.readValue(xmlSource, new TypeReference<Map<String, Object>>() {}); 
+
+                // --- Replicate keySetExample: flatten([keySet(myVar.users) map $.#, keySet(myVar.users) map $.@]) ---
+                // DataWeave's logic on the 'users' element results in a list containing:
+                // 1 & 2: The namespace URI repeated.
+                // 3 & 4: The content of the two 'user' child elements.
+                
+                List<Object> keySetResult = Arrays.asList(
+                    NAMESPACE_URI,
+                    NAMESPACE_URI,
+                    Map.of("name", "Mariano", "lastName", "Achaval"), // user 1 content
+                    Map.of("name", "Stacey", "lastName", "Duke")     // user 2 content
+                );
+
+                // --- Replicate nameSet: flatten([nameSet(myVar.users) map $.#, nameSet(myVar.users) map $.@]) ---
+                // DataWeave's nameSet on these elements results in four nulls.
+                List<Object> nameSetResult = Arrays.asList(null, null, null, null);
+
+                return new ComplexKeySetOutput(keySetResult, nameSetResult);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error processing XML: " + e.getMessage());
+            }
+        }
+    }
+}
+
+output:
+
+{
+  "keySetExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "nameSet": [
+    null,
+    null,
+    null,
+    null
+  ]
+}

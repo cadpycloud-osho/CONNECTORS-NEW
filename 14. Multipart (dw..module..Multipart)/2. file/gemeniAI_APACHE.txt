@@ -1,0 +1,210 @@
+file:
+
+example 1:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+public class MultipartFileRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:prepareFilePart")
+            .routeId("Multipart-File-Handler")
+            .process(exchange -> {
+                // 1. Logic: Read the file from resources (classpath)
+                String filePath = "orders.xml";
+                InputStream is = getClass().getClassLoader().getResourceAsStream(filePath);
+                
+                if (is == null) throw new RuntimeException("File not found: " + filePath);
+                
+                byte[] content = is.readAllBytes();
+
+                // 2. Prepare the Attachment
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+                
+                // ByteArrayDataSource allows setting Content-Type and FileName
+                ByteArrayDataSource ds = new ByteArrayDataSource(content, "application/xml");
+                ds.setName("orders.xml"); // Becomes 'filename' in Content-Disposition
+
+                // 3. Wrap in DataHandler and add to "file" part
+                am.addAttachment("file", new DataHandler(ds));
+                
+                // Optional: To match the DW "Output" structure exactly for logging:
+                exchange.getIn().setBody(java.util.Map.of(
+                    "headers", java.util.Map.of(
+                        "Content-Type", "application/xml",
+                        "Content-Disposition", java.util.Map.of("name", "file", "filename", "orders.xml")
+                    ),
+                    "content", new String(content, StandardCharsets.UTF_8)
+                ));
+            })
+            .marshal().json() // Marhsal to JSON to see the structured output
+            .log("File Part Prepared: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "headers": {
+    "Content-Type": "application/xml",
+    "Content-Disposition": {
+      "name": "file",
+      "filename": "orders.xml"
+    }
+  },
+  "content": "<?xml version='1.0' encoding='UTF-8'?>\n<orders>...</orders>"
+}
+
+
+-----------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import java.io.InputStream;
+
+public class MultipartFormFileRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:createMultipartForm")
+            .routeId("Multipart-Form-Generator")
+            .process(exchange -> {
+                // 1. Get the specialized Attachment Message
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+
+                // 2. Logic: Load file content (simulating path: ./orders.xml)
+                String filePath = "orders.xml";
+                InputStream is = getClass().getClassLoader().getResourceAsStream(filePath);
+                if (is == null) throw new RuntimeException("File not found");
+                
+                byte[] fileContent = is.readAllBytes();
+
+                // 3. Prepare the Part (corresponds to Multipart::file)
+                // We set the MIME type to application/xml and the filename to myorders.xml
+                ByteArrayDataSource ds = new ByteArrayDataSource(fileContent, "application/xml");
+                ds.setName("myorders.xml"); 
+
+                // Add to attachments with part name "file"
+                am.addAttachment("file", new DataHandler(ds));
+            })
+            // 4. Output: Replicate Multipart::form behavior
+            // "form-data" ensures the Content-Disposition header is set correctly
+            .marshal().mimeMultipart("form-data")
+            .log("Generated Multipart Form:\n${body}");
+    }
+}
+
+
+output:
+
+------=_Part_0_123456789.987654321
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  ...
+</orders>
+------=_Part_0_123456789.987654321--
+
+
+-----------------------------------------------------
+
+example 3:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import java.io.InputStream;
+
+public class MultipartJsonFileRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:createJsonMultipart")
+            .routeId("Json-Multipart-Generator")
+            .process(exchange -> {
+                // 1. Access the Attachment Message
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+
+                // 2. Logic: Load the JSON file (simulating src/main/resources)
+                String sourceFile = "myClients.json";
+                InputStream is = getClass().getClassLoader().getResourceAsStream(sourceFile);
+                
+                if (is == null) throw new RuntimeException("File not found: " + sourceFile);
+                byte[] content = is.readAllBytes();
+
+                // 3. Prepare the Part (corresponds to Multipart::file)
+                // We assign the destination filename "partMyClients.json" 
+                // and the MIME type "application/json"
+                ByteArrayDataSource ds = new ByteArrayDataSource(content, "application/json");
+                ds.setName("partMyClients.json"); 
+
+                // Add attachment with the name "myFile"
+                am.addAttachment("myFile", new DataHandler(ds));
+            })
+            // 4. Marshal to multipart/form-data
+            .marshal().mimeMultipart("form-data")
+            .log("Generated Multipart JSON:\n${body}");
+    }
+}
+
+
+output:
+
+------=_Part_0_123456789.987654321
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+   "clients": {
+     "client": {
+       "id": 1,
+       "name": "Mariano"
+     },
+     ...
+   }
+}
+------=_Part_0_123456789.987654321--
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

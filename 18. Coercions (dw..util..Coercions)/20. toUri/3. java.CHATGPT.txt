@@ -1,0 +1,30 @@
+toUri:
+
+
+
+input:
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        URI uri = URI.create("https://www.google.com/");
+        result.put("toUriExample", uri.toString());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{toUriExample=https://www.google.com/}
+
+

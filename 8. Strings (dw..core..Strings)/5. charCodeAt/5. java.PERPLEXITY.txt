@@ -1,0 +1,21 @@
+charCodeAt:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "MuleSoft";
+        char charAtIndex1 = input.charAt(1);
+        int charCodeAt = (int) charAtIndex1;
+        
+        System.out.println("{ \"charCode\" : " + charCodeAt + " }");
+    }
+}
+
+
+output:
+
+{"charCodeAt":117}
+

@@ -1,0 +1,56 @@
+atBeginningOfDay:
+
+atBeginningOfDay(dateTime: DateTime): DateTime
+
+atBeginningOfDay(dateTime: DateTime): DateTime
+Returns a new DateTime value that changes the Time value in the input to the beginning of the specified day.
+
+The hours, minutes, and seconds in the input change to 00:00:00.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  "atBeginningOfDayDateTime": atBeginningOfDay(|2020-10-06T18:23:20.351-03:00|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfDayDateTime": "2020-10-06T00:00:00-03:00"
+}
+
+
+---------------------------------------------------------------------
+
+atBeginningOfDay(localDateTime: LocalDateTime): LocalDateTime
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  "atBeginningOfDayLocalDateTime": atBeginningOfDay(|2020-10-06T18:23:20.351|)
+}
+
+DataWeave
+Output
+{
+  "atBeginningOfDayLocalDateTime": "2020-10-06T00:00:00"
+}
+
+
+
+
+
+
+
+
+
+
+

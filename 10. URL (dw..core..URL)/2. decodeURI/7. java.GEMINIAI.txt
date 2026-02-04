@@ -1,0 +1,54 @@
+decodeURI:
+
+
+
+input:
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mimics DataWeave's URL::decodeURI.
+     * Performs URL percent-decoding on the input string using UTF-8.
+     * @param encodedURI The URI string containing percent-encoded characters.
+     * @return The decoded string.
+     */
+    public static String decodeUri(String encodedURI) {
+        try {
+            // Use URLDecoder.decode with the standard UTF-8 charset
+            return URLDecoder.decode(encodedURI, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            // Handle exceptions like IllegalArgumentException if the encoding is malformed
+            return "Decoding Error: " + e.getMessage();
+        }
+    }
+
+    public static void main(String[] args) {
+        
+        // DataWeave input string
+        String encodedInput = "http://asd/%20text%20to%20decode%20/text";
+        String decodedURI;
+        
+        // --- Execution ---
+        
+        // a: decodeURI('http://asd/%20text%20to%20decode%20/text')
+        decodedURI = decodeUri(encodedInput); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"decodeURI\": \"" + decodedURI + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "decodeURI": "http://asd/ text to decode /text"
+}
+

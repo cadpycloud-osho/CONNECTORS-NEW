@@ -1,0 +1,72 @@
+isObjectType:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelObjectTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // Simulating type AType = { name: String }
+                        Class<?> AType = Person.class;
+
+                        // Simulating DataWeave isObjectType
+                        boolean a = isObjectType(AType);
+                        boolean b = isObjectType(Boolean.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave isObjectType
+    private static boolean isObjectType(Class<?> clazz) {
+        return !clazz.isPrimitive()
+                && !clazz.isInterface()
+                && clazz != String.class
+                && !Number.class.isAssignableFrom(clazz)
+                && clazz != Boolean.class;
+    }
+
+    // Simulating object type { name: String }
+    static class Person {
+        private String name;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

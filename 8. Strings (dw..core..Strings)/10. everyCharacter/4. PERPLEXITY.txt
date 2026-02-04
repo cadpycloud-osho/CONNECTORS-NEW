@@ -1,0 +1,30 @@
+everyCharacter:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class EveryCharacterController {
+    
+    @GetMapping(value = "/every-character", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean everyCharacterCheck() {
+        String input = "12 34  56";
+        return input.chars()
+                   .mapToObj(c -> (char) c)
+                   .allMatch(c -> c == ' ' || Character.isDigit(c));
+    }
+}
+
+
+output:
+
+
+true

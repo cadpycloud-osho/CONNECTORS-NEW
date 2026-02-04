@@ -1,0 +1,30 @@
+drop:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class DropController {
+
+    @GetMapping("/dropExample")
+    public List<String> dropExample() {
+        List<String> users = new ArrayList<>(Arrays.asList("Mariano", "Leandro", "Julian"));
+        
+        // Remove first 2 elements similar to DataWeave drop(users, 2)
+        return users.subList(2, users.size());
+    }
+}
+
+
+output:
+
+
+[
+  "Julian"
+]

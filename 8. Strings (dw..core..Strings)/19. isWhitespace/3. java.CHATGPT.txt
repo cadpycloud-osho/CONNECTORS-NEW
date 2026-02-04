@@ -1,0 +1,36 @@
+isWhitespace:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isWhitespaceDW(String input) {
+        if (input == null) return false;
+        return input.trim().isEmpty();
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", isWhitespaceDW(null));
+        result.put("b", isWhitespaceDW(""));
+        result.put("c", isWhitespaceDW("  "));
+        result.put("d", isWhitespaceDW("abc"));
+        result.put("e", isWhitespaceDW("ab2c"));
+        result.put("f", isWhitespaceDW("ab-c"));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=false, b=true, c=true, d=false, e=false, f=false}
+

@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="dynamics-crm-config">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="claims">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="username">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="organizationServiceUrl">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="disableCnCheck">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="enableLogging">
+                    <description><![CDATA[If this is true, requests and responses will be displayed in console log.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[Hostname of the proxy. If this property is not set then no proxy will be used, otherwise a proxy will be used, but a proxy host must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[Port of the proxy. If host is set then this property must be set and cannot be a negative number.]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[Username used to authenticate against the proxy. If this property is not set then no authentication is going to be used against the proxy, otherwise this value must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="poolingProfile">
+                    <description><![CDATA[Characteristics of the connection pool]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="kerberos">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="username">
+                    <description><![CDATA[Username that you want to login with. Domain should not be included.]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[Password for the user that you are going to login.]]></description>
+                </parameter>
+                <parameter name="organizationServiceUrl">
+                    <description><![CDATA[URL for the sharepoint instance that the connector is going to interact with.]]></description>
+                </parameter>
+                <parameter name="spn">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="realm">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="kdc">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="loginPropertiesFilePath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="kerberosPropertiesFilePath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="disableCnCheck">
+                    <description><![CDATA[When dealing with HTTPS certificates, if the certificate is not signed by a trusted partner, the server might respond with an Exception. <p> To prevent this it is possible to disable the CN (Common Name) check. <p> <b>Note</b>: this is not recommended for production environments.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[Hostname of the proxy. If this property is not set then no proxy will be used, otherwise a proxy will be used, but a proxy host must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[Port of the proxy. If host is set then this property must be set and cannot be a negative number.]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[Username used to authenticate against the proxy. If this property is not set then no authentication is going to be used against the proxy, otherwise this value must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="enableLogging">
+                    <description><![CDATA[If this is true, requests and responses will be displayed in console log.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="poolingProfile">
+                    <description><![CDATA[Characteristics of the connection pool]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="ntlm">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="username">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="organizationServiceUrl">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="disableCnCheck">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="gatewayRouterServiceAddress">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="enableLogging">
+                    <description><![CDATA[If this is true, requests and responses will be displayed in console log.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[Hostname of the proxy. If this property is not set then no proxy will be used, otherwise a proxy will be used, but a proxy host must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[Port of the proxy. If host is set then this property must be set and cannot be a negative number.]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[Username used to authenticate against the proxy. If this property is not set then no authentication is going to be used against the proxy, otherwise this value must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="poolingProfile">
+                    <description><![CDATA[Characteristics of the connection pool]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="online">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="username">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="organizationServiceUrl">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="disableCnCheck">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="authenticationRetries">
+                    <description><![CDATA[If the authentication process against Microsoft Online fails the first time the connector will attempt to re-authenticate this many times.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="enableLogging">
+                    <description><![CDATA[If this is true, requests and responses will be displayed in console log.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[Hostname of the proxy. If this property is not set then no proxy will be used, otherwise a proxy will be used, but a proxy host must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[Port of the proxy. If host is set then this property must be set and cannot be a negative number.]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[Username used to authenticate against the proxy. If this property is not set then no authentication is going to be used against the proxy, otherwise this value must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="stsMetadataUrl">
+                    <description><![CDATA[(Optional) The STS's metadata exchange url. For ADFS this is usually https://mycompany-sts.com/adfs/services/trust/mex.]]></description>
+                </parameter>
+                <parameter name="stsUsernamePortQname">
+                    <description><![CDATA[(Optional) The name of port that accepts username/password credentials as described in the STS's metadata exchange url. This value has to be specified as a Qname in the format '{http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice}UserNameWSTrustBinding_IWSTrust13Async'.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="poolingProfile">
+                    <description><![CDATA[Characteristics of the connection pool]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Microsoft Dynamics CRM">
+        <description><![CDATA[]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="associate">
+            <description><![CDATA[Create links between records.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="id">
+                    <description><![CDATA[The id of the record to which the related records are associated.]]></description>
+                </parameter>
+                <parameter name="relationshipEntityRoleIsReferenced">
+                    <description><![CDATA[false: when the primary entity record is Referencing the record to associate; true: when the primary entity record is Referenced by the record to associate.]]></description>
+                </parameter>
+                <parameter name="relationshipSchemaName">
+                    <description><![CDATA[The name of the relationship to create the link.]]></description>
+                </parameter>
+                <parameter name="relatedEntitiesIds">
+                    <description><![CDATA[A List<String> with the related entity records ids to associate.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="create">
+            <description><![CDATA[Create a new record.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="attributes">
+                    <description><![CDATA[The attributes of the record as a Map<String, Object>.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createMultiple">
+            <description><![CDATA[Create a several new record.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="listOfAttributes">
+                    <description><![CDATA[The list of attributes of the record as a List<Map<String, Object>>.]]></description>
+                </parameter>
+                <parameter name="useSingleTransaction">
+                    <description><![CDATA[If supported (CRM 2016 and above) use a single transaction to create all items, if anyone fails then rollback all.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="delete">
+            <description><![CDATA[Delete a record.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="id">
+                    <description><![CDATA[The id of the record to delete.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteMultiple">
+            <description><![CDATA[Delete multiple records.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="ids">
+                    <description><![CDATA[The ids of the records to delete.]]></description>
+                </parameter>
+                <parameter name="useSingleTransaction">
+                    <description><![CDATA[If supported (CRM 2016 and above) use a single transaction to delete all items, if anyone fails then rollback all.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="disassociate">
+            <description><![CDATA[Delete a link between records.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of entity.]]></description>
+                </parameter>
+                <parameter name="id">
+                    <description><![CDATA[The id of the record from which the related records are disassociated.]]></description>
+                </parameter>
+                <parameter name="relationshipEntityRoleIsReferenced">
+                    <description><![CDATA[false: when the primary entity record is Referencing the record to associate; true: when the primary entity record is Referenced by the record to associate.]]></description>
+                </parameter>
+                <parameter name="relationshipSchemaName">
+                    <description><![CDATA[The name of the relationship to delete the link.]]></description>
+                </parameter>
+                <parameter name="relatedEntitiesIds">
+                    <description><![CDATA[A List<String> with the related entity records ids to disassociate.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="execute">
+            <description><![CDATA[Executes a message in the form of a request, and returns a response.]]></description>
+            <parameters>
+                <parameter name="requestName">
+                    <description><![CDATA[The logical name of request make.]]></description>
+                </parameter>
+                <parameter name="requestParameters">
+                    <description><![CDATA[[DEPRECATED] This parameter will be removed from the configuration in the near future. Set the #[payload] correctly before calling the connector.]]></description>
+                </parameter>
+                <parameter name="requestId">
+                    <description><![CDATA[The id of the request to make.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="executeMultiple">
+            <description><![CDATA[Executes multiple messages in the form of a request, and returns their respective responses.]]></description>
+            <parameters>
+                <parameter name="requests">
+                    <description><![CDATA[This parameter is a list of the requests (OrganizationRequest or Map). Set the #[payload] correctly before calling the connector.]]></description>
+                </parameter>
+                <parameter name="useSingleTransaction">
+                    <description><![CDATA[If supported (CRM 2016 and above) use a single transaction to execute all requests, if anyone fails then rollback all.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="retrieve">
+            <description><![CDATA[Retrieve a record.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="id">
+                    <description><![CDATA[The id of the record to retrieve.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="retrieveMultipleByQuery">
+            <description><![CDATA[Retrieve multiple records. <p> The definition of the Microsoft XML Query Language can be found in the Schema Definition in this link: <a href="http://msdn.microsoft.com/en-us/library/gg328332.aspx" >http://msdn.microsoft.com/en-us/library/gg328332.aspx</a> <p> The aggregation examples can be found in this link: <a href="http://msdn.microsoft.com/en-us/library/gg328122.aspx" >http://msdn.microsoft.com/en-us/library/gg328122.aspx</a>]]></description>
+            <parameters>
+                <parameter name="query">
+                    <description><![CDATA[For DataSense Query Language, the DSQL query. For Native Query Language, the Fetch XML query.]]></description>
+                </parameter>
+                <parameter name="itemsPerPage">
+                    <description><![CDATA[The number of items returned per page.]]></description>
+                </parameter>
+                <parameter name="singlePageNumber">
+                    <description><![CDATA[If greater than 0, returns only that specific page.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="update">
+            <description><![CDATA[Update a record's attributes.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="id">
+                    <description><![CDATA[The id of the record to update.]]></description>
+                </parameter>
+                <parameter name="attributes">
+                    <description><![CDATA[The attributes to be updated as a Map<String, Object>.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="updateMultiple">
+            <description><![CDATA[Update a record's attributes.]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity.]]></description>
+                </parameter>
+                <parameter name="listOfAttributes">
+                    <description><![CDATA[The list of attributes of the record as a List<Map<String, Object>>.]]></description>
+                </parameter>
+                <parameter name="useSingleTransaction">
+                    <description><![CDATA[If supported (CRM 2016 and above) use a single transaction to update all items, if anyone fails then rollback all.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources>
+        <source name="deleted-object">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="since">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fieldType">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="schedulingStrategy">
+                    <description><![CDATA[Configures the scheduler that triggers the polling]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="modified-object">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="since">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fieldType">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="schedulingStrategy">
+                    <description><![CDATA[Configures the scheduler that triggers the polling]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="new-object">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="since">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fieldType">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="schedulingStrategy">
+                    <description><![CDATA[Configures the scheduler that triggers the polling]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
+    <types/>
+</extension-documentation>

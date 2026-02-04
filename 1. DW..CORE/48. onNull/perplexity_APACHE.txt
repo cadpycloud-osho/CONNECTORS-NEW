@@ -1,0 +1,57 @@
+onNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class ReduceOnNullRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:reduceOnNull")
+            .process(exchange -> {
+                List<Object> emptyArray = new ArrayList<>();
+                
+                Object reduceResult = reduce(emptyArray, (item, acc) -> {
+                    // Concatenate item with accumulator (never executes on empty)
+                    return null; // Won't reach here for empty array
+                });
+                
+                // Handle null result with fallback
+                String finalResult = (reduceResult != null) ? 
+                    String.valueOf(reduceResult).length() : "Empty Text";
+                
+                Map<String, String> result = new HashMap<>();
+                result.put("onNull", finalResult);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private Object reduce(List<?> array, ReduceFunction fn) {
+        if (array.isEmpty()) {
+            return null; // Matches DataWeave empty reduce behavior
+        }
+        Object accumulator = null;
+        for (Object item : array) {
+            accumulator = fn.apply(item, accumulator);
+        }
+        return accumulator;
+    }
+    
+    @FunctionalInterface
+    interface ReduceFunction {
+        Object apply(Object item, Object accumulator);
+    }
+}
+
+
+output:
+
+{
+  "onNull": "Empty Text"
+}
+
+

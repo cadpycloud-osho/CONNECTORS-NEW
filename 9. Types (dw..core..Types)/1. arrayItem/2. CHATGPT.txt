@@ -1,0 +1,63 @@
+arrayItem:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static String arrayItem(String type) {
+        switch (type) {
+            case "Array<String>":
+                return "String";
+            case "Array<Number>":
+                return "Number";
+            case "Array<Any>":
+                return "Any";
+            case "Array": // default DW type
+                return "Any";
+            default:
+                return "Unknown";
+        }
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class ArrayItemController {
+
+    @GetMapping("/arrayitem")
+    public Map<String, String> arrayItemExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", TypeUtils.arrayItem("Array<String>"));
+        result.put("b", TypeUtils.arrayItem("Array<Number>"));
+        result.put("c", TypeUtils.arrayItem("Array<Any>"));
+        result.put("d", TypeUtils.arrayItem("Array"));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "String",
+  "b": "Number",
+  "c": "Any",
+  "d": "Any"
+}
+
+
+

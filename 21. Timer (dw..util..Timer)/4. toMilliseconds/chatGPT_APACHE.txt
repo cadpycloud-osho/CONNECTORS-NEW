@@ -1,0 +1,43 @@
+toMilliseconds:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.util.Map;
+
+public class ToMillisecondsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Parse the timestamp
+                Instant timestamp = Instant.parse("2018-07-23T22:03:04.829Z");
+
+                // Convert to milliseconds
+                long millis = timestamp.toEpochMilli();
+
+                // Set JSON body
+                Map<String, Object> body = Map.of("toMilliseconds", millis);
+                exchange.getMessage().setBody(body);
+            });
+    }
+}
+
+
+
+
+
+output:
+
+
+{
+  "toMilliseconds": 1532383384829
+}
+
+
+

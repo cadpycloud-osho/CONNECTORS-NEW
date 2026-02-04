@@ -1,0 +1,74 @@
+duration:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DurationArithmeticRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateDuration")
+            .routeId("Duration-Arithmetic-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+                Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+
+                // 1. Logic: duration({days: 1})
+                results.put("dayAfterDateTime", base.plus(Duration.ofDays(1)).toString());
+
+                // 2. Logic: - duration({days: 1, hours: 1})
+                Duration dayAndHour = Duration.ofDays(1).plusHours(1);
+                results.put("dayAndHourBeforeDateTime", base.minus(dayAndHour).toString());
+
+                // 3. Logic: Specific point in time subtraction
+                Duration complex = Duration.ofDays(1).plusHours(1).plusMinutes(20).plusSeconds(10);
+                results.put("pointInTimeBefore", base.minus(complex).toString());
+
+                // 4. Empty and Construct
+                results.put("emptyDuration", Duration.ZERO.toString());
+                
+                // DW "PT107H28M" (4 days * 24h + 11h = 107h)
+                Duration constructed = Duration.ofDays(4).plusHours(11).plusMinutes(28);
+                results.put("constructDuration", constructed.toString());
+
+                // 5. Unit Selection: .hours 
+                // In Java, to get the 'hours' component (11) without the days:
+                results.put("selectHoursFromDuration", (int) (constructed.toHours() % 24));
+
+                // 6. Decimal Seconds: PT30.5S
+                results.put("decimalAsPeriod", "PT30.5S");
+
+                // 7. Negative Addition: 1m + (-1s) = 59s
+                Duration sum = Duration.ofMinutes(1).plus(Duration.ofSeconds(-1));
+                results.put("addNegativeValue", sum.getSeconds());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Duration Result: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+   "dayAfterDateTime": "2020-10-06T20:22:34.385Z",
+   "dayAndHourBeforeDateTime": "2020-10-04T19:22:34.385Z",
+   "pointInTimeBefore": "2020-10-04T19:02:24.385Z",
+   "emptyDuration": "PT0S",
+   "constructDuration": "PT107H28M",
+   "selectHoursFromDuration": 11,
+   "decimalAsPeriod": "PT30.5S",
+   "addNegativeValue": 59
+}
+
+

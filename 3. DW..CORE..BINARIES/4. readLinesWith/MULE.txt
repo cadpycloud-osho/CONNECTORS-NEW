@@ -1,0 +1,24 @@
+readLinesWith:
+
+readLinesWith(content: Binary, charset: String): Array<String>
+
+readLinesWith(content: Binary, charset: String): Array<String>
+Splits the specified binary content into lines and returns the results in an array.
+
+Source
+%dw 2.0
+import * from dw::core::Binaries
+var content = read("Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n", "application/octet-stream")
+output application/json
+---
+{
+   lines : (content readLinesWith "UTF-8"),
+   showType: typeOf(content)
+}
+
+DataWeave
+Output
+{
+   "lines": [ "Line 1", "Line 2", "Line 3", "Line 4", "Line 5" ],
+   "showType": "Binary"
+}

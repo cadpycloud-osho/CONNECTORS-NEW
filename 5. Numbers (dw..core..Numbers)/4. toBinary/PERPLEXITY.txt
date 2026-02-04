@@ -1,0 +1,72 @@
+toBinary:
+
+
+input:
+
+
+package com.example.binarystringconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class BinaryStringConverterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BinaryStringConverterApplication.class, args);
+    }
+}
+
+@RestController
+class BinaryStringConverterController {
+
+    @GetMapping("/to-binary")
+    public Map<String, Object> convertToBinary() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("a", toBinary(BigInteger.valueOf(-2)));
+
+        // large number for b
+        BigInteger largeNumber = new BigInteger("100000000000000000000000000000000000000000000000000000000000000");
+        result.put("b", toBinary(largeNumber));
+
+        result.put("c", toBinary(BigInteger.ZERO));
+
+        // null input handling
+        result.put("d", toBinary(null));
+
+        result.put("e", toBinary(BigInteger.valueOf(2)));
+
+        return result;
+    }
+
+    private String toBinary(BigInteger number) {
+        if (number == null) {
+            return null;
+        }
+        if (number.signum() < 0) {
+            // Handle negative number: prepend '-' to the binary representation of the absolute value
+            return "-" + number.abs().toString(2);
+        }
+        return number.toString(2);
+    }
+}
+
+
+ouput:
+
+{
+  "a": "-10",
+  "b": "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "10"
+}
+
+

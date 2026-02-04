@@ -1,0 +1,79 @@
+findDataFormatDescriptorByMime:
+
+
+input:
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+public class DataFormatController {
+
+    // Simple model for a data format descriptor
+    static class DataFormatDescriptor {
+        String name;
+        String defaultMimeType;
+
+        DataFormatDescriptor(String name, String defaultMimeType) {
+            this.name = name;
+            this.defaultMimeType = defaultMimeType;
+        }
+    }
+
+    @GetMapping(value = "/data-format-runtime", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Map<String, String>> describeFormats() {
+        // Equivalent of findDataFormatDescriptorByMime({'*/*+json'}) etc.
+        DataFormatDescriptor jsonDF = findDataFormatDescriptorByMime("*", "json");
+        DataFormatDescriptor unknownDF = findDataFormatDescriptorByMime("*", "*");
+
+        return Map.of(
+            "json", simplify(jsonDF),
+            "unknown", simplify(unknownDF)
+        );
+    }
+
+    private DataFormatDescriptor findDataFormatDescriptorByMime(String type, String subtype) {
+        // Very small registry, similar to DataWeave runtime
+        if ("json".equalsIgnoreCase(subtype)) {
+            return new DataFormatDescriptor("json", "application/json");
+        }
+        if ("xml".equalsIgnoreCase(subtype)) {
+            return new DataFormatDescriptor("xml", "application/xml");
+        }
+        return null; // Not found
+    }
+
+    // fun simplify(df: DataFormatDescriptor | Null) = ...
+    private Map<String, String> simplify(DataFormatDescriptor df) {
+        return Optional.ofNullable(df)
+            .map(d -> Map.of(
+                "name", d.name,
+                "defaultMimeType", d.defaultMimeType
+            ))
+            .orElseGet(() -> Map.of(
+                "name", "unknown",
+                "defaultMimeType", "unknown"
+            ));
+    }
+}
+
+
+output:
+
+{
+  "json": {
+    "name": "json",
+    "defaultMimeType": "application/json"
+  },
+  "unknown": {
+    "name": "unknown",
+    "defaultMimeType": "unknown"
+  }
+}
+
+
+

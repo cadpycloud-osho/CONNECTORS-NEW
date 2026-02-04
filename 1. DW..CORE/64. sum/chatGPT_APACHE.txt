@@ -1,0 +1,17 @@
+sum:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.List<Integer> numbers = java.util.Arrays.asList(1, 2, 3);
+        int sum = numbers.stream().mapToInt(Integer::intValue).sum();
+        exchange.getIn().setBody(sum);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+6
+

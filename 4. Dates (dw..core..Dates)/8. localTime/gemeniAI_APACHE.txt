@@ -1,0 +1,47 @@
+localTime:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ConstructLocalTimeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:constructLocalTime")
+            .routeId("Construct-Local-Time-Route")
+            .process(exchange -> {
+                // 1. Logic: localTime({ hour: 12, minutes: 30, seconds: 40})
+                // Java's LocalTime.of takes (hour, minute, second)
+                LocalTime newLocalTime = LocalTime.of(12, 30, 40);
+
+                // 2. Format to match DW output (HH:mm:ss)
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                String result = newLocalTime.format(formatter);
+
+                // 3. Construct the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("newLocalTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+
+output:
+
+
+{
+   "newLocalTime": "12:30:40"
+}
+

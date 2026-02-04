@@ -1,0 +1,69 @@
+isArrayType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+
+public class PathInspectorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:inspectPath")
+            .routeId("Path-Type-Validator")
+            .process(exchange -> {
+                // Scenario A: Ends in Attribute
+                List<Map<String, String>> pathA = List.of(
+                    Map.of("kind", "Object", "selector", "user"),
+                    Map.of("kind", "Attribute", "selector", "name")
+                );
+
+                // Scenario B: Ends in Array Index
+                List<Map<String, Object>> pathB = List.of(
+                    Map.of("kind", "Object", "selector", "user"),
+                    Map.of("kind", "Array", "selector", 0)
+                );
+
+                // Scenario C: Is just an Array Index
+                List<Map<String, Object>> pathC = List.of(
+                    Map.of("kind", "Array", "selector", 0)
+                );
+
+                Map<String, Boolean> result = new java.util.LinkedHashMap<>();
+                result.put("a", isArrayType(pathA));
+                result.put("b", isArrayType(pathB));
+                result.put("c", isArrayType(pathC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json()
+            .log("Path Inspection Result: ${body}");
+    }
+
+    /**
+     * Logic: Check if the last element in the path list is an 'Array' type
+     */
+    private boolean isArrayType(List<?> path) {
+        if (path == null || path.isEmpty()) return false;
+        
+        Object lastNode = path.get(path.size() - 1);
+        if (lastNode instanceof Map) {
+            Map<?, ?> metadata = (Map<?, ?>) lastNode;
+            // Replicating: kind == ARRAY_TYPE
+            return "Array".equalsIgnoreCase(String.valueOf(metadata.get("kind")));
+        }
+        return false;
+    }
+}
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+

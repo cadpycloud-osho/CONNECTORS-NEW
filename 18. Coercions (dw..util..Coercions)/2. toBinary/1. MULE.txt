@@ -1,0 +1,63 @@
+toBinary:
+
+toBinary(str: String, encoding: String): Binary
+
+Copy link to clipboardtoBinary(str: String, encoding: String): Binary
+Transform a String value into a Binary value using the specified encoding.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+  'UTF-16Ex': toBinary("DW", "UTF-16"),
+  'utf16Ex': toBinary("DW", "utf16"),
+  'UnicodeBigEx': toBinary("DW", "UnicodeBig"),
+  'UTF-32Ex': toBinary("DW", "UTF-32"),
+  'UTF_32Ex': toBinary("DW", "UTF_32")
+}
+
+
+DataWeave
+Output
+{
+  "UTF-16Ex": "/v8ARABX" as Binary {base: "64"},
+  utf16Ex: "/v8ARABX" as Binary {base: "64"},
+  UnicodeBigEx: "/v8ARABX" as Binary {base: "64"},
+  "UTF-32Ex": "AAAARAAAAFc=" as Binary {base: "64"},
+  UTF_32Ex: "AAAARAAAAFc=" as Binary {base: "64"}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

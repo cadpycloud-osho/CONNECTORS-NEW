@@ -1,0 +1,193 @@
+file:
+
+
+example 1:
+
+
+input:
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.nio.file.Files;
+
+@RestController
+public class FileMultipartController {
+
+    @GetMapping("/file-multipart")
+    public ResponseEntity<MultiValueMap<String, Object>> createFileMultipart() throws IOException {
+        // Read orders.xml from src/main/resources (matches DataWeave path)
+        ClassPathResource resource = new ClassPathResource("orders.xml");
+        String fileContent = Files.readString(resource.getFile().toPath());
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", fileContent)
+               .header(HttpHeaders.CONTENT_TYPE, "application/xml")
+               .header(HttpHeaders.CONTENT_DISPOSITION, 
+                      "form-data; name=\"file\"; filename=\"orders.xml\"");
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .body(builder.build());
+    }
+}
+
+
+output:
+
+Content-Type: multipart/form-data; boundary=...
+Content-Disposition: form-data; name="file"; filename="orders.xml"
+Content-Type: application/xml
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.nio.file.Files;
+
+@RestController
+public class MultipartFormFileController {
+
+    @GetMapping(value = "/multipart-form-file", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MultiValueMap<String, String> createMultipartFormFile() throws IOException {
+        // Read orders.xml from classpath (matches ./orders.xml path)
+        ClassPathResource resource = new ClassPathResource("orders.xml");
+        String fileContent = Files.readString(resource.getFile().toPath());
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        
+        // Matches myArgs: {name: "file", path: ordersFilePath, mime: "application/xml", fileName: "myorders.xml"}
+        builder.part("file", fileContent)
+               .header(HttpHeaders.CONTENT_TYPE, "application/xml")
+               .header(HttpHeaders.CONTENT_DISPOSITION, 
+                      "form-data; name=\"file\"; filename=\"myorders.xml\"");
+
+        return builder.build();
+    }
+}
+
+
+output:
+
+------=_Part_5349_1228640551.1560391284935
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+
+------=_Part_5349_1228640551.1560391284935--
+
+
+-------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.nio.file.Files;
+
+@RestController
+public class JsonFileMultipartController {
+
+    @GetMapping(value = "/json-file-multipart", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MultiValueMap<String, String> createJsonMultipart() throws IOException {
+        // Read myClients.json from src/main/resources
+        ClassPathResource resource = new ClassPathResource("myClients.json");
+        String jsonContent = Files.readString(resource.getFile().toPath());
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        
+        // Matches: Multipart::file("myFile", myClients, 'application/json', "partMyClients.json")
+        builder.part("myFile", jsonContent)
+               .header(HttpHeaders.CONTENT_TYPE, "application/json")
+               .header(HttpHeaders.CONTENT_DISPOSITION, 
+                      "form-data; name=\"myFile\"; filename=\"partMyClients.json\"");
+
+        return builder.build();
+    }
+}
+
+
+output:
+
+
+
+-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

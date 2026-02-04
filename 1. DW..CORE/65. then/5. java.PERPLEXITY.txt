@@ -1,0 +1,58 @@
+then:
+
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("mariano", "de Achaval");
+        
+        // chainResult: reduce ++ then sizeOf()
+        String chainConcat = names.stream().reduce("", String::concat);
+        int chainResult = chainConcat.length();
+        
+        // referenceResult: map upper() then object construction
+        List<String> upperNames = names.stream()
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+        
+        // onNullReturnNull: empty reduce then sizeOf() -> null
+        List<String> emptyList = new ArrayList<>();
+        String emptyConcat = emptyList.stream().reduce("", String::concat);
+        Integer onNullResult = emptyConcat.isEmpty() ? null : emptyConcat.length();
+        
+        // Manual JSON output
+        System.out.println("{");
+        System.out.println("  \"chainResult\" : " + chainResult + ",");
+        
+        System.out.print("  \"referenceResult\" : {\n");
+        System.out.print("    \"name\" : \"" + upperNames.get(0) + "\",\n");
+        System.out.print("    \"lastName\" : \"" + upperNames.get(1) + "\",\n");
+        System.out.println("    \"length\" : " + upperNames.size());
+        System.out.println("  },");
+        
+        System.out.println("  \"onNullReturnNull\" : " + onNullResult);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+   "chainResult": 17,
+   "referenceResult": {
+     "name": "MARIANO",
+     "lastName": "DE ACHAVAL",
+     "length": 2
+   },
+   "onNullReturnNull": null
+}
+
+

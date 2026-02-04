@@ -1,0 +1,47 @@
+nameSet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class NameSetRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getNameSet")
+            .routeId("NameSet-Extraction-Route")
+            .process(exchange -> {
+                // 1. Source Object: { "a" : true, "b" : 1 }
+                // Use LinkedHashMap to preserve the order "a", "b"
+                Map<String, Object> source = new LinkedHashMap<>();
+                source.put("a", true);
+                source.put("b", 1);
+
+                // 2. Logic: nameSet()
+                // In Java Maps, keys are strings. 
+                // We convert the Set of keys into a List for JSON array formatting.
+                List<String> names = new ArrayList<>(source.keySet());
+
+                // 3. Prepare response object
+                Map<String, Object> response = new HashMap<>();
+                response.put("nameSet", names);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Output as application/json
+            .marshal().json()
+            .log("Extracted Names: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "nameSet": ["a", "b"]
+}
+
+

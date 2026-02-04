@@ -1,0 +1,38 @@
+reverse:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + reverse("Mariano") + "\",");
+        System.out.println("  \"b\": " + reverse(null) + ",");
+        System.out.println("  \"c\": \"" + reverse("") + "\"");
+        System.out.println("}");
+    }
+    
+    private static String reverse(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return new StringBuilder(input).reverse().toString();
+    }
+}
+
+
+output:
+
+{
+  "a": "onairaM",
+  "b": null,
+  "c": ""
+}
+
+
+
+
+
+
+

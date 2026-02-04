@@ -1,0 +1,119 @@
+log:
+
+
+example 1:
+
+
+input:
+
+public class Main {
+
+    // --- Utility method to replicate DataWeave's log() behavior ---
+    public static String log(String level, String message) {
+        // 1. Side Effect (Console Output)
+        System.out.println(level + " - " + message);
+        
+        // 2. Expression Result (Returns the message argument)
+        return message;
+    }
+
+    public static void main(String[] args) {
+        
+        // DataWeave Expression Execution:
+        String expressionOutput = log("WARNING", "Houston, we have a problem");
+
+        // --- Output Generation ---
+        System.out.println("\n--- DataWeave log() Example 1 Conversion ---");
+        System.out.println("Console Output (Simulated): WARNING - Houston, we have a problem");
+        System.out.println("Expression Output: \"" + expressionOutput + "\"");
+    }
+}
+
+
+output:
+
+WARNING - Houston, we have a problem
+
+--- DataWeave log() Example 1 Conversion ---
+Console Output (Simulated): WARNING - Houston, we have a problem
+Expression Output: "Houston, we have a problem"
+
+-------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+import java.util.stream.Collectors;
+
+// --- Helper Classes to define the structure ---
+class Friend {
+    public String name;
+    public Friend(String name) { this.name = name; }
+    @Override public String toString() { return String.format("{ name: \"%s\" }", name); }
+}
+
+class User {
+    public Friend friend;
+    public int id;
+    public String name;
+    public User(Friend friend, int id, String name) { 
+        this.friend = friend; this.id = id; this.name = name; 
+    }
+    // Custom toString to simulate the DataWeave JSON output format
+    @Override 
+    public String toString() { 
+        return String.format("{\n  friend: %s,\n  id: %d,\n  name: \"%s\"\n}", friend, id, name); 
+    }
+}
+
+public class Main {
+
+    // --- Utility method to replicate DataWeave's log() behavior ---
+    public static User log(String level, User messageObject) {
+        // 1. Side Effect (Console Output - prints the formatted object)
+        System.out.println(level + " - " + messageObject.toString());
+        
+        // 2. Expression Result (Returns the original object instance)
+        return messageObject;
+    }
+
+    public static void main(String[] args) {
+        
+        // DataWeave Input: var myUser = {user: {friend: {name: "Shoki"}, id: 1, name: "Tomo"}, accountId: "leansh" }
+        User myUserObject = new User(new Friend("Shoki"), 1, "Tomo");
+
+        // DataWeave Expression Execution: log("User", myUser.user).friend.name
+        // Step 1: Execute log() and receive the User object back.
+        User loggedUser = log("User", myUserObject);
+        
+        // Step 2: Continue the chaining on the returned object: .friend.name
+        String expressionOutput = loggedUser.friend.name;
+
+        // --- Output Generation ---
+        System.out.println("\n--- DataWeave log() Example 2 Conversion ---");
+        System.out.println("Console Output (Simulated): See above.");
+        System.out.println("Expression Output: \"" + expressionOutput + "\"");
+    }
+}
+
+
+output:
+
+User - {
+  friend: { name: "Shoki" },
+  id: 1,
+  name: "Tomo"
+}
+
+--- DataWeave log() Example 2 Conversion ---
+Console Output (Simulated): See above.
+Expression Output: "Shoki"
+
+-------------------------------------------------------
+
+

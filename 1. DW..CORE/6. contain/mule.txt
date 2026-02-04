@@ -1,0 +1,90 @@
+contains:
+
+
+contains<T>(@StreamCapable items: Array<T>, element: Any): Boolean
+Returns true if an input contains a given value, false if not.
+
+
+
+input:
+
+%dw 2.0
+output application/json
+---
+ContainsRequestedItem: payload.root.*order.*items contains "3"
+DataWeave
+oardInput
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <order>
+      <items>155</items>
+    </order>
+    <order>
+      <items>30</items>
+    </order>
+    <order>
+      <items>15</items>
+    </order>
+    <order>
+      <items>5</items>
+    </order>
+    <order>
+      <items>4</items>
+      <items>7</items>
+    </order>
+    <order>
+      <items>1</items>
+      <items>3</items>
+    </order>
+    <order>
+        null
+    </order>
+</root>
+
+
+
+
+output:
+
+{ "ContainsRequestedItem": true }
+
+-----------------------------------------------------------------
+
+
+input:
+
+%dw 2.0
+output application/json
+---
+"mulesoft" contains("mule")
+
+output:
+
+true
+
+
+-----------------------------------------------------------------
+
+
+
+source:
+%dw 2.0
+output application/json
+---
+{ ContainsString : payload.root.mystring contains("me") }
+
+
+input:
+<?xml version="1.0" encoding="UTF-8"?>
+<root><mystring>some string</mystring></root>
+
+output:
+
+
+{ "ContainsString": true }
+
+
+
+-------------------------------------------------------------------
+
+

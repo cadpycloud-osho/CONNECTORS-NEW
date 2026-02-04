@@ -1,0 +1,23 @@
+abs(number: Number): Number
+
+
+input:
+
+from("direct:absExample")
+    // Input list
+    .setBody(constant(List.of(-2, 2.5, -3.4, 3)))
+
+    // Apply abs() to each element
+    .split(body())
+        .setBody(simple("${abs(${body})}"))
+        .aggregate(constant(true),
+            new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+    .end();
+
+
+output:
+
+[2, 2.5, 3.4, 3]
+
+

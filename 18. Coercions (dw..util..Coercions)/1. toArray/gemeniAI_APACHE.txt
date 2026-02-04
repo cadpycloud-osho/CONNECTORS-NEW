@@ -1,0 +1,44 @@
+toArray:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceToArray")
+            .process(exchange -> {
+                String inputA = "";
+                String inputB = "hola";
+
+                // Mapping the logic for 'a' and 'b'
+                exchange.getIn().setBody(java.util.Map.of(
+                    "a", stringToCharArray(inputA),
+                    "b", stringToCharArray(inputB)
+                ));
+            })
+            // indent=false is handled by the JSON library configuration
+            .marshal().json();
+    }
+
+    private List<String> stringToCharArray(String str) {
+        if (str == null || str.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return str.chars()
+                  .mapToObj(c -> String.valueOf((char) c))
+                  .collect(Collectors.toList());
+    }
+}
+
+output:
+
+{"a":[],"b":["h","o","l","a"]}
+
+

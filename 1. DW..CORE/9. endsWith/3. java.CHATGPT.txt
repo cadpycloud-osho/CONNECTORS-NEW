@@ -1,0 +1,35 @@
+endsWith:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    // Helper method similar to DataWeave's endsWith with null safety
+    public static boolean endsWith(String text, String suffix) {
+        if (text == null || suffix == null) {
+            return false;
+        }
+        return text.endsWith(suffix);
+    }
+
+    public static void main(String[] args) {
+
+        boolean result1 = endsWith("Mariano", "no");
+        boolean result2 = endsWith("Mariano", "to");
+
+        List<Boolean> output = Arrays.asList(result1, result2);
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+
+[true, false]

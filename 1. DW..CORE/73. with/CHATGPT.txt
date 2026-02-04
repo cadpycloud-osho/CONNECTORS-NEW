@@ -1,0 +1,20 @@
+with:
+
+input:
+
+@GetMapping("/mask-ssn")
+public Map<String, String> maskSSN() {
+    String masked = "987-65-4321".replaceAll("[0-9]", "x");
+
+    Map<String, String> response = new HashMap<>();
+    response.put("ssn", masked);
+
+    return response;
+}
+
+output:
+
+{
+  "ssn": "xxx-xx-xxxx"
+}
+

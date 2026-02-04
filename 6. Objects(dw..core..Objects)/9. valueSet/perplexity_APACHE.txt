@@ -1,0 +1,40 @@
+valueSet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class ValueSetRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:valueSet")
+            .process(exchange -> {
+                Map<String, Object> input = Map.of(
+                    "a", true,
+                    "b", 1
+                );
+                
+                // Extract values only as List (matches array output)
+                List<Object> values = new ArrayList<>(input.values());
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("valueSet", values);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+
+{
+  "valueSet": [true, 1]
+}
+

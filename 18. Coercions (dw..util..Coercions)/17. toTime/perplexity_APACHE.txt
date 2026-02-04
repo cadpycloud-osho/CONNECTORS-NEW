@@ -1,0 +1,119 @@
+toTime:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToTimeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    String inputTime = "13:44:12.283-08:00";
+                    
+                    // a: Multiple format fallback - first HH:mm:ss.xxx, then HH:mm:ss.nxxx
+                    DateTimeFormatter[] formatsA = {
+                        DateTimeFormatter.ofPattern("HH:mm:ss.SSSX"),
+                        DateTimeFormatter.ofPattern("HH:mm:ss.nXXX")
+                    };
+                    OffsetTime parsedTimeA = null;
+                    for (DateTimeFormatter fmt : formatsA) {
+                        try {
+                            parsedTimeA = OffsetTime.parse(inputTime, fmt);
+                            break;
+                        } catch (DateTimeParseException ignored) {}
+                    }
+                    result.put("a", parsedTimeA != null ? 
+                        parsedTimeA.format(DateTimeFormatter.ofPattern("HH:mm:ss.nxxx")) : null);
+                    
+                    // b: Single format HH:mm:ss.xxx only - should fail
+                    try {
+                        OffsetTime.parse(inputTime, DateTimeFormatter.ofPattern("HH:mm:ss.SSSX"));
+                        result.put("b", "Success");
+                    } catch (DateTimeParseException e) {
+                        result.put("b", "Could not find a valid formatter for '" + inputTime + "'");
+                    }
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+output:
+
+
+{
+  "a": "13:44:12.000000283-08:00",
+  "b": "Could not find a valid formatter for '13:44:12.283-08:00'"
+}
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToTimeSimpleRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // a: toTime("23:57:59Z") - ISO OffsetTime parsing
+                    result.put("a", OffsetTime.parse("23:57:59Z").toString());
+                    
+                    // b: toTime("13:44:12.283-08:00", "HH:mm:ss.nxxx")
+                    result.put("b", OffsetTime.parse("13:44:12.283-08:00", 
+                        DateTimeFormatter.ofPattern("HH:mm:ss.nXXX"))
+                        .format(DateTimeFormatter.ofPattern("HH:mm:ss.nxxx")));
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+output:
+
+{
+  "a": "23:57:59Z",
+  "b": "13:44:12.000000283-08:00"
+}
+
+
+
+---------------------------------------------------------
+

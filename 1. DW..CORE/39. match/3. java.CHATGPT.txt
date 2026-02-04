@@ -1,0 +1,85 @@
+match:
+
+
+example 1:
+
+
+input:
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String input = "me@mulesoft.com";
+        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+        Matcher matcher = pattern.matcher(input);
+
+        List<String> result = new ArrayList<>();
+
+        if (matcher.matches()) {
+            // Full match
+            result.add(matcher.group(0));
+            // Group 1
+            result.add(matcher.group(1));
+            // Group 2
+            result.add(matcher.group(2));
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[me@mulesoft.com, me, mulesoft]
+
+
+
+-------------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> ips = Arrays.asList(
+                "192.88.99.0/24",
+                "192.168.0.0/16",
+                "192.175.48.0/24"
+        );
+
+        // Filter only IPs ending with /24
+        List<String> result = ips.stream()
+                .filter(ip -> ip.matches(".*\\/24"))
+                .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+[192.88.99.0/24, 192.175.48.0/24]
+
+
+

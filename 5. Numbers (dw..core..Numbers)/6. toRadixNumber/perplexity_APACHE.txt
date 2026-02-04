@@ -1,0 +1,36 @@
+toRadixNumber:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class ToRadixNumberRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:toRadixNumber")
+            .process(exchange -> {
+                Map<String, String> result = new LinkedHashMap<>();
+                
+                // a: toRadixNumber(2, 2) → "10" (binary)
+                result.put("a", Integer.toString(2, 2));
+                
+                // b: toRadixNumber(255, 16) → "ff" (hex)
+                result.put("b", Integer.toString(255, 16));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "a": "10",
+  "b": "ff"
+}
+

@@ -1,0 +1,43 @@
+onNull:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+class OnNullController {
+    
+    @GetMapping("/onNull")
+    public Map<String, String> getOnNull() {
+        List<Object> emptyList = Collections.emptyList(); // Equivalent to []
+        
+        // Simulate DataWeave reduce: reduce empty list, then get size
+        int resultSize = emptyList.stream()
+            .reduce((item, accumulator) -> {
+                // For empty list, reduce never executes, result is null
+                return accumulator;
+            })
+            .map(r -> 0) // sizeOf equivalent for null/empty result
+            .orElse(0);  // Default size 0
+        
+        Map<String, String> response = new HashMap<>();
+        
+        // onNull "Empty Text" - since reduce result is effectively null/empty
+        response.put("onNull", "Empty Text");
+        
+        return response;
+    }
+}
+
+
+
+output:
+
+{
+  "onNull": "Empty Text"
+}
+

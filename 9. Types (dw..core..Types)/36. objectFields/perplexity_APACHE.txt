@@ -1,0 +1,115 @@
+objectFields:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class DataWeaveObjectFieldsRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processObjectFields")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, List<Map<String, Object>>> processObjectFields() {
+        Map<String, List<Map<String, Object>>> result = new HashMap<>();
+        
+        result.put("a", objectFields(createDictionaryType()));
+        result.put("b", objectFields(createSchemaType()));
+        result.put("c", objectFields(Object.class));
+        result.put("d", objectFields(createUserType()));
+        
+        return result;
+    }
+    
+    private List<Map<String, Object>> objectFields(Object type) {
+        List<Map<String, Object>> fields = new ArrayList<>();
+        
+        if (type == Object.class) {
+            return fields; // Empty for base Object
+        }
+        
+        Map<?,?> typeDef = (Map<?,?>) type;
+        String typeName = (String) typeDef.get("typeName");
+        
+        switch (typeName) {
+            case "ADictionary":
+                fields.add(createField("_", null, null, true, false, "String"));
+                break;
+            case "ASchema":
+                Map<String, Object> nameField = createField("name", "http://acme.com", 
+                    Map.of("foo", Map.of("ns", "http://acme.com", "value", "String", "required", true)), 
+                    true, false, "Object");
+                fields.add(nameField);
+                break;
+            case "AUser":
+                Map<String, Object> nameFieldUser = createField("name", null,
+                    Map.of("foo", Map.of("ns", null, "value", "String", "required", false),
+                           "l", Map.of("ns", null, "value", "Number", "required", true)),
+                    false, false, "String");
+                Map<String, Object> lastNameField = createField("lastName", null, null, true, true, "Number");
+                fields.add(nameFieldUser);
+                fields.add(lastNameField);
+                break;
+        }
+        return fields;
+    }
+    
+    private Map<String, Object> createField(String localName, String ns, 
+                                          Object attributes, 
+                                          boolean required, boolean repeated, String value) {
+        Map<String, Object> field = new HashMap<>();
+        Map<String, String> name = new HashMap<>();
+        name.put("localName", localName);
+        name.put("namespace", ns);
+        
+        Map<String, Object> key = new HashMap<>();
+        key.put("name", name);
+        key.put("attributes", attributes != null ? 
+            ((Map<String, Map<String, Object>>)attributes).values().stream().toList() : new ArrayList<>());
+        
+        field.put("key", key);
+        field.put("required", required);
+        field.put("repeated", repeated);
+        field.put("value", value);
+        return field;
+    }
+    
+    private Map<String, Object> createDictionaryType() {
+        Map<String, Object> type = new HashMap<>();
+        type.put("typeName", "ADictionary");
+        return type;
+    }
+    
+    private Map<String, Object> createSchemaType() {
+        Map<String, Object> type = new HashMap<>();
+        type.put("typeName", "ASchema");
+        return type;
+    }
+    
+    private Map<String, Object> createUserType() {
+        Map<String, Object> type = new HashMap<>();
+        type.put("typeName", "AUser");
+        return type;
+    }
+}
+
+
+
+output:
+
+{
+  "a": [{"key":{"name":{"localName":"_","namespace":null},"attributes":[]},"required":true,"repeated":false,"value":"String"}],
+  "b": [{"key":{"name":{"localName":"name","namespace":"http://acme.com"},"attributes":[{"name":{"localName":"foo","namespace":"http://acme.com"},"value":"String","required":true}]},"required":true,"repeated":false,"value":"Object"}],
+  "c": [],
+  "d": [{"key":{"name":{"localName":"name","namespace":null},"attributes":[{"name":{"localName":"foo","namespace":null},"value":"String","required":false},{"name":{"localName":"l","namespace":null},"value":"Number","required":true}]},"required":false,"repeated":false,"value":"String"},{"key":{"name":{"localName":"lastName","namespace":null},"attributes":[]},"required":true,"repeated":true,"value":"Number"}]
+}
+
+
+

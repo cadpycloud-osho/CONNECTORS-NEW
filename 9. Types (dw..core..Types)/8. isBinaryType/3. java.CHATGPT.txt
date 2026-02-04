@@ -1,0 +1,34 @@
+isBinaryType:
+
+
+
+INPUT:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isBinaryType(Class<?> type) {
+        return type == byte[].class;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        result.put("a", isBinaryType(byte[].class));   // ABinary
+        result.put("b", isBinaryType(byte[].class));   // Binary
+        result.put("c", isBinaryType(String.class));   // String
+
+        System.out.println(result);
+    }
+}
+
+
+OUTPUT:
+
+{a=true, b=true, c=false}
+
+
+
+

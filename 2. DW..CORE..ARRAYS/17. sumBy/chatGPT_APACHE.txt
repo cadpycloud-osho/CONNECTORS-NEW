@@ -1,0 +1,32 @@
+sumBy:
+
+
+input:
+
+from("direct:sumByExample")
+.process(exchange -> {
+    List<Map<String, Integer>> list = List.of(
+        Map.of("a", 1),
+        Map.of("a", 2),
+        Map.of("a", 3)
+    );
+
+    // Sum by key "a"
+    int sum = list.stream()
+                  .mapToInt(item -> item.get("a"))
+                  .sum();
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("sumBy", List.of(sum, sum)); // replicates both DW calls
+
+    exchange.getIn().setBody(result);
+});
+
+
+output:
+
+{
+  "sumBy": [6, 6]
+}
+
+

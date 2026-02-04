@@ -1,0 +1,49 @@
+words:
+
+words(text: String): Array<String>
+
+words(text: String): Array<String>
+Returns an array of words from a string.
+
+Separators between words include blank spaces, new lines, and tabs.
+
+
+
+
+Source
+%dw 2.0
+import words from dw::core::Strings
+output application/json
+---
+words("hello world\nhere\t\t\tdata-weave")
+
+DataWeave
+Output
+["hello", "world", "here", "data-weave"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

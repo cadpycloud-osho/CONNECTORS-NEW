@@ -1,0 +1,135 @@
+form:
+
+example 1:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import java.io.InputStream;
+
+public class CompositeMultipartRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:createCompositeMultipart")
+            .routeId("Composite-Multipart-Generator")
+            .process(exchange -> {
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+
+                // 1. Part: File (XML)
+                // Maps to Multipart::file(fileArgs)
+                InputStream is = getClass().getClassLoader().getResourceAsStream("orders.xml");
+                byte[] xmlContent = is != null ? is.readAllBytes() : new byte[0];
+                ByteArrayDataSource xmlDs = new ByteArrayDataSource(xmlContent, "application/xml");
+                xmlDs.setName("myorders.xml");
+                am.addAttachment("file", new DataHandler(xmlDs));
+
+                // 2. Part: Field (Text)
+                // Maps to Multipart::field(fieldArgs)
+                ByteArrayDataSource textDs = new ByteArrayDataSource("Annie Point", "text/plain");
+                am.addAttachment("userName", new DataHandler(textDs));
+
+                // 3. Part: Inline JSON object as a File
+                // Maps to Multipart::field("myJson", {...}, "application/json", "userInfo.json")
+                String jsonContent = "{\"user\": \"Annie Point\"}";
+                ByteArrayDataSource jsonDs = new ByteArrayDataSource(jsonContent, "application/json");
+                jsonDs.setName("userInfo.json");
+                am.addAttachment("myJson", new DataHandler(jsonDs));
+            })
+            // Marshal using the 'form-data' subtype
+            .marshal().mimeMultipart("form-data")
+            .log("Generated Composite Multipart:\n${body}");
+    }
+}
+
+output:
+
+------=_Part_0_123456789.987654321
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<orders>...</orders>
+------=_Part_0_123456789.987654321
+Content-Type: text/plain
+Content-Disposition: form-data; name="userName"
+
+Annie Point
+------=_Part_0_123456789.987654321
+Content-Type: application/json
+Content-Disposition: form-data; name="myJson"; filename="userInfo.json"
+
+{"user": "Annie Point"}
+------=_Part_0_123456789.987654321--
+
+
+
+-------------------------------------------------
+
+example 2:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.attachment.AttachmentMessage;
+import jakarta.activation.DataHandler;
+
+public class MultipartFormRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .routeId("Multipart-Generator")
+            .process(exchange -> {
+                // 1. Get the AttachmentMessage wrapper
+                AttachmentMessage am = exchange.getMessage(AttachmentMessage.class);
+
+                // 2. Logic: Add parts as attachments
+                // Part 1: Content-Disposition name is derived from the attachment key
+                am.addAttachment("myFirstPart", 
+                    new DataHandler("content for my first part", "text/plain"));
+
+                // Part 2
+                am.addAttachment("mySecondPart", 
+                    new DataHandler("content for my second part", "text/plain"));
+            })
+            // 3. Marshal to multipart/form-data
+            // The "form-data" parameter ensures the Content-Disposition header is added
+            .marshal().mimeMultipart("form-data")
+            .log("Generated Multipart Body:\n${body}");
+    }
+}
+
+output:
+
+------=_Part_0_12345678.1737471804
+Content-Type: text/plain
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_0_12345678.1737471804
+Content-Type: text/plain
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_0_12345678.1737471804--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

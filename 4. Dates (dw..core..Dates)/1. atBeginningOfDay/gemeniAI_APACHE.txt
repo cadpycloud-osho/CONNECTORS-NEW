@@ -1,0 +1,111 @@
+atBeginningOfDay:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class BeginningOfDayRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getBeginningOfDay")
+            .routeId("Beginning-Of-Day-Route")
+            .process(exchange -> {
+                // 1. Logic: The input DateTime string
+                String inputDT = "2020-10-06T18:23:20.351-03:00";
+
+                // 2. Parse the string into an OffsetDateTime
+                OffsetDateTime dateTime = OffsetDateTime.parse(inputDT);
+
+                // 3. Logic: atBeginningOfDay
+                // Reset the time to 00:00:00 while keeping date and offset
+                OffsetDateTime beginningOfDay = dateTime.with(LocalTime.MIN);
+
+                // 4. Format to string to match DW output style
+                String result = beginningOfDay.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+                // 5. Construct the Map structure
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfDayDateTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+  "atBeginningOfDayDateTime": "2020-10-06T00:00:00-03:00"
+}
+
+
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class BeginningOfLocalDayRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:startBeginningOfLocalDay")
+            .routeId("Beginning-Of-Local-Day-Route")
+            .process(exchange -> {
+                // 1. The input string (ISO-8601 format without offset)
+                String inputDT = "2020-10-06T18:23:20.351";
+
+                // 2. Parse into LocalDateTime
+                LocalDateTime dateTime = LocalDateTime.parse(inputDT);
+
+                // 3. Logic: atBeginningOfDay 
+                // .with(LocalTime.MIN) resets time to 00:00:00
+                LocalDateTime beginningOfLocalDay = dateTime.with(LocalTime.MIN);
+
+                // 4. Format the output to match DataWeave's default string output
+                // Use a formatter that stops at seconds if no nanos are present
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                String result = beginningOfLocalDay.format(formatter);
+
+                // 5. Structure the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("atBeginningOfDayLocalDateTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 6. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+  "atBeginningOfDayLocalDateTime": "2020-10-06T00:00:00"
+}
+
+
+
+--------------------------------------------------------

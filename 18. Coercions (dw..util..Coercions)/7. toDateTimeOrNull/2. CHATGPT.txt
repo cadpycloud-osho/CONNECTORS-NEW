@@ -1,0 +1,65 @@
+toDateTimeOrNull:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DateTimeOrNullController {
+
+    @GetMapping("/datetimeOrNull")
+    public Map<String, Object> getDateTimeOrNull() {
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("a", toDateTimeOrNull(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz",
+                        "uuuu-MM-dd HH:mm:ssz"
+                }
+        ));
+
+        result.put("b", toDateTimeOrNull(
+                "2003-10-01 23:57:59Z",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ssz"
+                }
+        ));
+
+        return result;
+    }
+
+    // Equivalent of DW toDateTimeOrNull()
+    private ZonedDateTime toDateTimeOrNull(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                return ZonedDateTime.parse(value, formatter);
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2003-10-01T23:57:59Z",
+  "b": null
+}
+

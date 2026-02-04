@@ -1,0 +1,21 @@
+lower:
+
+lower(text: String): String
+
+lower(text: String): String
+Returns the provided string in lowercase characters.
+
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "name" : lower("MULESOFT") }
+
+DataWeave
+Output
+{ "name": "mulesoft" }

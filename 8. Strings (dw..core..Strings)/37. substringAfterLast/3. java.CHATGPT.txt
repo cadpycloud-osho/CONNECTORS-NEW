@@ -1,0 +1,45 @@
+substringAfterLast:
+
+
+INPUT:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String substringAfterLastDW(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null) return null;
+        if (delimiter.equals("")) return null;
+        if (input.equals("")) return "";
+
+        int index = input.lastIndexOf(delimiter);
+
+        if (index == -1) return "";
+
+        return input.substring(index + delimiter.length());
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", substringAfterLastDW(null, "'"));
+        result.put("b", substringAfterLastDW("", "-"));
+        result.put("c", substringAfterLastDW("abc", "b"));
+        result.put("d", substringAfterLastDW("abcba", "b"));
+        result.put("e", substringAfterLastDW("abc", "d"));
+        result.put("f", substringAfterLastDW("abc", ""));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=null, b=, c=c, d=a, e=, f=null}
+

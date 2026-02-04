@@ -1,0 +1,67 @@
+xsiType:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+
+public class NamespaceXsiTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:namespaceXsiType")
+            .process(exchange -> {
+                Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                
+                // Namespace declarations
+                String acmeNS = "http://acme.com";
+                String xsiNS = "http://www.w3.org/2001/XMLSchema-instance";
+                
+                // <user> element with acme namespace
+                Element user = doc.createElementNS(acmeNS, "user");
+                doc.appendChild(user);
+                
+                // xsi:type="acme:user" attribute
+                Attr xsiType = doc.createAttributeNS(xsiNS, "type");
+                xsiType.setValue("acme:user");
+                user.setAttributeNodeNS(xsiType);
+                
+                // Add child elements
+                Element name = doc.createElementNS(acmeNS, "name");
+                name.setTextContent("Peter");
+                user.appendChild(name);
+                
+                Element lastName = doc.createElementNS(acmeNS, "lastName");
+                lastName.setTextContent("Parker");
+                user.appendChild(lastName);
+                
+                // Serialize to XML string
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                TransformerFactory.newInstance().newTransformer()
+                    .setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no")
+                    .setOutputProperty(OutputKeys.ENCODING, "UTF-8")
+                    .transform(new DOMSource(doc), new StreamResult(baos));
+                
+                exchange.getIn().setBody(baos.toString("UTF-8"));
+            })
+            .setHeader("Content-Type", constant("application/xml"))
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<user xsi:type="acme:user" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:acme="http://acme.com">
+    <name>Peter</name>
+    <lastName>Parker</lastName>
+</user>
+
+

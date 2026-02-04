@@ -1,0 +1,59 @@
+functionParamTypes:
+
+input:
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class FunctionParamTypesExample {
+
+    public static void main(String[] args) {
+        Map<String, List<Map<String, Object>>> result = new LinkedHashMap<>();
+        result.put("a", functionParamTypes("String, Number -> Number"));
+        result.put("b", functionParamTypes("-> Number"));
+
+        System.out.println(result);
+    }
+
+    public static List<Map<String, Object>> functionParamTypes(String functionSignature) {
+        List<Map<String, Object>> params = new ArrayList<>();
+        if (functionSignature == null || !functionSignature.contains("->")) {
+            return params;
+        }
+        String paramPart = functionSignature.substring(0, functionSignature.indexOf("->")).trim();
+        if (paramPart.isEmpty()) {
+            return params;
+        }
+        String[] paramTypes = paramPart.split(",");
+        for (String p : paramTypes) {
+            Map<String, Object> paramInfo = new LinkedHashMap<>();
+            paramInfo.put("paramType", p.trim());
+            paramInfo.put("optional", false); // DataWeave default
+            params.add(paramInfo);
+        }
+        return params;
+    }
+}
+
+
+
+output:
+
+{
+   "a": [
+     {
+       "paramType": "String",
+       "optional": false
+     },
+     {
+       "paramType": "Number",
+       "optional": false
+     }
+   ],
+   "b": []
+}
+
+
+

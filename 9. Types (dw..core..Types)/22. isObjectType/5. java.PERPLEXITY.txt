@@ -1,0 +1,36 @@
+isObjectType:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isObjectType(Object value) {
+        return value instanceof Map || (value != null && 
+               value.getClass().getDeclaredFields().length > 0);
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AType equivalent - object with name field
+        Map<String, String> aType = Map.of("name", "test");
+        Boolean boolValue = true;
+        
+        result.put("a", isObjectType(aType));
+        result.put("b", isObjectType(boolValue));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=true, b=false}
+
+

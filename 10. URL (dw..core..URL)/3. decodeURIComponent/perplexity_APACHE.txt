@@ -1,0 +1,50 @@
+decodeURIComponent:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+public class UrlDecodeComponentProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String path1 = "%20PATH/%20TO%20/DECODE%20";
+        String path2 = "%3B%2C%2F%3F%3A%40%26%3D";
+        String path3 = "%2D%5F%2E%21%7E%2A%27%28%29%24";
+        
+        String decoded1 = URLDecoder.decode(path1, StandardCharsets.UTF_8);
+        String decoded2 = URLDecoder.decode(path2, StandardCharsets.UTF_8);
+        String decoded3 = URLDecoder.decode(path3, StandardCharsets.UTF_8);
+        
+        String result = "{ \"decodeURIComponent\": { " +
+            "\"decodeURIComponent\": \"" + decoded1 + "\"," +
+            "\"decodeURIComponent\": \"" + decoded2 + "\"," +
+            "\"decodeURIComponent\": \"" + decoded3 + "\"" +
+            "}}";
+            
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:decodeURIComponent")
+    .process(new UrlDecodeComponentProcessor())
+    .log("${body}");
+
+
+
+output:
+
+{
+  "decodeURIComponent": {
+    "decodeURIComponent": " PATH/ TO /DECODE ",
+    "decodeURIComponent": ";,/?:@&=",
+    "decodeURIComponent": "-_.!~*'()$"
+  }
+}
+
+
+
+

@@ -1,0 +1,61 @@
+isUriType:
+
+
+
+input:
+
+import java.net.URI;
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isUriType(Type).
+     * Checks if the provided type is java.net.URI or a subclass/implementation.
+     */
+    public static boolean isUriType(Class<?> type) {
+        return URI.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'AUri' (which is Uri)
+        Class<?> aUriClass = URI.class;
+
+        // 2. Mimics the type 'Uri'
+        Class<?> uriClass = URI.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isUriType(AUri)
+        boolean a = isUriType(aUriClass); 
+
+        // b: isUriType(Uri)
+        boolean b = isUriType(uriClass); 
+        
+        // c: isUriType(String)
+        boolean c = isUriType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

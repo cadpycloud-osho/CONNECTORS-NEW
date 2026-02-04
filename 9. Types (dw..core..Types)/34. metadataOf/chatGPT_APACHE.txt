@@ -1,0 +1,72 @@
+metadataOf:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class CamelMetadataCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // type AType = String {format: "YYYY-MM-dd"}
+                        Class<?> AType = String.class;
+
+                        // Simulating DataWeave metadataOf
+                        Map<String, String> metadata = metadataOf(AType);
+
+                        StringBuilder jsonOutput = new StringBuilder();
+                        jsonOutput.append("{\n  \"a\": {");
+                        int count = 0;
+                        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+                            if (count++ > 0) jsonOutput.append(", ");
+                            jsonOutput.append("\"").append(entry.getKey()).append("\": ");
+                            jsonOutput.append("\"").append(entry.getValue()).append("\"");
+                        }
+                        jsonOutput.append("}\n}");
+
+                        exchange.getMessage().setBody(jsonOutput.toString());
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave metadataOf
+    private static Map<String, String> metadataOf(Class<?> clazz) {
+        Map<String, String> metadata = new HashMap<>();
+        if (clazz == String.class) {
+            metadata.put("format", "YYYY-MM-dd");
+        }
+        return metadata;
+    }
+}
+
+
+
+output:
+{
+  "a": {"format": "YYYY-MM-dd"}
+}
+
+
+
+

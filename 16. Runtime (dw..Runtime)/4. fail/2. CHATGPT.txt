@@ -1,0 +1,39 @@
+fail:
+
+
+input:
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
+public class DataCheckController {
+
+    @GetMapping("/check-data")
+    public List<String> checkData() {
+        List<String> result = new ArrayList<>(); // Empty list
+
+        if (result.size() <= 0) {
+            // Equivalent to DW fail()
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data was empty");
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Data was empty",
+  "path": "/check-data"
+}
+

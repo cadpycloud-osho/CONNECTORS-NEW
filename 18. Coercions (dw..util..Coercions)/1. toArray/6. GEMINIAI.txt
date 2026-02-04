@@ -1,0 +1,69 @@
+toArray:
+
+
+
+input:
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+
+public class DataWeaveCoercionConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Converts a string into a list of characters, handling the empty string case.
+     * This mimics the dw::util::Coercions::toArray() behavior for strings.
+     */
+    public List<String> toArray(String input) {
+        if (input == null || input.isEmpty()) {
+            // DataWeave toArray("") returns an empty array: []
+            return Arrays.asList(); 
+        }
+        
+        // DataWeave toArray("string") returns an array of characters: ["s", "t", "r", "i", "n", "g"]
+        // In Java, we convert the string to a stream of characters, map them back to Strings, and collect them.
+        return input.chars()
+                    .mapToObj(c -> String.valueOf((char) c))
+                    .collect(Collectors.toList());
+    }
+
+    public String getCoercionJson() throws IOException {
+        // Apply the transformation logic
+        List<String> aList = toArray("");
+        List<String> bList = toArray("hola");
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson will correctly serialize the empty List as [] and the List of Strings as ["h", "o", "l", "a"].
+        root.set("a", objectMapper.valueToTree(aList));
+        root.set("b", objectMapper.valueToTree(bList));
+
+        // Convert the root object to a JSON string (using indent=false as in the source)
+        return objectMapper.writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveCoercionConverter converter = new DataWeaveCoercionConverter();
+        try {
+            String jsonOutput = converter.getCoercionJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{"a":[],"b":["h","o","l","a"]}
+
+
+

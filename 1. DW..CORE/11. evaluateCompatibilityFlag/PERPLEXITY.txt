@@ -1,0 +1,33 @@
+evaluateCompatibilityFlag:
+
+INPUT:
+
+// CompatibilityFlagController.java
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class CompatibilityFlagController {
+
+    @GetMapping("/compatibility-flag")
+    public Map<String, Boolean> compatibilityFlag() {
+        Map<String, Boolean> response = new HashMap<>();
+        // Default to true matching DataWeave output, 
+        // can be overridden via -Dcom.mulesoft.dw.xml_reader.honourMixedContentStructure=false
+        String flagValue = System.getProperty("com.mulesoft.dw.xml_reader.honourMixedContentStructure", "true");
+        response.put("com.mulesoft.dw.xml_reader.honourMixedContentStructure", Boolean.parseBoolean(flagValue));
+        return response;
+    }
+}
+
+
+
+OUTPUT:
+
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}

@@ -1,0 +1,45 @@
+asin:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathAsinRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateAsin")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                results.put("asin0", Math.asin(0));
+                results.put("asin13", Math.asin(0.13));
+                results.put("asin-1", Math.asin(-1));
+                
+                // Handle out-of-bounds (1.1) to return null instead of NaN
+                double val11 = Math.asin(1.1);
+                results.put("asin1.1", Double.isNaN(val11) ? null : val11);
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "asin0": 0.0,
+  "asin13": 0.1303689797031455,
+  "asin-1": -1.5707963267948966,
+  "asin1.1": null
+}
+
+
+

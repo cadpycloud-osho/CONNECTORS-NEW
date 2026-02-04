@@ -1,0 +1,725 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="config">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="name">
+                    <description><![CDATA[The identifier of this element used to reference it in other components]]></description>
+                </parameter>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer waits for a response before it times out.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="oauth-client-credentials">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="serviceUrl">
+                    <description><![CDATA[Base URL of the service on Salesforce Marketing Cloud to access from the connector. All other endpoints are derived from this base URL.]]></description>
+                </parameter>
+                <parameter name="proxyConfiguration">
+                    <description><![CDATA[Proxy configuration for the connector.]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[A TimeUnit which qualifies the #connectionTimeout]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. When using `HTTPS`, the HTTP communication is secured using TLS / SSL. If `HTTPS` is configured as the protocol, the user must configure at least the keystore configuration in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="clientId">
+                    <description><![CDATA[The OAuth client id as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="clientSecret">
+                    <description><![CDATA[The OAuth client secret as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="tokenUrl">
+                    <description><![CDATA[The service provider's token endpoint URL]]></description>
+                </parameter>
+                <parameter name="scopes">
+                    <description><![CDATA[The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation]]></description>
+                </parameter>
+                <parameter name="objectStore">
+                    <description><![CDATA[A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Salesforce Marketing Cloud REST">
+        <description><![CDATA[]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="createAsset">
+            <description><![CDATA[Creates a draft of a new asset in either JSON or MIME format.]]></description>
+            <parameters>
+                <parameter name="assetType">
+                    <description><![CDATA[Asset type.]]></description>
+                </parameter>
+                <parameter name="asset">
+                    <description><![CDATA[Asset to create.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createEmailSendDefinition">
+            <description><![CDATA[Creates a long-living send definition object that references the email template, subscriber list, sending options, journey, and metadata.]]></description>
+            <parameters>
+                <parameter name="emailSendDefinition">
+                    <description><![CDATA[Email send definition to create.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createEventDefinition">
+            <description><![CDATA[Creates an event definition (name and data schema for an event) and defines an event definition key. The resource uses this key when firing an event to send it to the appropriate journey. Typically, marketers create the event definition in the Journey Builder UI. Use this resource instead if you're using a custom application for Journey Builder functionality. To call this resource, assign your API Integration the Automation | Interactions | Read scope.]]></description>
+            <parameters>
+                <parameter name="eventDefinition">
+                    <description><![CDATA[Email send definition to create.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createKeyword">
+            <description><![CDATA[Creates a keyword on an account.]]></description>
+            <parameters>
+                <parameter name="keyword">
+                    <description><![CDATA[Keyword to create.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createSmsSendDefinition">
+            <description><![CDATA[Creates an SMS send definition.]]></description>
+            <parameters>
+                <parameter name="smsSendDefinition">
+                    <description><![CDATA[SMS send definition to create.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteAsset">
+            <description><![CDATA[Deletes an asset.]]></description>
+            <parameters>
+                <parameter name="id">
+                    <description><![CDATA[ID of the asset to delete.]]></description>
+                </parameter>
+                <parameter name="isCdnDelete">
+                    <description><![CDATA[Permanently deletes the file and its URL in Akamai when the associated file is deleted in Content Builder. A value of `1` permanently deletes the file. An unspecified value or a value of `0` does not permanently delete the file.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteEmailSendDefinition">
+            <description><![CDATA[Deletes a message definition. You cannot restore a deleted definition. The deleted definition is archived, and the response provides a delete location of the definition key for reference. You can reuse a deleted definition key because the information associated with the deleted definition key is copied to a new unique identifier.]]></description>
+            <parameters>
+                <parameter name="definitionKey">
+                    <description><![CDATA[Definition key to delete.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteEventDefinition">
+            <description><![CDATA[Deletes an individual event definition by ID or key.]]></description>
+            <parameters>
+                <parameter name="definitionOption">
+                    <description><![CDATA[Definition key to delete.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteKeywordById">
+            <description><![CDATA[Deletes a keyword from an account.]]></description>
+            <parameters>
+                <parameter name="keywordId">
+                    <description><![CDATA[The keyword id to delete.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteKeywordByLongCode">
+            <description><![CDATA[Deletes a keyword from an account.]]></description>
+            <parameters>
+                <parameter name="keywordToDelete">
+                    <description><![CDATA[The keyword to delete.]]></description>
+                </parameter>
+                <parameter name="longCode">
+                    <description><![CDATA[The longcode of the keyword to delete.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteKeywordByShortCode">
+            <description><![CDATA[Deletes a keyword from an account.]]></description>
+            <parameters>
+                <parameter name="keywordToDelete">
+                    <description><![CDATA[The keyword to delete.]]></description>
+                </parameter>
+                <parameter name="shortCode">
+                    <description><![CDATA[The shortCode of the keyword to delete.]]></description>
+                </parameter>
+                <parameter name="countryCode">
+                    <description><![CDATA[The countryCode of the keyword to delete.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteSmsSendDefinition">
+            <description><![CDATA[Deletes a message definition. You cannot restore a deleted definition. The deleted definition is archived, and the response provides a delete location of the definition key for reference. You can reuse a deleted definition key because the information associated with the deleted definition key is copied to a new unique identifier.]]></description>
+            <parameters>
+                <parameter name="definitionKey">
+                    <description><![CDATA[Definition key to delete.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getEventDefinition">
+            <description><![CDATA[Retrieves an individual event definition by ID or key.]]></description>
+            <parameters>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="eventDefinitionId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="eventDefinitionKey">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="sendEmailMessageToMultipleRecipients">
+            <description><![CDATA[Sends a message to multiple recipients using a send definition. You can provide a messageKey in the request; otherwise, the messageKey is automatically generated in the response. The limit is 2000 recipients per request. If you send attributes with the recipients, we recommend no more than 500 recipients per request.]]></description>
+            <parameters>
+                <parameter name="sendEmailRequestBody">
+                    <description><![CDATA[Email send definition to create.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="sendEmailMessageToSingleRecipient">
+            <description><![CDATA[Sends a message to a single recipient via a send definition using a *Message Key* path parameter.]]></description>
+            <parameters>
+                <parameter name="messageKey">
+                    <description><![CDATA[Unique identifier used to track the message status. Can be automatically created when you create a message or can be provided as part of the request. Can be up to 100 characters, and there are no restricted characters. Each recipient in a request must have a unique *Message Key*. If you use a duplicate *Message Key* in the same send request, the message is rejected.]]></description>
+                </parameter>
+                <parameter name="emailRequestBody">
+                    <description><![CDATA[Content of the message to send.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="sendEmailMessageUsingTriggeredSendDefinition">
+            <description><![CDATA[Sends transactional email using Marketing Cloud's triggered send functionality.]]></description>
+            <parameters>
+                <parameter name="triggeredSendEmailBody">
+                    <description><![CDATA[Content of the message to send.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="id">
+                    <description><![CDATA[The ID of the event definition expressed in the form of a GUID (UUID). Required if not using a key.]]></description>
+                </parameter>
+                <parameter name="key">
+                    <description><![CDATA[The key of the event definition. Required if not using an ID.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="sendSmsMessageToMultipleRecipients">
+            <description><![CDATA[Sends a message to multiple recipients using a send definition. You can provide a messageKey in the request; otherwise, the messageKey is automatically generated in the response. The limit is 2000 recipients per request. If you send attributes with the recipients, we recommend no more than 500 recipients per request.]]></description>
+            <parameters>
+                <parameter name="sendSmsRequestBody">
+                    <description><![CDATA[Content of the message to send.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="sendSmsMessageToSingleRecipient">
+            <description><![CDATA[Sends a message to a single recipient via a send definition using a *Message Key* path parameter.]]></description>
+            <parameters>
+                <parameter name="messageKey">
+                    <description><![CDATA[Unique identifier used to track the message status. Can be automatically created when you create a message or can be provided as part of the request. Can be up to 100 characters, and there are no restricted characters. Each recipient in a request must have a unique *Message Key*. If you use a duplicate *Message Key* in the same send request, the message is rejected.]]></description>
+                </parameter>
+                <parameter name="smsRequestBody">
+                    <description><![CDATA[Content of the message to send.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="triggerEvent">
+            <description><![CDATA[Fires the entry event that initiates the journey. If you use UTF-8 characters in a payload for the Rest API, change the Content-Type header to: application/json; charset=UTF-8.]]></description>
+            <parameters>
+                <parameter name="triggerEventRequestBody">
+                    <description><![CDATA[The content of the message to be sent.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="unauthorize">
+            <description><![CDATA[Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again]]></description>
+            <parameters>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="updateEventDefinition">
+            <description><![CDATA[Updates an event definition by ID or key. Once an event definition is created, only a few properties can be updated. To call this resource, assign your API Integration the Automation | Interactions | Read scope.]]></description>
+            <parameters>
+                <parameter name="definitionOption">
+                    <description><![CDATA[Definition key to delete.]]></description>
+                </parameter>
+                <parameter name="updateEventDefinitionBody">
+                    <description><![CDATA[Event definition to update.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Read timeout value. Used to override the read timeout values defined in the connector configuration.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[Time unit value for the *Read Timeout* field.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources/>
+    <types>
+        <type name="com.mulesoft.connector.salesforce.marketing.rest.api.connection.param.ProxyConfiguration">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="host">
+                    <description><![CDATA[Hostname or IP address of the proxy server.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port of the proxy server.]]></description>
+                </parameter>
+                <parameter name="username">
+                    <description><![CDATA[Username to authenticate against the proxy server.]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[Password to authenticate against the proxy server.]]></description>
+                </parameter>
+                <parameter name="nonProxyHosts">
+                    <description><![CDATA[List of hosts against which the proxy must not be used.]]></description>
+                </parameter>
+                <parameter name="ntlmDomain">
+                    <description><![CDATA[Domain to authenticate against the proxy.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connector.salesforce.marketing.rest.api.param.DefinitionOption">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="id">
+                    <description><![CDATA[The ID of the event definition expressed in the form of a GUID (UUID).
+ Required if not using a key.]]></description>
+                </parameter>
+                <parameter name="key">
+                    <description><![CDATA[The key of the event definition.
+ Required if not using an ID.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+    </types>
+</extension-documentation>

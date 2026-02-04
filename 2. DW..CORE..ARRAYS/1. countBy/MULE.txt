@@ -1,0 +1,45 @@
+countBy:
+
+<T>(@StreamCapable array: Array<T>, matchingFunction: (T) -> Boolean): Number
+
+Counts the elements in an array that return true when the matching function is applied to the value of each element.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+---
+{ "countBy" : [1, 2, 3, 4] countBy (($ mod 2) == 0) }
+
+DataWeave
+Output
+{ "countBy": 2 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,56 @@
+nameSet:
+
+nameSet(obj: Object): Array<String>
+
+nameSet(obj: Object): Array<String>
+Returns an array of keys from an object.
+
+This function is Deprecated. Use dw::Core::namesOf, instead.
+
+
+Source
+%dw 2.0
+import * from dw::core::Objects
+output application/json
+---
+{ "nameSet" : nameSet({ "a" : true, "b" : 1}) }
+
+DataWeave
+Output
+{ "nameSet" : ["a","b"] }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,60 @@
+isUnionType:
+
+
+
+input:
+
+import java.lang.Boolean;
+import java.lang.String;
+import java.lang.reflect.Type;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptual proxy interface for the DataWeave 'String | Number' Union type.
+     * In Java, this structure is typically represented using interfaces or sealed classes (Java 17+).
+     * For simplicity, we use a marker interface here.
+     */
+    private static interface UnionTypeProxy {}
+
+    /**
+     * Conceptually mirrors DataWeave's isUnionType(Type).
+     * Checks if the provided type is assignable from our UnionTypeProxy marker.
+     */
+    public static boolean isUnionType(Class<?> type) {
+        return UnionTypeProxy.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. AType (which is the Union type 'String | Number')
+        Class<?> aTypeClass = UnionTypeProxy.class;
+
+        // 2. Boolean (A concrete, non-union type)
+        Class<?> booleanClass = Boolean.class;
+        
+        // --- Execution ---
+        
+        // a: isUnionType(AType)
+        boolean a = isUnionType(aTypeClass); 
+
+        // b: isUnionType(Boolean)
+        boolean b = isUnionType(booleanClass); 
+        
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+

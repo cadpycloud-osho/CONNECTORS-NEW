@@ -1,0 +1,66 @@
+
+
+
+isFunctionType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.spi.TypeConverterRegistry;
+import org.apache.camel.impl.converter.TypeConverterRegistryImpl;
+import org.apache.camel.TypeConverter;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveTypeCheckRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processTypeChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processTypeChecks() {
+        TypeConverterRegistry registry = getContext().getTypeConverterRegistry();
+        
+        // Check if function type matching String -> String exists
+        boolean a = hasFunctionType(registry, String.class, String.class);
+        
+        // Check if Boolean type has function converter
+        boolean b = hasFunctionType(registry, Boolean.class, null);
+        
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("a", a);
+        result.put("b", b);
+        
+        return result;
+    }
+    
+    private boolean hasFunctionType(TypeConverterRegistry registry, Class<?> fromType, Class<?> toType) {
+        try {
+            Method method = registry.getClass().getMethod("lookup", Class.class, Class.class);
+            Object converter = method.invoke(registry, fromType, toType);
+            return converter != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

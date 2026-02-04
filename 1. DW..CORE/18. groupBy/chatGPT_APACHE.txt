@@ -1,0 +1,151 @@
+groupBy:
+
+example 1:
+
+input:
+
+from("direct:groupByIndex")
+.setBody(constant(List.of("a","b","c")))
+.split(body())
+    .setHeader("groupKey", simple("${exchangeProperty.CamelSplitIndex}"))
+    .aggregate(header("groupKey"),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+output:
+
+{ "2": ["c"], "1": ["b"], "0": ["a"] }
+
+
+-------------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:groupByLanguage")
+.setBody(constant(List.of(
+    Map.of("name","Foo","language","Java"),
+    Map.of("name","Bar","language","Scala"),
+    Map.of("name","FooBar","language","Java")
+)))
+.split(body())
+    .setHeader("groupKey", simple("${body[language]}"))
+    .aggregate(header("groupKey"),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+
+output:
+
+{
+  "Scala": [{ "name": "Bar", "language": "Scala" }],
+  "Java": [
+    { "name": "Foo", "language": "Java" },
+    { "name": "FooBar", "language": "Java" }
+  ]
+}
+
+
+-------------------------------------------------------------
+
+
+
+example 3:
+
+input:
+
+from("direct:groupStaticKey")
+.setBody(constant(List.of(
+    "Move Left","Move Right","Move Up","Move Down"
+)))
+.aggregate(constant("myLabels"),
+    new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+.completionTimeout(100);
+
+
+output:
+
+{ "myLabels": ["Move Left","Move Right","Move Up","Move Down"] }
+
+
+-------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+from("direct:groupVowels")
+.setBody(constant("hello world!"))
+.split(body().tokenize(""))
+    .setHeader("groupKey",
+        simple("${body} regex '[aeiou]'"))
+    .aggregate(header("groupKey"),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+output:
+
+{
+  "false": "hll wrld!",
+  "true": "eoo"
+}
+
+
+-------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+from("direct:groupUpperValue")
+.setBody(constant(Map.of("a","b","c","d")))
+.split(simple("${body.entrySet()}"))
+    .setHeader("groupKey", simple("${body.value.toUpperCase()}"))
+    .aggregate(header("groupKey"),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+output:
+
+{ "B": { "a":"b" }, "D": { "c":"d" } }
+
+
+-------------------------------------------------------------
+
+
+
+example 6:
+
+input:
+
+from("direct:groupXml")
+.setBody(constant(List.of("9.99","10.99")))
+.aggregate(constant("costs"),
+    new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+.completionTimeout(100);
+
+
+output:
+
+{ "costs": { "price":"9.99", "price":"10.99" } }
+
+
+-------------------------------------------------------------
+
+
+
+
+

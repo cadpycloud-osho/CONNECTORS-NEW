@@ -1,0 +1,44 @@
+substringBeforeLast:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String substringBeforeLastDW(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null) delimiter = "";
+
+        if (delimiter.equals("")) {
+            if (input.length() <= 1) return "";
+            return input.substring(0, input.length() - 1);
+        }
+
+        int index = input.lastIndexOf(delimiter);
+        if (index == -1) return "";
+        return input.substring(0, index);
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", substringBeforeLastDW(null, "'"));
+        result.put("b", substringBeforeLastDW("", "-"));
+        result.put("c", substringBeforeLastDW("abc", "b"));
+        result.put("d", substringBeforeLastDW("abcba", "b"));
+        result.put("e", substringBeforeLastDW("abc", "d"));
+        result.put("f", substringBeforeLastDW("abc", ""));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=null, b=, c=a, d=abc, e=, f=ab}
+

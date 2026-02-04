@@ -1,0 +1,68 @@
+isRangeType:
+
+
+
+input:
+
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class RangeTypeCheckDemo {
+
+    /**
+     * Conceptual proxy class for the DataWeave 'Range' type. 
+     * This class is never instantiated; it's only used for Class type comparison.
+     */
+    private static final class RangeType {
+        private RangeType() {}
+    }
+
+    /**
+     * Conceptually mirrors DataWeave's isRangeType(Type).
+     * Checks if the provided type is our RangeType proxy or a subclass/implementation.
+     */
+    public static boolean isRangeType(Class<?> type) {
+        return RangeType.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ARange' (which is Range)
+        Class<?> aRangeClass = RangeType.class;
+
+        // 2. Mimics the type 'Range'
+        Class<?> rangeClass = RangeType.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isRangeType(ARange)
+        boolean a = isRangeType(aRangeClass); 
+
+        // b: isRangeType(Range)
+        boolean b = isRangeType(rangeClass); 
+        
+        // c: isRangeType(String)
+        boolean c = isRangeType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

@@ -1,0 +1,117 @@
+find:
+
+INPUT:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class FindExample1 {
+    public static List<Integer> findAllIndicesInList(List<String> inputList, String target) {
+        // DataWeave: ["Bond", "James", "Bond"] find "Bond"
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < inputList.size(); i++) {
+            if (target.equals(inputList.get(i))) {
+                indices.add(i);
+            }
+        }
+        return indices;
+    }
+
+    public static void main(String[] args) {
+        List<String> input = Arrays.asList("Bond", "James", "Bond");
+        String target = "Bond";
+        List<Integer> output = findAllIndicesInList(input, target);
+        System.out.println("Input List: " + input);
+        System.out.println("Target: " + target);
+        System.out.println("Output: " + output);
+    }
+}
+
+OUTPUT:
+
+ [0, 2]
+____________________________________________________________
+
+INPUT:
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class FindExample2 {
+    public static List<List<Integer>> findAllRegexIndices(String inputString, String regex) {
+        // DataWeave: "I heart DataWeave" find /\w*ea\w*(\b)/
+        List<List<Integer>> matches = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(inputString);
+
+        while (matcher.find()) {
+            List<Integer> indices = new ArrayList<>();
+            // DataWeave find returns [start index, end index] where end index is exclusive (length)
+            indices.add(matcher.start());
+            indices.add(matcher.end());
+            matches.add(indices);
+        }
+        return matches;
+    }
+
+    public static void main(String[] args) {
+        String input = "I heart DataWeave";
+        // The DataWeave regex /\w*ea\w*(\b)/ matches "heart" and "DataWeave"
+        // In Java, we use "\\w*ea\\w*\\b" as the String representation
+        String targetRegex = "\\w*ea\\w*\\b"; 
+        
+        List<List<Integer>> output = findAllRegexIndices(input, targetRegex);
+        System.out.println("Input String: \"" + input + "\"");
+        System.out.println("Target Regex: " + targetRegex);
+        System.out.println("Output: " + output);
+    }
+}
+
+OUTPUT:
+
+[[2, 7], [8, 17]]
+____________________________________________________________
+
+INPUT:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class FindExample3 {
+    public static List<List<Integer>> findAllSubstringIndices(String inputString, String target) {
+        // DataWeave: "aabccdbce" find "a"
+        List<List<Integer>> matches = new ArrayList<>();
+        int index = inputString.indexOf(target);
+        
+        while (index >= 0) {
+            List<Integer> indices = new ArrayList<>();
+            // Start index
+            indices.add(index);
+            // End index (start index + length of target)
+            indices.add(index + target.length()); 
+            matches.add(indices);
+            
+            // Continue search from the next character
+            index = inputString.indexOf(target, index + 1); 
+        }
+        return matches;
+    }
+
+    public static void main(String[] args) {
+        String input = "aabccdbce";
+        String target = "a";
+        List<List<Integer>> output = findAllSubstringIndices(input, target);
+        System.out.println("Input String: \"" + input + "\"");
+        System.out.println("Target: " + target);
+        System.out.println("Output: " + output);
+    }
+}
+
+OUTPUT:
+
+
+[[0, 1], [1, 2]]
+

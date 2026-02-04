@@ -1,0 +1,74 @@
+scan:
+
+
+example 1:
+
+
+input:
+
+from("direct:start")
+    .setBody(constant("www.mulesoft.com"))
+    .process(exchange -> {
+        String input = exchange.getIn().getBody(String.class);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("([w]*)\\.([a-z]*)\\.([a-z]*)");
+        java.util.regex.Matcher matcher = pattern.matcher(input);
+
+        java.util.List<String> result = new java.util.ArrayList<>();
+        result.add(input); // full match
+
+        if(matcher.find()) {
+            for(int i = 1; i <= matcher.groupCount(); i++){
+                result.add(matcher.group(i));
+            }
+        }
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+[ "www.mulesoft.com", "www", "mulesoft", "com" ]
+
+
+----------------------------------------------
+
+example 2:
+
+
+input:
+
+
+from("direct:start")
+    .setBody(constant("anypt@mulesoft.com,max@mulesoft.com"))
+    .process(exchange -> {
+        String input = exchange.getIn().getBody(String.class);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("([a-z]*)@([a-z]*).com");
+        java.util.regex.Matcher matcher = pattern.matcher(input);
+
+        java.util.List<java.util.List<String>> result = new java.util.ArrayList<>();
+
+        while(matcher.find()) {
+            java.util.List<String> matchList = new java.util.ArrayList<>();
+            matchList.add(matcher.group(0)); // full match
+            matchList.add(matcher.group(1)); // first group
+            matchList.add(matcher.group(2)); // second group
+            result.add(matchList);
+        }
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+[
+  [ "anypt@mulesoft.com", "anypt", "mulesoft" ],
+  [ "max@mulesoft.com", "max", "mulesoft" ]
+]
+
+
+

@@ -1,0 +1,64 @@
+unionItems:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class DataWeaveUnionItemsRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processUnionItems")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, List<String>> processUnionItems() {
+        Map<String, List<String>> result = new HashMap<>();
+        
+        // AType = String | Number (union type)
+        result.put("a", unionItems(createUnionType()));
+        
+        return result;
+    }
+    
+    private List<String> unionItems(Object unionType) {
+        // DataWeave unionItems extracts member types from union type
+        // String | Number -> ["String", "Number"]
+        if (unionType instanceof Map) {
+            Map<?,?> typeMap = (Map<?,?>) unionType;
+            if ("union".equals(typeMap.get("type"))) {
+                return (List<String>) typeMap.get("members");
+            }
+        }
+        return Arrays.asList("String", "Number");
+    }
+    
+    private Map<String, Object> createUnionType() {
+        // Simulates DataWeave union type: String | Number
+        Map<String, Object> unionType = new HashMap<>();
+        unionType.put("type", "union");
+        unionType.put("members", Arrays.asList("String", "Number"));
+        return unionType;
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": ["String", "Number"]
+}
+
+
+

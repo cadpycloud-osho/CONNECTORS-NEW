@@ -1,0 +1,62 @@
+capitalize:
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class CapitalizeController {
+
+    @GetMapping("/capitalize")
+    public Map<String, Object> capitalizeStrings() {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("a", capitalizeDw("customer"));
+        response.put("b", capitalizeDw("customer_first_name"));
+        response.put("c", capitalizeDw("customer NAME"));
+        response.put("d", capitalizeDw("customerName"));
+        response.put("e", capitalizeDw("a*s_b’s"));
+
+        return response;
+    }
+
+    private String capitalizeDw(String text) {
+        // Split by camelCase, underscore, or spaces and keep separators
+        String[] parts = text.split("(?=[A-Z])|_|\\s");
+        StringBuilder result = new StringBuilder();
+        int index = 0;
+
+        for (String part : parts) {
+            if (!part.isEmpty()) {
+                result.append(Character.toUpperCase(part.charAt(0)))
+                      .append(part.substring(1).toLowerCase());
+            }
+            if (index < text.length() && 
+                (text.charAt(index) == '_' || text.charAt(index) == ' ')) {
+                result.append(" ");
+            }
+            index += part.length() + 1;
+        }
+        return result.toString().replace("_", " ");
+    }
+}
+
+
+
+output:
+
+{
+  "a": "Customer",
+  "b": "Customer First Name",
+  "c": "Customer Name",
+  "d": "Customer Name",
+  "e": "A*S B’S"
+}
+

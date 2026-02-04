@@ -1,0 +1,22 @@
+wait:
+
+wait<T>(value: T, timeout: Number): T
+
+wait<T>(value: T, timeout: Number): T
+Stops the execution for the specified timeout period (in milliseconds).
+
+
+
+
+Source
+%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+{ "user" : 1 } wait 2000
+
+
+DataWeave
+Output
+{ "user": 1 }
+

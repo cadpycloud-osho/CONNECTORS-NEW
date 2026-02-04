@@ -1,0 +1,39 @@
+field:
+
+
+
+input:
+
+@RestController
+public class FieldController {
+    
+    @PostMapping("/create-field")
+    public Map<String, Object> createField(@RequestBody Map<String, String> request) {
+        String namespaceUri = request.getOrDefault("namespace", "http://acme.com/foo");
+        String fieldName = request.getOrDefault("name", "myFieldName");
+        return createFieldObject(namespaceUri, fieldName);
+    }
+    
+    private Map<String, Object> createFieldObject(String namespaceUri, String fieldName) {
+        Map<String, Object> field = new HashMap<>();
+        field.put("kind", "Object");
+        field.put("namespace", namespaceUri);
+        field.put("selector", fieldName);
+        return field;
+    }
+}
+
+
+
+output:
+
+{
+   "kind": "Object",
+   "namespace": "http://acme.com/foo",
+   "selector": "myFieldName"
+}
+
+
+
+
+

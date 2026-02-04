@@ -1,0 +1,159 @@
+fromString:
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class MimeController {
+
+    @GetMapping("/mime1")
+    public Map<String, Object> parseMime1() {
+        String mime = "application/json";
+
+        String[] parts = mime.split("/");
+        String type = parts[0];
+        String subtype = parts[1];
+
+        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("type", type);
+        result.put("subtype", subtype);
+        result.put("parameters", params);
+
+        return Map.of(
+                "success", true,
+                "result", result
+        );
+    }
+}
+
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "application",
+    "subtype": "json",
+    "parameters": {}
+  }
+}
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+@RestController
+public class MimeController {
+
+    @GetMapping("/mime2")
+    public Map<String, Object> parseMime2() {
+        String mime = "multipart/form-data; boundary=the-boundary";
+
+        String[] mainParts = mime.split(";");
+        String[] typeParts = mainParts[0].trim().split("/");
+
+        String type = typeParts[0];
+        String subtype = typeParts[1];
+
+        Map<String, Object> params = new HashMap<>();
+
+        if (mainParts.length > 1) {
+            String[] keyVal = mainParts[1].trim().split("=");
+            params.put(keyVal[0], keyVal[1]);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("type", type);
+        result.put("subtype", subtype);
+        result.put("parameters", params);
+
+        return Map.of(
+                "success", true,
+                "result", result
+        );
+    }
+}
+
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "multipart",
+    "subtype": "form-data",
+    "parameters": {
+      "boundary": "the-boundary"
+    }
+  }
+}
+
+------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+@RestController
+public class MimeController {
+
+    @GetMapping("/mime3")
+    public Map<String, Object> parseMime3() {
+
+        String mime = "Invalid MIME type";
+
+        if (!mime.contains("/")) {
+            return Map.of(
+                    "success", false,
+                    "error", Map.of(
+                            "message", "Unable to find a sub type in `Invalid MIME type`."
+                    )
+            );
+        }
+
+        return Map.of("success", true); // not used
+    }
+}
+
+
+output:
+
+
+{
+  "success": false,
+  "error": {
+    "message": "Unable to find a sub type in `Invalid MIME type`."
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

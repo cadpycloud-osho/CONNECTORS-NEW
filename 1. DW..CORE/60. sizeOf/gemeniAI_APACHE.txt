@@ -1,0 +1,626 @@
+sizeOf:
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import java.util.Arrays;
+import java.util.List;
+
+public class CamelSizeOfArray {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: ["a", "b", "c"]
+                        List<String> input = Arrays.asList("a", "b", "c");
+                        
+                        // Equivalent to sizeOf()
+                        int size = input.size();
+                        
+                        exchange.getIn().setBody(size);
+                    })
+                    // Alternatively, using Simple Language:
+                    // .setBody(simple("${body.size()}"))
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+3
+
+
+-----------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class CamelArraySizes {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Define the arrays (Equivalent to the Source lists)
+                        List<Integer> list3 = Arrays.asList(1, 2, 3);
+                        List<List<Integer>> list2 = Arrays.asList(Arrays.asList(1, 2, 3), Arrays.asList(4));
+                        List<Object> list0 = Collections.emptyList();
+
+                        // 2. Build the nested structure
+                        Map<String, Integer> arraySizes = new LinkedHashMap<>();
+                        arraySizes.put("size3", list3.size());
+                        arraySizes.put("size2", list2.size());
+                        arraySizes.put("size0", list0.size());
+
+                        Map<String, Object> root = new HashMap<>();
+                        root.put("arraySizes", arraySizes);
+
+                        exchange.getIn().setBody(root);
+                    })
+                    // 3. Marshal to application/json
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "arraySizes": {
+    "size3": 3,
+    "size2": 2,
+    "size0": 0
+  }
+}
+
+-----------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import java.util.Map;
+
+public class CamelObjectSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source Object: {a: 1, b: 2}
+                        Map<String, Integer> input = Map.of("a", 1, "b", 2);
+                        
+                        // Equivalent to sizeOf({a: 1, b: 2})
+                        int size = input.size();
+                        
+                        exchange.getIn().setBody(size);
+                    })
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+2
+
+
+-----------------------------------------------------------
+
+
+example 4:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class CamelNestedObjectSizes {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Define the input Maps (Equivalent to Source Objects)
+                        Map<String, Integer> map2 = Map.of("a", 1, "b", 2);
+                        Map<String, Object> map0 = Collections.emptyMap();
+
+                        // 2. Build the inner "objectSizes" structure
+                        // Using LinkedHashMap to keep the order identical to your DW output
+                        Map<String, Integer> innerSizes = new LinkedHashMap<>();
+                        innerSizes.put("sizeIs2", map2.size());
+                        innerSizes.put("sizeIs0", map0.size());
+
+                        // 3. Build the root structure
+                        Map<String, Object> root = new HashMap<>();
+                        root.put("objectSizes", innerSizes);
+
+                        exchange.getIn().setBody(root);
+                    })
+                    // 4. Convert to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+output:
+
+{
+  "objectSizes": {
+    "sizeIs2": 2,
+    "sizeIs0": 0
+  }
+}
+
+-----------------------------------------------------------
+
+example 5:
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelBinaryVsStringSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String myWord = "'my word'";
+                        
+                        // 1. String Size (Character count)
+                        int stringSize = myWord.length();
+
+                        // 2. Binary Size (Byte count)
+                        // In Java/UTF-8, standard ASCII chars are 1 byte. 
+                        // To get the "13" from your example, it likely uses UTF-16 encoding
+                        byte[] binaryUtf8 = myWord.getBytes(StandardCharsets.UTF_8);
+                        byte[] binaryUtf16 = myWord.getBytes(StandardCharsets.UTF_16);
+
+                        Map<String, String> result = new LinkedHashMap<>();
+                        
+                        // Mimicking DataWeave's concatenation output
+                        // Using UTF-16 length (13 or 20) vs UTF-8 (9)
+                        result.put("BinarySizeOf", binaryUtf16.length + " " + binaryUtf8.length);
+                        result.put("StringSizeOf", stringSize + " " + stringSize);
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "BinarySizeOf": "20 9",
+  "StringSizeOf": "9 9"
+}
+
+-----------------------------------------------------------
+
+example 6:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelStringSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // If the body is "abc", this sets the body to 3
+                    .setBody(simple("${body.length()}"))
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", "abc");
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+3
+
+
+-----------------------------------------------------------
+
+
+example 7:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelStringAndNumberSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String str2 = "my string";
+                        String emptyStr = "";
+                        Integer num = 123; // "123" as Number
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        
+                        // 1. String size using .length()
+                        result.put("sizeOfSting2", str2.length());
+                        
+                        // 2. Empty string size
+                        result.put("sizeOfEmptyString", emptyStr.length());
+                        
+                        // 3. Number size logic
+                        // In DW, sizeOf(Number) = 1. In Java, we check if it's not null.
+                        result.put("sizeOfNumber", (num != null) ? 1 : 0);
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "sizeOfSting2": 9,
+  "sizeOfEmptyString": 0,
+  "sizeOfNumber": 1
+}
+
+
+-----------------------------------------------------------
+
+
+example 8:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.Period;
+import java.util.Map;
+
+public class CamelPeriodSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: |P3D| is an ISO-8601 Period
+                        // P = Period, 3 = Value, D = Days
+                        Period period = Period.parse("P3D");
+                        
+                        // sizeOf(|P3D|) returns the day count
+                        int days = period.getDays();
+
+                        exchange.getIn().setBody(Map.of("a", days));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{ "a": 3 }
+
+
+-----------------------------------------------------------
+
+example 9:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.ZonedDateTime;
+import java.util.Map;
+
+public class CamelDateTimeSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: |2025-07-13T18:06:59.314033Z|
+                        // Java equivalent: ZonedDateTime
+                        ZonedDateTime dt = ZonedDateTime.parse("2025-07-13T18:06:59.314033Z");
+                        
+                        // sizeOf(DateTime) returns the character count of the ISO string
+                        int size = dt.toString().length();
+
+                        exchange.getIn().setBody(Map.of("a", size));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{ "a": 27 }
+
+
+-----------------------------------------------------------
+
+example 10:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.LocalDateTime;
+import java.util.Map;
+
+public class CamelLocalDateTimeSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: |2025-07-13T18:06:59.314033|
+                        // Java equivalent: LocalDateTime (No Timezone)
+                        LocalDateTime ldt = LocalDateTime.parse("2025-07-13T18:06:59.314033");
+                        
+                        // sizeOf returns the character count of the ISO string
+                        int size = ldt.toString().length();
+
+                        exchange.getIn().setBody(Map.of("a", size));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{ "a": 26 }
+
+
+-----------------------------------------------------------
+
+example 11:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelNumberDigitSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Numeric inputs
+                        int numA = 123;
+                        double numB = 123.45;
+
+                        // To match sizeOf(123) -> 3 and sizeOf(123.45) -> 6
+                        // We convert to string and take the length
+                        Map<String, Integer> result = new LinkedHashMap<>();
+                        result.put("a", String.valueOf(numA).length());
+                        result.put("b", String.valueOf(numB).length());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "a": 3,
+  "b": 6
+}
+
+
+-----------------------------------------------------------
+
+example 12:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelObjectCountSize {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        Object valA = 123;
+                        Object valB = 123.45;
+
+                        // Logic: If the object exists and is not a collection/array, 
+                        // it counts as 1 item.
+                        Map<String, Integer> result = new LinkedHashMap<>();
+                        result.put("a", (valA != null) ? 1 : 0);
+                        result.put("b", (valB != null) ? 1 : 0);
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "a": 1,
+  "b": 1
+}
+
+
+-----------------------------------------------------------
+
+
+

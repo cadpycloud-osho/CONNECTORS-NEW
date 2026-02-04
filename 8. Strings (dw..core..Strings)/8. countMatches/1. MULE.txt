@@ -1,0 +1,50 @@
+countMatches:
+
+countMatches(text: String, pattern: String): Number
+
+countMatches(text: String, pattern: String): Number
+Counts the number of matches in a string.
+
+
+
+countMatches(text: String, pattern: String): Number
+
+Source
+%dw 2.0
+import countMatches from dw::core::Strings
+output application/json
+---
+"hello worlo!" countMatches "lo"
+DataWeave
+Output
+2
+
+
+
+-------------------------------------------------------------------
+
+countMatches(text: String, pattern: Regex): Number
+
+Source
+%dw 2.0
+import countMatches from dw::core::Strings
+output application/json
+---
+"hello, ciao!" countMatches /[aeiou]/
+Output
+5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,61 @@
+isNamespaceType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveNamespaceTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processNamespaceChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processNamespaceChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ANamespace = Namespace (type alias)
+        result.put("a", isNamespaceType(Namespace.class));
+        
+        // Built-in Namespace type
+        result.put("b", isNamespaceType(Namespace.class));
+        
+        // String - not Namespace
+        result.put("c", isNamespaceType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isNamespaceType(Class<?> type) {
+        // DataWeave Namespace type check equivalent (introduced in DW 2.3.0)
+        // Returns true for Namespace and its aliases
+        return type == Namespace.class || 
+               "Namespace".equals(type.getSimpleName()) ||
+               type.getName().contains("Namespace");
+    }
+    
+    // Namespace interface equivalent for DataWeave Namespace type simulation
+    private interface Namespace {}
+}
+
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

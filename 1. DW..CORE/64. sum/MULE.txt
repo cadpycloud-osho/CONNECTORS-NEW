@@ -1,0 +1,38 @@
+sum:
+
+sum(@StreamCapable values: Array<Number>): Number
+
+sum(@StreamCapable values: Array<Number>): Number
+Returns the sum of numeric values in an array.
+
+Returns 0 if the array is empty and produces an error when non-numeric values are in the array.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+sum([1, 2, 3])
+
+
+DataWeave
+Output
+6
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

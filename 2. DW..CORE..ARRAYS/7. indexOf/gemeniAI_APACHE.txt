@@ -1,0 +1,53 @@
+
+indexOf:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+
+public class CamelIndexOfExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: var users = ["Mariano", "Leandro", "Julian"]
+                        List<String> users = List.of("Mariano", "Leandro", "Julian");
+                        
+                        // Java equivalent of indexOf(users, "Julian")
+                        int index = users.indexOf("Julian");
+
+                        exchange.getIn().setBody(index);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+from("direct:checkIndex")
+    // Note: Simple can invoke methods on the body object
+    .setHeader("UserIndex", simple("${body.indexOf('Julian')}"))
+    .choice()
+        .when(header("UserIndex").isEqualTo(2))
+            .log("Julian is at the expected position.")
+    .end();
+
+output:
+
+2

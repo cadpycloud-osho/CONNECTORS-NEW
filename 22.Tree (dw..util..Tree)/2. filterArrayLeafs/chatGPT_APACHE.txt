@@ -1,0 +1,119 @@
+filterArrayLeafs:
+
+
+input:
+
+import java.util.*;
+
+public class FilterArrayLeafsExample {
+
+    public static void main(String[] args) {
+
+        List<Object> myArray = new ArrayList<>();
+        myArray.add(1);
+
+        Map<String, Object> obj = new LinkedHashMap<>();
+        obj.put("name", new ArrayList<>(Arrays.asList("", true)));
+        obj.put("test", 213);
+
+        myArray.add(obj);
+        myArray.add("123");
+        myArray.add(null);
+
+        // a: keep values not null or string
+        List<Object> a = filterArrayLeafs(myArray, value -> !(value == null || value instanceof String));
+
+        // b: keep values that are null or equal 1
+        List<Object> b = filterArrayLeafs(myArray, value -> (value == null || (value instanceof Integer && (Integer)value == 1)));
+
+        // c: filter nested object { a : [1,2] } keeping 1 or null
+        Map<String, Object> cMap = new LinkedHashMap<>();
+        cMap.put("a", new ArrayList<>(Arrays.asList(1, 2)));
+        Map<String, Object> c = filterMapLeafs(cMap, value -> (value == null || (value instanceof Integer && (Integer)value == 1)));
+
+        // d: filter values where path is not array type (simulated)
+        List<Object> d = filterArrayLeafs(myArray, value -> !(value instanceof List));
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        output.put("d", d);
+
+        System.out.println(output);
+    }
+
+    // Recursive filter for list
+    private static List<Object> filterArrayLeafs(List<Object> list, java.util.function.Predicate<Object> predicate) {
+        List<Object> result = new ArrayList<>();
+        for (Object item : list) {
+            if (item instanceof List) {
+                result.add(filterArrayLeafs((List<Object>) item, predicate));
+            } else if (item instanceof Map) {
+                result.add(filterMapLeafs((Map<String, Object>) item, predicate));
+            } else {
+                if (predicate.test(item)) {
+                    result.add(item);
+                }
+            }
+        }
+        return result;
+    }
+
+    // Recursive filter for map
+    private static Map<String, Object> filterMapLeafs(Map<String, Object> map, java.util.function.Predicate<Object> predicate) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof List) {
+                result.put(entry.getKey(), filterArrayLeafs((List<Object>) value, predicate));
+            } else if (value instanceof Map) {
+                result.put(entry.getKey(), filterMapLeafs((Map<String, Object>) value, predicate));
+            } else {
+                if (predicate.test(value)) {
+                    result.put(entry.getKey(), value);
+                } else {
+                    result.put(entry.getKey(), new ArrayList<>()); // mimic empty array for filtered out leaf
+                }
+            }
+        }
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": [
+    1,
+    {
+      "name": [
+        true
+      ],
+      "test": 213
+    }
+  ],
+  "b": [
+    1,
+    {
+      "name": [],
+      "test": 213
+    },
+    null
+  ],
+  "c": {
+    "a": [
+      1
+    ]
+  },
+  "d": [
+    {
+      "name": [],
+      "test": 213
+    }
+  ]
+}
+
+
+

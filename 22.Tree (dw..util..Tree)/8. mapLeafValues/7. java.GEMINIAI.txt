@@ -1,0 +1,279 @@
+mapLeafValues:
+
+example 1:
+input:
+
+
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    // Input data structure from DataWeave
+    private static final Map<String, Object> INPUT_DATA;
+    static {
+        // Safe and mutable structure creation
+        Map<String, Object> innerMap = new LinkedHashMap<>();
+        innerMap.put("name", "mariano");
+        innerMap.put("lastName", "achaval");
+        
+        Map<String, Object> temp = new LinkedHashMap<>();
+        temp.put("user", List.of(innerMap));
+        temp.put("group", "data-weave");
+        INPUT_DATA = Collections.unmodifiableMap(temp);
+    }
+
+    // --- Transformation Function replicating (value, path) -> upper(value) ---
+
+    private static final BiFunction<Object, List<Object>, Object> LEAF_MAPPER = (value, path) -> {
+        if (value instanceof String) {
+            return ((String) value).toUpperCase();
+        }
+        return value;
+    };
+
+    // --- Core Recursive Mapping Logic ---
+
+    @SuppressWarnings("unchecked")
+    private static Object mapLeafValuesRecursive(Object input, BiFunction<Object, List<Object>, Object> mapper, List<Object> currentPath) {
+        
+        // 1. Base Case: Primitives and Null (Leaf Nodes)
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            return mapper.apply(input, currentPath);
+        } 
+        
+        // 2. Recursive Case: Map (Object)
+        else if (input instanceof Map) {
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            originalMap.forEach((key, value) -> {
+                // Path update for map keys (attribute selectors)
+                List<Object> nextPath = new ArrayList<>(currentPath);
+                nextPath.add(key);
+                newMap.put(key, mapLeafValuesRecursive(value, mapper, nextPath));
+            });
+            return newMap;
+        } 
+        
+        // 3. Recursive Case: List (Array)
+        else if (input instanceof List) {
+            List<Object> originalList = (List<Object>) input;
+            
+            // NOTE: In the original code, the path for list items is NOT updated with the index.
+            // This behavior is kept to match the input logic.
+            return originalList.stream()
+                .map(item -> mapLeafValuesRecursive(item, mapper, currentPath))
+                .collect(Collectors.toList());
+        } 
+        return input; 
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> {
+                        String jsonValue = toPrettyJson(v, indent + 1);
+                        return jsonValue.contains("\n") ? jsonValue : next + jsonValue;
+                    })
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+    public static void main(String[] args) {
+        
+        // Execute the mapping function
+        Map<String, Object> mappedData = (Map<String, Object>) mapLeafValuesRecursive(INPUT_DATA, LEAF_MAPPER, List.of());
+
+        // Output the map using the pure Java JSON printer
+        System.out.println(toPrettyJson(mappedData, 0));
+    }
+}
+output:
+
+{
+  "user": [
+    {
+      "name": "MARIANO",
+      "lastName": "ACHAVAL"
+    }
+  ],
+  "group": "DATA-WEAVE"
+}
+
+
+-----------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    // Input data structure from DataWeave
+    private static final Map<String, Object> INPUT_DATA;
+    static {
+        Map<String, Object> temp = new LinkedHashMap<>();
+        temp.put("name", "Mariano");
+        temp.put("test", List.of(1, 2, 3));
+        INPUT_DATA = Collections.unmodifiableMap(temp);
+    }
+    
+    // --- Path Type Checkers (Simplified AST representation) ---
+    // Checks the kind of the current parent structure
+
+    private static boolean isObjectType(List<String> path) {
+        if (path.isEmpty()) return false;
+        // Check the last node type added (which represents the parent structure)
+        return "OBJECT_TYPE".equals(path.get(path.size() - 1));
+    }
+
+    private static boolean isArrayType(List<String> path) {
+        if (path.isEmpty()) return false;
+        // Check the last node type added (which represents the parent structure)
+        return "ARRAY_TYPE".equals(path.get(path.size() - 1));
+    }
+
+    // --- Transformation Function (LEAF_MAPPER) ---
+
+    private static final BiFunction<Object, List<String>, Object> LEAF_MAPPER = (value, path) -> {
+        if (isObjectType(path)) {
+            // When the leaf is accessed via a Map key (parent is an Object)
+            return "***";
+        } else if (isArrayType(path)) {
+            // When the leaf is accessed via a List index (parent is an Array)
+            return "In an array";
+        } else {
+            // This case handles the root level if it's a primitive (not applicable here)
+            return "Is an attribute"; 
+        }
+    };
+
+    // --- Core Recursive Mapping Logic ---
+
+    @SuppressWarnings("unchecked")
+    private static Object mapLeafValuesRecursive(
+            Object input, 
+            BiFunction<Object, List<String>, Object> mapper, 
+            List<String> currentPath) {
+        
+        // 1. Base Case: Primitives and Null (Leaf Nodes)
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            return mapper.apply(input, currentPath);
+        } 
+        
+        // 2. Recursive Case: Map (Object)
+        else if (input instanceof Map) {
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            // Recurse through map entries
+            originalMap.forEach((key, value) -> {
+                // New path indicates that the items inside this map are accessed from an OBJECT_TYPE parent
+                List<String> nextPath = new ArrayList<>(currentPath);
+                nextPath.add("OBJECT_TYPE"); 
+
+                newMap.put(key, mapLeafValuesRecursive(value, mapper, nextPath));
+            });
+            return newMap;
+        } 
+        
+        // 3. Recursive Case: List (Array)
+        else if (input instanceof List) {
+            List<Object> originalList = (List<Object>) input;
+            
+            // New path indicates that the items inside this list are accessed from an ARRAY_TYPE parent
+            List<String> nextPath = new ArrayList<>(currentPath);
+            nextPath.add("ARRAY_TYPE"); 
+
+            return originalList.stream()
+                .map(item -> mapLeafValuesRecursive(item, mapper, nextPath))
+                .collect(Collectors.toList());
+        } 
+        return input; 
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> {
+                        String jsonValue = toPrettyJson(v, indent + 1);
+                        return jsonValue.contains("\n") ? jsonValue : next + jsonValue;
+                    })
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+    public static void main(String[] args) {
+        
+        // Execute the mapping function
+        Map<String, Object> mappedData = (Map<String, Object>) mapLeafValuesRecursive(INPUT_DATA, LEAF_MAPPER, List.of());
+
+        // Output the map using the pure Java JSON printer
+        System.out.println(toPrettyJson(mappedData, 0));
+    }
+}
+
+output:
+
+{
+  "name": "***",
+  "test": [
+    "In an array",
+    "In an array",
+    "In an array"
+  ]
+}

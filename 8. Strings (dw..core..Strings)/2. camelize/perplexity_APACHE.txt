@@ -1,0 +1,55 @@
+
+
+camelize:
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class CamelizeConverter {
+    public static String camelize(String input) {
+        if (input == null) return null;
+        
+        // Remove leading underscore(s)
+        String clean = input.replaceAll("^_+", "");
+        
+        if (clean.isEmpty()) return "";
+        
+        // Split by underscore and camelize
+        String[] parts = clean.split("_");
+        StringBuilder result = new StringBuilder(parts[0].toLowerCase());
+        
+        for (int i = 1; i < parts.length; i++) {
+            String part = parts[i];
+            if (!part.isEmpty()) {
+                result.append(part.substring(0, 1).toUpperCase())
+                      .append(part.substring(1).toLowerCase());
+            }
+        }
+        return result.toString();
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", camelize("customer_first_name"));
+        result.put("b", camelize("_name_starts_with_underscore"));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+   "a": "customerFirstName",
+   "b": "nameStartsWithUnderscore"
+}
+
+
+
+

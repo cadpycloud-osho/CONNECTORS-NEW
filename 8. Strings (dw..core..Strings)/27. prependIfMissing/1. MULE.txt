@@ -1,0 +1,59 @@
+prependIfMissing:
+
+prependIfMissing(text: String, prefix: String): String
+
+prependIfMissing(text: String, prefix: String): String
+Prepends the prefix to the beginning of the string if the text does not already start with that prefix.
+
+
+
+Source
+%dw 2.0
+import prependIfMissing from dw::core::Strings
+output application/json
+---
+{
+  "a": prependIfMissing(null, ""),
+  "b": prependIfMissing("abc", ""),
+  "c": prependIfMissing("", "xyz"),
+  "d": prependIfMissing("abc", "xyz"),
+  "e": prependIfMissing("xyzabc", "xyz")
+}
+
+DataWeave
+Output
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

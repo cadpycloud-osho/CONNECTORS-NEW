@@ -1,0 +1,316 @@
+toString:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.math.RoundingMode;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class NumberToStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:formatNumbers")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // a: Default toString
+                results.put("a", String.valueOf(1.0).replace(".0", ""));
+
+                // b: Pattern ".00" (Default rounding is HALF_EVEN in many Java envs, but we're explicit)
+                DecimalFormat dfB = new DecimalFormat(".00");
+                dfB.setRoundingMode(RoundingMode.HALF_UP);
+                results.put("b", dfB.format(0.005));
+
+                // c: Locale "ES" (Spanish uses ',' as decimal separator)
+                DecimalFormat dfC = new DecimalFormat("#.##", new DecimalFormatSymbols(new Locale("es", "ES")));
+                results.put("c", dfC.format(0.035));
+
+                // d: Spanish + HALF_EVEN rounding
+                DecimalFormat dfD = new DecimalFormat("#.##", new DecimalFormatSymbols(new Locale("es", "ES")));
+                dfD.setRoundingMode(RoundingMode.HALF_EVEN);
+                results.put("d", dfD.format(0.005));
+
+                // e: Pattern "#.00" + HALF_EVEN
+                DecimalFormat dfE = new DecimalFormat("#.00");
+                dfE.setRoundingMode(RoundingMode.HALF_EVEN);
+                results.put("e", dfE.format(0.035));
+
+                // f: Escaped prefix and suffix
+                DecimalFormat dfF = new DecimalFormat("$#.## 'in my account'");
+                results.put("f", dfF.format(1.1234));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+{
+  "a": "1",
+  "b": ".01",
+  "c": "0,04",
+  "d": "0",
+  "e": ".04",
+  "f": "$1.12 in my account"
+}
+
+
+
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class DateTimeToStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:formatDates")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // aDate: LocalDate with custom separator
+                results.put("aDate", LocalDate.of(2003, 10, 1)
+                    .format(DateTimeFormatter.ofPattern("uuuu/MM/dd")));
+
+                // aDateTime: ISO-8601 with Offset
+                results.put("aDateTime", OffsetDateTime.parse("2018-09-17T22:13:00-03:00")
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+                // aLocalTime: Custom pattern
+                results.put("aLocalTime", LocalTime.of(23, 57, 59)
+                    .format(DateTimeFormatter.ofPattern("HH-mm-ss")));
+
+                // aLocalDateTime: Default ISO
+                results.put("aLocalDateTime", LocalDateTime.parse("2015-10-01T23:57:59")
+                    .toString());
+
+                // aLocalDateTimeFormatted: Including AM/PM marker ('a')
+                results.put("aLocalDateTimeFormatted", LocalDateTime.parse("2003-10-01T23:57:59")
+                    .format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss a")));
+
+                // aLocalDateTimeFormattedAndLocalizedSpain: Full names and Spanish Locale
+                DateTimeFormatter esFormatter = DateTimeFormatter.ofPattern("eeee, dd MMMM, uuuu HH:mm:ss a", new Locale("es", "ES"));
+                results.put("aLocalDateTimeFormattedAndLocalizedSpain", LocalDateTime.parse("2003-01-01T23:57:59")
+                    .format(esFormatter));
+
+                // aTimeZone: Custom offset formatting
+                results.put("aTimeZone", ZoneOffset.of("-03:00").getId());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+{
+  "aDate": "2003/10/01",
+  "aDateTime": "2018-09-17T22:13:00-03:00",
+  "aLocalTime": "23-57-59",
+  "aLocalDateTime": "2015-10-01T23:57:59",
+  "aLocalDateTimeFormatted": "2003-10-01 23:57:59 PM",
+  "aLocalDateTimeFormattedAndLocalizedSpain": "miércoles, 01 enero, 2003 23:57:59 p. m.",
+  "aTimeZone": "-03:00"
+}
+
+
+
+
+--------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
+import java.util.Map;
+
+public class BinaryToStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:convertBinary")
+            .process(exchange -> {
+                // Simulating the Binary data encoded in UTF-32
+                String originalText = "DW Test";
+                byte[] binaryData = originalText.getBytes(Charset.forName("UTF-32"));
+
+                // DataWeave equivalent: toString(binaryData, "UTF-32")
+                // We decode the byte array back into a String using the same charset
+                String result = new String(binaryData, Charset.forName("UTF-32"));
+
+                exchange.getIn().setBody(Map.of("a", result));
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+
+{
+  "a": "DW Test"
+}
+
+
+
+
+--------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Duration;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class MiscToStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:miscToString")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // transformTimeZone: ZoneOffset
+                results.put("transformTimeZone", ZoneOffset.UTC.getId());
+
+                // transformBoolean: Boolean.toString()
+                results.put("transformBoolean", String.valueOf(true));
+
+                // transformPeriod (Date-based): java.time.Period
+                results.put("transformPeriod", Period.parse("P1D").toString());
+
+                // transformRegex: java.util.regex.Pattern
+                results.put("transformRegex", Pattern.compile("a-Z").pattern());
+
+                // transformDuration (Time-based): java.time.Duration
+                results.put("transformDuration", Duration.parse("PT8M10S").toString());
+
+                // transformUri: java.net.URI
+                results.put("transformUri", URI.create("https://docs.mulesoft.com/").toString());
+
+                // transformKey: Extracting key from a Map
+                Map<String, String> map = Map.of("aKeyToString", "aValue");
+                String firstKey = map.keySet().iterator().next();
+                results.put("transformKey", firstKey);
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+
+
+{
+  "transformTimeZone": "Z",
+  "transformBoolean": "true",
+  "transformPeriod": "P1D",
+  "transformRegex": "a-Z",
+  "transformDuration": "PT8M10S",
+  "transformUri": "https://docs.mulesoft.com/",
+  "transformKey": "aKeyToString"
+}
+
+
+
+--------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class ArrayToStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:arrayToString")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Case a: Empty Array []
+                List<String> listA = List.of();
+                // String.join with an empty list returns ""
+                results.put("a", String.join("", listA));
+
+                // Case b: ["h", "o", "l", "a"]
+                List<String> listB = List.of("h", "o", "l", "a");
+                results.put("b", String.join("", listB));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "a": "",
+  "b": "hola"
+}
+
+
+
+
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,38 @@
+decodeURI:
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+public class UrlDecodeProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String encodedUrl = "http://asd/%20text%20to%20decode%20/text";
+        
+        // Exact DataWeave decodeURI equivalent
+        String decodedUrl = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8);
+        
+        exchange.getIn().setBody(
+            "{ \"decodeURI\" : \"" + decodedUrl + "\" }"
+        );
+    }
+}
+
+from("direct:decodeUri")
+    .process(new UrlDecodeProcessor())
+    .log("${body}");
+
+
+output:
+
+
+{
+  "decodeURI": "http://asd/ text to decode /text"
+}
+
+
+

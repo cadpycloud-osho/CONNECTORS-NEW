@@ -1,0 +1,67 @@
+isNullType:
+
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NullCheckController {
+
+    /**
+     * Conceptual proxy class for the DataWeave 'Null' type.
+     */
+    private static final class NullType {
+        private NullType() {}
+    }
+
+    /**
+     * Helper method for conceptual equivalence to isNullType(Type).
+     */
+    private boolean isNullType(Class<?> type) {
+        return NullType.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/null-typecheck")
+    public Map<String, Boolean> checkNullTypes() {
+        
+        // DataWeave type ANull is an alias for Null (Conceptually NullType in Java context)
+        Class<?> aNull = NullType.class;
+        
+        // DataWeave type Null (Conceptually NullType in Java context)
+        Class<?> nullType = NullType.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isNullType(aNull);
+        boolean b = isNullType(nullType);
+        boolean c = isNullType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

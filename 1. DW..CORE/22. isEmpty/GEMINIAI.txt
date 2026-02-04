@@ -1,0 +1,170 @@
+
+isEmpty:
+
+EXAMPLE 1:
+
+INPUT:
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class IsEmptyListExample {
+
+    public static List<Boolean> checkListEmptiness() {
+        // DataWeave: isEmpty([])
+        List<Integer> emptyList = Collections.emptyList();
+        boolean result1 = emptyList.isEmpty(); 
+
+        // DataWeave: isEmpty([1])
+        List<Integer> populatedList = Arrays.asList(1);
+        boolean result2 = populatedList.isEmpty();
+
+        // Return results as a List (JSON array equivalent)
+        return Arrays.asList(result1, result2);
+    }
+
+    public static void main(String[] args) {
+        List<Boolean> output = checkListEmptiness();
+        System.out.println("Input Logic: List.isEmpty()");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+OUTPUT:
+
+
+[true, false]
+
+
+
+_________________________________________________________________
+EXAMPLE 2:
+
+isEmpty:
+
+
+INPUT:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class IsEmptyStringExample {
+
+    public static List<Boolean> checkStringEmptiness() {
+        // DataWeave: isEmpty("")
+        String emptyString = "";
+        boolean result1 = emptyString.isEmpty(); 
+
+        // DataWeave: isEmpty("DataWeave")
+        String populatedString = "DataWeave";
+        boolean result2 = populatedString.isEmpty();
+
+        // Return results as a List (JSON array equivalent)
+        return Arrays.asList(result1, result2);
+    }
+
+    public static void main(String[] args) {
+        List<Boolean> output = checkStringEmptiness();
+        System.out.println("Input Logic: String.isEmpty()");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+
+OUTPUT:
+
+[true, false]
+
+
+
+
+_________________________________________________________________
+EXAMPLE 3:
+
+
+isEmpty:
+
+
+INPUT:
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+public class IsEmptyMapExample {
+
+    public static List<Boolean> checkMapEmptiness() {
+        // DataWeave: isEmpty({})
+        Map<String, String> emptyMap = Collections.emptyMap();
+        boolean result1 = emptyMap.isEmpty(); 
+
+        // DataWeave: isEmpty({name: "DataWeave"})
+        Map<String, String> populatedMap = Map.of("name", "DataWeave");
+        boolean result2 = populatedMap.isEmpty();
+
+        // Return results as a List (JSON array equivalent)
+        return Arrays.asList(result1, result2);
+    }
+
+    public static void main(String[] args) {
+        List<Boolean> output = checkMapEmptiness();
+        System.out.println("Input Logic: Map.isEmpty()");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+
+OUTPUT:
+
+[true, false]
+
+
+
+
+_________________________________________________________________
+EXAMPLE 4:
+
+
+isEmpty:
+
+
+INPUT:
+
+import java.util.Map;
+
+public class IsEmptyNullExample {
+
+    // Custom check to replicate DW's isEmpty(null) -> true
+    public static boolean isNullEmpty(Object value) {
+        return value == null;
+    }
+
+    public static Map<String, Boolean> checkNullEmptiness() {
+        // DataWeave: isEmpty(null)
+        Object nullInput = null;
+        boolean result = isNullEmpty(nullInput);
+        
+        // Return results as a Map (JSON object equivalent)
+        return Map.of("nullValue", result);
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> output = checkNullEmptiness();
+        System.out.println("Input Logic: value == null");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+OUTPUT:
+
+
+{nullValue=true}
+
+
+
+
+
+
+

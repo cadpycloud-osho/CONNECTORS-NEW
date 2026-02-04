@@ -1,0 +1,380 @@
+toString:
+
+
+example 1:
+
+
+
+input:
+
+
+@SpringBootApplication
+@RestController
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.util.Map;
+
+public class ToStringApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ToStringApp.class, args);
+    }
+
+    @GetMapping("/to-string")
+    public Map<String, String> toStringConversions() {
+        return Map.of(
+            "a", formatDefault(1.0),
+            "b", formatWithPattern(0.005, ".00"),
+            "c", formatWithLocale(0.035, "#.##", "ES"),
+            "d", formatWithRounding(0.005, "#.##", "ES", RoundingMode.HALF_EVEN),
+            "e", formatWithNullLocale(0.035, "#.00", RoundingMode.HALF_EVEN),
+            "f", formatWithCustomText(1.1234, "\\$.## 'in my account'")
+        );
+    }
+    
+    private static String formatDefault(double value) {
+        return String.valueOf((long) value);
+    }
+    
+    private static String formatWithPattern(double value, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        return format.format(value);
+    }
+    
+    private static String formatWithLocale(double value, String pattern, String locale) {
+        DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance(new Locale(locale));
+        format.applyPattern(pattern);
+        return format.format(value);
+    }
+    
+    private static String formatWithRounding(double value, String pattern, String locale, RoundingMode mode) {
+        DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance(new Locale(locale));
+        format.applyPattern(pattern);
+        format.setRoundingMode(mode);
+        return format.format(value);
+    }
+    
+    private static String formatWithNullLocale(double value, String pattern, RoundingMode mode) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        format.setRoundingMode(mode);
+        return format.format(value);
+    }
+    
+    private static String formatWithCustomText(double value, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        return format.format(value);
+    }
+}
+
+
+output:
+
+{
+  "a": "1",
+  "b": ".01",
+  "c": "0,04",
+  "d": "0",
+  "e": ".04",
+  "f": "$1.12 in my account"
+}
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Map;
+
+public class DateTimeToStringApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DateTimeToStringApp.class, args);
+    }
+
+    @GetMapping("/date-time-to-string")
+    public Map<String, Object> dateTimeToString() {
+        return Map.of(
+            "aDate", formatDate(),
+            "aDateTime", formatDateTime(),
+            "aLocalTime", formatLocalTime(),
+            "aLocalDateTime", formatLocalDateTime(),
+            "aLocalDateTimeFormatted", formatLocalDateTimeFormatted(),
+            "aLocalDateTimeFormattedAndLocalizedSpain", formatLocalizedSpain(),
+            "aTime", getTypeOfTime(),
+            "aTimeZone", formatTimeZone()
+        );
+    }
+    
+    private static String formatDate() {
+        LocalDate date = LocalDate.parse("2003-10-01");
+        return date.format(DateTimeFormatter.ofPattern("uuuu/MM/dd"));
+    }
+    
+    private static String formatDateTime() {
+        OffsetDateTime dateTime = OffsetDateTime.parse("2018-09-17T22:13:00-03:00");
+        return dateTime.toString();
+    }
+    
+    private static String formatLocalTime() {
+        LocalTime time = LocalTime.parse("23:57:59");
+        return time.format(DateTimeFormatter.ofPattern("HH-mm-ss"));
+    }
+    
+    private static String formatLocalDateTime() {
+        LocalDateTime dateTime = LocalDateTime.parse("2015-10-01T23:57:59");
+        return dateTime.toString();
+    }
+    
+    private static String formatLocalDateTimeFormatted() {
+        LocalDateTime dateTime = LocalDateTime.parse("2003-10-01T23:57:59");
+        return dateTime.format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss a"));
+    }
+    
+    private static String formatLocalizedSpain() {
+        LocalDateTime dateTime = LocalDateTime.parse("2003-01-01T23:57:59");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+            "eeee, dd MMMM, uuuu HH:mm:ss a", Locale.forLanguageTag("ES")
+        );
+        return dateTime.format(formatter);
+    }
+    
+    private static String getTypeOfTime() {
+        OffsetTime time = OffsetTime.parse("22:10:18Z");
+        return time instanceof OffsetTime ? "Time" : time.getClass().getSimpleName();
+    }
+    
+    private static String formatTimeZone() {
+        ZoneOffset zone = ZoneOffset.of("-03:00");
+        return zone.toString();
+    }
+}
+
+
+
+output:
+
+
+{
+  "aDate": "2003/10/01",
+  "aDateTime": "2018-09-17T22:13:00-03:00",
+  "aLocalTime": "23-57-59",
+  "aLocalDateTime": "2015-10-01T23:57:59",
+  "aLocalDateTimeFormatted": "2003-10-01 23:57:59 PM",
+  "aLocalDateTimeFormattedAndLocalizedSpain": "miércoles, 01 enero, 2003 23:57:59 p. m.",
+  "aTime": "Time",
+  "aTimeZone": "-03:00"
+}
+
+---
+
+
+example 3:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+public class BinaryToStringApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BinaryToStringApp.class, args);
+    }
+
+    @GetMapping("/binary-to-string")
+    public Map<String, String> binaryToString() {
+        // Equivalent to DataWeave: "DW Test" as Binary {encoding: "UTF-32"}
+        String original = "DW Test";
+        Charset utf32Charset = Charset.forName("UTF-32");
+        byte[] binaryData = original.getBytes(utf32Charset);
+        
+        // Equivalent to DataWeave: toString(binaryData, "UTF-32")
+        String result = new String(binaryData, utf32Charset);
+        
+        return Map.of(
+            "a", result
+        );
+    }
+}
+
+
+
+output:
+
+{
+  "a": "DW Test"
+}
+
+
+---
+
+
+
+example 4:
+
+
+
+input:
+
+
+@SpringBootApplication
+@RestController
+import java.net.URI;
+import java.time.Duration;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class TransformToStringApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(TransformToStringApp.class, args);
+    }
+
+    @GetMapping("/transform-to-string")
+    public Map<String, String> transformToString() {
+        // Equivalent to DataWeave keysOf() ++ merge
+        Map<String, String> map = Map.of("aKeyToString", "aValue");
+        String transformKey = map.keySet().iterator().next();
+        
+        return Map.of(
+            "transformTimeZone", toStringZoneOffset(),
+            "transformBoolean", toStringBoolean(),
+            "transformPeriod", toStringPeriod(),
+            "transformRegex", toStringRegex(),
+            "transformPeriod2", toStringDuration(), // Second transformPeriod
+            "transformUri", toStringUri(),
+            "transformKey", transformKey
+        );
+    }
+    
+    private static String toStringZoneOffset() {
+        return ZoneOffset.UTC.toString(); // |Z| equivalent
+    }
+    
+    private static String toStringBoolean() {
+        return Boolean.TRUE.toString();
+    }
+    
+    private static String toStringPeriod() {
+        return Period.parse("P1D").toString();
+    }
+    
+    private static String toStringRegex() {
+        return Pattern.compile("a-Z").pattern();
+    }
+    
+    private static String toStringDuration() {
+        return Duration.parse("PT8M10S").toString();
+    }
+    
+    private static String toStringUri() {
+        return new URI("https://docs.mulesoft.com/").toString();
+    }
+}
+
+
+output:
+
+{
+  "transformTimeZone": "Z",
+  "transformBoolean": "true",
+  "transformPeriod": "P1D",
+  "transformRegex": "a-Z",
+  "transformPeriod2": "PT8M10S",
+  "transformUri": "https://docs.mulesoft.com/",
+  "transformKey": "aKeyToString"
+}
+
+
+---
+
+
+
+
+example 5:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+import java.util.List;
+import java.util.Map;
+
+public class ArrayToStringApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ArrayToStringApp.class, args);
+    }
+
+    @GetMapping("/array-to-string")
+    public Map<String, String> arrayToString() {
+        return Map.of(
+            "a", toStringEmptyArray(),
+            "b", toStringArray()
+        );
+    }
+    
+    private static String toStringEmptyArray() {
+        // Equivalent to DataWeave toString([])
+        List<String> emptyArray = List.of();
+        return String.join("", emptyArray);
+    }
+    
+    private static String toStringArray() {
+        // Equivalent to DataWeave toString(["h", "o", "l", "a"])
+        List<String> array = List.of("h", "o", "l", "a");
+        return String.join("", array);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "",
+  "b": "hola"
+}
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

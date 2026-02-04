@@ -1,0 +1,39 @@
+sum:
+
+
+
+
+input:
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // Input array of numbers
+        List<Integer> numbers = Arrays.asList(1, 2, 3);
+        
+        // --- 1. Define the operation (sum) ---
+        // Java Stream reduce with initial value 0 for summation.
+        // Equivalent to: 0 + 1 + 2 + 3
+        int result = numbers.stream().reduce(0, Integer::sum); 
+        
+        // --- 2. Assemble the final JSON output ---
+        ObjectMapper mapper = new ObjectMapper();
+
+        // 3. Output the result (the raw integer 6)
+        // DataWeave output is just the number 6, which JSON standard represents as 6.
+        String outputJson = mapper.writeValueAsString(result);
+        
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+
+6
+

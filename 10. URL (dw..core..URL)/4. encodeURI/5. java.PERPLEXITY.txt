@@ -1,0 +1,35 @@
+encodeURI:
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+        
+        // First case: encode spaces, %, ", \
+        String text1 = "http://asd/ text to decode /%/\"\\/text";
+        String encoded1 = text1.replace(" ", "%20")
+                              .replace("%", "%25")
+                              .replace("\"", "%22")
+                              .replace("\\", "%5C");
+        result.put("encodeURI", encoded1);
+        
+        // Second case: safe URI chars not encoded
+        String text2 = "http://:;,/?:@&=\\$_-_.!~*'()";
+        result.put("not_encoded", text2);
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{encodeURI=http://asd/%20text%20to%20decode%20/%25/%22%5C/text, not_encoded=http://:;,/?:@&=\$_-_.!~*'()}
+

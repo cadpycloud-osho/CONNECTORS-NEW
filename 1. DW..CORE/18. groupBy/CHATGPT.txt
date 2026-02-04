@@ -1,0 +1,269 @@
+groupBy:
+
+
+EXAMPLE 1:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class GroupBy1Controller {
+
+    @GetMapping("/group1")
+    public Map<String, List<String>> groupByIndex() {
+        List<String> arr = List.of("a", "b", "c");
+        Map<String, List<String>> result = new LinkedHashMap<>();
+
+        for (int i = arr.size() - 1; i >= 0; i--) {
+            result.put(String.valueOf(i), List.of(arr.get(i)));
+        }
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "2": ["c"],
+  "1": ["b"],
+  "0": ["a"]
+}
+
+
+_________________________________________________________
+
+EXAMPLE 2:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+public class GroupBy2Controller {
+
+    @GetMapping("/group2")
+    public Map<String, List<Map<String, String>>> groupByLanguage() {
+        List<Map<String, String>> data = List.of(
+                Map.of("name", "Foo", "language", "Java"),
+                Map.of("name", "Bar", "language", "Scala"),
+                Map.of("name", "FooBar", "language", "Java")
+        );
+
+        return data.stream()
+                .sorted(Comparator.comparing(m -> m.get("language")))
+                .collect(Collectors.groupingBy(m -> m.get("language"), LinkedHashMap::new, Collectors.toList()));
+    }
+}
+
+
+OUTPUT:
+
+{
+  "Scala": [
+    { "name": "Bar", "language": "Scala" }
+  ],
+  "Java": [
+    { "name": "Foo", "language": "Java" },
+    { "name": "FooBar", "language": "Java" }
+  ]
+}
+
+
+_________________________________________________________
+
+EXAMPLE 3:
+
+INPUT:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class GroupBy3Controller {
+
+    @GetMapping("/group3")
+    public Map<String, List<String>> groupLabels() {
+        List<String> labels = List.of("Move Left", "Move Right", "Move Up", "Move Down");
+        return Map.of("myLabels", labels);
+    }
+}
+
+OUTPUT:
+
+{
+  "myLabels": [
+    "Move Left",
+    "Move Right",
+    "Move Up",
+    "Move Down"
+  ]
+}
+
+
+
+_________________________________________________________
+
+EXAMPLE 4:
+
+INPUT:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class GroupBy4Controller {
+
+    @GetMapping("/group4")
+    public Map<String, String> groupByVowels() {
+
+        String str = "hello world!";
+        String vowels = "aeiou";
+
+        StringBuilder vowelGroup = new StringBuilder();
+        StringBuilder nonVowelGroup = new StringBuilder();
+
+        for (char ch : str.toCharArray()) {
+            if (vowels.indexOf(ch) >= 0)
+                vowelGroup.append(ch);
+            else
+                nonVowelGroup.append(ch);
+        }
+
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("false", nonVowelGroup.toString());
+        result.put("true", vowelGroup.toString());
+        return result;
+    }
+}
+
+OUTPUT:
+
+{
+  "false": "hll wrld!",
+  "true": "eoo"
+}
+
+
+
+_________________________________________________________
+
+EXAMPLE 5:
+
+INPUT:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class GroupBy5Controller {
+
+    @GetMapping("/group5")
+    public Map<String, Map<String, String>> groupByUpperValue() {
+        Map<String, String> input = new LinkedHashMap<>();
+        input.put("a", "b");
+        input.put("c", "d");
+
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
+        input.forEach((k, v) -> result.put(v.toUpperCase(), Map.of(k, v)));
+
+        return result;
+    }
+}
+
+OUTPUT:
+
+{
+  "D": { "c": "d" },
+  "B": { "a": "b" }
+}
+
+
+
+
+_________________________________________________________
+
+EXAMPLE 6:
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class GroupBy6Controller {
+
+    @GetMapping("/group6")
+    public Map<String, Map<String, List<String>>> groupPrices() {
+        Map<String, List<String>> prices = new LinkedHashMap<>();
+        prices.put("price", List.of("9.99", "10.99"));
+
+        Map<String, Map<String, List<String>>> result = new LinkedHashMap<>();
+        result.put("costs", prices);
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "costs": {
+    "price": [
+      "9.99",
+      "10.99"
+    ]
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

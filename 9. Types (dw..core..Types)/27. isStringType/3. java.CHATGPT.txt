@@ -1,0 +1,35 @@
+isStringType:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isStringType(Class<?> type) {
+        return String.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> AString = String.class;
+
+        result.put("a", isStringType(AString));
+        result.put("b", isStringType(String.class));
+        result.put("c", isStringType(Boolean.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+

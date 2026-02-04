@@ -1,0 +1,84 @@
+hashWith:
+
+
+input:
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class HashService {
+
+    private static final String HASH_ALGORITHM = "MD2";
+
+    /**
+     * Calculates the raw binary MD2 hash for a given data.
+     *
+     * @param data The input data (e.g., "hello").
+     * @return The raw MD2 hash as a byte array.
+     */
+    public byte[] calculateMd2Binary(String data) 
+            throws NoSuchAlgorithmException {
+        
+        // 1. Get the MessageDigest instance for MD2
+        MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+
+        // 2. Convert the input data to bytes (using UTF-8) and calculate the hash
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        return md.digest(dataBytes);
+    }
+    
+    /**
+     * Calculates the MD2 hash and returns it as a Base64 encoded String
+     * for safe transport/display.
+     *
+     * @param data The input data.
+     * @return The Base64 encoded MD2 hash.
+     */
+    public String calculateMd2Base64(String data) 
+            throws NoSuchAlgorithmException {
+        
+        byte[] hashBytes = calculateMd2Binary(data);
+        return Base64.getEncoder().encodeToString(hashBytes);
+    }
+}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+@RestController
+public class HashController {
+
+    private final HashService hashService;
+
+    public HashController(HashService hashService) {
+        this.hashService = hashService;
+    }
+
+    @GetMapping("/calculate-md2")
+    public Map<String, String> getMd2Hash() {
+        try {
+            String data = "hello";
+            
+            // Return the output as a Base64 string for JSON compatibility
+            String md2Base64 = hashService.calculateMd2Base64(data);
+            
+            return Map.of("md2_Base64", md2Base64);
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return Map.of("error", "MD2 Algorithm not supported: " + e.getMessage());
+        }
+    }
+}
+
+output:
+
+{ 
+  "md2_Base64": "VQQsc2DTAzH9aB/dfgT8BlU=" 
+}
+

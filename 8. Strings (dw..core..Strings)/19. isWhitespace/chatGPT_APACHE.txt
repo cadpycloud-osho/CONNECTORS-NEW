@@ -1,0 +1,50 @@
+isWhitespace:
+
+input:
+
+import java.util.*;
+
+public class IsWhitespaceExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> output = new LinkedHashMap<>();
+
+        output.put("a", isWhitespace(null));
+        output.put("b", isWhitespace(""));
+        output.put("c", isWhitespace("  "));
+        output.put("d", isWhitespace("abc"));
+        output.put("e", isWhitespace("ab2c"));
+        output.put("f", isWhitespace("ab-c"));
+
+        System.out.println(output);
+    }
+
+    private static boolean isWhitespace(String str) {
+        if (str == null) return false;
+        if (str.isEmpty()) return true;
+
+        for (char c : str.toCharArray()) {
+            if (!Character.isWhitespace(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+
+
+

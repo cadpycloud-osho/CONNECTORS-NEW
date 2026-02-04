@@ -1,0 +1,48 @@
+isTimeType:
+
+isTimeType(t: Type): Boolean
+
+isTimeType(t: Type): Boolean
+Returns true if the input is the Time type.
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ATime = Time
+output application/json
+---
+{
+   a: isTimeType(ATime),
+   b: isTimeType(Time),
+   c: isTimeType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

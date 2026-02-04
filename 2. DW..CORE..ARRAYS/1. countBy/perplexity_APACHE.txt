@@ -1,0 +1,33 @@
+countBy:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+
+public class CountByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:countBy")
+            .process(exchange -> {
+                List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+                
+                // countBy (($ mod 2) == 0) → count even numbers
+                long evenCount = numbers.stream()
+                    .filter(n -> (n % 2) == 0)
+                    .count();
+                
+                exchange.getIn().setBody(Map.of("countBy", (int) evenCount));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{ "countBy": 2 }
+

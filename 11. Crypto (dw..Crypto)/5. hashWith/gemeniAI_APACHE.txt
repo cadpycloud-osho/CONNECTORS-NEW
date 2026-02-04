@@ -1,0 +1,47 @@
+hashWith:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+public class Md2HashRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateMd2")
+            .routeId("MD2-Hash-Route")
+            .process(exchange -> {
+                // 1. Input string
+                String input = "hello";
+
+                // 2. Logic: Create MD2 MessageDigest
+                MessageDigest md = MessageDigest.getInstance("MD2");
+                
+                // 3. Generate raw bytes (Binary)
+                byte[] hashBytes = md.digest(input.getBytes(StandardCharsets.UTF_8));
+
+                // 4. Mimic DataWeave's Binary-to-JSON serialization
+                // Converting raw bytes directly to a String results in replacement characters
+                String binaryString = new String(hashBytes, StandardCharsets.UTF_8);
+
+                exchange.getIn().setBody(Map.of("md2", binaryString));
+            })
+            .marshal().json()
+            .log("MD2 Binary Result: ${body}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "md2": "\ufffd\u0004ls\ufffd\u00031\ufffdh\ufffd}8\u0004\ufffd\u0006U"
+}
+
+

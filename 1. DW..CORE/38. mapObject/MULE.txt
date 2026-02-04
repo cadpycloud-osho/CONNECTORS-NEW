@@ -1,0 +1,74 @@
+mapObject:
+
+mapObject<K, V>(@StreamCapable object: { (K)?: V }, mapper: (value: V, key: K, index: Number) -> Object): Object
+
+mapObject<K, V>(@StreamCapable object: { (K)?: V }, mapper: (value: V, key: K, index: Number) -> Object): Object
+Iterates over an object using a mapper that acts on keys, values, or indices of that object.
+
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{"a":"b","c":"d"} mapObject (value,key,index) -> { (index) : { (value):key} }
+
+DataWeave
+Output
+{ "0": { "b": "a" }, "1": { "d": "c" } }
+JSON
+
+
+_________________________________________________________________
+
+Source
+%dw 2.0
+output application/xml
+---
+{
+    prices: payload.prices mapObject (value, key) -> {
+        (key): (value + 5) as Number {format: "##.00"}
+    }
+}
+
+
+
+Input
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+    <basic>9.99</basic>
+    <premium>53</premium>
+    <vip>398.99</vip>
+</prices>
+XML
+Output
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+  <basic>14.99</basic>
+  <premium>58.00</premium>
+  <vip>403.99</vip>
+</prices>
+_________________________________________________________________
+
+
+
+Input:
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+XML
+
+Output:
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+
+
+
+
+
+

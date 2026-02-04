@@ -1,0 +1,48 @@
+pluralize:
+
+
+input:
+
+public class PluralizeExample {
+
+    public static void main(String[] args) {
+        System.out.println("{ \"pluralize\" : \"" + pluralize("box") + "\" }");
+    }
+
+    public static String pluralize(String word) {
+        if (word == null || word.isEmpty()) {
+            return word;
+        }
+
+        String lower = word.toLowerCase();
+
+        // Words ending with s, x, z, ch, sh → add "es"
+        if (lower.endsWith("s") || lower.endsWith("x") ||
+            lower.endsWith("z") || lower.endsWith("ch") ||
+            lower.endsWith("sh")) {
+            return word + "es";
+        }
+
+        // Words ending with consonant + y → replace y with ies
+        if (lower.endsWith("y") && word.length() > 1 &&
+            !isVowel(lower.charAt(word.length() - 2))) {
+            return word.substring(0, word.length() - 1) + "ies";
+        }
+
+        // Default → add "s"
+        return word + "s";
+    }
+
+    private static boolean isVowel(char c) {
+        return "aeiou".indexOf(c) >= 0;
+    }
+}
+
+
+
+output:
+
+{ "pluralize" : "boxes" }
+
+
+

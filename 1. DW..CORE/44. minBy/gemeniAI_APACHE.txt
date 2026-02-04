@@ -1,0 +1,123 @@
+minBy:
+
+example 1:
+
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+
+public class CamelMinByExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [ { "a" : 1 }, { "a" : 2 }, { "a" : 3 } ]
+                        List<Map<String, Integer>> input = Arrays.asList(
+                            Map.of("a", 1),
+                            Map.of("a", 2),
+                            Map.of("a", 3)
+                        );
+
+                        // Equivalent to minBy (item) -> item.a
+                        // Find the map with the minimum value for key "a"
+                        Optional<Map<String, Integer>> minItem = input.stream()
+                            .min(Comparator.comparingInt(item -> item.get("a")));
+
+                        exchange.getIn().setBody(minItem.orElse(null));
+                    })
+                    // Convert the Map result to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{ "a" : 1 }
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.*;
+import java.util.*;
+import java.util.stream.Stream;
+
+public class CamelMinByMixedTypes {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // 1. Setup Data
+                        OffsetDateTime dt1 = OffsetDateTime.parse("2017-10-01T22:57:59-03:00");
+                        OffsetDateTime dt2 = OffsetDateTime.parse("2018-10-01T23:57:59-03:00");
+
+                        Map<String, Object> myMinBy = new LinkedHashMap<>();
+
+                        // byDateTime: Earliest timestamp
+                        myMinBy.put("byDateTime", Stream.of(dt1, dt2).min(Comparator.naturalOrder()).get().toString());
+
+                        // byDate: Earliest calendar date
+                        myMinBy.put("byDate", Stream.of(dt1.toLocalDate(), dt2.toLocalDate()).min(Comparator.naturalOrder()).get().toString());
+
+                        // byTime: Earliest clock time
+                        myMinBy.put("byTime", Stream.of(dt1.toOffsetTime(), dt2.toOffsetTime()).min(Comparator.naturalOrder()).get().toString());
+
+                        // aBoolean: false is considered "smaller" than true
+                        myMinBy.put("aBoolean", Stream.of(true, false, (0 > 1), (1 > 0)).min(Boolean::compare).get());
+
+                        // emptyArray: Safely handle empty stream
+                        myMinBy.put("emptyArray", Stream.empty().min(Comparator.naturalOrder()).orElse(null));
+
+                        exchange.getIn().setBody(Map.of("myMinBy", myMinBy));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "myMinBy": {
+    "byDateTime": "2017-10-01T22:57:59-03:00",
+    "byDate": "2017-10-01",
+    "byTime": "22:57:59-03:00",
+    "aBoolean": false,
+    "emptyArray": null
+  }
+}

@@ -1,0 +1,205 @@
+filterTree:
+
+
+
+
+input:
+
+package com.example.service;
+
+import org.springframework.stereotype.Service;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+@Service
+public class TreeFilterService {
+
+    // --- Predicates replicating DataWeave logic ---
+
+    // Predicate for 'a': value is String -> !isEmpty(s), else true
+    // Removes empty strings at any level.
+    private final Predicate<Object> PREDICATE_A = (value) -> {
+        if (value instanceof String) {
+            return !((String) value).isEmpty();
+        }
+        return true;
+    };
+
+    // Predicate for 'b': value is String
+    // Only keeps nodes that are strings. Since the input is null (not a string), it remains null.
+    private final Predicate<Object> PREDICATE_B = (value) -> (value instanceof String);
+
+    // Predicate for 'c': value is Array -> !isEmpty(a as Array), else true
+    // Removes empty arrays at any level.
+    @SuppressWarnings("unchecked")
+    private final Predicate<Object> PREDICATE_C = (value) -> {
+        if (value instanceof List) {
+            return !((List<Object>) value).isEmpty();
+        }
+        return true;
+    };
+
+
+    // --- Core Recursive Filter Logic ---
+
+    /**
+     * Recursively traverses and filters ALL nodes based on the predicate.
+     * Replicates the core logic of dw::util::Tree::filterTree.
+     * @param input The current object/list/primitive being processed.
+     * @param predicate The filtering condition.
+     * @return The filtered object, or null if filtered out.
+     */
+    @SuppressWarnings("unchecked")
+    private Object filterTreeRecursive(Object input, Predicate<Object> predicate) {
+        
+        // 1. Base Case: Primitives and Null
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            // Apply filter: if it fails, return null (remove)
+            return predicate.test(input) ? input : null;
+        } 
+        
+        // 2. Recursive Case: Map (Object)
+        else if (input instanceof Map) {
+            // Apply filter to the map itself (PREDICATE_A/C always return true for Maps, PREDICATE_B returns false)
+            if (!predicate.test(input)) {
+                return null; 
+            }
+            
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            originalMap.forEach((key, value) -> {
+                // Recurse on children
+                Object result = filterTreeRecursive(value, predicate);
+                // Only keep key-value pairs where the value was NOT filtered out (null)
+                if (result != null) {
+                    newMap.put(key, result);
+                }
+            });
+
+            // If the map becomes empty, DataWeave typically removes it unless it had attributes/metadata.
+            // Since we don't handle DataWeave attributes in this simplified Java model, we check for emptiness.
+            if (newMap.isEmpty() && !predicate.test(input)) { 
+                 return null;
+            }
+            return newMap;
+        } 
+        
+        // 3. Recursive Case: List (Array)
+        else if (input instanceof List) {
+            // Apply filter to the list itself
+             if (!predicate.test(input)) {
+                return null; 
+            }
+            
+            List<Object> originalList = (List<Object>) input;
+            
+            List<Object> filteredList = originalList.stream()
+                // Recurse on children
+                .map(item -> filterTreeRecursive(item, predicate))
+                // Filter out children that were removed recursively (returned null)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+            // If the list becomes empty AND the filter was primarily on content (PREDICATE_A), it might be removed.
+            // For PREDICATE_C (filtering on Array type), this check is already done by predicate.test(input) above.
+            if (filteredList.isEmpty() && !predicate.test(input)) {
+                return null;
+            }
+            return filteredList;
+        } 
+        return input; 
+    }
+
+    // --- Public Execution Method ---
+
+    public Map<String, Object> runFilterSimulation() {
+        Map<String, Object> output = new LinkedHashMap<>();
+        
+        // Input structure for 'a'. Attributes are ignored in this simple Java model.
+        Map<String, Object> inputA = Map.of(
+            "name", "",
+            "lastName", "Achaval",
+            "friends", List.of(
+                Map.of("id", "", "test", true), 
+                Map.of("age", 123), 
+                ""
+            )
+        );
+        
+        // a: filterTree (removes empty strings)
+        output.put("a", filterTreeRecursive(inputA, PREDICATE_A));
+        
+        // b: null filterTree (value is String) -> Null is not a String, so it remains null.
+        output.put("b", filterTreeRecursive(null, PREDICATE_B));
+        
+        // c: filterTree (removes empty arrays)
+        List<Object> inputC = List.of(
+            Map.of("name", "Mariano", "friends", List.of()),
+            Map.of("test", List.of(1, 2, 3)),
+            Map.of("dw", "")
+        );
+        output.put("c", filterTreeRecursive(inputC, PREDICATE_C));
+
+        return output;
+    }
+}
+
+
+package com.example.controller;
+
+import com.example.service.TreeFilterService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class TreeController {
+
+    private final TreeFilterService treeFilterService;
+
+    public TreeController(TreeFilterService treeFilterService) {
+        this.treeFilterService = treeFilterService;
+    }
+
+    @GetMapping("/filterTree")
+    public Map<String, Object> getFilteredTree() {
+        return treeFilterService.runFilterSimulation();
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "lastName": "Achaval",
+    "friends": [
+      {
+        "test": true
+      },
+      {
+        "age": 123
+      }
+    ]
+  },
+  "b": null,
+  "c": [
+    {
+      "name": "Mariano"
+    },
+    {
+      "test": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "dw": ""
+    }
+  ]
+}
+
+

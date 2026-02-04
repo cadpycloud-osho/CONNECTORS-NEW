@@ -1,0 +1,107 @@
+map:
+
+example 1:
+
+input:
+
+from("direct:mapWithIndex")
+.setBody(constant(List.of("jose", "pedro", "mateo")))
+
+.split(body())
+    .setBody(simple("{ \"${exchangeProperty.CamelSplitIndex}\": \"${body}\" }"))
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+
+output:
+
+[
+  { "0": "jose" },
+  { "1": "pedro" },
+  { "2": "mateo" }
+]
+
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:mapIndexConcat")
+.setBody(constant(List.of("a", "b", "c")))
+
+.split(body())
+    .setBody(simple(
+        "${exchangeProperty.CamelSplitIndex + 1}_${body}"
+    ))
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+
+output:
+
+[ "1_a", "2_b", "3_c" ]
+
+
+-------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:mapDollarDollar")
+.setBody(constant(List.of("joe", "pete", "matt")))
+
+.split(body())
+    .setBody(simple(
+        "{ \"${exchangeProperty.CamelSplitIndex}\": \"${body}\" }"
+    ))
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+
+output:
+
+[
+  { "0": "joe" },
+  { "1": "pete" },
+  { "2": "matt" }
+]
+
+
+-------------------------------------------------------
+
+example 4:
+
+input:
+
+from("direct:csvExample")
+.setBody(constant(List.of(
+    Map.of("age", 14, "name", "Claire"),
+    Map.of("age", 56, "name", "Max"),
+    Map.of("age", 89, "name", "John")
+)))
+.marshal().csv();
+
+
+
+output:
+
+age,name
+14,Claire
+56,Max
+89,John
+
+
+-------------------------------------------------------
+

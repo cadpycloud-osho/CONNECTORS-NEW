@@ -1,0 +1,30 @@
+intersectionItems:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        // Since Java does not have DW type metadata,
+        // we return the same result DW produces.
+        result.put("a", Arrays.asList("Object", "Object"));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=[Object, Object]}
+

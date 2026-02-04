@@ -1,0 +1,91 @@
+splitWhere:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.Collections;
+
+public class SplitWhereExample {
+
+    /**
+     * Replicates the DataWeave 'splitWhere(array, predicate)' function.
+     * Finds the index of the first element satisfying the predicate and splits the list there.
+     *
+     * @param sourceList The list to split.
+     * @param predicate The condition to test elements against.
+     * @return A map containing the two resulting lists under keys "l" and "r".
+     */
+    public static <T> Map<String, List<T>> splitWhere(List<T> sourceList, Predicate<T> predicate) {
+        if (sourceList == null || sourceList.isEmpty()) {
+            return Map.of("l", Collections.emptyList(), "r", Collections.emptyList());
+        }
+
+        int splitIndex = -1;
+        
+        // 1. Find the index where the condition is first met
+        for (int i = 0; i < sourceList.size(); i++) {
+            if (predicate.test(sourceList.get(i))) {
+                splitIndex = i;
+                break; // Stop immediately upon finding the first match
+            }
+        }
+        
+        int size = sourceList.size();
+
+        if (splitIndex == -1) {
+            // Case 1: No match found. 'l' gets everything, 'r' gets nothing.
+            return Map.of("l", sourceList, "r", Collections.emptyList());
+        } else {
+            // Case 2: Match found at splitIndex.
+            // 'l' (Left) list: From index 0 (inclusive) up to splitIndex (exclusive)
+            List<T> left = sourceList.subList(0, splitIndex); 
+            
+            // 'r' (Right) list: From splitIndex (inclusive) up to the end (size exclusive)
+            List<T> right = sourceList.subList(splitIndex, size); 
+            
+            return Map.of("l", left, "r", right);
+        }
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        // Input List
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+        
+        // DataWeave Logic: users splitWhere (item) -> item startsWith "Jul"
+        Predicate<String> splitCondition = item -> item.startsWith("Jul");
+        
+        Map<String, List<String>> result = splitWhere(users, splitCondition);
+        
+        // --- Output Generation (Simulating JSON structure) ---
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave splitWhere Equivalent Output ---");
+        System.out.println("Input List: " + users);
+        System.out.println("Condition: item startsWith \"Jul\"");
+        
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+}
+
+output:
+
+{
+  "l": [
+    "Mariano",
+    "Leandro"
+  ],
+  "r": [
+    "Julian",
+    "Tomo"
+  ]
+}

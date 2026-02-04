@@ -1,0 +1,71 @@
+minutes:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MinutesProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        Instant baseInstant =
+                Instant.parse("2020-10-05T20:22:34.385Z");
+
+        // nextMinute
+        result.put("nextMinute",
+                baseInstant.plus(Duration.ofMinutes(1)).toString());
+
+        // previousMinute
+        result.put("previousMinute",
+                baseInstant.minus(Duration.ofMinutes(1)).toString());
+
+        // decimalInputPeriod (4.555 minutes)
+        // 4.555 × 60 = 273.3 seconds
+        Duration decimalMinutes =
+                Duration.ofMillis(273300);
+
+        result.put("decimalInputPeriod", decimalMinutes.toString());
+
+        // wholeNumberInputPeriod
+        result.put("wholeNumberInputPeriod",
+                Duration.ofMinutes(4).toString());
+
+        // addNegativeValue: -1 min + 2 min = 1 min → seconds
+        long seconds =
+                Duration.ofMinutes(-1)
+                        .plus(Duration.ofMinutes(2))
+                        .getSeconds();
+
+        result.put("addNegativeValue", seconds);
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:start")
+    .process(new MinutesProcessor())
+    .to("log:minutes-example");
+
+
+output:
+
+
+{
+  "nextMinute": "2020-10-05T20:23:34.385Z",
+  "previousMinute": "2020-10-05T20:21:34.385Z",
+  "decimalInputPeriod": "PT4M33.3S",
+  "wholeNumberInputPeriod": "PT4M",
+  "addNegativeValue": 60
+}
+
+

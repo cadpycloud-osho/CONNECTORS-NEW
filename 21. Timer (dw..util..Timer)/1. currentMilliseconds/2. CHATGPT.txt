@@ -1,0 +1,39 @@
+currentMilliseconds:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class TimerController {
+
+    @GetMapping("/currentMilliseconds")
+    public Map<String, Long> getCurrentMilliseconds() {
+
+        Map<String, Long> result = new HashMap<>();
+
+        // Equivalent of DW currentMilliseconds()
+        result.put("currentMilliseconds", System.currentTimeMillis());
+
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "currentMilliseconds": 1532923168900
+}
+
+

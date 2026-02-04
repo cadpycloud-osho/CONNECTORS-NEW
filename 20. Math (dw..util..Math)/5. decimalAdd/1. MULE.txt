@@ -1,0 +1,7 @@
+decimalAdd
+
+decimalAdd(lhs: Number, rhs: Number, ctx: OperationContext = DECIMAL_128_CONTEXT): Number
+
+decimalAdd(lhs: Number, rhs: Number, ctx: OperationContext = DECIMAL_128_CONTEXT): Number
+Performs number addition with rounding specified by the operation context.
+

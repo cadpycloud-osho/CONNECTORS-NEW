@@ -1,0 +1,52 @@
+splitWhere:
+
+
+input:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.function.Predicate;
+
+@SpringBootApplication
+public class SplitWhereDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SplitWhereDemoApplication.class, args);
+    }
+}
+
+@RestController
+class SplitWhereController {
+    
+    private Map<String, List<String>> splitWhere(List<String> list, Predicate<String> predicate) {
+        int splitIndex = 0;
+        for (int i = 0; i < list.size(); i++) {
+            if (predicate.test(list.get(i))) {
+                splitIndex = i;
+                break;
+            }
+        }
+        
+        Map<String, List<String>> result = new HashMap<>();
+        result.put("l", list.subList(0, splitIndex));
+        result.put("r", list.subList(splitIndex, list.size()));
+        
+        return result;
+    }
+    
+    @GetMapping("/splitWhere")
+    public Map<String, List<String>> splitWhereExample() {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian", "Tomo");
+        return splitWhere(users, item -> item.startsWith("Jul"));
+    }
+}
+
+
+output:
+
+{
+  "l": ["Mariano", "Leandro"],
+  "r": ["Julian", "Tomo"]
+}

@@ -1,0 +1,65 @@
+fromBinary:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class BinaryController {
+
+    private BigInteger fromBinary(String binary) {
+        if (binary == null) return null;
+        if (binary.isEmpty()) return null;
+
+        // Handle negative binary numbers
+        if (binary.startsWith("-")) {
+            return new BigInteger(binary.substring(1), 2).negate();
+        }
+
+        return new BigInteger(binary, 2);
+    }
+
+    private BigInteger fromBinary(Integer number) {
+        if (number == null) return null;
+        return new BigInteger(Integer.toBinaryString(number), 2);
+    }
+
+    @GetMapping("/fromBinary")
+    public Map<String, Object> convertBinary() {
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("a", fromBinary("-10"));
+        response.put("b", fromBinary("11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000"));
+        response.put("c", fromBinary(0));
+        response.put("d", fromBinary((String) null));
+        response.put("e", fromBinary("100"));
+
+        return response;
+    }
+}
+
+
+
+output:
+
+{
+  "a": -2,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 4
+}
+
+
+
+

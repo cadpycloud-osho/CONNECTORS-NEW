@@ -1,0 +1,42 @@
+mapString:
+
+
+input:
+
+import java.util.*;
+
+public class MapStringConverter {
+    public static String mapString(String input, java.util.function.Function<String, String> mapper) {
+        if (input == null) return null;
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            String charStr = String.valueOf(input.charAt(i));
+            result.append(mapper.apply(charStr));
+        }
+        return result.toString();
+    }
+    
+    public static boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) return false;
+        return str.chars().allMatch(Character::isDigit);
+    }
+    
+    public static void main(String[] args) {
+        String input = "$234";
+        String result = mapString(input, ch -> isNumeric(ch) ? "~" : ch);
+        
+        Map<String, String> output = new LinkedHashMap<>();
+        output.put("balance", result);
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+  "balance": "$~~~"
+}
+
+

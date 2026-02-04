@@ -1,0 +1,79 @@
+entriesOf:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.*;
+
+public class EntriesOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:entriesOf")
+            .setBody(simple("<xml attr=\"x\"><a>true</a><b>1</b></xml>"))
+            .process(exchange -> {
+                // Parse XML
+                Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new ByteArrayInputStream(exchange.getIn().getBody(String.class).getBytes()));
+                
+                NodeList children = doc.getDocumentElement().getChildNodes();
+                List<Map<String, Object>> entries = new ArrayList<>();
+                
+                // Create entry for root element
+                Map<String, Object> entry = new LinkedHashMap<>();
+                entry.put("key", "xml");
+                
+                // Extract attributes
+                Map<String, String> attributes = new LinkedHashMap<>();
+                doc.getDocumentElement().getAttributes().item(0).getAttributes();
+                NamedNodeMap attrs = doc.getDocumentElement().getAttributes();
+                for (int i = 0; i < attrs.getLength(); i++) {
+                    Node attr = attrs.item(i);
+                    attributes.put(attr.getNodeName(), attr.getNodeValue());
+                }
+                entry.put("attributes", attributes);
+                
+                // Extract child elements as value object
+                Map<String, String> valueObj = new LinkedHashMap<>();
+                for (int i = 0; i < children.getLength(); i++) {
+                    Node child = children.item(i);
+                    if (child.getNodeType() == Node.ELEMENT_NODE) {
+                        valueObj.put(child.getNodeName(), child.getTextContent());
+                    }
+                }
+                entry.put("value", valueObj);
+                
+                entries.add(entry);
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("entriesOf", entries);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+

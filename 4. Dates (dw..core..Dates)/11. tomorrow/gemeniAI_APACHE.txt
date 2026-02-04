@@ -1,0 +1,37 @@
+tomorrow:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class TomorrowDateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getTomorrow")
+            .routeId("Tomorrow-Date-Route")
+            .process(exchange -> {
+                // 1. Logic: tomorrow()
+                // Get today's date and add 1 day
+                LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+                // 2. Format to ISO-8601 string (yyyy-MM-dd)
+                String result = tomorrow.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                // 3. Set the result as the message body
+                exchange.getIn().setBody(result);
+            })
+            // 4. Logic: output application/json
+            // Marshals the string into a JSON formatted string (with quotes)
+            .marshal().json()
+            .log("Tomorrow's Date: ${body}");
+    }
+}
+
+output:
+
+"2026-01-22"
+

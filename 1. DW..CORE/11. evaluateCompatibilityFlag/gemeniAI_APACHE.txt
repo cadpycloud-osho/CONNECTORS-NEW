@@ -1,0 +1,54 @@
+evaluateCompatibilityFlag:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.rest.RestParamType;
+import java.util.Collections;
+
+public class CompatibilityRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:getCompatibility")
+            .setBody(method(this, "getFlagMap"))
+            .marshal().json() // Converts the Map to the JSON output format
+            .log("${body}");
+    }
+
+    // Helper to mimic the DataWeave logic
+    public java.util.Map<String, Object> getFlagMap() {
+        String flagKey = "com.mulesoft.dw.xml_reader.honourMixedContentStructure";
+        
+        // Reading from System properties or Camel properties
+        // Defaulting to 'true' to match your requested output
+        boolean flagValue = Boolean.parseBoolean(System.getProperty(flagKey, "true"));
+        
+        return Collections.singletonMap(flagKey, flagValue);
+    }
+}
+
+<route>
+    <from uri="direct:getCompatibility"/>
+    <setBody>
+        <groovy>
+            return ["com.mulesoft.dw.xml_reader.honourMixedContentStructure": 
+                    System.getProperty("com.mulesoft.dw.xml_reader.honourMixedContentStructure", "true").toBoolean()]
+        </groovy>
+    </setBody>
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+</route>
+
+
+
+
+output:
+
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}
+
+

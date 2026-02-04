@@ -1,0 +1,24 @@
+abs(number: Number): Number
+
+
+input:
+
+from("direct:start")
+  .process().groovy("""
+    import groovy.json.JsonSlurper
+    import groovy.json.JsonBuilder
+    
+    def jsonSlurper = new JsonSlurper()
+    def input = [-2, 2.5, -3.4, 3]
+    def result = input.collect { Math.abs(it) }
+    def json = new JsonBuilder(result)
+    exchange.in.body = json.toString()
+  """)
+  .to("mock:result");
+
+
+output:
+
+[2, 2.5, 3.4, 3]
+
+

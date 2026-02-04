@@ -1,0 +1,52 @@
+sqrt:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the List of Longs into a single-line JSON array string.
+     */
+    private static String formatListAsJsonArray(List<Long> list) {
+        // Collect numbers and join with ", "
+        String elements = list.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(", "));
+            
+        // The requested output is formatted as [ 2, 5, 10 ]
+        return "[ " + elements + " ]";
+    }
+
+    public static void main(String[] args) {
+        // --- 1. Define the operations (simulating DW sqrt()) ---
+        
+        // Operation 1: sqrt(4)
+        double result1 = Math.sqrt(4); 
+        long output1 = (long) result1; // 2
+
+        // Operation 2: sqrt(25)
+        double result2 = Math.sqrt(25); 
+        long output2 = (long) result2; // 5
+
+        // Operation 3: sqrt(100)
+        double result3 = Math.sqrt(100); 
+        long output3 = (long) result3; // 10
+
+        // --- 2. Assemble the list ---
+        List<Long> results = Arrays.asList(output1, output2, output3);
+
+        // 3. Output the result
+        System.out.println(formatListAsJsonArray(results));
+    }
+}
+
+output:
+
+
+[ 2, 5, 10 ]
+

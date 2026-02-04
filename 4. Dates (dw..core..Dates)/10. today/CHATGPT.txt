@@ -1,0 +1,21 @@
+today:
+
+
+
+
+input:
+
+@GetMapping("/today")
+public Map<String, String> getTodayDate() {
+    LocalDate today = LocalDate.now(); // Same as DW today()
+    return Map.of("today", today.toString());
+}
+
+
+output:
+
+
+{
+  "today": "2025-12-10"
+}
+

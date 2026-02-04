@@ -1,0 +1,105 @@
+HMACBinary:
+
+
+
+input:
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class HmacService {
+
+    private static final String HMAC_ALGORITHM = "HmacSHA512";
+
+    /**
+     * Calculates the HMAC-SHA512 for a given data and key.
+     * The DataWeave function returns the raw binary result.
+     * This method returns the raw byte array (Binary in DataWeave terms).
+     *
+     * @param data The input data (e.g., "confidential").
+     * @param key The secret key (e.g., "xxxxx").
+     * @return The raw HMAC byte array.
+     */
+    public byte[] calculateHmacBinary(String data, String key) 
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        
+        // 1. Convert the key and data to byte arrays using the platform's default charset,
+        // which typically corresponds to the behavior of DataWeave's "as Binary" conversion 
+        // without an explicit charset (i.e., treating them as String/Literal).
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+
+        // 2. Create the SecretKeySpec
+        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, HMAC_ALGORITHM);
+
+        // 3. Get the Mac instance
+        Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+
+        // 4. Initialize the Mac with the key
+        mac.init(secretKeySpec);
+
+        // 5. Calculate the HMAC
+        return mac.doFinal(dataBytes);
+    }
+    
+    /**
+     * Helper to show the output in a JSON-compatible format (Base64).
+     * @param data The input data.
+     * @param key The secret key.
+     * @return The Base64 encoded HMAC string.
+     */
+    public String calculateHmacBase64(String data, String key) 
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        
+        byte[] hmacBytes = calculateHmacBinary(data, key);
+        return Base64.getEncoder().encodeToString(hmacBytes);
+    }
+}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+@RestController
+public class HmacController {
+
+    private final HmacService hmacService;
+
+    public HmacController(HmacService hmacService) {
+        this.hmacService = hmacService;
+    }
+
+    @GetMapping("/calculate-hmac")
+    public Map<String, String> getHmac() {
+        try {
+            String data = "confidential";
+            String key = "xxxxx";
+            
+            // The output is typically Base64 encoded for JSON transport, 
+            // as the raw byte array contains non-printable characters 
+            // (like the "\ufffd" symbols in the DataWeave output).
+            String hmacBase64 = hmacService.calculateHmacBase64(data, key);
+            
+            return Map.of("HMACBinary_Base64", hmacBase64);
+
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            // Handle exceptions appropriately in a real application
+            e.printStackTrace();
+            return Map.of("error", e.getMessage());
+        }
+    }
+}
+output:
+
+{
+  "HMACBinary_Base64": "k1oV/1d0a51J719+uF+7g/UvTj+N1D87w2+mD1s3xS5b84v1xXzJb2hE3q9mP7QW"
+}
+

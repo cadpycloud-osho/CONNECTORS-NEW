@@ -1,0 +1,54 @@
+min:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // min equivalents using Collections.min()
+        int minA = Collections.min(Arrays.asList(1, 1000));
+        int minB = Collections.min(Arrays.asList(1, 2, 3));
+        double minC = Collections.min(Arrays.asList(1.5, 2.5, 3.5));
+        
+        // Output JSON format
+        System.out.println("{\"a\":" + minA + ",\"b\":" + minB + ",\"c\":" + minC + "}");
+    }
+}
+
+
+output:
+
+{"a":1,"b":1,"c":1.5}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alternative using Stream API:
+
+java
+import java.util.*;
+import java.util.stream.*;
+
+public class Main {
+    public static void main(String[] args) {
+        int minA = Arrays.asList(1, 1000).stream().min(Integer::compareTo).orElse(0);
+        int minB = Arrays.asList(1, 2, 3).stream().min(Integer::compareTo).orElse(0);
+        double minC = Arrays.asList(1.5, 2.5, 3.5).stream().min(Double::compareTo).orElse(0.0);
+        
+        System.out.println("{\"a\":" + minA + ",\"b\":" + minB + ",\"c\":" + minC + "}");
+    }
+}

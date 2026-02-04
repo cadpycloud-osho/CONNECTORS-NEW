@@ -1,0 +1,37 @@
+charCodeAt:
+
+
+input:
+
+import java.util.*;
+
+public class CharCodeAtExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Integer> output = new LinkedHashMap<>();
+
+        output.put("charCodeAt", charCodeAt("MuleSoft", 1));
+
+        System.out.println(output);
+    }
+
+    private static int charCodeAt(String str, int index) {
+        if (str == null || str.isEmpty()) {
+            throw new IllegalArgumentException("Input string cannot be null or empty");
+        }
+        if (index < 0 || index >= str.length()) {
+            throw new IndexOutOfBoundsException("Index out of bounds");
+        }
+        return str.charAt(index); // returns ASCII / Unicode code of character at index
+    }
+}
+
+
+
+
+output:
+
+{ "charCodeAt": 117 }
+
+

@@ -1,0 +1,31 @@
+baseTypeOf:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.HashMap;
+
+@RestController
+public class TypeController {
+    
+    @GetMapping("/basetype")
+    public Map<String, String> getBaseType() {
+        Map<String, String> result = new HashMap<>();
+        result.put("a", "String");  // baseTypeOf(String {format: "YYYY-MM-dd"}) returns "String"
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "String"
+}
+
+
+

@@ -1,0 +1,35 @@
+everyCharacter:
+
+
+input:
+
+public class EveryCharacterExample {
+
+    public static void main(String[] args) {
+
+        String input = "12 34  56";
+
+        boolean result = everyCharacter(input);
+
+        System.out.println(result);
+    }
+
+    private static boolean everyCharacter(String str) {
+        if (str == null || str.isEmpty()) return false;
+
+        for (char c : str.toCharArray()) {
+            if (!(Character.isDigit(c) || c == ' ')) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+
+output:
+
+true
+
+

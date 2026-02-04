@@ -1,0 +1,48 @@
+replaceAll:
+
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class ReplaceAllController {
+    
+    @GetMapping("/replace")
+    public Map<String, Object> replaceAllExamples() {
+        return Map.of(
+            "a", replaceAll("Mariano", "a", "A"),
+            "b", replaceAll("AAAA", "AAA", "B"),
+            "c", replaceAll(null, "aria", "A"),
+            "d", replaceAll("Mariano", "j", "Test")
+        );
+    }
+    
+    private String replaceAll(String input, String target, String replacement) {
+        if (input == null) return null;
+        if (target == null || target.isEmpty()) return input;
+        StringBuilder result = new StringBuilder();
+        int lastIndex = 0;
+        int index = input.indexOf(target);
+        
+        while (index != -1) {
+            result.append(input.substring(lastIndex, index));
+            result.append(replacement);
+            lastIndex = index + target.length();
+            index = input.indexOf(target, lastIndex);
+        }
+        result.append(input.substring(lastIndex));
+        return result.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": "MAriAno",
+  "b": "BA",
+  "c": null,
+  "d": "Mariano"
+}
+

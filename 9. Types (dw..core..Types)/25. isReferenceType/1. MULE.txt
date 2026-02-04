@@ -1,0 +1,31 @@
+isReferenceType:
+
+isReferenceType(t: Type): Boolean
+
+isReferenceType(t: Type): Boolean
+Returns true if the input type is a Reference type.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::core::Types
+ type AArray = Array<String> {n: 1}
+ type AArray2 = Array<AArray>
+ ---
+ {
+     a: isReferenceType( AArray),
+     b: isReferenceType(arrayItem(AArray2)),
+     c: isReferenceType(String)
+ }
+
+
+DataWeave
+Output
+{
+  "a": false,
+  "b": true,
+  "c": false
+}

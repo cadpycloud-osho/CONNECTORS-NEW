@@ -1,0 +1,58 @@
+dropWhile:
+
+dropWhile<T>(array: Array<T>, condition: (item: T) -> Boolean): Array<T>
+
+dropWhile<T>(array: Array<T>, condition: (item: T) -> Boolean): Array<T>
+Drops elements from the array while the condition is met but stops the selection process when it reaches an element that fails to satisfy the condition.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var arr = [0,1,3,2,1]
+---
+arr dropWhile $ < 3
+
+DataWeave
+Output
+[
+  3,
+  2,
+  1
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

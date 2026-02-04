@@ -1,0 +1,53 @@
+pluralize:
+
+
+input:
+
+import java.util.*;
+
+public class PluralizeConverter {
+    public static String pluralize(String word) {
+        if (word == null) return null;
+        
+        word = word.toLowerCase().trim();
+        
+        // Common irregular plurals and rules
+        Map<String, String> irregulars = Map.of(
+            "box", "boxes",
+            "child", "children",
+            "man", "men",
+            "woman", "women",
+            "foot", "feet",
+            "tooth", "teeth",
+            "mouse", "mice"
+        );
+        
+        if (irregulars.containsKey(word)) {
+            return irregulars.get(word);
+        }
+        
+        // Rule-based pluralization
+        if (word.matches(".*[s|x|z|sh|ch]$")) {
+            return word + "es";
+        } else if (word.endsWith("y") && !word.matches(".*[aeiou]y$")) {
+            return word.substring(0, word.length() - 1) + "ies";
+        } else {
+            return word + "s";
+        }
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("pluralize", pluralize("box"));
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{ "pluralize" : "boxes" }
+
+
+

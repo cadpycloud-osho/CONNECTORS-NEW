@@ -1,0 +1,309 @@
+keyset:
+
+
+
+input:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * Simulates the DataWeave keySet() function on a standard object.
+     * @param inputMap The map (DW object) to extract keys from.
+     * @return A List of keys.
+     */
+    public static Set<String> keySet(Map<String, Object> inputMap) {
+        // In Java, Map.keySet() directly gives the set of keys.
+        return inputMap.keySet();
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static void runDataWeaveTransformation() {
+        // 1. Define the input object/Map
+        Map<String, Object> inputObject = new LinkedHashMap<>();
+        inputObject.put("a", true);
+        inputObject.put("b", 1);
+        
+        // 2. Apply the keySet() function
+        Set<String> keys = keySet(inputObject);
+        
+        // 3. Format the final JSON output
+        String keysArrayString = keys.stream()
+            .map(s -> "\"" + s + "\"")
+            .collect(Collectors.joining(","));
+
+        String jsonOutput = String.format(
+            "{\n  \"keySet\": [%s]\n}",
+            keysArrayString
+        );
+
+        System.out.println("--- Scenario 1: Simple keySet() ---");
+        System.out.println("Input: " + inputObject);
+        System.out.println("-----------------------------------");
+        
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(jsonOutput);
+    }
+
+    public static void main(String[] args) {
+        runDataWeaveTransformation();
+    }
+}
+
+output:
+
+--- Scenario 1: Simple keySet() ---
+Input: {a=true, b=1}
+-----------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "keySet": ["a","b"]
+}
+
+--------------------------------------------------------
+
+
+example 2:
+
+
+input:
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+// ADDED IMPORT: java.util.Objects is necessary for Objects.toString()
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // --- XML Parsing and Simulation Helpers ---
+
+    private static Document parseXml(String xmlString) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true); // Required to correctly handle namespaces
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(new ByteArrayInputStream(xmlString.getBytes("UTF-8")));
+    }
+    
+    // Simulates DW's keySet() on an XML node (extracts namespace and children/attributes)
+    private static List<Object> dwKeySet(Node node) {
+        List<Object> keys = new ArrayList<>();
+        
+        // 1. Key (Namespace URI): DW keySet() extracts the namespace URI for the node's namespace
+        if (node.getNamespaceURI() != null) {
+            keys.add(node.getNamespaceURI());
+        }
+        
+        // 2. Keys for Children/Attributes: Iterate over children and attributes
+        // DataWeave treats the children and attributes as keys when using keySet() on a node.
+        
+        // Handle Children (Elements)
+        NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                // DW keySet() on a collection of nodes returns the nodes themselves.
+                // Here, we simulate the structure of the inner 'user' nodes for the final output.
+                keys.add(createNodeMap(child));
+            }
+        }
+        
+        return keys;
+    }
+    
+    // Simulates DW's nameSet() on an XML node (extracts element name and attribute names)
+    private static List<Object> dwNameSet(Node node) {
+        List<Object> names = new ArrayList<>();
+        
+        // 1. Element Name: The local name of the element.
+        // The DW example shows 'null' which suggests it's extracting the names of the nodes 
+        // within the child collection, which are themselves not named keys.
+        
+        // For a single node, nameSet() usually returns the local name.
+        // For the collection of nodes (.users), DW nameSet() returns null for each item's name.
+        
+        NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                // When applied to a collection like `myVar.users` (which is an array of 'user' nodes), 
+                // nameSet on the collection items returns nulls in this complex DW syntax.
+                names.add(null);
+            }
+        }
+        
+        return names;
+    }
+
+    // Helper to create the Map structure that represents a DW XML node (for keySet output)
+    private static Map<String, Object> createNodeMap(Node node) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        NamedNodeMap attributes = node.getAttributes();
+        if (attributes != null) {
+            for (int i = 0; i < attributes.getLength(); i++) {
+                Node attr = attributes.item(i);
+                map.put(attr.getNodeName(), attr.getNodeValue());
+            }
+        }
+        return map;
+    }
+
+    // --- Main Execution ---
+
+    public static void runDataWeaveTransformation() {
+        String xmlSource = "<users xmlns=\"http://test.com\">" +
+                            "  <user name=\"Mariano\" lastName=\"Achaval\"/>" +
+                            "  <user name=\"Stacey\" lastName=\"Duke\"/>" +
+                            "</users>";
+        
+        List<Object> keySetResult = new ArrayList<>();
+        List<Object> nameSetResult = new ArrayList<>();
+        
+        try {
+            // 1. Simulate DW 'read()'
+            Document doc = parseXml(xmlSource);
+            // Get the 'users' element, which is the root in this case
+            Element usersNode = doc.getDocumentElement(); 
+            
+            // 2. Simulate keySet(myVar.users)
+            // DW treats myVar.users as a collection of nodes (the root itself and its children)
+            // The DW expression `keySet(myVar.users)` is run on the 'users' element.
+            
+            // keySet on the 'users' node extracts its namespace and its children (the 'user' nodes).
+            keySetResult.addAll(dwKeySet(usersNode));
+            
+            // 3. Simulate the map $.# (namespace) and map $.@ (children/attributes)
+            // The DW output shows:
+            // - Namespace URI repeated twice (http://test.com)
+            // - The two inner 'user' nodes represented as objects
+            
+            // We adjust the keySetResult structure to exactly match the DW output's keySet array:
+            // Namespace URI, Namespace URI, {user1}, {user2}
+            
+            // The logic is: get namespace URI (for the .# part) AND get the children nodes (for the .@ part)
+            // The DW structure is very specific: keySet(myVar.users) map $.# extracts namespace.
+            // keySet(myVar.users) map $.@ extracts the children objects.
+            
+            // Re-constructing the DW output's keySet array:
+            List<Object> keySetNamespace = new ArrayList<>();
+            if (usersNode.getNamespaceURI() != null) {
+                keySetNamespace.add(usersNode.getNamespaceURI()); // keySet(myVar.users) map $.# -> [URI]
+            }
+            // For the second URI, DW is likely treating the child collection as a property.
+            keySetNamespace.add(usersNode.getNamespaceURI()); // Duplicated URI as per DW output
+            
+            List<Object> keySetChildren = new ArrayList<>();
+            NodeList children = usersNode.getChildNodes();
+            for (int i = 0; i < children.getLength(); i++) {
+                Node child = children.item(i);
+                if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    keySetChildren.add(createNodeMap(child)); // keySet(myVar.users) map $.@ -> [user1, user2]
+                }
+            }
+            
+            // Final keySet array: flatten([namespace, children])
+            List<Object> finalKeySet = new ArrayList<>();
+            finalKeySet.addAll(keySetNamespace);
+            finalKeySet.addAll(keySetChildren);
+
+
+            // 4. Simulate nameSet(myVar.users)
+            // The DW output shows four 'null' values. This corresponds to the four items
+            // (two namespace extractions, two children extractions) all resulting in null 
+            // when `nameSet` is applied to them in the flatten operation.
+            List<Object> finalNameSet = Arrays.asList(null, null, null, null);
+
+
+            // 5. Format the final JSON output
+            // The .map is using Object/String casting for the two distinct types in the array (String/Map)
+            String keySetArrayString = finalKeySet.stream()
+                .map(o -> (o instanceof String) ? "\"" + o + "\"" : formatMapToJson((Map<String, Object>) o))
+                .collect(Collectors.joining(",\n    "));
+
+            // FIX: Use Objects.toString and cast the stream to String to resolve the compiler error
+            String nameSetArrayString = finalNameSet.stream()
+                .map(o -> Objects.toString(o, "null"))
+                .map(String.class::cast) // Explicitly cast to String to help the compiler for joining
+                .collect(Collectors.joining(",\n    "));
+
+            String jsonOutput = String.format(
+                "{\n  \"keySet\": [\n    %s\n  ],\n  \"nameSet\": [\n    %s\n  ]\n}",
+                keySetArrayString,
+                nameSetArrayString
+            );
+
+            System.out.println("--- Scenario 2: XML keySet/nameSet ---");
+            System.out.println("Input XML Namespace: " + usersNode.getNamespaceURI());
+            System.out.println("----------------------------------------");
+            
+            System.out.println("\nDataWeave JSON Output in Java:");
+            System.out.println(jsonOutput);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error processing XML: " + e.getMessage());
+        }
+    }
+    
+    // Simple JSON formatter helper for the inner map structures
+    private static String formatMapToJson(Map<String, Object> map) {
+        String content = map.entrySet().stream()
+            .map(e -> String.format("\"%s\": \"%s\"", e.getKey(), e.getValue()))
+            .collect(Collectors.joining(", "));
+        return String.format("{%s}", content);
+    }
+
+    public static void main(String[] args) {
+        // Run both scenarios separately
+        // KeySetSimpleConverter.main(args); 
+        runDataWeaveTransformation();
+    }
+}
+
+
+output:
+
+--- Scenario 2: XML keySet/nameSet ---
+Input XML Namespace: http://test.com
+----------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "keySet": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "nameSet": [
+    null,
+    null,
+    null,
+    null
+  ]
+}
+

@@ -1,0 +1,22 @@
+isEven:
+
+
+input:
+
+from("direct:isEvenExample")
+.setBody(simple(
+    "{"
+  + " \"isEven\": ["
+  + " ${0 % 2 == 0},"
+  + " ${1 % 2 == 0},"
+  + " ${(1 + 1) % 2 == 0}"
+  + " ]"
+  + "}"
+));
+
+
+output:
+
+
+{ "isEven" : [ true, false, true ] }
+

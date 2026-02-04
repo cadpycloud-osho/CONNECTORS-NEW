@@ -1,0 +1,231 @@
+
+
+toNumber:
+
+example 1:
+
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.*;
+
+public class ToNumberExample {
+
+    public static void main(String[] args) {
+
+        String input = "0.005";
+
+        List<String> formatsA = List.of("0.###", ".00");  // DW "seconds" → approximate
+        List<String> formatsB = List.of("0.###");          // DW "seconds"
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", parseOrNull(input, formatsA));
+        output.put("b", tryParseErrorMessage(input, formatsB));
+
+        // Print results
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+
+    private static Number parseOrNull(String value, List<String> formats) {
+        for (String fmt : formats) {
+            try {
+                DecimalFormat df = new DecimalFormat(fmt);
+                df.setParseBigDecimal(true);
+                return df.parse(value).doubleValue();
+            } catch (ParseException e) {
+                // ignore and try next format
+            }
+        }
+        return null;
+    }
+
+    private static String tryParseErrorMessage(String value, List<String> formats) {
+        for (String fmt : formats) {
+            try {
+                DecimalFormat df = new DecimalFormat(fmt);
+                df.setParseBigDecimal(true);
+                df.parse(value);
+                return null; // success
+            } catch (ParseException e) {
+                return "Could not find a valid formatter for '" + value + "'";
+            }
+        }
+        return null;
+    }
+}
+
+
+
+output:
+
+
+a: 0.005
+b: Could not find a valid formatter for '0.005'
+
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
+import java.util.*;
+
+public class DateTimeToEpoch {
+
+    public static void main(String[] args) {
+        String dateTimeStr = "2015-10-01T23:57:59Z";
+
+        // Parse the ISO-8601 datetime string
+        Instant instant = Instant.parse(dateTimeStr);
+
+        // Convert to epoch seconds and milliseconds
+        long epochSeconds = instant.getEpochSecond();
+        long epochMillis = instant.toEpochMilli();
+
+        Map<String, Long> output = new LinkedHashMap<>();
+        output.put("epoch", epochSeconds);
+        output.put("millis", epochMillis);
+
+        // Print results
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+}
+
+
+
+output:
+
+epoch: 1443743879
+millis: 1443743879000
+
+-----------------------------------------------------------------
+
+
+
+
+example 3:
+
+
+input:
+
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DurationToNumber {
+
+    public static void main(String[] args) {
+        String durationStr1 = "PT1H10M";   // DW to seconds
+        String durationStr2 = "PT1M7S";    // DW to milliseconds
+
+        Duration duration1 = Duration.parse(durationStr1);
+        Duration duration2 = Duration.parse(durationStr2);
+
+        Map<String, Long> output = new LinkedHashMap<>();
+        output.put("toSecondsEx1", duration1.getSeconds());          // seconds
+        output.put("toSecondsEx2", duration2.toMillis());           // milliseconds
+
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+}
+
+
+
+output:
+
+toSecondsEx1: 4200
+toSecondsEx2: 67000
+
+-----------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.util.*;
+
+public class ToNumberExample {
+
+    public static void main(String[] args) throws ParseException {
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // default
+        output.put("default", Double.parseDouble("1.0"));
+
+        // with format ".00"
+        output.put("withFormat", parseWithPattern("0.005", "0.00", Locale.getDefault()));
+
+        // with local "ES" (Spanish)
+        output.put("withLocal", parseWithPattern("1,25", "#.##", new Locale("es", "ES")));
+
+        // with extra placeholders
+        output.put("withExtraPlaceholders", parseWithPattern("5.55", "####.####", Locale.getDefault()));
+
+        // key to number (string "123" → integer 123)
+        String myKey = "123";
+        output.put("keyToNumber", Integer.parseInt(myKey));
+
+        // print results
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+
+    private static double parseWithPattern(String value, String pattern, Locale locale) throws ParseException {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+        DecimalFormat df = new DecimalFormat(pattern, symbols);
+        df.setParseBigDecimal(true);
+        return df.parse(value).doubleValue();
+    }
+}
+
+
+
+output:
+
+default: 1.0
+withFormat: 0.005
+withLocal: 1.25
+withExtraPlaceholders: 5.55
+keyToNumber: 123
+
+
+
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+
+
+takeWhile:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Integer> arr = Arrays.asList(0, 1, 2, 1);
+        List<Integer> result = new ArrayList<>();
+
+        for (Integer val : arr) {
+            if (val <= 1) {
+                result.add(val);
+            } else {
+                break; // stop at first element that fails the predicate
+            }
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[0, 1]
+

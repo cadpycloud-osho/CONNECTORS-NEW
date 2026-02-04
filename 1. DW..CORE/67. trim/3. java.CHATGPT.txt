@@ -1,0 +1,83 @@
+trim:
+
+example 1:
+
+
+
+input:
+
+public class Main {
+
+    public static String dwTrim(String value) {
+        return value == null ? null : value.trim();
+    }
+
+    public static void main(String[] args) {
+
+        String trimmed = dwTrim("   my really long  text     ");
+
+        // Print JSON-style output
+        System.out.println("{");
+        System.out.println("  \"trim\" : \"" + trimmed + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+{
+  "trim" : "my really long  text"
+}
+
+
+-----------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+public class Main {
+
+    public static String dwTrim(String value) {
+        return value == null ? null : value.trim();
+    }
+
+    public static void main(String[] args) {
+
+        String vNull = dwTrim(null);
+        String empty = dwTrim("");
+        String blank = dwTrim("     ");
+        String noBlankSpaces = dwTrim("abc");
+        String withSpaces = dwTrim("    abc    ");
+
+        System.out.println("{");
+        System.out.println("  \"null\" : " + vNull + ",");
+        System.out.println("  \"empty\" : \"\" ,");
+        System.out.println("  \"blank\" : \"\" ,");
+        System.out.println("  \"noBlankSpaces\" : \"" + noBlankSpaces + "\",");
+        System.out.println("  \"withSpaces\" : \"" + withSpaces + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "null" : null,
+  "empty" : "",
+  "blank" : "",
+  "noBlankSpaces" : "abc",
+  "withSpaces" : "abc"
+}
+
+
+-----------------------------------------------------
+
+
+
+
+

@@ -1,0 +1,27 @@
+take:
+
+
+input:
+
+from("direct:takeExample")
+.process(exchange -> {
+    List<String> users = List.of("Mariano", "Leandro", "Julian");
+
+    // Take first 2 elements
+    List<String> result = users.stream()
+                               .limit(2)
+                               .toList();
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+output:
+
+[
+  "Mariano",
+  "Leandro"
+]
+
+

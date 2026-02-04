@@ -1,0 +1,82 @@
+unwrap:
+
+
+input:
+
+
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = StringUnwrapUtil.unwrap(null, "");
+        String b = StringUnwrapUtil.unwrap(null, "\0");
+        String c = StringUnwrapUtil.unwrap("'abc'", "'");
+        String d = StringUnwrapUtil.unwrap("AABabcBAA", "A");
+        String e = StringUnwrapUtil.unwrap("A", "#");
+        String f = StringUnwrapUtil.unwrap("#A", "#");
+        String g = StringUnwrapUtil.unwrap("A#", "#");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s,\n  \"c\": %s,\n  \"d\": %s,\n  \"e\": %s,\n  \"f\": %s,\n  \"g\": %s\n}",
+            formatJsonString(a), 
+            formatJsonString(b), 
+            formatJsonString(c), 
+            formatJsonString(d), 
+            formatJsonString(e),
+            formatJsonString(f),
+            formatJsonString(g)
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class StringUnwrapUtil {
+        public static String unwrap(String str, String wrapper) {
+            if (str == null) {
+                return null;
+            }
+            if (wrapper == null || wrapper.isEmpty()) {
+                return str;
+            }
+
+            if (str.startsWith(wrapper) && str.endsWith(wrapper) && str.length() >= 2 * wrapper.length()) {
+                // Remove prefix and suffix wrapper
+                return str.substring(wrapper.length(), str.length() - wrapper.length());
+            }
+
+            return str;
+        }
+    }
+
+    /**
+     * Helper to format the Java String result into a valid JSON string (with quotes)
+     * or the JSON literal 'null'.
+     */
+    private static String formatJsonString(String value) {
+        // If the Java String is null, return the JSON literal "null". Otherwise, quote the string value.
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+
+
+
+
+
+output:
+
+{
+  "a": null,
+  "b": null,
+  "c": "abc",
+  "d": "ABabcBA",
+  "e": "A",
+  "f": "#A",
+  "g": "A#"
+}

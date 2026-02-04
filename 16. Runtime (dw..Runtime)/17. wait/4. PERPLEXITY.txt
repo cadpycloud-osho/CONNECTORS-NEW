@@ -1,0 +1,33 @@
+wait:
+
+
+
+
+input:
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class WaitController {
+
+    @GetMapping(value = "/wait-example", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Integer> waitExample() throws InterruptedException {
+        // Matches: { "user" : 1 } wait 2000
+        Thread.sleep(2000); // 2000ms = 2 seconds delay
+        
+        return Map.of("user", 1);
+    }
+}
+
+
+output:
+
+{
+  "user": 1
+}
+
+

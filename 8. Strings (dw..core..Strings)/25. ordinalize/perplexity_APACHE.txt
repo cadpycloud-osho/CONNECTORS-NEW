@@ -1,0 +1,50 @@
+ordinalize:
+
+
+input:
+
+import java.util.*;
+
+public class OrdinalizeConverter {
+    public static String ordinalize(int number) {
+        if (number < 0) return String.valueOf(number);
+        
+        String numStr = String.valueOf(Math.abs(number));
+        char lastDigit = numStr.charAt(numStr.length() - 1);
+        
+        String suffix;
+        if (lastDigit >= '0' && lastDigit <= '9') {
+            switch (lastDigit) {
+                case '1': suffix = "st"; break;
+                case '2': suffix = "nd"; break;
+                case '3': suffix = "rd"; break;
+                default: suffix = "th"; break;
+            }
+        } else {
+            suffix = "th";
+        }
+        
+        return number + suffix;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", ordinalize(1));
+        result.put("b", ordinalize(2));
+        result.put("c", ordinalize(5));
+        result.put("d", ordinalize(103));
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+{
+  "a": "1st",
+  "b": "2nd", 
+  "c": "5th",
+  "d": "103rd"
+}
+
+

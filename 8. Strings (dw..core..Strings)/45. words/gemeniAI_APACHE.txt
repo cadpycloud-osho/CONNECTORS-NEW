@@ -1,0 +1,34 @@
+words:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.List;
+
+public class WordsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:extractWords")
+            .process(exchange -> {
+                String input = "hello world\nhere\t\t\tdata-weave";
+                
+                // \\s+ matches one or more spaces, tabs, or newlines
+                // This ensures multiple whitespaces don't create empty array elements
+                String[] wordsArray = (input != null) ? input.trim().split("\\s+") : new String[0];
+                
+                exchange.getIn().setBody(Arrays.asList(wordsArray));
+            })
+            .marshal().json();
+    }
+}
+
+
+
+output:
+
+
+["hello", "world", "here", "data-weave"]
+
+

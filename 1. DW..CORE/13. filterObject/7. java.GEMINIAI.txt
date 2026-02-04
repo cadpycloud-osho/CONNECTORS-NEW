@@ -1,0 +1,209 @@
+filterObject:
+
+
+
+example 1:
+
+
+input:
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: {"a" : "apple", "b" : "banana"} filterObject ((value) -> value == "apple")
+        Map<String, String> sourceMap = Map.of("a", "apple", "b", "banana");
+
+        // Core Logic: Stream the entrySet, filter by Entry value, and collect back to a Map
+        Map<String, String> filteredMap = sourceMap.entrySet().stream()
+                                               // filterObject condition: value == "apple"
+                                               .filter(entry -> "apple".equals(entry.getValue()))
+                                               .collect(Collectors.toMap(
+                                                   Map.Entry::getKey,
+                                                   Map.Entry::getValue
+                                               ));
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredMap);
+    }
+}
+
+
+
+
+output:
+
+{a: apple}
+
+------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: {"letter1": "a", "letter2": "b", "id": 1} filterObject ((value, key) -> key startsWith "letter")
+        
+        // Use a Map that can hold mixed types for the value (Object)
+        Map<String, Object> sourceMap = Map.of("letter1", "a", "letter2", "b", "id", 1);
+
+        // Core Logic: Stream the entrySet, filter by Entry key, and collect back to a Map
+        Map<String, Object> filteredMap = sourceMap.entrySet().stream()
+                                               // filterObject condition: key startsWith "letter"
+                                               .filter(entry -> entry.getKey().startsWith("letter"))
+                                               .collect(Collectors.toMap(
+                                                   Map.Entry::getKey,
+                                                   Map.Entry::getValue
+                                               ));
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredMap);
+    }
+}
+
+
+
+output:
+
+{letter1: a, letter2: b}
+
+------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: { "1": "a", "2": "b", "3": "c"} filterObject ((value, key, index) -> index < 1)
+        
+        // 1. Use LinkedHashMap to preserve insertion order (required for index-based logic)
+        LinkedHashMap<String, String> sourceMap = new LinkedHashMap<>();
+        sourceMap.put("1", "a");
+        sourceMap.put("2", "b");
+        sourceMap.put("3", "c");
+
+        AtomicInteger indexCounter = new AtomicInteger(0);
+        
+        // 2. Core Logic: Stream and filter based on the manually tracked index
+        Map<String, String> filteredMap = sourceMap.entrySet().stream()
+            // Map the entry to include the index, then filter
+            .filter(entry -> {
+                int index = indexCounter.getAndIncrement();
+                // filterObject condition: index < 1
+                return index < 1;
+            })
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (e1, e2) -> e1, // Merging function, safe because we don't expect key collisions
+                LinkedHashMap::new // Ensure the output map also preserves order
+            ));
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredMap);
+    }
+}
+
+
+
+output:
+
+{1: a}
+
+------------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.HashMap;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: myObject filterObject $ != null
+        
+        // 1. Create a Map that explicitly allows null values
+        Map<String, Object> sourceMap = new HashMap<>();
+        sourceMap.put("str1", "String 1");
+        sourceMap.put("str2", "String 2");
+        sourceMap.put("str3", null); // The field to be removed
+        sourceMap.put("str4", "String 4");
+
+        // Core Logic: Stream the entrySet and filter by value != null
+        Map<String, Object> filteredMap = sourceMap.entrySet().stream()
+                                               // filterObject condition: value != null
+                                               .filter(entry -> entry.getValue() != null)
+                                               .collect(Collectors.toMap(
+                                                   Map.Entry::getKey,
+                                                   Map.Entry::getValue
+                                               ));
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(filteredMap);
+    }
+}
+
+output:
+
+{str1: String 1, str2: String 2, str4: String 4}
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,115 @@
+toDate:
+
+example 1:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+@RestController
+public class DateCoercionsController {
+    
+    @GetMapping("/date-coercions")
+    public DateResponse getDateCoercions() {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy/MM/dd")
+            .orAppendPattern("yyyy-dd-MM")
+            .toFormatter(Locale.US);
+        
+        LocalDate dateA = null;
+        String errorB = null;
+        
+        try {
+            dateA = LocalDate.parse("2023-28-03", formatter);
+        } catch (DateTimeParseException e) {
+            errorB = "Could not find a valid formatter for '2023-28-03'";
+        }
+        
+        return new DateResponse(dateA, errorB);
+    }
+    
+    public static class DateResponse {
+        public LocalDate a;
+        public String b;
+        
+        public DateResponse(LocalDate a, String b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2023-03-28",
+  "b": "Could not find a valid formatter for '2023-28-03'"
+}
+
+
+
+
+----------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+@RestController
+public class DateCoercionsController {
+    
+    @GetMapping("/date-coercions")
+    public DateResponse getDateCoercions() {
+        LocalDate dateA = LocalDate.parse("2015-10-01");
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate dateB = LocalDate.parse("2003/10/01", formatterB);
+        
+        return new DateResponse(dateA, dateB);
+    }
+    
+    public static class DateResponse {
+        public LocalDate a;
+        public LocalDate b;
+        
+        public DateResponse(LocalDate a, LocalDate b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2015-10-01",
+  "b": "2003-10-01"
+}
+
+
+
+
+
+
+
+
+

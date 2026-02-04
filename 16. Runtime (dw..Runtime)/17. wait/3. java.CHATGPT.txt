@@ -1,0 +1,32 @@
+wait:
+
+
+
+
+input:
+
+import java.util.Collections;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        try {
+            Thread.sleep(2000); // 2 seconds wait
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        Map<String, Integer> result = Collections.singletonMap("user", 1);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{user=1}
+

@@ -1,0 +1,141 @@
+isEmpty:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+
+public class IsEmptyArrayRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkEmptyArray")
+            // 1. The Pure Camel equivalent of: [ isEmpty([]), isEmpty([1]) ]
+            // We use Groovy's isEmpty() on literal lists
+            .transform().groovy("[ [].isEmpty(), [1].isEmpty() ]")
+
+            // 2. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+[
+  true,
+  false
+]
+
+---------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class StringEmptyRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkStringEmpty")
+            // 1. The Pure Camel equivalent of: [ isEmpty(""), isEmpty("DataWeave") ]
+            // We apply the Groovy isEmpty() method to the string literals
+            .transform().groovy("[ \"\".isEmpty(), \"DataWeave\".isEmpty() ]")
+
+            // 2. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Send to output
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+[
+  true,
+  false
+]
+
+---------------------------------------------------------
+
+example 3:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class MapEmptyRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkMapEmpty")
+            // 1. The Pure Camel equivalent of: [ isEmpty({}), isEmpty({name: "DataWeave"}) ]
+            // [:] is the Groovy syntax for an empty Map literal
+            .transform().groovy("[ [:].isEmpty(), [name: 'DataWeave'].isEmpty() ]")
+
+            // 2. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+
+output:
+
+[
+  true,
+  false
+]
+
+---------------------------------------------------------
+
+example 4:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class NullEmptyRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkNullEmpty")
+            // 1. The Pure Camel equivalent of { "nullValue" : isEmpty(null) }
+            // We use a closure or simple check to ensure null returns true
+            .transform().groovy("""
+                def val = null
+                return [ "nullValue" : (val == null || val.isEmpty()) ]
+            """)
+
+            // 2. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 3. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+{
+  "nullValue": true
+}
+
+---------------------------------------------------------

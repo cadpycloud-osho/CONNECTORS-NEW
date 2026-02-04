@@ -1,0 +1,65 @@
+toLocalTime:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class LocalTimeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceLocalTime")
+            .process(exchange -> {
+                String input = "23:57:59";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                // Formatters equivalent to: [{format: "HH:mm:ss.n"}, {format: "HH:mm:ss"}]
+                // .n in DW corresponds to .S or .n in Java (fraction of second)
+                List<DateTimeFormatter> formatters = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.n"),
+                    DateTimeFormatter.ofPattern("HH:mm:ss")
+                );
+
+                // logic for 'a'
+                response.put("a", parseTimeOrError(input, formatters));
+
+                // logic for 'b' - simulating failure
+                List<DateTimeFormatter> failingFormatters = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.n")
+                );
+                
+                try {
+                    parseTimeOrError(input, failingFormatters);
+                } catch (Exception e) {
+                    response.put("b", e.getMessage());
+                }
+
+                exchange.getIn().setBody(response);
+            });
+    }
+
+    private LocalTime parseTimeOrError(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalTime.parse(input, formatter);
+            } catch (Exception ignored) {}
+        }
+        throw new IllegalArgumentException("Could not find a valid formatter for '" + input + "'");
+    }
+}
+
+
+output:
+
+{
+  a: |23:57:59| as LocalTime {format: "HH:mm:ss"},
+  b: "Could not find a valid formatter for '23:57:59'"
+}
+
+

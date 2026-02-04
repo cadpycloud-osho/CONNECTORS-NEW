@@ -1,0 +1,64 @@
+
+
+isRegexType:
+
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class DataWeaveRegexTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processRegexChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processRegexChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ARegex = Regex (type alias)
+        result.put("a", isRegexType(Regex.class));
+        
+        // Built-in Regex type
+        result.put("b", isRegexType(Regex.class));
+        
+        // Boolean - not Regex
+        result.put("c", isRegexType(Boolean.class));
+        
+        return result;
+    }
+    
+    private boolean isRegexType(Class<?> type) {
+        // DataWeave Regex type check equivalent
+        // Returns true for Regex and its aliases (pattern matching type)
+        return type == Regex.class || 
+               type == Pattern.class ||
+               "Regex".equals(type.getSimpleName()) ||
+               type.getName().contains("Regex");
+    }
+    
+    // Regex interface equivalent for DataWeave Regex type simulation
+    private interface Regex {}
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

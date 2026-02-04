@@ -1,0 +1,86 @@
+then:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.List;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class DataWeaveExamplesController {
+
+    // 1. Chain reduce (item ++ accumulator) then sizeOf
+    @GetMapping("/chainReduceSize")
+    public int chainReduceSize() {
+        List<String> list = List.of("mariano", "de Achaval");
+        // Reverse the list for (item ++ accumulator) behavior
+        Collections.reverse(list);
+        String concatenated = list.stream()
+                .reduce("", (acc, item) -> item + acc);
+        return concatenated.length();
+    }
+
+    // 2. Map to uppercase and then build object with name, lastName, length
+    static class NameResult {
+        public String name;
+        public String lastName;
+        public int length;
+
+        public NameResult(String name, String lastName, int length) {
+            this.name = name;
+            this.lastName = lastName;
+            this.length = length;
+        }
+    }
+
+    @GetMapping("/mapUppercaseSize")
+    public NameResult mapUppercaseSize() {
+        List<String> list = List.of("mariano", "de Achaval");
+        List<String> upperList = list.stream()
+                .map(String::toUpperCase)
+                .toList();
+        return new NameResult(
+                upperList.get(0),
+                upperList.get(1),
+                upperList.size()
+        );
+    }
+
+    // 3. Reduce empty list then sizeOf returns null
+    @GetMapping("/reduceEmptyReturnNull")
+    public Integer reduceEmptyReturnNull() {
+        List<String> list = Collections.emptyList();
+
+        return list.stream()
+                .reduce((acc, item) -> item + acc)
+                .map(String::length)
+                .orElse(null);
+    }
+}
+
+
+
+output:
+
+{
+  "name": "MARIANO",
+  "lastName": "DE ACHAVAL",
+  "length": 2
+}
+
+
+

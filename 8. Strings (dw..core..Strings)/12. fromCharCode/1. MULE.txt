@@ -1,0 +1,52 @@
+fromCharCode:
+
+fromCharCode(charCode: Number): String
+
+fromCharCode(charCode: Number): String
+Returns a character that matches the specified Unicode.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+{
+  "fromCharCode" : fromCharCode(117)
+}
+
+
+
+DataWeave
+Output
+{ "fromCharCode": "u" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

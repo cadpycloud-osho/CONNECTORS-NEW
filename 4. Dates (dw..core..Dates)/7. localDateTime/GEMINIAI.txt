@@ -1,0 +1,53 @@
+localDateTime:
+
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class LocalDateTimeCreationExample {
+
+    /**
+     * DataWeave equivalent: localDateTime({year: ..., seconds: ...})
+     * Creates a LocalDateTime object from component fields.
+     * * @param year The year component (e.g., 2012).
+     * @param month The month component (1 to 12).
+     * @param day The day component (1 to 31).
+     * @param hour The hour component (0 to 23).
+     * @param minute The minute component (0 to 59).
+     * @param second The second component (0 to 59).
+     * @return The resulting LocalDateTime object.
+     */
+    public static LocalDateTime createLocalDateTime(int year, int month, int day, int hour, int minute, int second) {
+        // Use the static factory method LocalDateTime.of()
+        return LocalDateTime.of(year, month, day, hour, minute, second);
+    }
+
+    public static void main(String[] args) {
+        // 1. Define the input parameters from DataWeave
+        int year = 2012;
+        int month = 10;
+        int day = 11;
+        int hour = 12;
+        int minute = 30;
+        int second = 40;
+
+        System.out.println("--- LocalDateTime Creation Example ---");
+        
+        // 2. Call the Java function
+        LocalDateTime newLocalDateTime = createLocalDateTime(year, month, day, hour, minute, second);
+        
+        // 3. Format the output to match the DataWeave ISO 8601 format
+        String formattedOutput = newLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        System.out.println("Source Input (Components): {year: 2012, month: 10, day: 11, hour: 12, minutes: 30, seconds: 40}");
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+output:
+
+2012-10-11T12:30:40
+

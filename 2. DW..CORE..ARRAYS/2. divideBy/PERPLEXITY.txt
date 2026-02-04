@@ -1,0 +1,90 @@
+
+divideBy:
+
+
+
+input:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@SpringBootApplication
+public class DivideByDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DivideByDemoApplication.class, args);
+    }
+}
+
+@RestController
+class DivideByController {
+    
+    private List<List<Integer>> divideBy(List<Integer> list, int chunkSize) {
+        return IntStream.range(0, (list.size() + chunkSize - 1) / chunkSize)
+            .mapToObj(i -> list.subList(
+                i * chunkSize, 
+                Math.min((i + 1) * chunkSize, list.size())
+            ))
+            .collect(Collectors.toList());
+    }
+    
+    @GetMapping("/divideBy")
+    public Map<String, List<Map<String, List<List<Integer>>>>> divideByExample() {
+        List<Integer> list1 = Arrays.asList(1, 2, 3, 4, 5);
+        List<Integer> list2 = Arrays.asList(1, 2, 3, 4, 5, 6);
+        
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, List<List<Integer>>>> divideByList = new ArrayList<>();
+        
+        // First: divideBy 2 on [1,2,3,4,5]
+        Map<String, List<List<Integer>>> first = new HashMap<>();
+        first.put("divideBy2", divideBy(list1, 2));
+        divideByList.add(first);
+        
+        // Second: divideBy 2 on [1,2,3,4,5,6]
+        Map<String, List<List<Integer>>> second = new HashMap<>();
+        second.put("divideBy2", divideBy(list2, 2));
+        divideByList.add(second);
+        
+        // Third: divideBy 3 on [1,2,3,4,5]
+        Map<String, List<List<Integer>>> third = new HashMap<>();
+        third.put("divideBy3", divideBy(list1, 3));
+        divideByList.add(third);
+        
+        result.put("divideBy", divideByList);
+        return result;
+    }
+}
+
+
+
+
+{
+  "divideBy": [
+    {
+      "divideBy2": [
+        [1, 2],
+        [3, 4],
+        [5]
+      ]
+    },
+    {
+      "divideBy2": [
+        [1, 2],
+        [3, 4],
+        [5, 6]
+      ]
+    },
+    {
+      "divideBy3": [
+        [1, 2, 3],
+        [4, 5]
+      ]
+    }
+  ]
+}

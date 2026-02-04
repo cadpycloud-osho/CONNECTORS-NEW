@@ -1,0 +1,45 @@
+MD5:
+
+MD5(content: Binary): String
+
+MD5(content: Binary): String
+Computes the MD5 hash and transforms the binary result into a hexadecimal lower case string.
+
+
+
+
+Source
+%dw 2.0
+import dw::Crypto
+output application/json
+---
+{ "md5" : Crypto::MD5("asd" as Binary) }
+
+
+
+DataWeave
+Output
+{ "md5": "7815696ecbf1c96e6894b779456d330e" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

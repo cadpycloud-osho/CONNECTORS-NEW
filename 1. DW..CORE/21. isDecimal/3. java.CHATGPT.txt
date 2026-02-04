@@ -1,0 +1,65 @@
+isDecimal:
+
+
+
+
+input:
+
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    // Equivalent of DataWeave isDecimal()
+    private static boolean isDecimal(Object value) {
+
+        if (value == null) {
+            return false;
+        }
+
+        // If value is a floating-point number
+        if (value instanceof Float || value instanceof Double) {
+            return true;
+        }
+
+        // If value is an integer number
+        if (value instanceof Integer || value instanceof Long
+                || value instanceof Short || value instanceof Byte) {
+            return false;
+        }
+
+        // If value is a String
+        if (value instanceof String) {
+            try {
+                BigDecimal bd = new BigDecimal((String) value);
+                return bd.scale() > 0; // has decimal part
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        List<Boolean> result = Arrays.asList(
+                isDecimal(1.1),
+                isDecimal(1),
+                isDecimal("1.1")
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false, true]
+
+
+
+

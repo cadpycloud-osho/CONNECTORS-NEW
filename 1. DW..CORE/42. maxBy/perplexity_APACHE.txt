@@ -1,0 +1,161 @@
+maxBy:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MaxByRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:maxBy")
+            .process(exchange -> {
+                List<Map<String, Integer>> items = Arrays.asList(
+                    Map.of("a", 1),
+                    Map.of("a", 3),
+                    Map.of("a", 2)
+                );
+                
+                // Find max by 'a' field value
+                Map<String, Integer> maxItem = items.stream()
+                    .max(Comparator.comparingInt(m -> m.get("a")))
+                    .orElse(null);
+                
+                exchange.getIn().setBody(maxItem);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "a": 3 }
+
+
+---------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class MaxByTemporalRoute extends RouteBuilder {
+    private static final DateTimeFormatter DT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:maxByTemporal")
+            .process(exchange -> {
+                // Parse DataWeave temporal literals
+                ZonedDateTime dt1 = ZonedDateTime.parse("2017-10-01T22:57:59-03:00", DT_FORMAT);
+                ZonedDateTime dt2 = ZonedDateTime.parse("2018-10-01T23:57:59-03:00", DT_FORMAT);
+                
+                Map<String, Object> myMaxBy = new LinkedHashMap<>();
+                
+                // byDateTime: max of ZonedDateTime objects
+                myMaxBy.put("byDateTime", maxTemporal(Arrays.asList(dt1, dt2), ZonedDateTime::compareTo));
+                
+                // byDate: max of LocalDate objects
+                LocalDate date1 = dt1.toLocalDate();
+                LocalDate date2 = dt2.toLocalDate();
+                myMaxBy.put("byDate", maxTemporal(Arrays.asList(date1, date2), LocalDate::compareTo));
+                
+                // byTime: max of OffsetTime objects  
+                OffsetTime time1 = dt1.toOffsetTime();
+                OffsetTime time2 = dt2.toOffsetTime();
+                myMaxBy.put("byTime", maxTemporal(Arrays.asList(time1, time2), OffsetTime::compareTo));
+                
+                // emptyArray: null
+                myMaxBy.put("emptyArray", null);
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("myMaxBy", myMaxBy);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> T maxTemporal(List<T> items, Comparator<T> comparator) {
+        return items.isEmpty() ? null : items.stream()
+            .max(comparator)
+            .orElse(null);
+    }
+}
+
+
+output:
+
+{
+  "myMaxBy": {
+    "byDateTime": "2018-10-01T23:57:59-03:00",
+    "byDate": "2018-10-01", 
+    "byTime": "23:57:59-03:00",
+    "emptyArray": null
+  }
+}
+
+
+---------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class MaxByStringRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:maxByString")
+            .process(exchange -> {
+                List<String> items = Arrays.asList("A", "B", "C");
+                
+                // maxBy with identity function - returns highest string lexicographically
+                String maxString = items.stream()
+                    .max(String::compareTo)
+                    .orElse(null);
+                
+                exchange.getIn().setBody(maxString);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+"C"
+
+
+---------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

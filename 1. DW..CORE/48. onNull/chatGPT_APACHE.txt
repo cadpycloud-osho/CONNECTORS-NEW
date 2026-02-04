@@ -1,0 +1,18 @@
+onNull:
+
+
+input:
+
+from("direct:onNullExample")
+.setBody(simple(
+    "{ \"onNull\": ${[ ].isEmpty() ? 'Empty Text' : [ ].size()} }"
+));
+
+
+output:
+
+
+{
+  "onNull": "Empty Text"
+}
+

@@ -1,0 +1,148 @@
+atBeginningOfWeek:
+
+example 1:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a ZonedDateTime to the start of its week (Sunday at midnight), 
+     * preserving the time zone. This mimics DataWeave's default week start of Sunday.
+     * @param dateTimeString The input date-time string with offset.
+     * @return The resulting date-time string at the start of the week.
+     */
+    public static String calculateBeginningOfWeekZoned(String dateTimeString) {
+        // 1. Parse the input string
+        ZonedDateTime originalZdt = ZonedDateTime.parse(dateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        // 2. Adjust the date to the preceding Sunday and the time to midnight
+        ZonedDateTime beginningOfWeekZdt = originalZdt
+            // Adjust to the preceding day of week (Sunday)
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)) 
+            // Set the time to midnight (00:00:00)
+            .with(LocalTime.MIN);                       
+        
+        // 3. Format the result
+        return beginningOfWeekZdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351-03:00";
+        String output = calculateBeginningOfWeekZoned(input);
+        
+        System.out.println("--- Scenario 1: ZonedDateTime (with Offset) ---");
+        System.out.println("Input (DW: DateTime):   " + input);
+        System.out.println("Java Output:            " + output);
+    }
+}
+
+output:
+2020-10-04T00:00:00-03:00
+
+------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a LocalDateTime to the start of its week (Sunday at midnight).
+     * This mimics the DataWeave 'atBeginningOfWeek(LocalDateTime)' function.
+     * @param dateTimeString The input local date-time string.
+     * @return The resulting local date-time string at the start of the week.
+     */
+    public static String calculateBeginningOfWeekLocal(String dateTimeString) {
+        // 1. Parse the input string
+        LocalDateTime originalLdt = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        // 2. Adjust the date to the preceding Sunday and the time to midnight
+        LocalDateTime beginningOfWeekLdt = originalLdt
+            // Adjust to the preceding day of week (Sunday)
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)) 
+            // Set the time to midnight (00:00:00)
+            .with(LocalTime.MIN);                       
+        
+        // 3. Format the result
+        return beginningOfWeekLdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351";
+        String output = calculateBeginningOfWeekLocal(input);
+        
+        System.out.println("\n--- Scenario 2: LocalDateTime (without Offset) ---");
+        System.out.println("Input (DW: LocalDateTime): " + input);
+        System.out.println("Java Output:               " + output);
+    }
+}
+
+output:
+
+2020-10-04T00:00:00
+------------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.time.temporal.TemporalAdjusters;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a LocalDate to the start of its week (Sunday).
+     * This mimics the DataWeave 'atBeginningOfWeek(Date)' function.
+     * @param dateString The input date string.
+     * @return The resulting date string at the start of the week.
+     */
+    public static String calculateBeginningOfWeekDate(String dateString) {
+        // 1. Parse the input string
+        LocalDate originalDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        // 2. Adjust the date to the preceding Sunday
+        LocalDate beginningOfWeekDate = originalDate
+            // Adjust to the preceding day of week (Sunday)
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)); 
+        
+        // 3. Format the result
+        return beginningOfWeekDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06";
+        String output = calculateBeginningOfWeekDate(input);
+        
+        System.out.println("\n--- Scenario 3: Date (without Time/Offset) ---");
+        System.out.println("Input (DW: Date):          " + input);
+        System.out.println("Java Output:               " + output);
+    }
+}
+
+output:
+
+2020-10-04
+------------------------------------------------------------------
+

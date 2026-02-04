@@ -1,0 +1,70 @@
+pluck:
+
+pluck<K, V, R>(@StreamCapable object: { (K)?: V }, mapper: (value: V, key: K, index: Number) -> R): Array<R>
+
+pluck<K, V, R>(@StreamCapable object: { (K)?: V }, mapper: (value: V, key: K, index: Number) -> R): Array<R>
+Useful for mapping an object into an array, pluck iterates over an object and returns an array of keys, values, or indices from the object.
+
+It is an alternative to mapObject, which is similar but returns an object, instead of an array.
+
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{"a":"b","c":"d"} pluck (value,key,index) -> { (index) : { (value):key} }
+
+DataWeave
+Output
+[ { "0": { "b": "a" } }, { "1": { "d": "c" } } ]
+
+
+
+----------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+var readXml = read("<prices>
+    <basic>9.99</basic>
+    <premium>53.00</premium>
+    <vip>398.99</vip>
+    </prices>", "application/xml")
+---
+"result" : {
+  "keys" : readXml.prices pluck($$),
+  "values" : readXml.prices pluck($) as Number,
+  "indices" : readXml.prices pluck($$$)
+}
+
+
+DataWeave
+Output
+{
+   "result": {
+     "keys": [ "basic", "premium", "vip" ],
+     "values": [ 9.99, 53, 398.99 ],
+     "indices": [ 0, 1, 2 ]
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

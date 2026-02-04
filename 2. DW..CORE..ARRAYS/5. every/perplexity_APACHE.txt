@@ -1,0 +1,64 @@
+every:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class EveryRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:every")
+            .process(exchange -> {
+                List<Integer> arr1 = Arrays.asList(1,1,1);
+                List<Integer> arr2 = Arrays.asList(1);
+                List<Integer> arr3 = Arrays.asList(1,2,3);
+                List<Integer> arr4 = Arrays.asList(1,1,0);
+                List<Integer> arr5 = Arrays.asList(0,1,1,0);
+                List<Integer> arr6 = Arrays.asList(1,2,3);
+                List<Integer> arr0 = new ArrayList<>(); // empty array
+                
+                Map<String, List<Boolean>> ok = Map.of(
+                    "ok", Arrays.asList(
+                        everyMatch(arr1, x -> x == 1),
+                        everyMatch(arr2, x -> x == 1)
+                    )
+                );
+                
+                Map<String, List<Boolean>> err = Map.of(
+                    "err", Arrays.asList(
+                        everyMatch(arr3, x -> (x % 2) == 1),
+                        everyMatch(arr4, x -> x == 1),
+                        everyMatch(arr5, x -> x == 1),
+                        everyMatch(arr6, x -> x == 1),
+                        everyMatch(arr0, x -> true)
+                    )
+                );
+                
+                exchange.getIn().setBody(Map.of("results", Arrays.asList(ok, err)));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    private boolean everyMatch(List<Integer> list, java.util.function.Predicate<Integer> predicate) {
+        return list.stream().allMatch(predicate);
+    }
+}
+
+
+output:
+
+{
+  "results": [
+    {
+      "ok": [ true, true ]
+    },
+    {
+      "err": [ false, false, false, false, false ]
+    }
+  ]
+}
+
+

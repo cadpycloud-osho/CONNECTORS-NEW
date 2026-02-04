@@ -1,0 +1,30 @@
+last:
+
+
+input:
+
+import java.util.*;
+
+public class LastConverter {
+    public static String last(String input, int n) {
+        if (input == null) return null;
+        if (n <= 0) return "";
+        if (n >= input.length()) return input;
+        return input.substring(input.length() - n);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("last", last("hello world!", 6));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{"last": "world!"}
+
+
+

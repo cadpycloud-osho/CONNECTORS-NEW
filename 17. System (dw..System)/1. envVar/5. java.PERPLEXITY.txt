@@ -1,0 +1,50 @@
+envVar:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> envVars = new HashMap<>();
+        List<Map<String, Object>> envList = new ArrayList<>();
+        
+        Map<String, Object> realEnv = new HashMap<>();
+        realEnv.put("real", System.getenv("SHELL"));
+        envList.add(realEnv);
+        
+        Map<String, Object> fakeEnv = new HashMap<>();
+        fakeEnv.put("fake", System.getenv("FAKE_ENV_VAR"));
+        envList.add(fakeEnv);
+        
+        envVars.put("envVars", envList);
+        System.out.println("{");
+        System.out.println("  \"envVars\" : [");
+        System.out.println("    {");
+        System.out.println("      \"real\" : \"" + System.getenv("SHELL") + "\"");
+        System.out.println("    },");
+        System.out.println("    {");
+        System.out.println("      \"fake\" : null");
+        System.out.println("    }");
+        System.out.println("  ]");
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+
+{
+  "envVars" : [ {
+    "real" : "/bin/bash"
+  }, {
+    "fake" : null
+  } ]
+}
+
+
+

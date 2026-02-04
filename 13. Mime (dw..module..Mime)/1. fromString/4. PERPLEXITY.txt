@@ -1,0 +1,153 @@
+fromString:
+
+
+example 1:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MimeExample1 {
+    
+    @GetMapping("/mime1")
+    public Map<String, Object> parseMime1() {
+        String mimeString = "application/json";
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        Map<String, Object> mime = new HashMap<>();
+        mime.put("type", "application");
+        mime.put("subtype", "json");
+        mime.put("parameters", new HashMap<>());
+        result.put("result", mime);
+        
+        return result;
+    }
+}
+
+
+output:
+{
+  "success": true,
+  "result": {
+    "type": "application",
+    "subtype": "json",
+    "parameters": {}
+  }
+}
+
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MimeExample2 {
+    
+    @GetMapping("/mime2")
+    public Map<String, Object> parseMime2() {
+        String mimeString = "multipart/form-data; boundary=the-boundary";
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        Map<String, Object> mime = new HashMap<>();
+        mime.put("type", "multipart");
+        mime.put("subtype", "form-data");
+        Map<String, String> params = new HashMap<>();
+        params.put("boundary", "the-boundary");
+        mime.put("parameters", params);
+        result.put("result", mime);
+        
+        return result;
+    }
+}
+
+
+output:
+{
+  "success": true,
+  "result": {
+    "type": "multipart",
+    "subtype": "form-data",
+    "parameters": {
+      "boundary": "the-boundary"
+    }
+  }
+}
+
+
+------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MimeExample3 {
+    
+    @GetMapping("/mime3")
+    public Map<String, Object> parseMime3() {
+        String mimeString = "Invalid MIME type";
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", false);
+        Map<String, String> error = new HashMap<>();
+        error.put("message", "Unable to find a sub type in `Invalid MIME type`.");
+        result.put("error", error);
+        
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "success": false,
+  "error": {
+    "message": "Unable to find a sub type in `Invalid MIME type`."
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,85 @@
+slice:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 3, 4, 5};
+        int start = 1;
+        int end = 4;
+        
+        System.out.print("[");
+        for (int i = start; i < end; i++) {
+            System.out.print(arr[i]);
+            if (i < end - 1) System.out.print(", ");
+        }
+        System.out.println("]");
+    }
+}
+
+
+
+output:
+
+[1, 2, 3]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Java Array Copy Version
+Uses Arrays.copyOfRange which matches DataWeave slice behavior exactly (start inclusive, end exclusive).
+
+java
+import java.util.Arrays;
+
+public class SliceArrayCopy {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 3, 4, 5};
+        int[] result = Arrays.copyOfRange(arr, 1, 4);
+        System.out.println(Arrays.toString(result));
+    }
+}
+Output: [1, 2, 3]
+
+Java Streams Version
+Functional slicing using Streams with skip and limit operations.
+
+java
+import java.util.Arrays;
+
+public class SliceStream {
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 3, 4, 5};
+        int[] result = Arrays.stream(arr)
+                            .skip(1)
+                            .limit(3)
+                            .toArray();
+        System.out.println(Arrays.toString(result));
+    }
+}
+Output: [1, 2, 3]

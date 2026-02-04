@@ -1,0 +1,28 @@
+today:
+
+
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/today")
+    public Map<String, String> getToday() {
+        LocalDate today = LocalDate.now();
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("today", today.toString());
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "today": "2025-12-10"
+}
+

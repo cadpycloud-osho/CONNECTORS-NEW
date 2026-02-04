@@ -1,0 +1,66 @@
+fromBinary:
+
+
+
+input:
+
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Equivalent of DataWeave fromBinary()
+    private static BigInteger fromBinary(Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof Number) {
+            return BigInteger.valueOf(((Number) value).longValue());
+        }
+
+        if (value instanceof String) {
+            String str = ((String) value).trim();
+            if (str.isEmpty()) {
+                return BigInteger.ZERO;
+            }
+            // Handle negative binary string
+            boolean negative = str.startsWith("-");
+            if (negative) {
+                str = str.substring(1);
+            }
+            BigInteger result = new BigInteger(str, 2);
+            return negative ? result.negate() : result;
+        }
+
+        throw new IllegalArgumentException("Unsupported input: " + value);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("a", fromBinary("-10"));
+        result.put("b", fromBinary("11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000"));
+        result.put("c", fromBinary(0));
+        result.put("d", fromBinary(null));
+        result.put("e", fromBinary("100"));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  a=-2,
+  b=100000000000000000000000000000000000000000000000000000000000000,
+  c=0,
+  d=null,
+  e=4
+}
+
+

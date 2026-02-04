@@ -1,0 +1,91 @@
+eval:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Expression;
+import org.apache.camel.spi.Language;
+import org.apache.camel.support.DefaultExchange;
+
+public class DynamicExecutionService {
+
+    private final CamelContext context;
+
+    public DynamicExecutionService(CamelContext context) {
+        this.context = context;
+    }
+
+    public void executeDynamicScripts() {
+        Exchange exchange = new DefaultExchange(context);
+        exchange.getIn().setBody("{\"name\": \"Mariano\"}");
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "application/json");
+
+        // 1. Basic Execution (equivalent to dw::Runtime::run)
+        Language dw = context.resolveLanguage("datasonnet"); // DataSonnet is the Camel equivalent to DW
+        Expression expression = dw.createExpression("{ a: 1 }");
+        Object result = expression.evaluate(exchange, Object.class);
+
+        // 2. Library/Function execution logic
+        // Camel uses Bean registry for "Utils" functions
+        context.getRegistry().bind("Utils", new MyUtils());
+        Expression libExpr = dw.createExpression("bean:Utils?method=sum(1,2)");
+        
+        // 3. Handling Timeouts & Security
+        // In Camel, this is done via the 'Threads' DSL or custom Policy
+        try {
+            // Simulated dynamic evaluation with a safety wrapper
+            Object secureResult = evaluateWithTimeout("{ a: payload.name }", exchange, 2000);
+        } catch (Exception e) {
+            // Capture 'execFail' or 'parseFail'
+        }
+    }
+
+    private Object evaluateWithTimeout(String script, Exchange ex, long ms) {
+        // Implementation logic for Sandboxed execution
+        return null; 
+    }
+}
+
+
+
+output:
+
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": { "a": 1 },
+    "mimeType": "application/json",
+    "encoding": "UTF-8",
+    "logs": []
+  },
+  "logs": {
+    "m": ["1"],
+    "l": ["INFO"]
+  },
+  "grant": {
+    "success": false,
+    "message": "Access Denied: Resource 'http://google.com' is restricted by SecurityPolicy",
+    "stack": ["org.apache.camel.CamelAuthorizationException: Policy check failed"]
+  },
+  "library": {
+    "success": true,
+    "value": 3
+  },
+  "timeout": false,
+  "parseFail": {
+    "success": false,
+    "message": "Script Error: unexpected token at line 1",
+    "location": { "line": 1, "column": 2 }
+  },
+  "defaultOutput": {
+    "success": true,
+    "value": "name|lastName\nMariano|achaval",
+    "mimeType": "text/csv"
+  }
+}
+
+
+

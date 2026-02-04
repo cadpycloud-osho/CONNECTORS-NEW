@@ -1,0 +1,28 @@
+toRegex:
+
+
+
+input:
+
+import java.util.regex.Pattern;
+
+public class RegexExample {
+    public static void main(String[] args) {
+        // Compile regex patterns
+        Pattern toRegexEx1 = Pattern.compile("a-Z");
+        Pattern toRegexEx2 = Pattern.compile("0-9+");
+
+        // Print patterns
+        System.out.println("toRegexEx1: " + toRegexEx1.pattern());
+        System.out.println("toRegexEx2: " + toRegexEx2.pattern());
+    }
+}
+
+
+output:
+
+
+toRegexEx1: a-Z
+toRegexEx2: 0-9+
+
+

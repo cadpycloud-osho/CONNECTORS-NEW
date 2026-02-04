@@ -1,0 +1,44 @@
+someCharacter:
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.Predicate;
+
+public class SomeCharacterConverter {
+    public static boolean someCharacter(String text, Predicate<String> predicate) {
+        if (text == null || text.isEmpty()) return false;
+        
+        for (int i = 0; i < text.length(); i++) {
+            String ch = String.valueOf(text.charAt(i));
+            if (predicate.test(ch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isUpperCase(String ch) {
+        if (ch == null || ch.length() != 1) return false;
+        return Character.isUpperCase(ch.charAt(0));
+    }
+    
+    public static void main(String[] args) {
+        boolean result = someCharacter("someCharacter", ch -> isUpperCase(ch));
+        
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("someCharacter", result);
+        System.out.println(output);
+    }
+}
+
+
+
+
+output:
+
+true
+
+

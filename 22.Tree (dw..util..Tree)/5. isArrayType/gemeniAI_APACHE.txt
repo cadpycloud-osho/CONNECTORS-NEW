@@ -1,0 +1,53 @@
+isArrayType:
+
+
+input:
+
+public class IsArrayTypeConverter {
+    public static boolean isArrayType(List<Map<String, Object>> path) {
+        // Check if path contains ANY ARRAY_TYPE element
+        return path.stream().anyMatch(p -> "ARRAY_TYPE".equals(p.get("kind")));
+    }
+    
+    public static void main(String[] args) {
+        List<Map<String, Object>> pathA = Arrays.asList(
+            createPathElement("OBJECT_TYPE", "user", null),
+            createPathElement("ATTRIBUTE_TYPE", "name", null)
+        );
+        
+        List<Map<String, Object>> pathB = Arrays.asList(
+            createPathElement("OBJECT_TYPE", "user", null),
+            createPathElement("ARRAY_TYPE", 0, null)
+        );
+        
+        List<Map<String, Object>> pathC = Arrays.asList(
+            createPathElement("ARRAY_TYPE", 0, null)
+        );
+        
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isArrayType(pathA));  // false - no ARRAY_TYPE
+        result.put("b", isArrayType(pathB));  // true  - has ARRAY_TYPE
+        result.put("c", isArrayType(pathC));  // true  - has ARRAY_TYPE
+        
+        System.out.println(result);
+    }
+    
+    private static Map<String, Object> createPathElement(String kind, Object selector, String namespace) {
+        Map<String, Object> element = new LinkedHashMap<>();
+        element.put("kind", kind);
+        element.put("selector", selector);
+        element.put("namespace", namespace);
+        return element;
+    }
+}
+
+
+output:
+
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+

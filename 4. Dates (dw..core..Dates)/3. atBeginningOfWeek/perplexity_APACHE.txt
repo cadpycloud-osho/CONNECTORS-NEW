@@ -1,0 +1,86 @@
+atBeginningOfWeek:
+
+
+example 1:
+
+input:
+
+
+from("direct:beginningOfWeek")
+    .process(exchange -> {
+        ZonedDateTime input = ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        ZonedDateTime startOfWeek = input.with(DayOfWeek.SUNDAY).truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfWeekDateTime", startOfWeek.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDateTime": "2020-10-04T00:00:00-03:00"
+}
+
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:beginningOfWeekLocal")
+    .process(exchange -> {
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        LocalDateTime startOfWeek = input.with(DayOfWeek.SUNDAY).truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfWeekLocalDateTime", startOfWeek.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+
+output:
+
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00:00"
+}
+
+
+
+-------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:beginningOfWeekDate")
+    .process(exchange -> {
+        LocalDate input = LocalDate.parse("2020-10-06");
+        LocalDate startOfWeek = input.with(DayOfWeek.SUNDAY);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfWeekDate", startOfWeek.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDate": "2020-10-04"
+}
+
+
+
+-------------------------------------------------------
+
+

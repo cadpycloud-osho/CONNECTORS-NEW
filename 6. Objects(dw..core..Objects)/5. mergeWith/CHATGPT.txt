@@ -1,0 +1,48 @@
+mergeWith:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MergeController {
+
+    @GetMapping("/mergeWith")
+    public Map<String, Object> mergeObjects() {
+
+        Map<String, Object> map1 = new LinkedHashMap<>();
+        map1.put("a", true);
+        map1.put("b", 1);
+
+        Map<String, Object> map2 = new LinkedHashMap<>();
+        map2.put("a", false);
+        map2.put("c", "Test");
+
+        // Simulating DataWeave mergeWith → map2 overwrites map1 values
+        map1.putAll(map2);
+
+        return Map.of("mergeWith", map1);
+    }
+}
+
+
+
+output:
+
+
+{
+  "mergeWith": {
+    "b": 1,
+    "a": false,
+    "c": "Test"
+  }
+}
+
+
+

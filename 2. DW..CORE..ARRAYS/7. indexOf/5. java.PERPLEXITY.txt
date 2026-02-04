@@ -1,0 +1,53 @@
+indexOf:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String[] users = {"Mariano", "Leandro", "Julian"};
+        String target = "Julian";
+        int index = -1;
+        
+        for (int i = 0; i < users.length; i++) {
+            if (users[i].equals(target)) {
+                index = i;
+                break; // Found first match
+            }
+        }
+        
+        System.out.println(index);
+    }
+}
+
+
+
+output:
+
+2
+
+
+
+
+
+
+
+
+
+
+Java with Built-in indexOf
+Using Java's List.indexOf method, which matches DataWeave behavior exactly.
+
+java
+import java.util.Arrays;
+import java.util.List;
+
+public class IndexOfList {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        int index = users.indexOf("Julian");
+        System.out.println(index);
+    }
+}
+Output: 2

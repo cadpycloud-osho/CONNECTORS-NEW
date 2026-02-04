@@ -1,0 +1,38 @@
+writeLinesWith:
+
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+import java.util.stream.IntStream;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String lines = IntStream.range(1, 6)   // 1 to 5
+                .mapToObj(i -> "Line " + i)
+                .reduce("", (a, b) -> a + b + "\n");
+
+        System.out.println("{ \"lines\": \"" + lines + "\" }");
+    }
+}
+
+
+
+output:
+
+
+{
+  "lines": "Line 1
+Line 2
+Line 3
+Line 4
+Line 5
+"
+}
+
+
+
+

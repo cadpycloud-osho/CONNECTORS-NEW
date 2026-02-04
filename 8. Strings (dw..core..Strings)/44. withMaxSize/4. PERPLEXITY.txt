@@ -1,0 +1,40 @@
+withMaxSize:
+
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class WithMaxSizeController {
+    
+    @GetMapping("/maxsize")
+    public Map<String, Object> withMaxSizeExamples() {
+        return Map.of(
+            "a", withMaxSize("123", 10),
+            "b", withMaxSize("123", 3),
+            "c", withMaxSize("123", 2),
+            "d", withMaxSize("123", 0),
+            "e", withMaxSize(null, 23)
+        );
+    }
+    
+    private String withMaxSize(String input, int maxSize) {
+        if (input == null) return null;
+        if (maxSize <= 0) return input;
+        return input.length() <= maxSize ? input : input.substring(0, maxSize);
+    }
+}
+
+
+output:
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}
+
+

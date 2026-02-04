@@ -1,0 +1,75 @@
+write:
+
+
+write(value: Any, contentType: String = "application/dw", writerProperties: Object = {}): String | Binary
+
+write(value: Any, contentType: String = "application/dw", writerProperties: Object = {}): String | Binary
+Writes a value as a string or binary in a supported format.
+
+Returns a String or Binary with the serialized representation of the value in the specified format (MIME type). This function can write to a different format than the input. Note that the data must validate in that new format, or an error will occur. For example, application/xml content is not valid within an application/json format, but text/plain can be valid. It returns a String value for all text-based data formats (such as XML, JSON , CSV) and a Binary value for all the binary formats (such as Excel, MultiPart, OctetStream)
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ hello : write("world", "text/plain") }
+
+DataWeave
+
+Output
+{ "hello": "world" }
+
+
+
+-------------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/xml
+---
+{ "output" : write(payload, "application/csv", {"header":true, "separator" : "|"}) }
+
+DataWeave
+Input
+[
+  {
+    "Name": "Mr White",
+    "Email": "white@mulesoft.com",
+    "Id": "1234",
+    "Title": "Chief Java Prophet"
+  },
+  {
+    "Name": "Mr Orange",
+    "Email": "orange@mulesoft.com",
+    "Id": "4567",
+    "Title": "Integration Ninja"
+  }
+]
+
+JSON
+Output
+<?xml version="1.0" encoding="US-ASCII"?>
+<output>Name|Email|Id|Title
+Mr White|white@mulesoft.com|1234|Chief Java Prophet
+Mr Orange|orange@mulesoft.com|4567|Integration Ninja
+</output>
+XML
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

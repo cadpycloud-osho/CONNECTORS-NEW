@@ -1,0 +1,75 @@
+splitAt:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class SplitAtExample {
+
+    /**
+     * Replicates the DataWeave 'splitAt(array, index)' function.
+     * Divides a list into two sublists at the given splitIndex.
+     *
+     * @param sourceList The list to split.
+     * @param splitIndex The index at which to split the list.
+     * @return A map containing the two resulting lists under keys "l" and "r".
+     */
+    public static <T> Map<String, List<T>> splitAt(List<T> sourceList, int splitIndex) {
+        if (sourceList == null || splitIndex < 0 || splitIndex > sourceList.size()) {
+            throw new IllegalArgumentException("Invalid split index or source list.");
+        }
+
+        int size = sourceList.size();
+        
+        // 'l' (Left) list: From index 0 (inclusive) up to splitIndex (exclusive)
+        List<T> left = sourceList.subList(0, splitIndex); 
+        
+        // 'r' (Right) list: From splitIndex (inclusive) up to the end (size exclusive)
+        List<T> right = sourceList.subList(splitIndex, size); 
+        
+        return Map.of("l", left, "r", right);
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        // Input List
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        int splitIndex = 1;
+        
+        // DataWeave Logic: users splitAt 1
+        Map<String, List<String>> result = splitAt(users, splitIndex);
+        
+        // --- Output Generation (Simulating JSON structure) ---
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave splitAt Equivalent Output ---");
+        System.out.println("Input List: " + users);
+        System.out.println("Split Index: " + splitIndex);
+        
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+}
+
+
+output:
+
+
+{
+  "l": [
+    "Mariano"
+  ],
+  "r": [
+    "Leandro",
+    "Julian"
+  ]
+}
+

@@ -1,0 +1,125 @@
+filterObject:
+
+INPUT:
+
+@GetMapping("/filter1")
+public Map<String, String> filterObject1() {
+    Map<String, String> input = Map.of("a", "apple", "b", "banana");
+    Map<String, String> result = new HashMap<>();
+
+    input.forEach((k, v) -> {
+        if ("apple".equals(v)) {
+            result.put(k, v);
+        }
+    });
+
+    return result;
+}
+
+OUTPUT:
+
+{ "a": "apple" }
+
+
+___________________________________________________________________
+
+INPUT:
+
+@GetMapping("/filter2")
+public Map<String, Object> filterObject2() {
+    Map<String, Object> input = Map.of("letter1", "a", "letter2", "b", "id", 1);
+    Map<String, Object> result = new HashMap<>();
+
+    input.forEach((k, v) -> {
+        if (k.startsWith("letter")) {
+            result.put(k, v);
+        }
+    });
+
+    return result;
+}
+
+
+OUTPUT:
+
+
+{ "letter1": "a", "letter2": "b" }
+
+___________________________________________________________________
+
+INPUT:
+
+@GetMapping("/filter3")
+public Map<String, String> filterObject3() {
+    Map<String, String> input = new LinkedHashMap<>();
+    input.put("1", "a");
+    input.put("2", "b");
+    input.put("3", "c");
+
+    Map<String, String> result = new LinkedHashMap<>();
+
+    int[] index = {0};
+    input.forEach((k, v) -> {
+        if (index[0] < 1) {
+            result.put(k, v);
+        }
+        index[0]++;
+    });
+
+    return result;
+}
+
+
+OUTPUT:
+
+
+{ "1": "a" }
+
+
+
+___________________________________________________________________
+
+INPUT:
+
+@GetMapping("/filter4")
+public Map<String, String> filterObject4() {
+    Map<String, String> input = new LinkedHashMap<>();
+    input.put("str1", "String 1");
+    input.put("str2", "String 2");
+    input.put("str3", null);
+    input.put("str4", "String 4");
+
+    Map<String, String> result = new LinkedHashMap<>();
+
+    input.forEach((k, v) -> {
+        if (v != null) {
+            result.put(k, v);
+        }
+    });
+
+    return result;
+}
+
+
+OUTPUT:
+
+{
+  "str1": "String 1",
+  "str2": "String 2",
+  "str4": "String 4"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

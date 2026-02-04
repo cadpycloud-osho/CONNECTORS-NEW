@@ -1,0 +1,69 @@
+underscore:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class CaseController {
+
+    @GetMapping("/underscore-conversion")
+    public Map<String, String> convertDataWeaveUnderscore() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = StringCaseUtil.underscore("customer");
+        String b = StringCaseUtil.underscore("customer-first-name");
+        String c = StringCaseUtil.underscore("customer NAME");
+        String d = StringCaseUtil.underscore("customerName");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d
+        );
+    }
+}
+public class StringCaseUtil {
+
+    /**
+     * Replicates the dw::core::Strings::underscore function (CamelCase to snake_case, 
+     * and space/hyphen to underscore).
+     *
+     * @param str The input string.
+     * @return The string converted to snake_case.
+     */
+    public static String underscore(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        // 1. Replace all hyphens/spaces with an underscore.
+        String temp = str.replaceAll("[- ]", "_");
+        
+        // 2. Insert an underscore before any uppercase letter that is NOT preceded by 
+        // a boundary (like start of string or existing underscore).
+        // Regex: (?<=[^\\s_])([A-Z]) 
+        // - Lookbehind: (?<=[^\\s_]) ensures the preceding character is NOT a whitespace or underscore.
+        // - Group 1: ([A-Z]) captures the uppercase letter.
+        // Replacement: "_$1" inserts the underscore before the captured letter.
+        temp = temp.replaceAll("(?<=[^\\s_])([A-Z])", "_$1");
+
+        // 3. Convert the entire result to lowercase.
+        return temp.toLowerCase();
+    }
+}
+ouput:
+
+{
+  "a": "customer",
+  "b": "customer_first_name",
+  "c": "customer_name",
+  "d": "customer_name"
+}
+

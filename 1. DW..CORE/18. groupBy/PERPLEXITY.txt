@@ -1,0 +1,274 @@
+groupBy:
+
+EXAMPLE 1:
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@SpringBootApplication
+public class GroupByIndexApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(GroupByIndexApp.class, args);
+
+        List<String> list = List.of("a", "b", "c");
+
+        Map<String, List<String>> grouped = IntStream.range(0, list.size())
+                .boxed()
+                .collect(Collectors.toMap(
+                        i -> String.valueOf(i),
+                        i -> List.of(list.get(i)),
+                        (a, b) -> {
+                            List<String> merged = new ArrayList<>(a);
+                            merged.addAll(b);
+                            return merged;
+                        },
+                        LinkedHashMap::new));
+
+        System.out.println(grouped);
+        // Output: {0=[a], 1=[b], 2=[c]}
+    }
+}
+
+
+OUTPUT:
+{0=[a], 1=[b], 2=[c]}
+
+_________________________________________________________
+EXAMPLE 2:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class GroupByLanguageApp {
+
+    static class Person {
+        String name;
+        String language;
+
+        Person(String name, String language) {
+            this.name = name;
+            this.language = language;
+        }
+
+        @Override
+        public String toString() {
+            return "{\"name\":\"" + name + "\",\"language\":\"" + language + "\"}";
+        }
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(GroupByLanguageApp.class, args);
+
+        List<Person> people = Arrays.asList(
+                new Person("Foo", "Java"),
+                new Person("Bar", "Scala"),
+                new Person("FooBar", "Java")
+        );
+
+        Map<String, List<Person>> grouped = people.stream()
+                .collect(Collectors.groupingBy(p -> p.language, LinkedHashMap::new, Collectors.toList()));
+
+        System.out.println(grouped);
+        // Output shows grouping by language with lists of Person
+    }
+}
+
+
+OUTPUT:
+
+{Java=[{"name":"Foo","language":"Java"}, {"name":"FooBar","language":"Java"}], Scala=[{"name":"Bar","language":"Scala"}]}
+
+_________________________________________________________
+EXAMPLE 3:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class GroupLabelsApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(GroupLabelsApp.class, args);
+
+        List<Map<String, String>> items = List.of(
+                Map.of("id", "internal"),
+                Map.of("id", "left", "label", "Move Left"),
+                Map.of("id", "right", "label", "Move Right"),
+                Map.of("id", "up", "label", "Move Up"),
+                Map.of("id", "down", "label", "Move Down")
+        );
+
+        List<String> labels = items.stream()
+                .map(item -> item.get("label"))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        Map<String, List<String>> result = Collections.singletonMap("myLabels", labels);
+
+        System.out.println(result);
+        // Output: {myLabels=[Move Left, Move Right, Move Up, Move Down]}
+    }
+}
+
+OUTPUT:
+
+{myLabels=[Move Left, Move Right, Move Up, Move Down]}
+
+
+_________________________________________________________
+EXAMPLE 4:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class GroupByVowelApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(GroupByVowelApp.class, args);
+
+        String input = "hello world!";
+        Set<Character> vowels = Set.of('a', 'e', 'i', 'o', 'u');
+
+        Map<Boolean, String> grouped = input.chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.groupingBy(
+                        ch -> vowels.contains(Character.toLowerCase(ch)),
+                        LinkedHashMap::new,
+                        Collectors.mapping(String::valueOf, Collectors.joining())
+                ));
+
+        System.out.println(grouped);
+        // Output: {false=hll wrld!, true=eoo}
+    }
+}
+
+
+OUTPUT:
+
+{false=hll wrld!, true=eoo}
+
+
+_________________________________________________________
+EXAMPLE 5:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class GroupByUppercaseApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(GroupByUppercaseApp.class, args);
+
+        Map<String, String> map = Map.of("a", "b", "c", "d");
+
+        Map<String, Map<String, String>> grouped = map.entrySet().stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.getValue().toUpperCase(),
+                        LinkedHashMap::new,
+                        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+                ));
+
+        System.out.println(grouped);
+        // Output: {B={a=b}, D={c=d}}
+    }
+}
+
+
+OUTPUT:
+
+
+{B={a=b}, D={c=d}}
+
+
+_________________________________________________________
+EXAMPLE 6:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.*;
+
+@SpringBootApplication
+public class GroupXmlPricesApp {
+
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(GroupXmlPricesApp.class, args);
+
+        String xml = "<prices><price>9.99</price><price>10.99</price></prices>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document doc = factory.newDocumentBuilder()
+                .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+        NodeList priceNodes = doc.getElementsByTagName("price");
+        List<String> prices = new ArrayList<>();
+
+        for (int i = 0; i < priceNodes.getLength(); i++) {
+            prices.add(priceNodes.item(i).getTextContent());
+        }
+
+        Map<String, List<String>> grouped = Collections.singletonMap("costs", prices);
+
+        System.out.println(grouped);
+        // Output: {costs=[9.99, 10.99]}
+    }
+}
+
+
+OUTPUT:
+
+
+{costs=[9.99, 10.99]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

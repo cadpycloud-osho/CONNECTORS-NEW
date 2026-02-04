@@ -1,0 +1,99 @@
+mask:
+
+mask(value: Null, fieldName: String | Number | PathElement): (newValueProvider: (oldValue: Any, path: Path) -> Any) -> Null
+
+mask(value: Null, fieldName: String | Number | PathElement): (newValueProvider: (oldValue: Any, path: Path) -> Any) -> Null
+Helper function that enables mask to work with a null value.
+
+Introduced in DataWeave version 2.2.2.
+
+mask(value: Any, selector: PathElement): (newValueProvider: (oldValue: Any, path: Path) -> Any) -> Any
+This mask function replaces all simple elements that match the specified criteria.
+
+Simple elements do not have child elements and cannot be objects or arrays.
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::util::Values
+---
+[{name: "Peter Parker", password: "spiderman"}, {name: "Bruce Wayne", password: "batman"}] mask field("password") with "*****"
+
+
+DataWeave
+Output
+[
+   {
+     "name": "Peter Parker",
+     "password": "*****"
+   },
+   {
+     "name": "Bruce Wayne",
+     "password": "*****"
+   }
+ ]
+
+--------------------------------------------------------------------
+
+
+mask(value: Any, fieldName: String): (newValueProvider: (oldValue: Any, path: Path) -> Any) -> Any
+This mask function selects a field by its name.
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::util::Values
+---
+[{name: "Peter Parker", password: "spiderman"}, {name: "Bruce Wayne", password: "batman"}] mask "password" with "*****"
+
+
+DataWeave
+Output
+[
+   {
+     "name": "Peter Parker",
+     "password": "*****"
+   },
+   {
+     "name": "Bruce Wayne",
+     "password": "*****"
+   }
+ ]
+
+--------------------------------------------------------------------
+
+
+mask(value: Any, i: Number): (newValueProvider: (oldValue: Any, path: Path) -> Any) -> Any
+This mask function selects an element from array by its index.
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::util::Values
+---
+[[123, true], [456, true]] mask 1 with false
+
+
+DataWeave
+Output
+[
+   [
+     123,
+     false
+   ],
+   [
+     456,
+     false
+   ]
+ ]
+
+
+
+
+

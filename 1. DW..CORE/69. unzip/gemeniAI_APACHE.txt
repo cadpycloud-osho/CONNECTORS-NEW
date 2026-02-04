@@ -1,0 +1,191 @@
+unzip:
+
+example 1:
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CamelUnzipExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Input: [[0,"a"], [1,"b"], [2,"c"], [3,"d"]]
+                        List<List<Object>> input = List.of(
+                            List.of(0, "a"),
+                            List.of(1, "b"),
+                            List.of(2, "c"),
+                            List.of(3, "d")
+                        );
+
+                        List<Object> firstList = new ArrayList<>();
+                        List<Object> secondList = new ArrayList<>();
+
+                        // Standard Unzip logic: iterate and separate
+                        for (List<Object> pair : input) {
+                            if (pair.size() >= 2) {
+                                firstList.add(pair.get(0));
+                                secondList.add(pair.get(1));
+                            }
+                        }
+
+                        // Wrap back into a List of Lists for the final output
+                        exchange.getIn().setBody(List.of(firstList, secondList));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[
+  [0, 1, 2, 3],
+  ["a", "b", "c", "d"]
+]
+
+-----------------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+public class CamelInconsistentUnzip {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Input: [[0,"a"], [1,"a","foo"], [2], [3,"a"]]
+                        List<List<Object>> input = List.of(
+                            List.of(0, "a"),
+                            List.of(1, "a", "foo"),
+                            List.of(2),
+                            List.of(3, "a")
+                        );
+
+                        // To get [0, 1, 2, 3], we extract the first element of each sub-list
+                        List<Object> result = input.stream()
+                            .filter(subList -> !subList.isEmpty())
+                            .map(subList -> subList.get(0))
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[0, 1, 2, 3]
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CamelMultiUnzip {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source Data: List of Rows
+                        List<List<Object>> rows = List.of(
+                            List.of(0, "a", "W"),
+                            List.of(1, "b", "X"),
+                            List.of(2, "c", "Y"),
+                            List.of(3, "d", "Z")
+                        );
+
+                        if (rows.isEmpty()) return;
+
+                        // Initialize the Column Lists based on the first row's size
+                        int columnCount = rows.get(0).size();
+                        List<List<Object>> columns = new ArrayList<>();
+                        for (int i = 0; i < columnCount; i++) {
+                            columns.add(new ArrayList<>());
+                        }
+
+                        // Distribute row data into columns
+                        for (List<Object> row : rows) {
+                            for (int i = 0; i < columnCount; i++) {
+                                // Add element to the i-th column list
+                                columns.get(i).add(row.get(i));
+                            }
+                        }
+
+                        exchange.getIn().setBody(columns);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  [0, 1, 2, 3],
+  ["a", "b", "c", "d"],
+  ["W", "X", "Y", "Z"]
+]
+
+-----------------------------------------------------------

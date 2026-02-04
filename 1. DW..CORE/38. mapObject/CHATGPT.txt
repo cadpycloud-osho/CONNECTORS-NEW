@@ -1,0 +1,164 @@
+mapObject:
+
+
+example 1:
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class JsonController {
+
+    @GetMapping("/transform1")
+    public Map<String, Object> transformJson() {
+        Map<String, String> input = new LinkedHashMap<>();
+        input.put("a", "b");
+        input.put("c", "d");
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        int index = 0;
+
+        for (Map.Entry<String, String> entry : input.entrySet()) {
+            Map<String, String> nested = new LinkedHashMap<>();
+            nested.put(entry.getValue(), entry.getKey());
+            output.put(String.valueOf(index), nested);
+            index++;
+        }
+        return output;
+    }
+}
+
+
+output:
+
+{
+  "0": { "b": "a" },
+  "1": { "d": "c" }
+}
+
+
+__________________________________________________________________________
+
+
+example 2:
+
+XML → Modified XML (mapObject & formatting)
+
+Spring Boot Code
+
+Add dependency in pom.xml if not present:
+
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+
+
+
+package com.example.demo;
+
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
+public class Prices {
+    @JacksonXmlProperty(localName = "basic")
+    public double basic;
+    
+    @JacksonXmlProperty(localName = "premium")
+    public double premium;
+    
+    @JacksonXmlProperty(localName = "vip")
+    public double vip;
+}
+
+Controller.java
+
+@GetMapping(value = "/transform2", produces = "application/xml")
+public Prices modifyPrices() {
+    Prices prices = new Prices();
+    prices.basic = 9.99 + 5;
+    prices.premium = 53 + 5;
+    prices.vip = 398.99 + 5;
+    return prices;
+}
+
+input:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+    <basic>9.99</basic>
+    <premium>53</premium>
+    <vip>398.99</vip>
+</prices>
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+  <basic>14.99</basic>
+  <premium>58.0</premium>
+  <vip>403.99</vip>
+</prices>
+
+
+__________________________________________________________________________
+
+
+example 3:
+
+Empty XML Input → Empty XML Output
+
+
+ Input
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+
+ Spring Boot Code
+@GetMapping(value = "/transform3", produces = "application/xml")
+public String emptyPrices() {
+    return "<prices></prices>";
+}
+
+
+ Output
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+
+__________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

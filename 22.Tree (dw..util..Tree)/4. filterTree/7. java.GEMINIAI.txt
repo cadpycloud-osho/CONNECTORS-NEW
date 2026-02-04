@@ -1,0 +1,193 @@
+filterTree:
+
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    // --- Predicates replicating DataWeave logic ---
+
+    // PREDICATE_A: value is NOT an empty String
+    private static final Predicate<Object> PREDICATE_A = (value) -> {
+        if (value instanceof String) {
+            return !((String) value).isEmpty();
+        }
+        return true;
+    };
+
+    // PREDICATE_B: value is a String
+    private static final Predicate<Object> PREDICATE_B = (value) -> (value instanceof String);
+
+    // PREDICATE_C: value is NOT an empty List
+    @SuppressWarnings("unchecked")
+    private static final Predicate<Object> PREDICATE_C = (value) -> {
+        if (value instanceof List) {
+            return !((List<Object>) value).isEmpty();
+        }
+        return true;
+    };
+
+    // --- Core Recursive Filter Logic ---
+
+    @SuppressWarnings("unchecked")
+    private static Object filterTreeRecursive(Object input, Predicate<Object> predicate) {
+        
+        // 1. Base Case: Primitives and Null
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            return predicate.test(input) ? input : null;
+        } 
+        
+        // 2. Recursive Case: Map (Object)
+        else if (input instanceof Map) {
+            // Apply filter to the map itself first
+            if (!predicate.test(input)) {
+                return null; 
+            }
+            
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            originalMap.forEach((key, value) -> {
+                Object result = filterTreeRecursive(value, predicate);
+                if (result != null) {
+                    newMap.put(key, result);
+                }
+            });
+
+            // Map removal logic: If the map failed the predicate check, it would have been removed above.
+            // If it passed the predicate but is now empty, it is NOT removed (it returns {}).
+            // DataWeave filterTree returns null if the object is empty AND failed the original predicate,
+            // but since we checked the predicate at the start, we return the filtered map, even if empty.
+            return newMap;
+        } 
+        
+        // 3. Recursive Case: List (Array)
+        else if (input instanceof List) {
+            // Apply filter to the list itself first
+             if (!predicate.test(input)) {
+                return null; 
+            }
+            
+            List<Object> originalList = (List<Object>) input;
+            
+            List<Object> filteredList = originalList.stream()
+                .map(item -> filterTreeRecursive(item, predicate))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+            // List removal logic: If the list failed the predicate check, it would have been removed above.
+            // If it passed the predicate but is now empty, it is NOT removed (it returns []).
+            return filteredList;
+        } 
+        return input; 
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> {
+                        String jsonValue = toPrettyJson(v, indent + 1);
+                        return jsonValue.contains("\n") ? jsonValue : next + jsonValue;
+                    })
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+    public static void main(String[] args) {
+        
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // Input structure for 'a'
+        // Using LinkedHashMap and Arrays.asList for safe mutation/construction
+        Map<String, Object> inputA = new LinkedHashMap<>();
+        inputA.put("name", "");
+        inputA.put("lastName", "Achaval");
+        
+        List<Object> friendsList = Arrays.asList(
+            Map.of("id", "", "test", true), 
+            Map.of("age", 123), 
+            ""
+        );
+        inputA.put("friends", friendsList);
+        
+        // a: filterTree (removes empty strings)
+        output.put("a", filterTreeRecursive(inputA, PREDICATE_A));
+        
+        // b: null filterTree (value is String) -> results in null
+        output.put("b", filterTreeRecursive(null, PREDICATE_B));
+        
+        // c: filterTree (removes empty arrays)
+        List<Object> inputC = Arrays.asList(
+            Map.of("name", "Mariano", "friends", List.of()),
+            Map.of("test", List.of(1, 2, 3)),
+            Map.of("dw", "")
+        );
+        output.put("c", filterTreeRecursive(inputC, PREDICATE_C));
+
+        // Output the map as JSON
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+
+output:
+
+{
+  "a": {
+    "lastName": "Achaval",
+    "friends": [
+      {
+        "test": true
+      },
+      {
+        "age": 123
+      }
+    ]
+  },
+  "b": null,
+  "c": [
+    {
+      "name": "Mariano"
+    },
+    {
+      "test": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "dw": ""
+    }
+  ]
+}
+
+

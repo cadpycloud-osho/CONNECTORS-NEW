@@ -1,0 +1,49 @@
+abs(number: Number): Number
+
+
+
+input:
+
+
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.Math; // This import is technically unnecessary as java.lang is auto-imported, but it does no harm.
+
+// Renamed to Main to match the assumed file name (Main.java) and resolve the compilation error.
+public class Main { 
+
+    public static void main(String[] args) {
+        // DataWeave Source: [ abs(-2), abs(2.5), abs(-3.4), abs(3) ]
+        
+        // 1. Define the input numbers (using the most appropriate Java types)
+        int num1 = -2;
+        double num2 = 2.5;
+        double num3 = -3.4;
+        int num4 = 3;
+
+        // 2. Apply the absolute value function (equivalent to DW's abs())
+        // Java's Math.abs() is overloaded to handle int, long, float, and double.
+        int result1 = Math.abs(num1);        // returns int: 2
+        double result2 = Math.abs(num2);     // returns double: 2.5
+        double result3 = Math.abs(num3);     // returns double: 3.4
+        int result4 = Math.abs(num4);        // returns int: 3
+
+        // 3. Collect the results into a List of Objects to match the mixed DataWeave array 
+        List<Object> outputList = new ArrayList<>();
+        outputList.add(result1);
+        outputList.add(result2);
+        outputList.add(result3);
+        outputList.add(result4);
+
+        // Print the result
+        System.out.println("Output:");
+        System.out.println(outputList);
+    }
+}
+
+
+output:
+
+
+[2, 2.5, 3.4, 3]
+

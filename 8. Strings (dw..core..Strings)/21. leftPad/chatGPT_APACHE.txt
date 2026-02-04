@@ -1,0 +1,53 @@
+leftPad:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LeftPadExample {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", leftPad(null, 3));
+        result.put("b", leftPad("", 3));
+        result.put("c", leftPad("bat", 5));
+        result.put("d", leftPad("bat", 3));
+        result.put("e", leftPad("bat", -1));
+
+        System.out.println(result);
+    }
+
+    private static String leftPad(String str, int size) {
+        if (str == null) {
+            return null;
+        }
+        if (size <= str.length()) {
+            return str;
+        }
+        int pads = size - str.length();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < pads; i++) {
+            sb.append(' ');
+        }
+        sb.append(str);
+        return sb.toString();
+    }
+}
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}
+
+

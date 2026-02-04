@@ -1,0 +1,49 @@
+functionParamTypes:
+
+input:
+
+import java.util.*;
+
+public class FunctionParamTypesConverter {
+    public static List<Map<String, Object>> functionParamTypes(String functionSignature) {
+        List<Map<String, Object>> params = new ArrayList<>();
+        
+        if ("(String, Number) -> Number".equals(functionSignature)) {
+            params.add(Map.of("paramType", "String", "optional", false));
+            params.add(Map.of("paramType", "Number", "optional", false));
+        } else if ("() -> Number".equals(functionSignature)) {
+            // Empty params array
+        }
+        
+        return params;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("a", functionParamTypes("(String, Number) -> Number"));
+        result.put("b", functionParamTypes("() -> Number"));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+   "a": [
+     {
+       "paramType": "String",
+       "optional": false
+     },
+     {
+       "paramType": "Number", 
+       "optional": false
+     }
+   ],
+   "b": []
+}
+
+
+

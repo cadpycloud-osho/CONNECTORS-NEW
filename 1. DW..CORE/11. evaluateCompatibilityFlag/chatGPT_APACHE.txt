@@ -1,0 +1,23 @@
+evaluateCompatibilityFlag:
+
+
+input:
+
+from("direct:compatibilityFlag")
+.setProperty("honourMixedContentStructure", constant(true))
+.setBody(simple(
+    "{ \"com.mulesoft.dw.xml_reader.honourMixedContentStructure\": ${exchangeProperty.honourMixedContentStructure} }"
+));
+
+
+
+
+
+output:
+
+
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}
+
+

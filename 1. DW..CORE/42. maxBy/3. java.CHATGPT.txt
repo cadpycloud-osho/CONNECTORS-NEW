@@ -1,0 +1,148 @@
+maxBy:
+
+
+example 1:
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Map<String, Integer>> list = new ArrayList<>();
+
+        list.add(Collections.singletonMap("a", 1));
+        list.add(Collections.singletonMap("a", 3));
+        list.add(Collections.singletonMap("a", 2));
+
+        // Find the maxBy "a"
+        Map<String, Integer> maxItem = list.stream()
+                .max(Comparator.comparingInt(item -> item.get("a")))
+                .orElse(Collections.emptyMap());
+
+        System.out.println(maxItem);
+    }
+}
+
+
+output:
+
+{a=3}
+
+----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        OffsetDateTime myDateTime1 = OffsetDateTime.parse("2017-10-01T22:57:59-03:00");
+        OffsetDateTime myDateTime2 = OffsetDateTime.parse("2018-10-01T23:57:59-03:00");
+
+        // byDateTime
+        OffsetDateTime maxByDateTime =
+                maxBy(Arrays.asList(myDateTime1, myDateTime2));
+
+        // byDate
+        LocalDate maxByDate =
+                maxBy(Arrays.asList(myDateTime1.toLocalDate(), myDateTime2.toLocalDate()));
+
+        // byTime
+        LocalTime maxByTime =
+                maxBy(Arrays.asList(myDateTime1.toLocalTime(), myDateTime2.toLocalTime()));
+
+        // empty array
+        List<OffsetDateTime> emptyList = Collections.emptyList();
+        OffsetDateTime emptyMax = maxBy(emptyList);
+
+        System.out.println("{");
+        System.out.println("  \"myMaxBy\": {");
+        System.out.println("    \"byDateTime\": \"" + maxByDateTime + "\",");
+        System.out.println("    \"byDate\": \"" + maxByDate + "\",");
+        System.out.println("    \"byTime\": \"" + maxByTime + "\",");
+        System.out.println("    \"emptyArray\": " + (emptyMax == null ? "null" : "\"" + emptyMax + "\""));
+        System.out.println("  }");
+        System.out.println("}");
+    }
+
+    private static <T extends Comparable<? super T>> T maxBy(List<T> list) {
+        if (list == null || list.isEmpty()) return null;
+        return Collections.max(list);
+    }
+}
+
+
+
+output:
+
+{
+  "myMaxBy": {
+    "byDateTime": "2018-10-01T23:57:59-03:00",
+    "byDate": "2018-10-01",
+    "byTime": "23:57:59",
+    "emptyArray": null
+  }
+}
+
+
+
+----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> letters = Arrays.asList("A", "B", "C");
+
+        String maxLetter = maxBy(letters);
+
+        System.out.println(maxLetter);
+    }
+
+    private static <T extends Comparable<T>> T maxBy(List<T> list) {
+        if (list == null || list.isEmpty()) return null;
+        return Collections.max(list);
+    }
+}
+
+output:
+
+
+C
+
+
+
+
+
+
+

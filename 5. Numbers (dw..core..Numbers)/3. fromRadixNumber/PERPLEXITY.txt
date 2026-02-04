@@ -1,0 +1,82 @@
+fromRadixNumber:
+
+
+input:
+
+
+package com.example.radixconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class RadixConverterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RadixConverterApplication.class, args);
+    }
+}
+
+@RestController
+class RadixConverterController {
+
+    @GetMapping("/convert-radix")
+    public Map<String, Object> convertRadixNumbers() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        // a: fromRadixNumber("10", 2) => binary "10" = decimal 2
+        result.put("a", fromRadixNumber("10", 2));
+
+        // b: fromRadixNumber("FF", 16) => hex "FF" = decimal 255
+        result.put("b", fromRadixNumber("FF", 16));
+
+        return result;
+    }
+
+    private Object fromRadixNumber(String numberStr, int radix) {
+        if (numberStr == null || numberStr.trim().isEmpty()) {
+            return null;
+        }
+        numberStr = numberStr.trim();
+
+        try {
+            // Support for negative numbers
+            boolean isNegative = false;
+            if (numberStr.startsWith("-")) {
+                isNegative = true;
+                numberStr = numberStr.substring(1);
+            }
+            BigInteger value = new BigInteger(numberStr, radix);
+            if (isNegative) {
+                value = value.negate();
+            }
+
+            // Return Integer, Long, or BigInteger as string for large numbers
+            if (value.bitLength() <= 31) {
+                return value.intValue();
+            } else if (value.bitLength() <= 63) {
+                return value.longValue();
+            } else {
+                return value.toString();
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": 2,
+  "b": 255
+}
+

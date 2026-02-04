@@ -1,0 +1,53 @@
+replaceAll:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String replaceAllDW(String input, String search, String replace) {
+        if (input == null) return null;
+        if (search == null || search.isEmpty()) return input;
+
+        return input.replace(search, replace);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class ReplaceController {
+
+    @GetMapping("/replaceall")
+    public Map<String, String> replaceAllExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.replaceAllDW("Mariano", "a", "A"));
+        result.put("b", StringUtils.replaceAllDW("AAAA", "AAA", "B"));
+        result.put("c", StringUtils.replaceAllDW(null, "aria", "A"));
+        result.put("d", StringUtils.replaceAllDW("Mariano", "j", "Test"));
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": "MAriAno",
+  "b": "BA",
+  "c": null,
+  "d": "Mariano"
+}

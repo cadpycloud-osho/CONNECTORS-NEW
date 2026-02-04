@@ -1,0 +1,90 @@
+valueSet:
+
+
+
+input:
+
+package com.example.dataweaveconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@SpringBootApplication
+public class DataweaveValueSetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveValueSetApplication.class, args);
+    }
+
+    // =========================================================================
+    // 1. DTO (Data Transfer Object)
+    // =========================================================================
+    // We use List<Object> because the values are of mixed types (Boolean and Integer)
+    public record DataWeaveOutput(
+        List<Object> valueSet
+    ) {}
+
+    // =========================================================================
+    // 2. REST CONTROLLER
+    // =========================================================================
+    @RestController
+    @RequestMapping("/convert")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+
+        @Autowired
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/valueSet")
+        public DataWeaveOutput runDataWeaveLogic() {
+            // Source object: {a: true, b: 1}. Map.of preserves declaration order (Java 9+).
+            Map<String, Object> sourceObject = Map.of("a", true, "b", 1);
+            
+            List<Object> values = dataWeaveService.getValueSet(sourceObject);
+
+            return new DataWeaveOutput(values);
+        }
+    }
+
+    // =========================================================================
+    // 3. SERVICE LAYER (LOGIC IMPLEMENTATION)
+    // =========================================================================
+    @Service
+    public static class DataWeaveService {
+
+        /**
+         * Mimics the DataWeave dw::core::Objects::valueSet operation.
+         * Extracts all values from the map into a list.
+         *
+         * @param inputMap The map (DataWeave Object) to retrieve values from.
+         * @return A list of the map's values.
+         */
+        public List<Object> getValueSet(Map<String, Object> inputMap) {
+            // Direct equivalent: get the collection of values and convert it to an ArrayList.
+            return new ArrayList<>(inputMap.values());
+        }
+    }
+}
+
+output:
+
+
+{
+  "valueSet": [
+    true,
+    1
+  ]
+}
+

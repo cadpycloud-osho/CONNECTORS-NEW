@@ -1,0 +1,83 @@
+try:
+
+
+input:
+
+import java.util.Map;
+import java.util.Random;
+
+class PureJavaFunctionFailureException extends RuntimeException {
+    public PureJavaFunctionFailureException(String message) {
+        super(message);
+    }
+}
+
+public class Main {
+
+    private static final Random random = new Random();
+
+    /**
+     * Replicates the DW function randomNumber().
+     */
+    public static String randomNumber() {
+        if (random.nextDouble() > 0.5) {
+            throw new PureJavaFunctionFailureException("This function is failing");
+        } else {
+            return "OK";
+        }
+    }
+
+    /**
+     * Replicates the main DW expression: try(() -> randomNumber())
+     */
+    public static Map<String, Object> executeTry() {
+        try {
+            String result = randomNumber();
+            
+            // Replicates the DW Success Output
+            return Map.of(
+                "success", true,
+                "result", result
+            );
+
+        } catch (PureJavaFunctionFailureException e) {
+            // Replicates the DW Failure Output
+            return Map.of(
+                "success", false,
+                "error", Map.of(
+                    "kind", e.getClass().getSimpleName(),
+                    "message", e.getMessage(),
+                    "location", "Unknown location",
+                    "stack", new String[]{"main (Pure Java)"} 
+                )
+            );
+        }
+    }
+    
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Try/Fail Simulation ---");
+        Map<String, Object> result = executeTry();
+        System.out.println(result);
+    }
+}
+
+output:
+
+Possible Output 1 (Success):
+
+--- Pure Java Try/Fail Simulation ---
+{success=true, result=OK}
+Possible Output 2 (Failure):
+
+--- Pure Java Try/Fail Simulation ---
+{
+  success=false, 
+  error={
+    kind=PureJavaFunctionFailureException, 
+    message=This function is failing, 
+    location=Unknown location, 
+    stack=[main (Pure Java)]
+  }
+}
+
+

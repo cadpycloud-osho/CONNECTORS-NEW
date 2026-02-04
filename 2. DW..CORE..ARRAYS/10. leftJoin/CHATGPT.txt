@@ -1,0 +1,117 @@
+leftJoin:
+
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+// Start Spring Boot
+@SpringBootApplication
+@RestController
+public class DemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+    // POJO: User
+    static class User {
+        private String id;
+        private String name;
+
+        public User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        public String getId() { return id; }
+        public String getName() { return name; }
+    }
+
+    // POJO: Product
+    static class Product {
+        private String ownerId;
+        private String name;
+
+        public Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+        public String getOwnerId() { return ownerId; }
+        public String getName() { return name; }
+    }
+
+    // API → Simulates DataWeave leftJoin
+    @GetMapping("/leftJoin")
+    public List<Map<String, Object>> leftJoin() {
+
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"),
+            new User("2", "Leandro"),
+            new User("3", "Julian"),
+            new User("5", "Julian")
+        );
+
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"),
+            new Product("1", "BAT"),
+            new Product("3", "DataSense"),
+            new Product("4", "SmartConnectors")
+        );
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (User u : users) {
+            boolean matched = false;
+            for (Product p : products) {
+                if (u.getId().equals(p.getOwnerId())) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("l", u);
+                    row.put("r", p);
+                    result.add(row);
+                    matched = true;
+                }
+            }
+            if (!matched) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("l", u);
+                result.add(row);
+            }
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+[
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "DataWeave" }
+  },
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "BAT" }
+  },
+  {
+    "l": { "id": "2", "name": "Leandro" }
+  },
+  {
+    "l": { "id": "3", "name": "Julian" },
+    "r": { "ownerId": "3", "name": "DataSense" }
+  },
+  {
+    "l": { "id": "5", "name": "Julian" }
+  }
+]
+
+

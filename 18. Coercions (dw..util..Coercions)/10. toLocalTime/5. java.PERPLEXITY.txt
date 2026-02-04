@@ -1,0 +1,85 @@
+toLocalTime:
+
+
+example 1:
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String input = "23:57:59";
+        
+        // Equivalent to DataWeave 'a'
+        LocalTime resultA = parseWithMultipleFormats(input);
+        
+        // Equivalent to DataWeave 'b'
+        String errorMessageB = parseWithSingleFormat(input);
+        
+        System.out.println("Result: " + Map.of("a", resultA, "b", errorMessageB));
+    }
+    
+    private static LocalTime parseWithMultipleFormats(String input) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+            .appendPattern("HH:mm:ss")
+            .toFormatter();
+        return LocalTime.parse(input, formatter);
+    }
+    
+    private static String parseWithSingleFormat(String input) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+            LocalTime.parse(input, formatter);
+            return null;
+        } catch (DateTimeParseException e) {
+            return e.getMessage();
+        }
+    }
+}
+
+
+output:
+
+Result: {a=23:57:59, b=Text '23:57:59' could not be parsed at index 8}
+
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        // Equivalent to DataWeave toLocalTime("23:57:59")
+        LocalTime time1 = LocalTime.parse("23:57:59");
+        
+        // Equivalent to DataWeave toLocalTime("13:44:12.283", "HH:mm:ss.n")
+        DateTimeFormatter formatterWithNanos = DateTimeFormatter.ofPattern("HH:mm:ss.n");
+        LocalTime time2 = LocalTime.parse("13:44:12.283", formatterWithNanos);
+        
+        System.out.println("Result: " + Map.of(
+            "toLocalTimeEx", time1.toString(),
+            "toLocalTimeEx2", time2.toString()
+        ));
+    }
+}
+
+
+output:
+
+Result: {toLocalTimeEx=23:57:59, toLocalTimeEx2=13:44:12.283}
+

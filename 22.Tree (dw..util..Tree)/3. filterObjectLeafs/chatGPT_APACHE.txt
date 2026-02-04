@@ -1,0 +1,105 @@
+filterObjectLeafs:
+
+
+input:
+
+import java.util.*;
+
+public class FilterObjectLeafsExample {
+
+    public static void main(String[] args) {
+
+        // Input array
+        List<Map<String, Object>> myArray = new ArrayList<>();
+
+        Map<String, Object> obj1 = new LinkedHashMap<>();
+        obj1.put("name", "");  // with metadata ignored
+        obj1.put("id", "test");
+
+        Map<String, Object> obj2 = new LinkedHashMap<>();
+        obj2.put("name", "Me");
+        obj2.put("id", null);
+
+        myArray.add(obj1);
+        myArray.add(obj2);
+
+        // Object 'a' to filter
+        Map<String, Object> a = new LinkedHashMap<>();
+        a.put("name", "Mariano");
+        a.put("lastName", null);
+        a.put("age", 123);
+        a.put("friends", myArray);
+
+        Map<String, Object> filteredA = filterObjectLeafs(a, (value, path) ->
+                !(value == null || value instanceof String));
+
+        // Object 'b' to filter
+        Map<String, Object> b = new LinkedHashMap<>();
+        b.put("c", null);
+        b.put("d", "hello");
+
+        Map<String, Object> filteredB = filterObjectLeafs(b, (value, path) ->
+                (value == null && path instanceof String)); // simulate isObjectType
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", filteredA);
+        output.put("b", filteredB);
+
+        System.out.println(output);
+    }
+
+    // Recursive filter for maps
+    private static Map<String, Object> filterObjectLeafs(
+            Map<String, Object> map,
+            BiPredicate<Object, Object> predicate) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                result.put((String) key, filterObjectLeafs((Map<String, Object>) value, predicate));
+            } else if (value instanceof List) {
+                List<Object> list = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    if (item instanceof Map) {
+                        list.add(filterObjectLeafs((Map<String, Object>) item, predicate));
+                    } else if (predicate.test(item, key)) {
+                        list.add(item);
+                    } else {
+                        list.add(new LinkedHashMap<>()); // mimic empty object
+                    }
+                }
+                result.put((String) key, list);
+            } else {
+                if (predicate.test(value, key)) {
+                    result.put((String) key, value);
+                }
+            }
+        }
+        return result;
+    }
+
+    @FunctionalInterface
+    interface BiPredicate<T, U> {
+        boolean test(T t, U u);
+    }
+}
+
+
+
+output:
+
+{
+  "a": {
+    "age": 123,
+    "friends": [
+      {},
+      {}
+    ]
+  },
+  "b": {
+    "c": null
+  }
+}

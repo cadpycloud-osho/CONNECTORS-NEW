@@ -1,0 +1,60 @@
+functionParamTypes:
+
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class FunctionTypeController {
+    
+    public static class ParamInfo {
+        public String paramType;
+        public boolean optional;
+        
+        public ParamInfo(String paramType, boolean optional) {
+            this.paramType = paramType;
+            this.optional = optional;
+        }
+    }
+    
+    @GetMapping("/function-params")
+    public Map<String, List<ParamInfo>> getFunctionParams() {
+        Map<String, List<ParamInfo>> result = new HashMap<>();
+        
+        // AFunction = (String, Number) -> Number
+        List<ParamInfo> paramsA = Arrays.asList(
+            new ParamInfo("String", false),
+            new ParamInfo("Number", false)
+        );
+        result.put("a", paramsA);
+        
+        // AFunction2 = () -> Number (no parameters)
+        result.put("b", new ArrayList<>());
+        
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": [
+    {
+      "paramType": "String",
+      "optional": false
+    },
+    {
+      "paramType": "Number",
+      "optional": false
+    }
+  ],
+  "b": []
+}
+

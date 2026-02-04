@@ -1,0 +1,108 @@
+mergeWith:
+
+
+input:
+
+
+package com.example.dataweaveconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class DataweaveMergeWithApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveMergeWithApplication.class, args);
+    }
+
+    // =========================================================================
+    // 1. DTO (Data Transfer Object)
+    // =========================================================================
+    public record DataWeaveOutput(
+        Map<String, Object> mergeWith
+    ) {}
+
+    // =========================================================================
+    // 2. REST CONTROLLER
+    // =========================================================================
+    @RestController
+    @RequestMapping("/convert")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+
+        @Autowired
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/mergeWith")
+        public DataWeaveOutput runDataWeaveLogic() {
+            // Left object: { "a" : true, "b" : 1}
+            Map<String, Object> leftObject = Map.of("a", true, "b", 1);
+            
+            // Right object: { "a" : false, "c" : "Test"}
+            Map<String, Object> rightObject = Map.of("a", false, "c", "Test");
+            
+            Map<String, Object> mergedMap = dataWeaveService.mergeWith(leftObject, rightObject);
+
+            return new DataWeaveOutput(mergedMap);
+        }
+    }
+
+    // =========================================================================
+    // 3. SERVICE LAYER (LOGIC IMPLEMENTATION)
+    // =========================================================================
+    @Service
+    public static class DataWeaveService {
+
+        /**
+         * Mimics the DataWeave dw::core::Objects::mergeWith operation (++)
+         * where the right map overwrites keys from the left map.
+         *
+         * @param leftMap The base map.
+         * @param rightMap The map whose entries overwrite and extend the base map.
+         * @return A new map containing the merged result, preserving the DataWeave output order.
+         */
+        public Map<String, Object> mergeWith(Map<String, Object> leftMap, Map<String, Object> rightMap) {
+            // DataWeave's merge order is typically:
+            // 1. Keys unique to the left object
+            // 2. All keys from the right object (handling overwrites)
+            
+            Map<String, Object> finalMap = new LinkedHashMap<>();
+
+            // 1. Add keys unique to the left map (e.g., "b": 1)
+            leftMap.forEach((key, value) -> {
+                if (!rightMap.containsKey(key)) {
+                    finalMap.put(key, value);
+                }
+            });
+
+            // 2. Add all keys from the right map (e.g., "a": false, "c": "Test").
+            // This handles the overwrite of 'a'.
+            finalMap.putAll(rightMap);
+
+            return finalMap;
+        }
+    }
+}
+
+output:
+
+{
+  "mergeWith": {
+    "b": 1,
+    "a": false,
+    "c": "Test"
+  }
+}
+

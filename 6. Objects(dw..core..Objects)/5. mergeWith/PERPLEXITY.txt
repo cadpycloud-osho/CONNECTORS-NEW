@@ -1,0 +1,67 @@
+mergeWith:
+
+
+input:
+
+package com.example.mergewith;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class MergeWithApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MergeWithApplication.class, args);
+    }
+}
+
+@RestController
+class MergeWithController {
+
+    @GetMapping("/merge-with")
+    public Map<String, Object> mergeWithExample() {
+        Map<String, Object> map1 = new LinkedHashMap<>();
+        map1.put("a", true);
+        map1.put("b", 1);
+
+        Map<String, Object> map2 = new LinkedHashMap<>();
+        map2.put("a", false);
+        map2.put("c", "Test");
+
+        Map<String, Object> merged = mergeWith(map1, map2);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("mergeWith", merged);
+        return result;
+    }
+
+    private Map<String, Object> mergeWith(Map<String, Object> first, Map<String, Object> second) {
+        // Create a new map to hold the merged result preserving insertion order
+        Map<String, Object> result = new LinkedHashMap<>(first);
+        // Overwrite or add all keys from second
+        for (Map.Entry<String, Object> entry : second.entrySet()) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+}
+
+
+
+output:
+
+
+{
+  "mergeWith": {
+    "a": false,
+    "b": 1,
+    "c": "Test"
+  }
+}
+

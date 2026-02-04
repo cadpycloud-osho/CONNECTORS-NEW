@@ -1,0 +1,42 @@
+asin:
+
+
+input:
+
+import java.util.*;
+import static java.lang.Math.*;
+
+public class AsinConverter {
+    public static Double safeAsin(double value) {
+        if (value < -1.0 || value > 1.0) {
+            return null;
+        }
+        return asin(value);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        result.put("asin0", safeAsin(0));
+        result.put("asin13", safeAsin(0.13));
+        result.put("asin-1", safeAsin(-1));
+        result.put("asin1.1", safeAsin(1.1));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+   "asin0": 0.0,
+   "asin13": 0.1303689797031455,
+   "asin-1": -1.5707963267948966,
+   "asin1.1": null
+}
+
+
+
+

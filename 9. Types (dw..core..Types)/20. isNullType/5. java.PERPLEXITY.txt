@@ -1,0 +1,37 @@
+isNullType:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isNullType(Object value) {
+        return value == null;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Object aNull = null;     // ANull
+        Object nullType = null;  // Null
+        Object str = "test";     // String
+        
+        result.put("a", isNullType(aNull));
+        result.put("b", isNullType(nullType));
+        result.put("c", isNullType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=true, c=false}
+

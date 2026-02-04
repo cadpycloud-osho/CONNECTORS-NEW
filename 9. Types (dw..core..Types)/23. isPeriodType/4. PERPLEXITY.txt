@@ -1,0 +1,45 @@
+isPeriodType:
+
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Period;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class PeriodTypeController {
+
+    private boolean isPeriodType(Object value) {
+        return value instanceof Period;
+    }
+
+    @GetMapping("/period-type-check")
+    public Map<String, Boolean> checkPeriodTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Period aPeriod = Period.ofDays(1);   // APeriod alias
+        Period periodType = Period.ofWeeks(1); // Period
+        String str = "test";                 // String
+        
+        result.put("a", isPeriodType(aPeriod));
+        result.put("b", isPeriodType(periodType));
+        result.put("c", isPeriodType(str));
+        
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

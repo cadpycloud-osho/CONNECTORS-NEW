@@ -1,0 +1,64 @@
+between:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.*;
+
+public class PeriodsBetweenRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:periodsBetween")
+            .process(exchange -> {
+                Map<String, String> result = new LinkedHashMap<>();
+                
+                // a: between(|2010-12-12|, |2010-12-10|) → P2D
+                Period a = Period.between(
+                    LocalDate.of(2010, 12, 10),  // startInclusive
+                    LocalDate.of(2010, 12, 12)   // endExclusive
+                );
+                result.put("a", "P" + (a.getYears() > 0 ? a.getYears() + "Y" : "") +
+                              (a.getMonths() > 0 ? a.getMonths() + "M" : "") +
+                              a.getDays() + "D");
+                
+                // b: between(|2011-12-11|, |2010-11-10|) → P1Y1M1D  
+                Period b = Period.between(
+                    LocalDate.of(2010, 11, 10),
+                    LocalDate.of(2011, 12, 11)
+                );
+                result.put("b", "P" + b.getYears() + "Y" + b.getMonths() + "M" + b.getDays() + "D");
+                
+                // c: between(|2020-02-29|, |2020-03-30|) → P-1M-1D (negative)
+                Period c = Period.between(
+                    LocalDate.of(2020, 3, 30),
+                    LocalDate.of(2020, 2, 29)
+                );
+                result.put("c", "P" + (c.getYears() < 0 ? c.getYears() + "Y" : "") +
+                              (c.getMonths() < 0 ? c.getMonths() + "M" : "") +
+                              (c.getDays() < 0 ? c.getDays() + "D" : c.getDays() + "D"));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "a": "P2D",
+  "b": "P1Y1M1D", 
+  "c": "P-1M-1D"
+}
+
+
+
+
+

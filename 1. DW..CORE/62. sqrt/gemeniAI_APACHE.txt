@@ -1,0 +1,49 @@
+sqrt:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class CamelSqrtExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source: [4, 25, 100]
+                        List<Double> inputs = List.of(4.0, 25.0, 100.0);
+
+                        // Equivalent to sqrt()
+                        List<Double> results = inputs.stream()
+                            .map(Math::sqrt)
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(results);
+                    })
+                    // Marshal to JSON to match output format
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[ 2.0, 5.0, 10.0 ]
+

@@ -1,0 +1,56 @@
+substringBeforeLast:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringBeforeLastExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringBeforeLast(null, "'"));
+        result.put("b", substringBeforeLast("", "-"));
+        result.put("c", substringBeforeLast("abc", "b"));
+        result.put("d", substringBeforeLast("abcba", "b"));
+        result.put("e", substringBeforeLast("abc", "d"));
+        result.put("f", substringBeforeLast("abc", ""));
+
+        System.out.println(result);
+    }
+
+    public static String substringBeforeLast(String value, String delimiter) {
+        if (value == null) {
+            return null;
+        }
+        if (delimiter == null || delimiter.isEmpty()) {
+            // In DW, returns characters except the last one if delimiter is empty
+            if (value.length() <= 1) {
+                return "";
+            }
+            return value.substring(0, value.length() - 1);
+        }
+        int index = value.lastIndexOf(delimiter);
+        if (index == -1) {
+            return "";
+        }
+        return value.substring(0, index);
+    }
+}
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "abc",
+  "e": "",
+  "f": "ab"
+}
+
+
+
+

@@ -1,0 +1,52 @@
+evaluateCompatibilityFlag:
+
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        // Simulate DataWeave compatibility flag check
+        // In real Mule runtime, this would read from configuration
+        boolean honourMixedContent = true;  // Default enabled flag
+        
+        Map<String, Boolean> result = Map.of(
+            "com.mulesoft.dw.xml_reader.honourMixedContentStructure", 
+            honourMixedContent
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "com.mulesoft.dw.xml_reader.honourMixedContentStructure": true
+}
+
+
+
+
+
+
+
+
+
+
+
+Alternative with System Property Check
+
+
+
+String flagKey = "com.mulesoft.dw.xml_reader.honourMixedContentStructure";
+boolean flagValue = Boolean.parseBoolean(
+    System.getProperty(flagKey, "true")  // Default true
+);
+
+Map<String, Boolean> result = Map.of(flagKey, flagValue);
+System.out.println(result);

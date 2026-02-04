@@ -1,0 +1,36 @@
+attr:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        String namespaceUri = "http://acme.com/foo";
+        String attrName = "myAttr";
+        
+        Map<String, Object> result = createAttr(namespaceUri, attrName);
+        System.out.println(result);
+    }
+    
+    public static Map<String, Object> createAttr(String namespaceUri, String attrName) {
+        Map<String, Object> attr = new HashMap<>();
+        attr.put("kind", "Attribute");
+        attr.put("namespace", namespaceUri);
+        attr.put("selector", attrName);
+        return attr;
+    }
+}
+
+
+output:
+
+
+{
+   "kind": "Attribute",
+   "namespace": "http://acme.com/foo",
+   "selector": "myAttr"
+}
+

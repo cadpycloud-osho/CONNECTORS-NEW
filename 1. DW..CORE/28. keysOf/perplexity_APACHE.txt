@@ -1,0 +1,121 @@
+keysOf:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class KeysOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:keysOf")
+            .setBody(exchange -> {
+                Map<String, Object> inputMap = new HashMap<>();
+                inputMap.put("a", true);
+                inputMap.put("b", 1);
+                return inputMap;
+            })
+            .process(exchange -> {
+                Map<String, Object> input = exchange.getIn().getBody(Map.class);
+                List<String> keys = new ArrayList<>(input.keySet());
+                
+                Map<String, Object> result = new HashMap<>();
+                result.put("keysOf", keys);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{ "keysOf": ["a", "b"] }
+
+
+----------------------------------------------------------------\
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.namespace.NamespaceContext;
+import java.util.*;
+
+public class KeysNamesOfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:keysNamesOf")
+            .setBody(simple("<users xmlns='http://test.com'><user name='Mariano' lastName='Achaval'/><user name='Stacey' lastName='Duke'/></users>"))
+            .process(exchange -> {
+                String xml = exchange.getIn().getBody(String.class);
+                Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new ByteArrayInputStream(xml.getBytes()));
+                
+                NodeList users = doc.getElementsByTagNameNS("*", "user");
+                List<Object> keysOfExample = new ArrayList<>();
+                List<Object> namesOfExample = new ArrayList<>();
+                
+                // First two elements: namespace for users collection
+                keysOfExample.add("http://test.com");
+                keysOfExample.add("http://test.com");
+                namesOfExample.add(null);
+                namesOfExample.add(null);
+                
+                // Next two: attributes of each user (matching keysOf behavior)
+                for (int i = 0; i < users.getLength(); i++) {
+                    Element user = (Element) users.item(i);
+                    Map<String, String> attrs = new LinkedHashMap<>();
+                    NamedNodeMap attrMap = user.getAttributes();
+                    for (int j = 0; j < attrMap.getLength(); j++) {
+                        Node attr = attrMap.item(j);
+                        attrs.put(attr.getNodeName(), attr.getNodeValue());
+                    }
+                    keysOfExample.add(attrs);
+                    namesOfExample.add(null); // namesOf returns null for elements
+                }
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("keysOfExample", keysOfExample);
+                result.put("namesOfExample", namesOfExample);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "keysOfExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "namesOfExample": [
+    null,
+    null,
+    null,
+    null
+  ]
+}
+
+

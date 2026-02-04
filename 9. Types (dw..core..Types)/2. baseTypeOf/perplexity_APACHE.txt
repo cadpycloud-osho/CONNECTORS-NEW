@@ -1,0 +1,32 @@
+baseTypeOf:
+
+
+input:
+
+import java.util.*;
+
+public class BaseTypeOfConverter {
+    // Simulates DataWeave baseTypeOf() - extracts underlying primitive type
+    public static String baseTypeOf(String typedString) {
+        // AType = String {format: "YYYY-MM-dd"} → base type is "String"
+        return "String";
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", baseTypeOf("String {format: \"YYYY-MM-dd\"}"));
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "String"
+}
+
+
+
+

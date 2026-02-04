@@ -1,0 +1,174 @@
+map:
+
+example 1:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@RestController
+public class MapTransformController {
+
+    /**
+     * DataWeave Source: ["jose", "pedro", "mateo"] map (value, index) -> { (index) : value}
+     * Accessible at http://localhost:8080/map/kvp-with-index
+     */
+    @GetMapping("/map/kvp-with-index")
+    public List<Map<String, String>> mapToKeyValuePair() {
+        List<String> names = Arrays.asList("jose", "pedro", "mateo");
+
+        return IntStream.range(0, names.size())
+            .mapToObj(index -> {
+                String value = names.get(index);
+                Map<String, String> entry = new LinkedHashMap<>();
+                // Put the index (converted to String) as the key and the value as the value
+                entry.put(String.valueOf(index), value);
+                return entry;
+            })
+            .collect(Collectors.toList());
+    }
+}
+output:
+
+[
+  {
+    "0": "jose"
+  },
+  {
+    "1": "pedro"
+  },
+  {
+    "2": "mateo"
+  }
+]
+____________________________________________________________________________
+
+
+example 2:
+
+
+input:
+
+// ... inside the MapTransformController class ...
+
+    /**
+     * DataWeave Source: ['a', 'b', 'c'] map ((value, index) -> (index + 1) ++ '_' ++ value)
+     * Accessible at http://localhost:8080/map/string-with-index
+     */
+    @GetMapping("/map/string-with-index")
+    public List<String> mapToStringConcatenation() {
+        List<String> letters = Arrays.asList("a", "b", "c");
+
+        return IntStream.range(0, letters.size())
+            .mapToObj(index -> {
+                String value = letters.get(index);
+                // Create the concatenated string: (index + 1) + "_" + value
+                return (index + 1) + "_" + value;
+            })
+            .collect(Collectors.toList());
+    }
+output:
+
+[
+  "1_a",
+  "2_b",
+  "3_c"
+]
+____________________________________________________________________________
+
+
+
+example 3:
+
+
+input:
+
+// ... inside the MapTransformController class ...
+
+    /**
+     * DataWeave Source: ['joe', 'pete', 'matt'] map ( "$$" : $)
+     * Accessible at http://localhost:8080/map/anonymous-kvp
+     */
+    @GetMapping("/map/anonymous-kvp")
+    public List<Map<String, String>> mapToAnonymousKeyValuePair() {
+        List<String> names = Arrays.asList("joe", "pete", "matt");
+
+        // The logic is identical to Example 1, as Java doesn't use the '$$' syntax.
+        return IntStream.range(0, names.size())
+            .mapToObj(index -> {
+                String value = names.get(index);
+                Map<String, String> entry = new LinkedHashMap<>();
+                entry.put(String.valueOf(index), value);
+                return entry;
+            })
+            .collect(Collectors.toList());
+    }
+output:
+
+[
+  {
+    "0": "joe"
+  },
+  {
+    "1": "pete"
+  },
+  {
+    "2": "matt"
+  }
+]
+____________________________________________________________________________
+
+
+
+example 4:
+
+
+input:
+
+// ... inside the MapTransformController class ...
+
+    /**
+     * DataWeave Source: Maps List of Objects to a List and outputs application/csv.
+     * Accessible at http://localhost:8080/map/to-csv.
+     */
+    @GetMapping(value = "/map/to-csv", produces = "text/csv")
+    public String mapToCSV() {
+        // Define the input data structure
+        List<Map<String, Object>> people = Arrays.asList(
+            Map.of("age", 14, "name", "Claire"),
+            Map.of("age", 56, "name", "Max"),
+            Map.of("age", 89, "name", "John")
+        );
+
+        // Build the CSV string
+        StringBuilder csv = new StringBuilder("age,name\n"); // Header row
+
+        // Map/iterate over the list and append the values
+        for (Map<String, Object> person : people) {
+            // Mapping logic: age: $.age, name: $.name
+            // We ensure the order is correct for CSV output
+            csv.append(person.get("age")).append(",");
+            csv.append(person.get("name")).append("\n");
+        }
+
+        return csv.toString();
+    }
+}
+
+
+Output (CSV):
+
+age,name
+14,Claire
+56,Max
+89,John
+
+

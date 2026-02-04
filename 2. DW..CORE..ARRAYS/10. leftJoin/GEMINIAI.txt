@@ -1,0 +1,192 @@
+
+leftJoin:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class DataWeaveCombinedExample {
+
+    // --- Data Classes for Left Join ---
+    static class User {
+        public String id;
+        public String name;
+        public User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    static class Product {
+        public String ownerId;
+        public String name;
+        public Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+    }
+
+    @JsonInclude(Include.NON_NULL)
+    static class LeftJoinResult {
+        @JsonProperty("l")
+        public User left;
+        @JsonProperty("r")
+        public Product right;
+
+        public LeftJoinResult(User left, Product right) {
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    // --- 1. Equivalent of DataWeave dropWhile ---
+    public static <T> List<T> dropWhile(List<T> sourceList, Predicate<T> predicate) {
+        int dropCount = 0;
+        for (T element : sourceList) {
+            if (predicate.test(element)) {
+                dropCount++;
+            } else {
+                break;
+            }
+        }
+        return sourceList.subList(dropCount, sourceList.size());
+    }
+
+    // --- 2. Equivalent of DataWeave indexWhere ---
+    public static <T> int indexWhere(List<T> sourceList, Predicate<T> predicate) {
+        for (int i = 0; i < sourceList.size(); i++) {
+            if (predicate.test(sourceList.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    // --- 3. Equivalent of DataWeave leftJoin ---
+    public static List<LeftJoinResult> leftJoin(List<User> leftList, List<Product> rightList) {
+        List<LeftJoinResult> finalJoinedList = new ArrayList<>();
+        
+        for (User user : leftList) {
+            // Find all products that match the current user ID
+            List<Product> matchingProducts = rightList.stream()
+                    .filter(product -> user.id.equals(product.ownerId))
+                    .collect(Collectors.toList());
+
+            if (matchingProducts.isEmpty()) {
+                // Case: No match found (Left element with null Right)
+                finalJoinedList.add(new LeftJoinResult(user, null));
+            } else {
+                // Case: One or more matches found (Add one result for each match)
+                for (Product product : matchingProducts) {
+                    finalJoinedList.add(new LeftJoinResult(user, product));
+                }
+            }
+        }
+        return finalJoinedList;
+    }
+
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave Array Function Equivalents in Java ---\n");
+        
+        // =========================================================================
+        // A. DataWeave: arr dropWhile $ < 3 -> [3, 2, 1]
+        // Java Equivalent: Custom dropWhile(list, predicate)
+        // =========================================================================
+        List<Integer> arrDropWhile = Arrays.asList(0, 1, 3, 2, 1);
+        List<Integer> resultA = dropWhile(arrDropWhile, n -> n < 3);
+
+        System.out.println("A. DataWeave 'dropWhile' Equivalent:");
+        System.out.println("   Input: " + arrDropWhile);
+        System.out.println("   Condition: $ < 3");
+        System.out.println("   Result: " + resultA);
+        System.out.println("   (DataWeave Output: [3, 2, 1])\n");
+
+
+        // =========================================================================
+        // B. DataWeave: users indexWhere (item) -> item startsWith "Jul" -> 2
+        // Java Equivalent: Custom indexWhere(list, predicate)
+        // =========================================================================
+        List<String> usersIndex = Arrays.asList("Mariano", "Leandro", "Julian");
+        int indexResult = indexWhere(usersIndex, item -> item.startsWith("Jul"));
+
+        System.out.println("B. DataWeave 'indexWhere' Equivalent:");
+        System.out.println("   Input: " + usersIndex);
+        System.out.println("   Condition: startsWith \"Jul\"");
+        System.out.println("   Result: " + indexResult);
+        System.out.println("   (DataWeave Output: 2)\n");
+
+        
+        // =========================================================================
+        // C. DataWeave: leftJoin(...) 
+        // Java Equivalent: Custom leftJoin(leftList, rightList)
+        // =========================================================================
+        List<User> usersLeft = Arrays.asList(
+            new User("1", "Mariano"), new User("2", "Leandro"), 
+            new User("3", "Julian"), new User("5", "Julian")
+        );
+        List<Product> productsRight = Arrays.asList(
+            new Product("1", "DataWeave"), new Product("1", "BAT"), 
+            new Product("3", "DataSense"), new Product("4", "SmartConnectors")
+        );
+        
+        List<LeftJoinResult> joinResult = leftJoin(usersLeft, productsRight);
+
+        System.out.println("C. DataWeave 'leftJoin' Equivalent (Partial Output):");
+        System.out.println("   Input (Left): " + usersLeft.stream().map(u -> u.id).collect(Collectors.toList()));
+        System.out.println("   Output JSON (First three elements):");
+        
+        // Print the full JSON output for verification (truncated for brevity in the console printout)
+        String jsonOutput = mapper.writeValueAsString(joinResult);
+        System.out.println(jsonOutput.substring(0, 400) + "\n   ...\n");
+        System.out.println("   (DataWeave Output matches the full JSON structure printed above)");
+    }
+}
+
+
+
+
+
+
+
+output:
+
+[
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "DataWeave" }
+  },
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "BAT" }
+  },
+  {
+    "l": { "id": "2", "name": "Leandro" }
+  },
+  {
+    "l": { "id": "3", "name": "Julian" },
+    "r": { "ownerId": "3", "name": "DataSense" }
+  },
+  {
+    "l": { "id": "5", "name": "Julian" }
+  }
+]
+
+

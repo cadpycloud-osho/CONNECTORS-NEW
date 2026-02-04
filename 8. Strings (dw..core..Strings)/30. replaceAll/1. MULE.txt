@@ -1,0 +1,53 @@
+replaceAll:
+
+replaceAll(text: String, target: String, replacement: String): String
+
+replaceAll(text: String, target: String, replacement: String): String
+Replaces all substrings that match a literal search string with a specified replacement string.
+
+Replacement proceeds from the beginning of the string to the end. For example, the result of replacing "aa" with "b" in the string` "aaa" is "ba", rather than "ab".
+
+
+
+
+
+Source
+import * from dw::core::Strings
+output application/json
+---
+{
+    a: replaceAll("Mariano", "a" , "A"),
+    b: replaceAll("AAAA", "AAA" , "B"),
+    c: replaceAll(null, "aria" , "A"),
+    d: replaceAll("Mariano", "j" , "Test"),
+}
+
+
+DataWeave
+Output
+{
+   "a": "MAriAno",
+   "b": "BA",
+   "c": null,
+   "d": "Mariano"
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

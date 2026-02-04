@@ -1,0 +1,68 @@
+isAlpha:
+
+
+input:
+
+import java.util.Objects;
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's isAlpha(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY alphabetic characters.
+     */
+    public static boolean isAlphaString(String input) {
+        // DataWeave's isAlpha returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // Iterate through all characters. If any is not a letter, return false.
+        for (char c : input.toCharArray()) {
+            if (!Character.isLetter(c)) {
+                return false;
+            }
+        }
+        // If the loop completes, all characters are letters.
+        return true;
+    }
+
+    public static void main(String[] args) {
+        // Note: The string "  " contains a non-breaking space (\u00A0) and a standard space (' ')
+        // Both fail the Character.isLetter() check.
+        boolean a = isAlphaString(null);
+        boolean b = isAlphaString("");
+        boolean c = isAlphaString("  ");
+        boolean d = isAlphaString("abc");
+        boolean e = isAlphaString("ab2c");
+        boolean f = isAlphaString("ab-c");
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c + ",");
+        System.out.println("  \"d\": " + d + ",");
+        System.out.println("  \"e\": " + e + ",");
+        System.out.println("  \"f\": " + f);
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+
+
+

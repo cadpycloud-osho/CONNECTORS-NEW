@@ -1,0 +1,57 @@
+toNumberOrNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class NumberOrNullRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    String input = "0.005";
+                    
+                    // 'a': Multiple format fallback (seconds -> 0.000, .00 -> 0.00)
+                    result.put("a", parseNumberOrNull(input, "0.000", "0.00"));
+                    
+                    // 'b': Single format only (seconds -> 0.000)
+                    result.put("b", parseNumberOrNull(input, "0.000"));
+                    
+                    exchange.getIn().setBody(result);
+                }
+                
+                private Double parseNumberOrNull(String input, String... patterns) {
+                    for (String pattern : patterns) {
+                        try {
+                            return new DecimalFormat(pattern).parse(input).doubleValue();
+                        } catch (ParseException ignored) {}
+                    }
+                    return null;
+                }
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "a": 0.005,
+  "b": null
+}
+
+
+
+

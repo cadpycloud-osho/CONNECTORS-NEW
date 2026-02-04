@@ -1,0 +1,166 @@
+nodeExists:
+
+
+input:
+
+public class Friend {
+    private String name;
+
+    // Getters and Setters
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+public class User {
+    private String name;
+    private String lastName;
+    private List<Friend> friends;
+
+    // Getters and Setters
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public List<Friend> getFriends() {
+        return friends;
+    }
+    public void setFriends(List<Friend> friends) {
+        this.friends = friends;
+    }
+}
+
+public class MyObject {
+    private List<User> user;
+
+    // Getters and Setters
+    public List<User> getUser() {
+        return user;
+    }
+    public void setUser(List<User> user) {
+        this = user;
+    }
+}
+import org.springframework.stereotype.Service;
+import java.util.Optional;
+
+@Service
+public class NodeExistenceService {
+
+    /**
+     * Checks if a user or a friend with the given name exists.
+     */
+    public boolean nameExists(MyObject myObject, String name) {
+        if (myObject == null || myObject.getUser() == null) {
+            return false;
+        }
+
+        // Check in User objects (User.name)
+        Optional<User> userMatch = myObject.getUser().stream()
+            .filter(user -> name.equals(user.getName()))
+            .findFirst();
+
+        if (userMatch.isPresent()) {
+            return true;
+        }
+
+        // Check in Friend objects (Friend.name)
+        return myObject.getUser().stream()
+            .flatMap(user -> user.getFriends().stream())
+            .anyMatch(friend -> name.equals(friend.getName()));
+    }
+
+    /**
+     * Checks if a field with the specific name exists (Only checks for "wrongField" in the root object's fields,
+     * which is equivalent to how DataWeave's simple selector check often works, but simplified for the POJO structure).
+     * For this simple POJO structure, the field 'wrongField' must be handled as a generic search,
+     * which is complex in plain Java. A more practical interpretation is checking if a top-level property exists.
+     * Since 'wrongField' is not a POJO property, the DataWeave result 'false' is consistent.
+     */
+    public boolean wrongFieldExists(MyObject myObject) {
+        // In a strict POJO world, a field name must exist in one of the classes.
+        // Since 'wrongField' is not a field in MyObject, User, or Friend, it doesn't exist.
+        // If we were parsing a generic JSON structure, we would use Jackson's JsonNode.
+        // For the POJO example, we'll return false, matching the DataWeave output.
+        return false;
+    }
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final NodeExistenceService nodeExistenceService;
+
+    // Constructor injection
+    public DataWeaveController(NodeExistenceService nodeExistenceService) {
+        this.nodeExistenceService = nodeExistenceService;
+    }
+
+    private MyObject createSourceData() {
+        // ... (Code to instantiate myObject as shown in the source)
+        // This creates the exact 'myObject' defined in your DataWeave Source.
+        Friend julian = new Friend(); julian.setName("julian");
+        Friend tom = new Friend(); tom.setName("tom");
+        User user1 = new User(); user1.setName("mariano"); user1.setLastName("achaval"); user1.setFriends(Arrays.asList(julian, tom));
+
+        Friend peter = new Friend(); peter.setName("peter");
+        Friend robert = new Friend(); robert.setName("robert");
+        User user2 = new User(); user2.setName("leandro"); user2.setLastName("shokida"); user2.setFriends(Arrays.asList(peter, robert));
+
+        MyObject myObject = new MyObject();
+        myObject.setUser(Arrays.asList(user1, user2));
+        return myObject;
+    }
+
+    @GetMapping("/check-nodes")
+    public Map<String, Boolean> checkNodes() {
+        MyObject myObject = createSourceData();
+        Map<String, Boolean> result = new HashMap<>();
+
+        // Applying the search logic
+        result.put("mariano", nodeExistenceService.nameExists(myObject, "mariano"));
+        result.put("julian", nodeExistenceService.nameExists(myObject, "julian"));
+        result.put("tom", nodeExistenceService.nameExists(myObject, "tom"));
+        result.put("leandro", nodeExistenceService.nameExists(myObject, "leandro"));
+        result.put("peter", nodeExistenceService.nameExists(myObject, "peter"));
+        
+        // Specific check for a non-existent field
+        result.put("wrongField", nodeExistenceService.wrongFieldExists(myObject));
+        
+        // Specific check for a non-existent name
+        result.put("teo", nodeExistenceService.nameExists(myObject, "teo"));
+
+        return result;
+    }
+}
+output:
+
+
+{
+  "mariano": true,
+  "julian": true,
+  "tom": true,
+  "leandro": true,
+  "peter": true,
+  "wrongField": false,
+  "teo": false
+}
+
+

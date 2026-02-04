@@ -1,0 +1,80 @@
+toBase64:
+
+
+
+input:
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.util.Base64;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // DataWeave: var emailChecksum = Crypto::MD5("achaval@gmail.com" as Binary)
+        String email = "achaval@gmail.com";
+        String emailChecksum = md5Hex(email);
+
+        // DataWeave: var image = readUrl("https://www.gravatar.com/avatar/$(emailChecksum)", "application/octet-stream")
+        String gravatarUrl = "https://www.gravatar.com/avatar/" + emailChecksum;
+        byte[] image = readUrlToBytes(gravatarUrl);
+
+        // DataWeave: toBase64(image)
+        String base64Image = Base64.getEncoder().encodeToString(image);
+
+        // Output JSON-like result
+        System.out.println("\"" + base64Image + "\"");
+    }
+
+    // MD5 hash → hex string (Crypto::MD5)
+    public static String md5Hex(String input) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest(input.getBytes("UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b & 0xff));
+        }
+        return sb.toString();
+    }
+
+    // Read URL into byte[] (readUrl(..., "application/octet-stream"))
+    public static byte[] readUrlToBytes(String urlStr) throws Exception {
+        URL url = new URL(urlStr);
+        try (InputStream in = url.openStream();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[4096];
+            int n;
+            while ((n = in.read(buffer)) != -1) {
+                baos.write(buffer, 0, n);
+            }
+            return baos.toByteArray();
+        }
+    }
+}
+
+
+
+
+output:
+
+
+Expected output shape
+emailChecksum will be a 32‑char lowercase hex MD5 string, for example "1b2c3d...".​
+
+gravatarUrl will look like:
+https://www.gravatar.com/avatar/<md5-of-email>.​
+
+base64Image will be a long Base64 string representing the downloaded avatar image, similar in form to:
+"/9j/4AAQSkZJRgABAQEAYABgAAD//..." (shortened here for readability).
+
+
+
+
+
+
+
+
+
+

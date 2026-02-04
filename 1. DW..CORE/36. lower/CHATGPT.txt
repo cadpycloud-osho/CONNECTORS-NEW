@@ -1,0 +1,35 @@
+lower:
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class LowerCaseController {
+
+    @GetMapping("/lowercase")
+    public Map<String, String> toLowerCase() {
+
+        String input = "MULESOFT";
+        String output = input.toLowerCase();
+
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("name", output);
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "name": "mulesoft"
+}
+
+

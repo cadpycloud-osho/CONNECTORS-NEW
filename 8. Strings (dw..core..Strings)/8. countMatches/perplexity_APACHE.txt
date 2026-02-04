@@ -1,0 +1,63 @@
+countMatches:
+
+example 1:
+
+
+input:
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.camel.builder.RouteBuilder;
+
+public class CountMatchesRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:countMatches")
+            .process(exchange -> {
+                String input = "hello worlo!";
+                int count = StringUtils.countMatches(input, "lo");
+                
+                exchange.getIn().setBody(count);
+            });
+    }
+}
+
+output:
+
+2
+
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.regex.*;
+
+public class CountMatchesRegexConverter {
+    public static int countMatches(String input, String regex) {
+        if (input == null || regex == null) return 0;
+        Matcher matcher = Pattern.compile(regex).matcher(input);
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("countMatches", countMatches("hello, ciao!", "[aeiou]"));
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+5
+
+
+----------------------------------------------------------

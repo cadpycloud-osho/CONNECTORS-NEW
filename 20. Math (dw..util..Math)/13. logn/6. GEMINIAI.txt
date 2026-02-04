@@ -1,0 +1,52 @@
+logn:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the logn (natural logarithm) function.
+     * @return A map containing the results of the natural logarithm calculations.
+     */
+    @GetMapping("/calculateLogn")
+    public Map<String, Object> calculateLogn() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // Helper function to replicate DataWeave's logn behavior (null for non-positive input)
+        Object logn(double x) {
+            // Natural logarithm domain requires x > 0.
+            if (x <= 0) {
+                return null;
+            }
+            // Math.log calculates the natural logarithm (ln or log base e).
+            return Math.log(x);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("logn10", logn(10));
+        output.put("logn13", logn(0.13));
+        output.put("logn-20", logn(-20));
+
+        return output;
+    }
+}
+
+output:
+
+{
+  "logn10": 2.302585092994046,
+  "logn13": -2.0402208285265546,
+  "logn-20": null
+}
+

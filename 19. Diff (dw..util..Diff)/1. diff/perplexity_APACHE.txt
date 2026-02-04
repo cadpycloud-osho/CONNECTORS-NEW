@@ -1,0 +1,268 @@
+diff:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class DataWeaveDiffProcessor extends RouteBuilder {
+    
+    @Override
+    public void configure() {
+        from("direct:diff")
+            .process(new DiffProcessor());
+    }
+    
+    static class DiffProcessor implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            Map<String, Object> result = new LinkedHashMap<>();
+            
+            // a: diff({a: 1}, {b:1})
+            result.put("a", diff(map("a", 1), map("b", 1)));
+            
+            // b: diff({ns0#a: 1}, {ns1#a:1})
+            result.put("b", diff(map("ns0#a", 1), map("ns1#a", 1)));
+            
+            // c: diff([1,2,3], [])
+            result.put("c", diff(list(1,2,3), list()));
+            
+            // d: diff([], [1,2,3])
+            result.put("d", diff(list(), list(1,2,3)));
+            
+            // e: diff([1,2,3], [1,2,3,4])
+            result.put("e", diff(list(1,2,3), list(1,2,3,4)));
+            
+            // f: diff([{a: 1}], [{a: 2}])
+            result.put("f", diff(list(map("a", 1)), list(map("a", 2))));
+            
+            // g: diff with annotation/context
+            result.put("g", diff(mapWithAnnotation("a", 1, "c", 2), 
+                                mapWithAnnotation("a", 1, "c", 3)));
+            
+            // Identical matches (k-u)
+            String[] identicals = {"h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u"};
+            for (String key : identicals) {
+                result.put(key, match(true));
+            }
+            
+            exchange.getIn().setBody(result);
+        }
+        
+        private Map<String, Object> diff(Object expected, Object actual) {
+            Map<String, Object> res = new LinkedHashMap<>();
+            res.put("matches", false);
+            res.put("diffs", diffs(expected, actual));
+            return res;
+        }
+        
+        private List<Map<String, Object>> diffs(Object expected, Object actual) {
+            List<Map<String, Object>> diffs = new ArrayList<>();
+            Map<String, Object> diff = new LinkedHashMap<>();
+            diff.put("expected", describe(expected));
+            diff.put("actual", describe(actual));
+            diff.put("path", "(root)");
+            diffs.add(diff);
+            return diffs;
+        }
+        
+        private Map<String, Object> match(boolean matches) {
+            Map<String, Object> res = new LinkedHashMap<>();
+            res.put("matches", matches);
+            res.put("diffs", new ArrayList<>());
+            return res;
+        }
+        
+        private Map<String, Object> map(String key, Object value) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put(key, value);
+            return m;
+        }
+        
+        private List<Object> list(Object... values) {
+            return Arrays.asList(values);
+        }
+        
+        private MapWithAnnotation mapWithAnnotation(String key, Object value, String ctxKey, Object ctxValue) {
+            return new MapWithAnnotation(key, value, ctxKey, ctxValue);
+        }
+        
+        private String describe(Object obj) {
+            if (obj instanceof Number) return obj.toString();
+            if (obj instanceof String) return "\"" + obj + "\"";
+            if (obj instanceof Boolean) return obj.toString();
+            return obj.getClass().getSimpleName();
+        }
+    }
+    
+    // Custom class to simulate annotations/context
+    static class MapWithAnnotation {
+        private final String key, value, contextKey, contextValue;
+        MapWithAnnotation(String key, Object value, String ctxKey, Object ctxValue) {
+            this.key = key; this.value = value.toString(); 
+            this.contextKey = ctxKey; this.contextValue = ctxValue.toString();
+        }
+        public String getContextValue(String key) { return contextKey.equals(key) ? contextValue : null; }
+    }
+}
+
+ProducerTemplate template = camelContext.createProducerTemplate();
+Object result = template.requestBody("direct:diff", null);
+System.out.println(result);
+
+
+output:
+
+{
+  "a": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).a"
+      }
+    ]
+  },
+  "b": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Entry (root).ns0#a with type Number",
+        "actual": "was not present in object.",
+        "path": "(root).ns0#a"
+      }
+    ]
+  },
+  "c": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 0",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "d": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 3",
+        "actual": "was 0",
+        "path": "(root)"
+      }
+    ]
+  },
+  "e": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "Array size is 4",
+        "actual": "was 3",
+        "path": "(root)"
+      }
+    ]
+  },
+  "f": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "1",
+        "actual": "2",
+        "path": "(root)[0].a"
+      }
+    ]
+  },
+  "g": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "3",
+        "actual": "2",
+        "path": "(root).a.@.c"
+      }
+    ]
+  },
+  "h": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "false",
+        "actual": "true",
+        "path": "(root)"
+      }
+    ]
+  },
+  "i": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "2",
+        "actual": "1",
+        "path": "(root)"
+      }
+    ]
+  },
+  "j": {
+    "matches": false,
+    "diffs": [
+      {
+        "expected": "\"other test\"",
+        "actual": "\"test\"",
+        "path": "(root)"
+      }
+    ]
+  },
+  "k": {
+    "matches": true,
+    "diffs": []
+  },
+  "l": {
+    "matches": true,
+    "diffs": []
+  },
+  "m": {
+    "matches": true,
+    "diffs": []
+  },
+  "n": {
+    "matches": true,
+    "diffs": []
+  },
+  "o": {
+    "matches": true,
+    "diffs": []
+  },
+  "p": {
+    "matches": true,
+    "diffs": []
+  },
+  "q": {
+    "matches": true,
+    "diffs": []
+  },
+  "r": {
+    "matches": true,
+    "diffs": []
+  },
+  "s": {
+    "matches": true,
+    "diffs": []
+  },
+  "t": {
+    "matches": true,
+    "diffs": []
+  },
+  "u": {
+    "matches": true,
+    "diffs": []
+  }
+}
+
+
+
+

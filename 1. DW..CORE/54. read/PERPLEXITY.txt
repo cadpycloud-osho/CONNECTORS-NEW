@@ -1,0 +1,104 @@
+read:
+
+
+example 1:
+
+
+input:
+
+@GetMapping(value = "/json-to-xml", produces = MediaType.APPLICATION_XML_VALUE)
+public @ResponseBody HelloResponse jsonToXml() {
+    // Simulate read('{ "hello" : "world" }','application/json')
+    Map<String, String> jsonInput = Map.of("hello", "world");
+    return new HelloResponse(jsonInput.get("hello"));
+}
+
+@XmlRootElement
+class HelloResponse {
+    private String hello;
+    
+    public HelloResponse() {}
+    public HelloResponse(String hello) { this.hello = hello; }
+    
+    @XmlElement
+    public String getHello() { return hello; }
+    public void setHello(String hello) { this.hello = hello; }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hello>world</hello>
+
+-----------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+@GetMapping("/csv-to-json")
+public Map<String, String> csvToJson() {
+    String csvInput = "Some, Body"; // myVar equivalent
+    
+    // Parse CSV with no header, return first row as object
+    String[] columns = csvInput.split(",");
+    Map<String, String> row = new HashMap<>();
+    row.put("column_0", columns[0].trim());
+    row.put("column_1", columns[1].trim());
+    
+    return row;
+}
+
+output:
+
+{
+  "column_0": "Some",
+  "column_1": " Body"
+}
+
+-----------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+@GetMapping(value = "/xml-read-prices", produces = MediaType.APPLICATION_XML_VALUE)
+public @ResponseBody XmlPricesResponse xmlReadPrices() throws Exception {
+    String xmlInput = "<prices><basic>9.99</basic></prices>";
+    
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    Document doc = builder.parse(new org.xml.sax.InputSource(new StringReader(xmlInput)));
+    
+    NodeList basicNode = doc.getElementsByTagName("basic");
+    return new XmlPricesResponse(basicNode.item(0).getTextContent());
+}
+
+@XmlRootElement(name = "XML")
+class XmlPricesResponse {
+    @XmlElement(name = "basic")
+    private String basic;
+    
+    public XmlPricesResponse() {}
+    public XmlPricesResponse(String basic) { this.basic = basic; }
+    
+    public String getBasic() { return basic; }
+    public void setBasic(String basic) { this.basic = basic; }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<XML>
+    <basic>9.99</basic>
+</XML>
+
+-----------------------------------------------------------
+

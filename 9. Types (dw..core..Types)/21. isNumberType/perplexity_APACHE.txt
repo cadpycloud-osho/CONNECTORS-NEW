@@ -1,0 +1,61 @@
+isNumberType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveNumberTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processNumberChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processNumberChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ANumber = Number (type alias)
+        result.put("a", isNumberType(Number.class));
+        
+        // Built-in Number type
+        result.put("b", isNumberType(Number.class));
+        
+        // String - not Number
+        result.put("c", isNumberType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isNumberType(Class<?> type) {
+        // DataWeave Number type check equivalent
+        // Returns true for Number and its aliases
+        return type == Number.class || 
+               type == Double.class ||
+               type == Float.class ||
+               type == Integer.class ||
+               type == Long.class ||
+               "Number".equals(type.getSimpleName()) ||
+               type.getName().contains("Number");
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

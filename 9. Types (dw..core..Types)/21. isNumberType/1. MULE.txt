@@ -1,0 +1,48 @@
+isNumberType:
+
+isNumberType(t: Type): Boolean
+
+isNumberType(t: Type): Boolean
+Returns true if the input is the Number type.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ANumber = Number
+output application/json
+---
+{
+   a: isNumberType(ANumber),
+   b: isNumberType(Number),
+   c: isNumberType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

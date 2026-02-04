@@ -1,0 +1,27 @@
+version:
+
+
+input:
+
+public class Main {
+
+    private static final String DATAWEAVE_VERSION = "2.5";
+
+    /**
+     * Replicates the DataWeave version() function.
+     * @return The DataWeave version string.
+     */
+    public static String getRuntimeVersion() {
+        return DATAWEAVE_VERSION;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Version Simulation ---");
+        System.out.println(getRuntimeVersion());
+    }
+}
+
+output:
+
+2.5
+

@@ -1,0 +1,61 @@
+attr:
+
+
+input:
+
+package com.example.demo.model;
+
+public class AttributeDescriptor {
+
+    private String kind;
+    private String namespace;
+    private String selector;
+
+    public AttributeDescriptor(String namespace, String selector) {
+        this.kind = "Attribute";
+        this.namespace = namespace;
+        this.selector = selector;
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public String getSelector() {
+        return selector;
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.model.AttributeDescriptor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ValuesController {
+
+    @GetMapping("/attr")
+    public AttributeDescriptor getAttribute() {
+
+        // Equivalent of DW: attr(ns0, "myAttr")
+        return new AttributeDescriptor(
+                "http://acme.com/foo",
+                "myAttr"
+        );
+    }
+}
+
+output:
+
+{
+  "kind": "Attribute",
+  "namespace": "http://acme.com/foo",
+  "selector": "myAttr"
+}
+
+

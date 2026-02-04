@@ -1,0 +1,17 @@
+randomInt:
+
+randomInt(upperBound: Number): Number
+
+randomInt(upperBound: Number): Number
+Returns a pseudo-random whole number from 0 to the specified number (exclusive).
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ price: randomInt(1000) }
+
+DataWeave
+Output
+{ "price": 442.0 }

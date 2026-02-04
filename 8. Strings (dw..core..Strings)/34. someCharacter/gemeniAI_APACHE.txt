@@ -1,0 +1,31 @@
+someCharacter:
+
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+
+public class SomeCharacterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkUpperCase")
+            .process(exchange -> {
+                String input = "someCharacter";
+
+                // .anyMatch() is the Java equivalent of DW's 'someCharacter'
+                boolean result = input != null && input.chars()
+                    .anyMatch(Character::isUpperCase);
+
+                exchange.getIn().setBody(result);
+            });
+    }
+}
+
+
+
+
+output:
+
+true
+

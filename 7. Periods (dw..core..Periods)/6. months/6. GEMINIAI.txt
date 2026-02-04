@@ -1,0 +1,84 @@
+months:
+
+
+input:
+
+
+A. The Model (POJO)
+Java
+
+import lombok.Data; 
+
+@Data // Use @Data for automatic getters/setters (assuming Lombok is used)
+public class MonthPeriodResult {
+    private String nextMonth;
+    private String fourMonthPeriod;
+    private long addNegativeValue;
+}
+B. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+import java.time.ZonedDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class MonthPeriodService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+    public MonthPeriodResult calculateMonths() {
+        MonthPeriodResult result = new MonthPeriodResult();
+        
+        // --- 1. DateTime Arithmetic ---
+        ZonedDateTime nextMonth = baseDateTime.plusMonths(1);
+        // Use replace() to match DW's preference of omitting ".000" on ISO output
+        result.setNextMonth(nextMonth.format(instantFormatter).replace(".000Z", "Z"));
+
+        // --- 2. Period Construction and Arithmetic ---
+        
+        // fourMonthPeriod : months(4)
+        Period fourMonthPeriod = Period.ofMonths(4);
+        result.setFourMonthPeriod(fourMonthPeriod.toString()); // P4M
+
+        // addNegativeValue: months(-1) + months(2) -> 1 month
+        Period combinedPeriod = Period.ofMonths(-1).plus(Period.ofMonths(2));
+        // DW outputs the total magnitude (1)
+        result.setAddNegativeValue(combinedPeriod.toTotalMonths()); // 1
+
+        return result;
+    }
+}
+C. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class PeriodController {
+
+    private final MonthPeriodService monthPeriodService;
+
+    public PeriodController(MonthPeriodService monthPeriodService) {
+        this.monthPeriodService = monthPeriodService;
+    }
+
+    @GetMapping("/api/month-calculations")
+    public MonthPeriodResult getCalculatedMonths() {
+        // Spring Boot automatically converts the MonthPeriodResult object to JSON
+        return monthPeriodService.calculateMonths();
+    }
+}
+
+output:
+
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+

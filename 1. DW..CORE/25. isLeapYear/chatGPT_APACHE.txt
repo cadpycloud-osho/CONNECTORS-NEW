@@ -1,0 +1,75 @@
+isLeapYear:
+
+example 1:
+
+input:
+
+from("direct:isLeapYear")
+.setBody(simple(
+    "[" +
+    "${date:2016-10-01T23:57:59:isLeapYear}," +
+    "${date:2017-10-01T23:57:59:isLeapYear}" +
+    "]"
+));
+
+
+
+output:
+
+[ true, false ]
+
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:isLeapYearDate")
+.setBody(simple(
+    "[" +
+    "${date:2016-10-01:isLeapYear}," +
+    "${date:2017-10-01:isLeapYear}" +
+    "]"
+));
+
+
+
+output:
+
+[ true, false ]
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:isLeapYearWithZone")
+.setBody(simple(
+    "[" +
+    "${date:2016-10-01T23:57:59-03:00:isLeapYear}," +
+    "${date:2016-10-01T23:57:59Z:isLeapYear}" +
+    "]"
+));
+
+
+
+output:
+
+[ true, true ]
+
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+

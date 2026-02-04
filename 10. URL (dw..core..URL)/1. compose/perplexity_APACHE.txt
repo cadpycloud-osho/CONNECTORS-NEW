@@ -1,0 +1,88 @@
+compose:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.spi.annotations.Route;
+
+@Route
+public class UrlCompositionRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    String urlPath = "content folder";
+                    String baseUrl = "http://examplewebsite.com/";
+                    String pagePath = "/page.html";
+                    
+                    // Camel URI encoding (equivalent to DataWeave compose/encode)
+                    String encodedPath = exchange.getContext().getUriComponent("http")
+                        .createEndpoint("http://example.com", "?path=" + urlPath).getEndpointUri();
+                    
+                    // Or simpler direct approach using URLEncoder
+                    String encodedUrl = baseUrl + java.net.URLEncoder.encode(urlPath, "UTF-8") + pagePath;
+                    
+                    exchange.getIn().setBody(
+                        "{ \"encodedURL\" : \"" + encodedUrl + "\" }"
+                    );
+                }
+            })
+            .log("Output: ${body}");
+    }
+}
+
+
+
+
+output:
+
+{ "encodedURL" : "http://examplewebsite.com/content%20folder/page.html" }
+
+
+
+---------------------------------------------------------
+
+example 2:
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+// Camel Processor - Direct equivalent to DataWeave backtick compose
+public class UrlEncodeProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String urlPath = "content folder";
+        
+        // Exact DataWeave `backtick` equivalent: interpolate + encode path only
+        String encodedURL = "http://examplewebsite.com/" + 
+            URLEncoder.encode(urlPath, StandardCharsets.UTF_8) + 
+            "/page.html";
+            
+        exchange.getIn().setBody("{\"encodedURL\":\"" + encodedURL + "\"}");
+    }
+}
+
+from("direct:encodeUrl")
+    .process(new UrlEncodeProcessor())
+    .log("${body}");
+
+
+output:
+
+{ "encodedURL" : "http://examplewebsite.com/content%20folder/page.html" }
+
+
+
+---------------------------------------------------------

@@ -1,0 +1,41 @@
+substringAfter:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + substringAfter(null, "'") + ",");
+        System.out.println("  \"b\": \"" + substringAfter("", "-") + "\",");
+        System.out.println("  \"c\": \"" + substringAfter("abc", "b") + "\",");
+        System.out.println("  \"d\": \"" + substringAfter("abcba", "b") + "\",");
+        System.out.println("  \"e\": \"" + substringAfter("abc", "d") + "\",");
+        System.out.println("  \"f\": \"" + substringAfter("abc", "") + "\"");
+        System.out.println("}");
+    }
+    
+    private static String substringAfter(String input, String delimiter) {
+        if (input == null || delimiter == null || delimiter.isEmpty()) {
+            return input != null ? input : null;
+        }
+        int index = input.indexOf(delimiter);
+        return index == -1 ? "" : input.substring(index + delimiter.length());
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "cba",
+  "e": "",
+  "f": "abc"
+}
+
+

@@ -1,0 +1,47 @@
+lookup:
+
+
+input:
+
+public class Main {
+
+    // --- Component 2: Replicates flow2 Logic ---
+    public static String flow2(String inputData) {
+        // Equivalent to: <set-payload value='#[payload.test ++ "world"]' />
+        String payload = inputData + " world";
+        
+        // Equivalent to: <logger level="INFO" doc:name="Logger" message='#[payload]'/>
+        System.out.println("Flow2 Logger: " + payload);
+        
+        return payload;
+    }
+
+    // --- Component 1: Replicates flow1 Logic (including HTTP entry point) ---
+    public static String flow1HttpEntry() {
+        // Equivalent to: <ee:set-payload><![CDATA[%dw 2.0 output application/json --- Mule::lookup('flow2', {test:'hello '})]]></ee:set-payload>
+        
+        // 1. Prepare data for lookup (the variable passed to flow2)
+        String inputForFlow2 = "hello ";
+        
+        // 2. Synchronous call (Mule::lookup('flow2', ...))
+        String finalResult = flow2(inputForFlow2);
+        
+        return finalResult;
+    }
+
+    // --- Main Method (Simulates HTTP Request) ---
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Simulation ---");
+        
+        String response = flow1HttpEntry();
+        
+        System.out.println("Flow1 HTTP Response Body (JSON): \"" + response + "\"");
+    }
+}
+
+output:
+
+
+--- Pure Java Simulation ---
+Flow2 Logger: hello world
+Flow1 HTTP Response Body (JSON): "hello world"

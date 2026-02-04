@@ -1,0 +1,55 @@
+toBoolean:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Uses standard Java to mimic DataWeave's toBoolean(String).
+     */
+    private boolean toBoolean(String input) {
+        // Boolean.parseBoolean(String) is case-insensitive for "true" and returns false otherwise.
+        // This behavior exactly matches DataWeave's toBoolean("String").
+        return Boolean.parseBoolean(input);
+    }
+
+    public Map<String, Boolean> getBooleanMap() {
+        // Apply the transformation logic
+        boolean a = toBoolean("true");
+        boolean b = toBoolean("false");
+        boolean c = toBoolean("FALSE");
+        boolean d = toBoolean("TrUe"); // Case-insensitive check
+
+        // Create the root object (Map in Java)
+        Map<String, Boolean> rootMap = new HashMap<>();
+        
+        // Add the results to the map
+        rootMap.put("a", a);
+        rootMap.put("b", b);
+        rootMap.put("c", c);
+        rootMap.put("d", d);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Boolean> result = converter.getBooleanMap();
+        
+        // Print the Java structure (closely matches the desired output structure)
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=true, b=false, c=false, d=true}
+

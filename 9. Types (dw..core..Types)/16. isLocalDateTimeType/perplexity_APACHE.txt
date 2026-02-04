@@ -1,0 +1,58 @@
+isLocalDateTimeType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveLocalDateTimeTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processLocalDateTimeChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processLocalDateTimeChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ALocalDateTime = LocalDateTime (type alias)
+        result.put("a", isLocalDateTimeType(LocalDateTime.class));
+        
+        // Built-in LocalDateTime type
+        result.put("b", isLocalDateTimeType(LocalDateTime.class));
+        
+        // String - not LocalDateTime
+        result.put("c", isLocalDateTimeType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isLocalDateTimeType(Class<?> type) {
+        // DataWeave LocalDateTime type check equivalent
+        // Returns true for LocalDateTime and its aliases
+        return type == LocalDateTime.class || 
+               "LocalDateTime".equals(type.getSimpleName()) ||
+               type.getName().contains("LocalDateTime");
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

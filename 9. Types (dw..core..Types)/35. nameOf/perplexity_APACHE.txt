@@ -1,0 +1,77 @@
+
+
+nameOf:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveNameOfRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processNameOfChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, String> processNameOfChecks() {
+        Map<String, String> result = new HashMap<>();
+        
+        // AArray = Array<String> {n: 1}
+        result.put("a", nameOf(createAArrayType()));
+        
+        // AArray2 = Array<String>
+        result.put("b", nameOf(createAArray2Type()));
+        
+        // Built-in String type
+        result.put("c", nameOf(String.class));
+        
+        return result;
+    }
+    
+    private String nameOf(Object type) {
+        // DataWeave nameOf returns the type name (user-defined or built-in)
+        if (type instanceof Map) {
+            Map<?,?> typeMap = (Map<?,?>) type;
+            return (String) typeMap.getOrDefault("typeName", "Unknown");
+        } else if (type instanceof Class) {
+            return ((Class<?>) type).getSimpleName();
+        }
+        return "Unknown";
+    }
+    
+    private Map<String, Object> createAArrayType() {
+        Map<String, Object> type = new HashMap<>();
+        type.put("typeName", "AArray");
+        type.put("base", "Array");
+        type.put("item", "String");
+        type.put("n", 1);
+        return type;
+    }
+    
+    private Map<String, Object> createAArray2Type() {
+        Map<String, Object> type = new HashMap<>();
+        type.put("typeName", "AArray2");
+        type.put("base", "Array");
+        type.put("item", "String");
+        return type;
+    }
+}
+
+
+output:
+
+{
+   "a": "AArray",
+   "b": "AArray2",
+   "c": "String"
+}
+
+
+

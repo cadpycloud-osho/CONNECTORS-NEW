@@ -1,0 +1,53 @@
+isKeyType:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.xml.namespace.QName;
+
+public class KeyTypeCheckRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkKeyType")
+            .process(exchange -> {
+                // In Java, we often treat String or QName as the functional equivalent of a 'Key'
+                Object keyReference = String.class;
+                Object keyLiteral = "someKey";
+                Object nonKey = Boolean.TRUE;
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Checking if the type is a String or QName (common 'key' types)
+                result.put("a", isKeyType(keyReference));
+                result.put("b", isKeyType(keyLiteral.getClass()));
+                result.put("c", isKeyType(nonKey.getClass()));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isKeyType(Object type) {
+        if (!(type instanceof Class)) return false;
+        Class<?> clazz = (Class<?>) type;
+        
+        // DataWeave Keys are most similar to Strings or XML QNames in Camel
+        return clazz.equals(String.class) || clazz.equals(QName.class);
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

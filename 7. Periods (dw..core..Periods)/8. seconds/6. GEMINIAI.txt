@@ -1,0 +1,97 @@
+seconds:
+
+
+input:
+
+A. The Model (POJO)
+Java
+
+import lombok.Data; 
+// Add dependency: implementation 'org.projectlombok:lombok'
+
+@Data
+public class SecondDurationResult {
+    private String nextSecond;
+    private String previousSecond;
+    private String decimalInputPeriod;
+    private String wholeNumberInputPeriod;
+    private long addNegativeValue;
+}
+B. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class SecondDurationService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+    private final ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+    public SecondDurationResult calculateSeconds() {
+        SecondDurationResult result = new SecondDurationResult();
+        
+        // --- DateTime Arithmetic ---
+        
+        // nextSecond: |2020-10-05T20:22:34.385Z| + seconds(1)
+        result.setNextSecond(baseDateTime.plusSeconds(1).format(instantFormatter).replace(".000Z", "Z"));
+
+        // previousSecond: |2020-10-05T20:22:34.385Z| - seconds(1)
+        result.setPreviousSecond(baseDateTime.minusSeconds(1).format(instantFormatter).replace(".000Z", "Z"));
+
+        // --- Duration Construction and Arithmetic ---
+        
+        // decimalInputPeriod: seconds(4.555)
+        // 4.555 seconds = 4555 milliseconds
+        result.setDecimalInputPeriod(Duration.ofMillis(4555).toString()); // PT4.555S
+        
+        // wholeNumberInputPeriod: seconds(4)
+        result.setWholeNumberInputPeriod(Duration.ofSeconds(4).toString()); // PT4S
+
+        // addNegativeValue: seconds(-1) + seconds(2)
+        // 1 second = 1 (DW outputs total seconds)
+        Duration combinedDuration = Duration.ofSeconds(-1).plusSeconds(2);
+        result.setAddNegativeValue(combinedDuration.getSeconds()); // 1
+
+        return result;
+    }
+}
+C. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DurationController {
+
+    private final SecondDurationService durationService;
+
+    public DurationController(SecondDurationService durationService) {
+        this.durationService = durationService;
+    }
+
+    @GetMapping("/api/second-calculations")
+    public SecondDurationResult getCalculatedSeconds() {
+        // Spring Boot automatically converts the object to JSON
+        return durationService.calculateSeconds();
+    }
+}
+
+
+
+
+Spring Boot Output (When accessing /api/second-calculations)
+JSON
+
+{
+  "nextSecond": "2020-10-05T20:22:35.385Z",
+  "previousSecond": "2020-10-05T20:22:33.385Z",
+  "decimalInputPeriod": "PT4.555S",
+  "wholeNumberInputPeriod": "PT4S",
+  "addNegativeValue": 1
+}
+

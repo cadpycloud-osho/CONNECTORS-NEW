@@ -1,0 +1,131 @@
+scan:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CamelRegexScan {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String input = "www.mulesoft.com";
+                        // Regex: ([w]*)\.([a-z]*)\.([a-z]*)
+                        // Note: Java uses double backslash for escaping
+                        Pattern pattern = Pattern.compile("([w]*)\\.([a-z]*)\\.([a-z]*)");
+                        Matcher matcher = pattern.matcher(input);
+
+                        List<String> results = new ArrayList<>();
+                        
+                        if (matcher.find()) {
+                            // group(0) is the full match: "www.mulesoft.com"
+                            // group(1..n) are the capture groups: "www", "mulesoft", "com"
+                            for (int i = 0; i <= matcher.groupCount(); i++) {
+                                results.add(matcher.group(i));
+                            }
+                        }
+
+                        exchange.getIn().setBody(results);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[
+  "www.mulesoft.com",
+  "www",
+  "mulesoft",
+  "com"
+]
+
+----------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CamelRegexMultiScan {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String input = "anypt@mulesoft.com,max@mulesoft.com";
+                        // Regex: ([a-z]*)@([a-z]*).com
+                        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+                        Matcher matcher = pattern.matcher(input);
+
+                        List<List<String>> allMatches = new ArrayList<>();
+                        
+                        // Equivalent to scan: iterate while matches are found
+                        while (matcher.find()) {
+                            List<String> currentMatchGroups = new ArrayList<>();
+                            // Group 0 is full match, 1 is name, 2 is domain
+                            for (int i = 0; i <= matcher.groupCount(); i++) {
+                                currentMatchGroups.add(matcher.group(i));
+                            }
+                            allMatches.add(currentMatchGroups);
+                        }
+
+                        exchange.getIn().setBody(allMatches);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[
+  ["anypt@mulesoft.com", "anypt", "mulesoft"],
+  ["max@mulesoft.com", "max", "mulesoft"]
+]
+
+

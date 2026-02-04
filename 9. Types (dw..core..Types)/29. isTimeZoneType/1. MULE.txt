@@ -1,0 +1,53 @@
+isTimeZoneType:
+
+isTimeZoneType(t: Type): Boolean
+
+isTimeZoneType(t: Type): Boolean
+Returns true if the input is the TimeZone type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ATimeZone = TimeZone
+output application/json
+---
+{
+   a: isTimeZoneType(ATimeZone),
+   b: isTimeZoneType(TimeZone),
+   c: isTimeZoneType(String),
+}
+
+
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

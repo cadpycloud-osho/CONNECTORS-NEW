@@ -1,0 +1,64 @@
+minutes:
+
+input:
+
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Define the fixed input ZonedDateTime (UTC)
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        
+        // Formatter for ZonedDateTime output in ISO 8601 format
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        // --- 1. DateTime Arithmetic ---
+
+        // nextMinute: |2020-10-05T20:22:34.385Z| + minutes(1)
+        ZonedDateTime nextMinute = baseDateTime.plusMinutes(1);
+        
+        // previousMinute: |2020-10-05T20:22:34.385Z| - minutes(1)
+        ZonedDateTime previousMinute = baseDateTime.minusMinutes(1);
+
+        // --- 2. Duration Construction and Arithmetic ---
+
+        // decimalInputPeriod: minutes(4.555)
+        // 4.555 minutes = 273.3 seconds. Use milliseconds for fractional seconds.
+        double totalSecondsDouble = 4.555 * 60; 
+        long totalMilliseconds = (long) (totalSecondsDouble * 1000); 
+        Duration decimalInputPeriod = Duration.ofMillis(totalMilliseconds); // PT4M33.3S
+
+        // wholeNumberInputPeriod: minutes(4)
+        Duration wholeNumberInputPeriod = Duration.ofMinutes(4); // PT4M
+
+        // addNegativeValue: minutes(-1) + minutes(2)
+        // 1 minute = 60 seconds (DataWeave outputs total seconds)
+        Duration combinedDuration = Duration.ofMinutes(-1).plusMinutes(2);
+        long addNegativeValue = combinedDuration.getSeconds(); // 60
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        // Use replace() to match DW's preference of omitting ".000" on ISO output
+        System.out.println("  \"nextMinute\": \"" + nextMinute.format(formatter).replace(".000Z", "Z") + "\",");
+        System.out.println("  \"previousMinute\": \"" + previousMinute.format(formatter).replace(".000Z", "Z") + "\",");
+        System.out.println("  \"decimalInputPeriod\": \"" + decimalInputPeriod.toString() + "\",");
+        System.out.println("  \"wholeNumberInputPeriod\": \"" + wholeNumberInputPeriod.toString() + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+output:
+
+
+{
+  "nextMinute": "2020-10-05T20:23:34.385Z",
+  "previousMinute": "2020-10-05T20:21:34.385Z",
+  "decimalInputPeriod": "PT4M33.3S",
+  "wholeNumberInputPeriod": "PT4M",
+  "addNegativeValue": 60
+}

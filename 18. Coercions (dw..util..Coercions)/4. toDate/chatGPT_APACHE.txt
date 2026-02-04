@@ -1,0 +1,113 @@
+toDate:
+
+example 1:
+
+
+
+
+input:
+
+import java.text.*;
+import java.util.*;
+import java.time.*;
+import java.time.format.*;
+
+public class ToDateSimulation {
+
+    public static void main(String[] args) {
+
+        String input = "2023-28-03";
+
+        // List of date formats to try
+        List<DateTimeFormatter> formatters = List.of(
+                DateTimeFormatter.ofPattern("yyyy/MM/dd").withLocale(Locale.US),
+                DateTimeFormatter.ofPattern("yyyy-dd-MM").withLocale(Locale.US)
+        );
+
+        LocalDate parsedDate = null;
+        String errorMsg = null;
+
+        // Try each formatter
+        for (DateTimeFormatter fmt : formatters) {
+            try {
+                parsedDate = LocalDate.parse(input, fmt);
+                break;  // Stop at first success
+            } catch (DateTimeParseException e) {
+                // continue trying next formatter
+            }
+        }
+
+        if (parsedDate == null) {
+            errorMsg = "Could not find a valid formatter for '" + input + "'";
+        }
+
+        // Output simulation
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", parsedDate != null ? parsedDate.toString() : null);
+        output.put("b", errorMsg);
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": "2023-03-28",
+  "b": null
+}
+
+
+{
+  "a": null,
+  "b": "Could not find a valid formatter for '2023-28-03'"
+}
+
+
+------------------------------------------------
+
+
+example 2:
+
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class ToDateExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // a -> default ISO format
+        LocalDate a = LocalDate.parse("2015-10-01"); // ISO_LOCAL_DATE
+        output.put("a", a.toString());
+
+        // b -> custom format
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+        LocalDate b = LocalDate.parse("2003/10/01", formatterB);
+        output.put("b", b.format(formatterB)); // formatted output like DW
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "2015-10-01",
+  "b": "2003/10/01"
+}
+
+
+

@@ -1,0 +1,79 @@
+toLocalTimeOrNull:
+
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private final String sourceTimeString = "23:57:59";
+
+    /**
+     * Mimics DataWeave's toLocalTimeOrNull() behavior.
+     * Tries multiple formatters and returns null if none succeed.
+     */
+    private LocalTime toLocalTimeOrNull(String timeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // If parsing succeeds, return the result immediately.
+                return LocalTime.parse(timeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Ignore the error and try the next formatter
+            }
+        }
+        // If the loop finishes without returning, all formatters failed.
+        return null;
+    }
+
+    public Map<String, Object> getLocalTimeParsingMap() {
+        // Define formatters
+        // Formatter 1: Fails (Expected fractional seconds 'HH:mm:ss.S', found 'HH:mm:ss')
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm:ss.S", Locale.US);
+        // Formatter 2: Succeeds (Matches 'HH:mm:ss')
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
+        
+        // --- Logic for Key 'a' (Successful Chaining) ---
+        // Fails with formatter1, succeeds with formatter2 -> returns a LocalTime
+        LocalTime parsedTimeA = toLocalTimeOrNull(sourceTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Failure to Parse) ---
+        // Fails with formatter1, no other options -> returns null
+        LocalTime parsedTimeB = toLocalTimeOrNull(sourceTimeString, formatter1);
+
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results. Use the ISO string format or null.
+        rootMap.put("a", parsedTimeA != null ? parsedTimeA.toString() : null); // "23:57:59"
+        rootMap.put("b", parsedTimeB != null ? parsedTimeB.toString() : null); // null
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Object> result = converter.getLocalTimeParsingMap();
+        
+        // Print the Java structure, matching the requested output format.
+        // We use Map.toString() for the simple structure: {a=23:57:59, b=null}
+        System.out.println("Result: " + result);
+    }
+}
+
+
+
+output:
+
+{a=23:57:59, b=null}
+
+

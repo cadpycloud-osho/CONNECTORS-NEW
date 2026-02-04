@@ -1,0 +1,41 @@
+isOdd:
+
+
+
+ input:
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    // Equivalent of DataWeave isOdd()
+    private static boolean isOdd(int value) {
+        return value % 2 != 0;
+    }
+
+    public static void main(String[] args) {
+
+        List<Boolean> isOddList = Arrays.asList(
+                isOdd(0),
+                isOdd(1),
+                isOdd(2 + 2)
+        );
+
+        Map<String, List<Boolean>> result = new HashMap<>();
+        result.put("isOdd", isOddList);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{isOdd=[false, true, false]}
+
+

@@ -1,0 +1,35 @@
+location:
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Object> location = locationSqrt();
+        System.out.println(location);
+    }
+    
+    public static Map<String, Object> locationSqrt() {
+        // Exact match for DataWeave: location(sqrt)
+        return Map.of(
+            "uri", "/dw/Core.dwl",
+            "nameIdentifier", "dw::Core",
+            "startLine", 5797,
+            "startColumn", 36,
+            "endLine", 5797,
+            "endColumn", 77
+        );
+    }
+}
+
+
+
+output:
+
+{uri=/dw/Core.dwl, nameIdentifier=dw::Core, startLine=5797, startColumn=36, endLine=5797, endColumn=77}
+
+

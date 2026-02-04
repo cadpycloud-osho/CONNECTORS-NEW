@@ -1,0 +1,36 @@
+localTime:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalTime;
+import java.util.Map;
+
+@RestController
+public class LocalTimeController {
+
+    @GetMapping("/local-time")
+    public Map<String, String> getLocalTime() {
+
+        LocalTime localTime = LocalTime.of(12, 30, 40);
+
+        return Map.of("newLocalTime", localTime.toString());
+    }
+}
+
+
+
+output:
+
+{
+  "newLocalTime": "12:30:40"
+}
+
+
+
+

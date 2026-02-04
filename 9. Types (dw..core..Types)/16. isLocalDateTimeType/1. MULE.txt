@@ -1,0 +1,61 @@
+isLocalDateTimeType:
+
+isLocalDateTimeType(t: Type): Boolean
+
+isLocalDateTimeType(t: Type): Boolean
+Returns true if the input is the LocalDateTime type.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ALocalDateTime = LocalDateTime
+output application/json
+---
+{
+   a: isLocalDateTimeType(ALocalDateTime),
+   b: isLocalDateTimeType(LocalDateTime),
+   c: isLocalDateTimeType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

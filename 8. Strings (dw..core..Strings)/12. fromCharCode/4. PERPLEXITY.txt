@@ -1,0 +1,39 @@
+fromCharCode:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class FromCharCodeController {
+    
+    @GetMapping(value = "/from-charcode", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FromCharCodeResponse fromCharCode() {
+        int unicode = 117;
+        char character = (char) unicode;
+        return new FromCharCodeResponse(String.valueOf(character));
+    }
+    
+    public static class FromCharCodeResponse {
+        public final String fromCharCode;
+        
+        public FromCharCodeResponse(String fromCharCode) {
+            this.fromCharCode = fromCharCode;
+        }
+    }
+}
+
+
+output:
+
+{ "fromCharCode": "u" }
+
+
+

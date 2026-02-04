@@ -1,0 +1,88 @@
+namesOf:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Input object simulation using Map
+        java.util.Map<String, Object> input = new java.util.HashMap<>();
+        input.put("a", true);
+        input.put("b", 1);
+        
+        // Get all field names/keys (namesOf equivalent)
+        java.util.List<String> names = new java.util.ArrayList<>(input.keySet());
+        
+        // Create output structure
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("namesOf", names);
+        
+        // Manual JSON output
+        System.out.print("{\"namesOf\":[");
+        for (int i = 0; i < names.size(); i++) {
+            System.out.print("\"" + names.get(i) + "\"");
+            if (i < names.size() - 1) {
+                System.out.print(",");
+            }
+        }
+        System.out.println("]}");
+    }
+}
+
+
+
+output:
+
+{"namesOf":["a","b"]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alternative using Java 8 Streams (more concise):
+
+java
+import java.util.*;
+import java.util.stream.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+public class NamesOfStreamExample {
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        ObjectNode input = mapper.createObjectNode();
+        input.put("a", true);
+        input.put("b", 1);
+        
+        // Stream-based namesOf equivalent
+        List<String> names = StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(
+                input.fieldNames(), Spliterator.ORDERED), false)
+            .collect(Collectors.toList());
+        
+        ObjectNode result = mapper.createObjectNode();
+        result.put("namesOf", mapper.valueToTree(names));
+        
+        System.out.println(mapper.writeValueAsString(result));
+    }
+}
+
+
+
+
+
+
+
+
+

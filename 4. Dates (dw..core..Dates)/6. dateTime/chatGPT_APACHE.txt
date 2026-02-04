@@ -1,0 +1,36 @@
+dateTime:
+
+
+input:
+
+from("direct:createDateTime")
+.process(exchange -> {
+
+    // Create a ZonedDateTime with specific date, time, and timezone
+    java.time.ZonedDateTime newDateTime = java.time.ZonedDateTime.of(
+        2012, 10, 11,          // year, month, day
+        12, 30, 40,            // hour, minute, second
+        0,                      // nanosecond
+        java.time.ZoneOffset.of("-03:00") // timezone
+    );
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("newDateTime", newDateTime.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+
+{
+  "newDateTime": "2012-10-11T12:30:40-03:00"
+}
+
+
+
+
+
+

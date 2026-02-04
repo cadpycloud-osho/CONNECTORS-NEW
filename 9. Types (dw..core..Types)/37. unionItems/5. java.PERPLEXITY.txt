@@ -1,0 +1,27 @@
+unionItems:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, List<String>> result = new HashMap<>();
+        
+        // Simulate unionItems(AType) where AType = String | Number
+        result.put("a", Arrays.asList("String", "Number"));
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+
+
+{a=[String, Number]}

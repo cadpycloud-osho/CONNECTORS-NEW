@@ -1,0 +1,36 @@
+isStringType:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isStringType(Object value) {
+        return value instanceof String;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        String aString = "test";      // AString
+        String stringType = "hello";  // String
+        Boolean boolValue = true;     // Boolean
+        
+        result.put("a", isStringType(aString));
+        result.put("b", isStringType(stringType));
+        result.put("c", isStringType(boolValue));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+

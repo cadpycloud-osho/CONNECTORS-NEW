@@ -1,0 +1,51 @@
+
+
+valuesOf:
+
+
+
+input:
+
+import java.util.LinkedHashMap; // Use LinkedHashMap to preserve insertion order for predictable output
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        
+        // Input Map (Object) - Using LinkedHashMap to ensure predictable order
+        Map<String, Object> inputObject = new LinkedHashMap<>();
+        inputObject.put("a", true);
+        inputObject.put("b", 1);
+        
+        // --- 1. Define the operation (valuesOf) ---
+        // Java: Map.values() returns a Collection of the values.
+        List<Object> valuesList = inputObject.values().stream().collect(Collectors.toList());
+
+        // Since valuesList is [true, 1], we format this into a JSON array string.
+        
+        // --- 2. Assemble the final JSON object using standard String formatting ---
+        
+        // Format the list contents: true, 1
+        String listContents = valuesList.stream()
+                                        .map(Object::toString)
+                                        .collect(Collectors.joining(", "));
+        
+        // Assemble the final JSON object structure
+        String outputJson = String.format("{\n  \"valuesOf\" : [ %s ]\n}", listContents);
+        
+        // 3. Output the result
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+
+
+{
+  "valuesOf" : [ true, 1 ]
+}
+

@@ -1,0 +1,112 @@
+minBy:
+
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Input data: [{"a":1}, {"a":2}, {"a":3}]
+        Map<String, Integer> item1 = new HashMap<>();
+        item1.put("a", 1);
+        Map<String, Integer> item2 = new HashMap<>();
+        item2.put("a", 2);
+        Map<String, Integer> item3 = new HashMap<>();
+        item3.put("a", 3);
+        
+        List<Map<String, Integer>> input = Arrays.asList(item1, item2, item3);
+        
+        // minBy equivalent: find item with minimum 'a' value
+        Map<String, Integer> minItem = input.stream()
+            .min((item1_, item2_) -> Integer.compare(item1_.get("a"), item2_.get("a")))
+            .orElse(null);
+        
+        // Output JSON manually
+        System.out.println("{\"a\":" + minItem.get("a") + "}");
+    }
+}
+
+
+
+output:
+
+{"a":1}
+
+
+------------------------------------------------------------------
+
+
+
+
+
+example 2:
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Stream;
+
+public class Main {
+    public static void main(String[] args) {
+        // Parse DataWeave datetime format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+        
+        ZonedDateTime myDateTime1 = ZonedDateTime.parse("2017-10-01T22:57:59-03:00", formatter);
+        ZonedDateTime myDateTime2 = ZonedDateTime.parse("2018-10-01T23:57:59-03:00", formatter);
+        
+        // byDateTime: min by full datetime
+        ZonedDateTime minDateTime = Stream.of(myDateTime1, myDateTime2)
+            .min(ZonedDateTime::compareTo).orElse(null);
+        
+        // byDate: min by date only
+        LocalDate date1 = myDateTime1.toLocalDate();
+        LocalDate date2 = myDateTime2.toLocalDate();
+        LocalDate minDate = Stream.of(date1, date2)
+            .min(LocalDate::compareTo).orElse(null);
+        
+        // byTime: min by time only
+        OffsetTime time1 = myDateTime1.toLocalTime().atOffset(myDateTime1.getOffset());
+        OffsetTime time2 = myDateTime2.toLocalTime().atOffset(myDateTime2.getOffset());
+        OffsetTime minTime = Stream.of(time1, time2)
+            .min(OffsetTime::compareTo).orElse(null);
+        
+        // aBoolean: min by boolean (false < true)
+        Boolean minBoolean = Stream.of(true, false, false, true)
+            .min(Boolean::compareTo).orElse(null);
+        
+        // emptyArray: returns null
+        Object minEmpty = Stream.<ZonedDateTime>empty()
+            .min(ZonedDateTime::compareTo).orElse(null);
+        
+        // Output JSON format
+        System.out.println("{\"myMinBy\":{");
+        System.out.println("  \"byDateTime\":\"" + minDateTime.format(formatter) + "\",");
+        System.out.println("  \"byDate\":\"" + minDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "\",");
+        System.out.println("  \"byTime\":\"" + minTime.format(DateTimeFormatter.ISO_OFFSET_TIME) + "\",");
+        System.out.println("  \"aBoolean\":" + minBoolean.toString().toLowerCase() + ",");
+        System.out.println("  \"emptyArray\":null");
+        System.out.println("}}");
+    }
+}
+
+
+
+output:
+
+{
+  "myMinBy":{
+    "byDateTime":"2017-10-01T22:57:59-03:00",
+    "byDate":"2017-10-01",
+    "byTime":"22:57:59-03:00",
+    "aBoolean":false,
+    "emptyArray":null
+  }
+}

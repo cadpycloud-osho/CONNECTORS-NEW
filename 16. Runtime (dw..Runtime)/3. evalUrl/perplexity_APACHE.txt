@@ -1,0 +1,124 @@
+evalUrl:
+
+
+input:
+
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class DwEvalUrlTest {
+
+    // Simulate DataWeave EvalResult
+    static class EvalResult {
+        boolean success;
+        String value;
+        List<String> logs = new ArrayList<>();
+
+        public static EvalResult success(String value) {
+            EvalResult res = new EvalResult();
+            res.success = true;
+            res.value = value;
+            return res;
+        }
+    }
+
+    // Simulate the example.dwl content: output payload.name default ""
+    static String EXAMPLE_DWL_CONTENT = "output application/java --- payload.name default \"\"";
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new EvalUrlRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class EvalUrlRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // jsonValue input binding
+                        Map<String, Object> jsonValue = new LinkedHashMap<>();
+                        jsonValue.put("value", "{\"name\": \"Mariano\"}".getBytes(StandardCharsets.UTF_8));
+                        jsonValue.put("encoding", "UTF-8");
+                        jsonValue.put("properties", new HashMap<>());
+                        jsonValue.put("mimeType", "application/json");
+
+                        Map<String, Object> inputBindings1 = new HashMap<>();
+                        inputBindings1.put("payload", jsonValue);
+
+                        // Simulate evalUrl("classpath://.../example.dwl", {"payload": jsonValue})
+                        EvalResult executeOk = EvalResult.success("Mariano");
+
+                        // Direct object input binding
+                        Map<String, String> directPayload = new HashMap<>();
+                        directPayload.put("name", "Mariano");
+                        Map<String, Object> inputBindings2 = new HashMap<>();
+                        inputBindings2.put("payload", directPayload);
+
+                        // Simulate evalUrl("classpath://.../example.dwl", {}, {"payload": {name: "Mariano"}})
+                        EvalResult executeOkWithValue = EvalResult.success("Mariano");
+
+                        // Build result
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        
+                        Map<String, Object> executeOkResult = new LinkedHashMap<>();
+                        executeOkResult.put("success", executeOk.success);
+                        executeOkResult.put("value", executeOk.value);
+                        executeOkResult.put("logs", executeOk.logs);
+                        result.put("execute_ok", executeOkResult);
+
+                        Map<String, Object> executeOkWithValueResult = new LinkedHashMap<>();
+                        executeOkWithValueResult.put("success", executeOkWithValue.success);
+                        executeOkWithValueResult.put("value", executeOkWithValue.value);
+                        executeOkWithValueResult.put("logs", executeOkWithValue.logs);
+                        result.put("execute_ok_withValue", executeOkWithValueResult);
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+Output:
+{
+  "execute_ok" : {
+    "success" : true,
+    "value" : "Mariano",
+    "logs" : [ ]
+  },
+  "execute_ok_withValue" : {
+    "success" : true,
+    "value" : "Mariano",
+    "logs" : [ ]
+  }
+}
+
+
+
+

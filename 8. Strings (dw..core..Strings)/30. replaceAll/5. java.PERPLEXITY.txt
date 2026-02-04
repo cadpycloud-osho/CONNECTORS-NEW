@@ -1,0 +1,44 @@
+replaceAll:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + replaceAll("Mariano", "a", "A") + "\",");
+        System.out.println("  \"b\": \"" + replaceAll("AAAA", "AAA", "B") + "\",");
+        System.out.println("  \"c\": " + replaceAll(null, "aria", "A") + ",");
+        System.out.println("  \"d\": \"" + replaceAll("Mariano", "j", "Test") + "\"");
+        System.out.println("}");
+    }
+    
+    private static String replaceAll(String input, String target, String replacement) {
+        if (input == null) return null;
+        if (target == null || target.isEmpty()) return input;
+        StringBuilder result = new StringBuilder();
+        int lastIndex = 0;
+        int index = input.indexOf(target);
+        
+        while (index != -1) {
+            result.append(input.substring(lastIndex, index));
+            result.append(replacement);
+            lastIndex = index + target.length();
+            index = input.indexOf(target, lastIndex);
+        }
+        result.append(input.substring(lastIndex));
+        return result.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": "MAriAno",
+  "b": "BA",
+  "c": null,
+  "d": "Mariano"
+}
+

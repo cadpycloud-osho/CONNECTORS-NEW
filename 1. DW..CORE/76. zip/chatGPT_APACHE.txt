@@ -1,0 +1,126 @@
+zip:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+
+from("direct:start")
+    .process(exchange -> {
+        List<Integer> numbers = Arrays.asList(0, 1);
+        List<String> letters = Arrays.asList("a", "b");
+        List<List<Object>> zipped = new ArrayList<>();
+
+        int size = Math.min(numbers.size(), letters.size());
+        for (int i = 0; i < size; i++) {
+            zipped.add(Arrays.asList(numbers.get(i), letters.get(i)));
+        }
+
+        exchange.getIn().setBody(zipped);
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+[ [0,"a"], [1,"b"] ]
+
+
+
+-----------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+Map<String, List<?>> result = new HashMap<>();
+
+result.put("a", zip(Arrays.asList(0,1,2,3), Arrays.asList("a","b","c","d")));
+result.put("b", zip(Arrays.asList(0,1,2,3), Arrays.asList("a")));
+result.put("c", zip(Arrays.asList(0,1,2,3), Arrays.asList("a","b")));
+result.put("d", zip(Arrays.asList(0,1,2), Arrays.asList("a","b","c","d")));
+
+exchange.getIn().setBody(result);
+
+// Helper method
+private List<List<Object>> zip(List<?> list1, List<?> list2) {
+    List<List<Object>> zipped = new ArrayList<>();
+    int size = Math.min(list1.size(), list2.size());
+    for (int i = 0; i < size; i++) {
+        zipped.add(Arrays.asList(list1.get(i), list2.get(i)));
+    }
+    return zipped;
+}
+
+
+
+output:
+
+{
+  "a": [[0,"a"],[1,"b"],[2,"c"],[3,"d"]],
+  "b": [[0,"a"]],
+  "c": [[0,"a"],[1,"b"]],
+  "d": [[0,"a"],[1,"b"],[2,"c"]]
+}
+
+
+
+-----------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+List<String> list1 = Arrays.asList("a", "b");
+List<Integer> list2 = Arrays.asList(1, 2, 3);
+List<String> list3 = Arrays.asList("aa", "bb");
+List<List<?>> list4 = Arrays.asList(
+    Arrays.asList("A","B","C"),
+    Arrays.asList(11,12),
+    Arrays.asList("aA","bB")
+);
+
+List<Object> zipped = new ArrayList<>();
+int outerSize = Math.min(list1.size(), list2.size());
+
+for (int i = 0; i < outerSize; i++) {
+    List<Object> inner = new ArrayList<>();
+    inner.add(Arrays.asList(list1.get(i), list2.get(i)));
+    inner.add(list3.get(i));
+    inner.add(list4.get(i));
+    zipped.add(inner);
+}
+
+exchange.getIn().setBody(zipped);
+
+
+
+output:
+
+[
+  [ [ "a", 1 ], "aa", ["A","B","C"] ],
+  [ [ "b", 2 ], "bb", [11,12] ]
+]
+
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+

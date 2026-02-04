@@ -1,0 +1,70 @@
+isUpperCase:
+
+
+
+input:
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's isUpperCase(text) function.
+     * Returns true if the string is NOT null, NOT empty, and contains ONLY uppercase letters.
+     */
+    public static boolean isUpperCaseString(String input) {
+        // 1. DataWeave returns false for null and empty strings.
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        // 2. Check every character
+        for (char c : input.toCharArray()) {
+            // Must be a letter AND must be uppercase. 
+            // This ensures we reject spaces, digits, and punctuation.
+            if (!Character.isLetter(c) || !Character.isUpperCase(c)) {
+                return false;
+            }
+        }
+        // If the loop completes, all characters are uppercase letters.
+        return true;
+    }
+
+    public static void main(String[] args) {
+        // Testing inputs:
+        boolean a = isUpperCaseString(null);
+        boolean b = isUpperCaseString("");
+        boolean c = isUpperCaseString("  ");
+        boolean d = isUpperCaseString("ABC");
+        boolean e = isUpperCaseString("aBC");
+        boolean f = isUpperCaseString("A C");
+        boolean g = isUpperCaseString("A1C");
+        boolean h = isUpperCaseString("A/C");
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c + ",");
+        System.out.println("  \"d\": " + d + ",");
+        System.out.println("  \"e\": " + e + ",");
+        System.out.println("  \"f\": " + f + ",");
+        System.out.println("  \"g\": " + g + ",");
+        System.out.println("  \"h\": " + h);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}
+
+

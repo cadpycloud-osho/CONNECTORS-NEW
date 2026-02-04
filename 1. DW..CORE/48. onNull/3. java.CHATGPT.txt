@@ -1,0 +1,46 @@
+onNull:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Step 1: Original list (empty)
+        List<String> onNullList = new ArrayList<>();
+
+        // Step 2: Reduce equivalent in Java
+        String reducedResult = onNullList.stream()
+                                         .reduce((item, accumulator) -> item + accumulator)
+                                         .orElse(null); // returns null if empty
+
+        // Step 3: Apply sizeOf logic if not null, else "Empty Text"
+        Object finalResult;
+        if (reducedResult != null) {
+            finalResult = reducedResult.length();
+        } else {
+            finalResult = "Empty Text";
+        }
+
+        // Step 4: Prepare output
+        Map<String, Object> output = new HashMap<>();
+        output.put("onNull", finalResult);
+
+        // Print output
+        System.out.println(output);
+    }
+}
+
+
+
+
+output:
+
+
+
+{
+  "onNull": "Empty Text"
+}
+

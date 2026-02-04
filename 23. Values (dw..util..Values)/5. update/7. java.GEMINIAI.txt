@@ -1,0 +1,435 @@
+update:
+
+example 1:
+
+input:
+
+// --- POJO Definition Added ---
+
+/**
+ * Represents the simple structure for the user object.
+ */
+class SimpleUser {
+    private String name;
+
+    // Constructor
+    public SimpleUser(String name) {
+        this.name = name;
+    }
+
+    // Getter (optional, but good practice)
+    public String getName() {
+        return name;
+    }
+
+    // Custom toString to mimic the JSON structure: { "name": "..." }
+    @Override
+    public String toString() {
+        return "{ \"name\": \"" + name + "\" }";
+    }
+}
+
+// --- Main Class with Transformation Logic ---
+
+public class Main {
+
+    /**
+     * Transformation logic: Ignores the source and creates a new object
+     * with a hardcoded value ("Data Weave").
+     */
+    public static SimpleUser runEx1() {
+        // Source data is created but immediately discarded (like an input variable)
+        SimpleUser source = new SimpleUser("Mariano");
+        
+        // Java equivalent of the transformation: creates a new SimpleUser object
+        SimpleUser output = new SimpleUser("Data Weave");
+        
+        return output;
+    }
+
+    public static void main(String[] args) {
+        SimpleUser finalOutput = runEx1();
+        
+        System.out.println("Output (Mimicking JSON structure):");
+        System.out.println(finalOutput);
+    }
+}
+
+output:
+
+ // Output: { "name": "Data Weave" }
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+// --- POJO Definition Added ---
+
+/**
+ * Represents the simple structure for the user object.
+ */
+class SimpleUser {
+    private String name;
+
+    // Constructor
+    public SimpleUser(String name) {
+        this.name = name;
+    }
+
+    // Getter (optional, but good practice)
+    public String getName() {
+        return name;
+    }
+
+    // Custom toString to mimic the JSON structure: { "name": "..." }
+    @Override
+    public String toString() {
+        return "{ \"name\": \"" + name + "\" }";
+    }
+}
+
+// --- Main Class with Transformation Logic ---
+
+public class Main {
+
+    /**
+     * Transformation logic: Ignores the source and creates a new object
+     * with a hardcoded value ("Data Weave").
+     */
+    public static SimpleUser runEx2() {
+        // Source data is created but immediately discarded (like an input variable)
+        SimpleUser source = new SimpleUser("Mariano");
+        
+        // Java equivalent of the transformation: creates a new SimpleUser object
+        SimpleUser output = new SimpleUser("Data Weave");
+        
+        return output;
+    }
+
+    public static void main(String[] args) {
+        SimpleUser finalOutput = runEx2();
+        
+        System.out.println("Output (Mimicking JSON structure):");
+        System.out.println(finalOutput);
+    }
+}
+
+output:
+
+  // Output: { "name": "Data Weave" }
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    /**
+     * Demonstrates list manipulation: copying a list and updating an element by index.
+     * This is the Java equivalent of updating a value in an array/list structure.
+     */
+    public static List<Integer> runEx3() {
+        // Source data: An immutable List created by Arrays.asList: [1, 2, 3]
+        List<Integer> source = Arrays.asList(1, 2, 3);
+        
+        // 1. Create a mutable copy (ArrayList) from the source List
+        List<Integer> output = new ArrayList<>(source);
+        
+        // 2. Update the element at index 1 (the number 2) to 5
+        output.set(1, 5);
+        
+        // Return the final list: [1, 5, 3]
+        return output;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> finalOutput = runEx3();
+        
+        System.out.println("Output (Java List Representation):");
+        System.out.println(finalOutput);
+    }
+}
+
+output:
+
+ // Output: [1, 5, 3]
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// --- POJO Definition Added ---
+
+/**
+ * Represents the structure for both the source and output Hero/Role objects.
+ * We rename the internal field 'role' from 'a'/'b' to match the output.
+ */
+class Hero {
+    private String role;
+    private String name;
+
+    // Constructor used for both creating source data and mapped output data
+    public Hero(String role, String name) {
+        this.role = role;
+        this.name = name;
+    }
+
+    // Getters
+    public String getRole() {
+        return role;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    // Custom toString to mimic the JSON structure: {"role": "...", "name": "..."}
+    @Override
+    public String toString() {
+        return "{\"role\": \"" + role + "\", \"name\": \"" + name + "\"}";
+    }
+}
+
+// --- Main Class with Transformation Logic ---
+
+public class Main {
+
+    /**
+     * Transformation logic: Maps the list, hardcoding the 'role' field to "Super Hero".
+     */
+    public static List<Hero> runEx4() {
+        // Source data (The 'role' field is 'a' and 'b' in the source)
+        List<Hero> source = Arrays.asList(
+            new Hero("a", "spiderman"), 
+            new Hero("b", "batman")
+        );
+        
+        // Java equivalent of the map transformation:
+        // Iterates through 'source' and creates a new Hero object for each item.
+        List<Hero> output = source.stream()
+            // Map operation: new Hero("Super Hero", oldHero.getName())
+            .map(hero -> new Hero("Super Hero", hero.getName()))
+            .collect(Collectors.toList());
+            
+        return output;
+    }
+
+    public static void main(String[] args) {
+        List<Hero> finalOutput = runEx4();
+        
+        System.out.println("Output (Mimicking JSON Array):");
+        
+        // Print the list, wrapping the output with brackets for a complete JSON array structure.
+        String jsonOutput = finalOutput.stream()
+            .map(Hero::toString)
+            .collect(Collectors.joining(",\n  ", "[\n  ", "\n]"));
+
+        System.out.println(jsonOutput);
+    }
+}
+output:
+
+ /* Output: 
+    [
+      {"role": "Super Hero", "name": "spiderman"},
+      {"role": "Super Hero", "name": "batman"}
+    ]*/
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    /**
+     * Demonstrates list manipulation: copying a list and updating an element by index.
+     * This is the Java equivalent of updating a value in an array/list structure.
+     */
+    public static List<Integer> runEx5() {
+        // Source data: An immutable List created by Arrays.asList
+        List<Integer> source = Arrays.asList(1, 2, 3);
+        
+        // 1. Create a mutable copy (ArrayList) from the source List
+        List<Integer> output = new ArrayList<>(source);
+        
+        // 2. Update the element at index 1 (the second element) to 5
+        output.set(1, 5);
+        
+        // Return the final list: [1, 5, 3]
+        return output;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> finalOutput = runEx5();
+        
+        System.out.println("Output (Java List Representation):");
+        System.out.println(finalOutput);
+    }
+}
+output:
+
+ // Output: [1, 5, 3]
+
+---------------------------------------------------------------
+
+
+
+
+example 6:
+
+input:
+
+public static void runEx6() {
+    NestedObject source = new NestedObject(new NestedUser("Mariano"));
+    
+    // Java equivalent of the update:
+    NestedObject output = new NestedObject(new NestedUser("Data Weave"));
+    
+     }
+}
+
+output:
+{ "user": { "name": "Data Weave" }
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// --- POJO Definitions for XML Structure ---
+
+/**
+ * Represents the inner <user> element with name and language.
+ * (Assuming the name is needed for construction but not explicitly in the final output structure).
+ */
+class XmlUser {
+    private String name;
+    private String language;
+
+    public XmlUser(String name, String language) {
+        this.name = name;
+        this.language = language;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    // Custom toString to mimic the inner <user> output structure
+    @Override
+    public String toString() {
+        return "  <user><language>" + language + "</language></user>";
+    }
+}
+
+/**
+ * Represents the root <users> element, containing a list of XmlUser objects.
+ */
+class XmlUsers {
+    private List<XmlUser> users;
+
+    public XmlUsers(List<XmlUser> users) {
+        this.users = users;
+    }
+
+    // Custom toString to mimic the final XML output structure
+    @Override
+    public String toString() {
+        // Build the inner user strings
+        String innerUsers = users.stream()
+            .map(XmlUser::toString)
+            .collect(Collectors.joining("\n"));
+
+        // Wrap with the root element
+        return "<users>\n" + innerUsers + "\n</users>";
+    }
+}
+
+// --- Main Class with Transformation Logic ---
+
+public class Main {
+
+    /**
+     * Transformation logic: Conditionally changes "English" language to "Gibberish".
+     */
+    public static XmlUsers runEx7() {
+        List<XmlUser> sourceUsers = Arrays.asList(
+            new XmlUser("Phoebe", "French"), 
+            new XmlUser("Joey", "English")
+        );
+        
+        List<XmlUser> updatedUsers = sourceUsers.stream()
+            .map(user -> {
+                String newLang = user.getLanguage();
+                // Apply conditional logic: If language is "English", change it to "Gibberish"
+                if ("English".equals(newLang)) {
+                    newLang = "Gibberish";
+                }
+                // Return a new XmlUser object with the (potentially) updated language
+                return new XmlUser(user.getName(), newLang);
+            })
+            .collect(Collectors.toList());
+        
+        // Wrap the list in the root container object
+        XmlUsers output = new XmlUsers(updatedUsers);
+        return output;
+    }
+
+    public static void main(String[] args) {
+        // Run the transformation and print the result
+        XmlUsers finalOutput = runEx7();
+        System.out.println("Output (Mimicking XML structure):");
+        System.out.println(finalOutput);
+    }
+}
+
+output:
+
+/* Output: 
+    <users>
+      <user><language>French</language></user>
+      <user><language>Gibberish</language></user>
+    </users> */
+
+---------------------------------------------------------------
+
+
+
+

@@ -1,0 +1,91 @@
+
+
+join:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class DataWeaveMultiExample {
+
+    // --- 1. Equivalent of DataWeave drop(users, 2) ---
+    public static <T> List<T> drop(List<T> sourceList, int elementsToDrop) {
+        if (sourceList == null || elementsToDrop >= sourceList.size()) {
+            return List.of(); 
+        }
+        return sourceList.subList(elementsToDrop, sourceList.size());
+    }
+
+    public static void main(String[] args) {
+        
+        System.out.println("--- DataWeave Array Function Equivalents in Java ---\n");
+        
+        // =========================================================================
+        // 1. DataWeave: [1, 2, 3, 4] countBy (($ mod 2) == 0) -> 2
+        // Java Equivalent: Stream.filter(n -> n % 2 == 0).count()
+        // =========================================================================
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+        
+        // Count how many elements satisfy the condition (are even)
+        long evenCount = numbers.stream()
+                .filter(n -> n % 2 == 0) 
+                .count();
+
+        System.out.println("1. DataWeave 'countBy' Equivalent (Even Numbers):");
+        System.out.println("   Input: " + numbers);
+        System.out.println("   Result: { \"countBy\": " + evenCount + " }");
+        System.out.println("   (DataWeave Output: 2)\n");
+
+
+        // =========================================================================
+        // 2. DataWeave: drop(users, 2) -> ["Julian"]
+        // Java Equivalent: List.subList(2, size())
+        // =========================================================================
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        int elementsToDrop = 2;
+        
+        List<String> remainingUsers = drop(users, elementsToDrop);
+
+        System.out.println("2. DataWeave 'drop' Equivalent (Drop first 2 elements):");
+        System.out.println("   Input: " + users);
+        System.out.println("   Result: " + remainingUsers);
+        System.out.println("   (DataWeave Output: [\"Julian\"])\n");
+
+        
+        // =========================================================================
+        // 3. DataWeave: indexOf(users, "Julian") -> 2
+        // Java Equivalent: List.indexOf()
+        // =========================================================================
+        String targetValue = "Julian";
+        int index = users.indexOf(targetValue);
+
+        System.out.println("3. DataWeave 'indexOf' Equivalent (Find 'Julian'):");
+        System.out.println("   Input: " + users);
+        System.out.println("   Result: " + index);
+        System.out.println("   (DataWeave Output: 2)\n");
+    }
+}
+
+
+
+Output:
+
+--- DataWeave Array Function Equivalents in Java ---
+
+1. DataWeave 'countBy' Equivalent (Even Numbers):
+   Input: [1, 2, 3, 4]
+   Result: { "countBy": 2 }
+   (DataWeave Output: 2)
+
+2. DataWeave 'drop' Equivalent (Drop first 2 elements):
+   Input: [Mariano, Leandro, Julian]
+   Result: [Julian]
+   (DataWeave Output: ["Julian"])
+
+3. DataWeave 'indexOf' Equivalent (Find 'Julian'):
+   Input: [Mariano, Leandro, Julian]
+   Result: 2
+   (DataWeave Output: 2)

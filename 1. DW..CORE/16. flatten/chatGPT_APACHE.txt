@@ -1,0 +1,78 @@
+flatten:
+
+example 1:
+
+
+input:
+
+from("direct:flattenArrays")
+.setBody(constant(List.of(
+    List.of(1, 2, 3),
+    List.of(4, 5, 6),
+    List.of(7, 8, 9)
+)))
+
+.split(body())
+    .split(body())
+        .aggregate(constant(true),
+            new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+    .end()
+.end();
+
+
+output:
+
+[1,2,3,4,5,6,7,8,9]
+
+
+
+---------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:flattenObjects")
+.setBody(constant(
+    Map.of("user", List.of(
+        Map.of(
+            "group", "dev",
+            "myarray", List.of(
+                Map.of("name", "Shoki", "id", 5678),
+                Map.of("name", "Mariano", "id", 9123)
+            )
+        ),
+        Map.of(
+            "group", "test",
+            "myarray", List.of(
+                Map.of("name", "Sai", "id", 2001),
+                Map.of("name", "Peter", "id", 2002)
+            )
+        )
+    ))
+))
+
+.split(simple("${body[user]}"))
+    .split(simple("${body[myarray]}"))
+        .aggregate(constant(true),
+            new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+    .end()
+.end();
+
+
+output:
+
+[
+  { "name": "Shoki", "id": 5678 },
+  { "name": "Mariano", "id": 9123 },
+  { "name": "Sai", "id": 2001 },
+  { "name": "Peter", "id": 2002 }
+]
+
+
+
+---------------------------------------------------
+

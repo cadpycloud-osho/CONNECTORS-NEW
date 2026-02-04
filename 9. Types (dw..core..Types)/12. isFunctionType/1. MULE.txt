@@ -1,0 +1,35 @@
+isFunctionType:
+
+isFunctionType(t: Type): Boolean
+
+isFunctionType(t: Type): Boolean
+Returns true if the input is the Function type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AFunction = (String) -> String
+output application/json
+---
+{
+   a: isFunctionType(AFunction),
+   b: isFunctionType(Boolean)
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": false
+}
+
+
+
+
+
+
+
+

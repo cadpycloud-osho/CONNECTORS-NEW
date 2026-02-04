@@ -1,0 +1,48 @@
+isAlphanumeric:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class AlphanumericRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:validateAlphanumeric")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides perfect parity with DW logic
+                results.put("a", StringUtils.isAlphanumeric(null));
+                results.put("b", StringUtils.isAlphanumeric(""));
+                results.put("c", StringUtils.isAlphanumeric("  "));
+                results.put("d", StringUtils.isAlphanumeric("abc"));
+                results.put("e", StringUtils.isAlphanumeric("ab c"));
+                results.put("f", StringUtils.isAlphanumeric("ab2c"));
+                results.put("g", StringUtils.isAlphanumeric("ab-c"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": true,
+  "g": false
+}
+
+

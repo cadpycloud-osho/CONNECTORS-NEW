@@ -1,0 +1,62 @@
+xsiType:
+
+
+input:
+
+
+package com.example.demo.model;
+
+import jakarta.xml.bind.annotation.*;
+
+@XmlRootElement(name = "user")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class User {
+
+    @XmlAttribute(name = "type", namespace = "http://www.w3.org/2001/XMLSchema-instance")
+    private String xsiType = "acme:user";
+
+    @XmlElement
+    private String name;
+
+    @XmlElement
+    private String lastName;
+
+    @XmlSchema(namespace = "http://acme.com")
+    static class AcmeNamespace {}
+
+    public User() {}
+
+    public User(String name, String lastName) {
+        this.name = name;
+        this.lastName = lastName;
+    }
+}
+
+
+package com.example.demo.controller;
+
+import com.example.demo.model.User;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class XMLController {
+
+    @GetMapping(value = "/xml-user", produces = MediaType.APPLICATION_XML_VALUE)
+    public User getUserAsXML() {
+        return new User("Peter", "Parker");
+    }
+}
+
+output:
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="acme:user">
+    <name>Peter</name>
+    <lastName>Parker</lastName>
+</user>
+
+

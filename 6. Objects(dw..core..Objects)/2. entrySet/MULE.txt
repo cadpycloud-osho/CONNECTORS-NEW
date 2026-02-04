@@ -1,0 +1,44 @@
+entrySet:
+
+entrySet<T <: Object>(obj: T): Array<{| key: Key, value: Any, attributes: Object |}>
+
+entrySet<T <: Object>(obj: T): Array<{| key: Key, value: Any, attributes: Object |}>
+Returns an array of key-value pairs that describe the key, value, and any attributes in the input object.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Objects
+var myVar = read('<xml attr="x"><a>true</a><b>1</b></xml>', 'application/xml')
+output application/json
+---
+{ "entrySet" : entrySet(myVar) }
+
+DataWeave
+Output
+{
+  "entrySet": [
+    {
+       "key": "xml",
+       "value": {
+         "a": "true",
+         "b": "1"
+       },
+       "attributes": {
+         "attr": "x"
+       }
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+

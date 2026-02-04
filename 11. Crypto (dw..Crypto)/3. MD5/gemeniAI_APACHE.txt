@@ -1,0 +1,47 @@
+MD5:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat; // Java 17+
+import java.util.Map;
+
+public class Md5HashRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateMd5")
+            .routeId("MD5-Hash-Route")
+            .process(exchange -> {
+                // 1. Input string
+                String input = "asd";
+
+                // 2. Logic: Create MD5 MessageDigest
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                
+                // 3. Perform the hash
+                byte[] hashBytes = md.digest(input.getBytes(StandardCharsets.UTF_8));
+
+                // 4. Convert byte array to Hex String (32 characters)
+                // If using Java 8/11, use Apache Commons Codec Hex.encodeHexString()
+                String hexOutput = HexFormat.of().formatHex(hashBytes);
+
+                exchange.getIn().setBody(Map.of("md5", hexOutput));
+            })
+            .marshal().json()
+            .log("MD5 Result: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "md5": "7815696ecbf1c96e6894b779456d330e"
+}
+

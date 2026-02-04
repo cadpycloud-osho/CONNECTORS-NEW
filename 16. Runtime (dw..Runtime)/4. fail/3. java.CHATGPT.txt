@@ -1,0 +1,28 @@
+fail:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> result = new ArrayList<>();
+
+        if (result.size() <= 0) {
+            throw new RuntimeException("Data was empty"); // Equivalent to DW fail()
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+Exception in thread "main" java.lang.RuntimeException: Data was empty
+	at FailExample.main(FailExample.java:8)

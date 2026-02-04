@@ -1,0 +1,78 @@
+failIf:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class DwFailIfTest {
+
+    // Simulate DataWeave failIf function
+    static class FailIf {
+        public static <T> T apply(T value, java.util.function.Predicate<T> evaluator, String message) {
+            if (evaluator.test(value)) {
+                throw new RuntimeException(message);
+            }
+            return value;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new FailIfRoute());
+        context.start();
+
+        try {
+            context.createProducerTemplate().sendBody("direct:start", null);
+        } catch (Exception e) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+            System.err.println("ERROR " + sdf.format(new Date()) + " ...");
+            System.err.println("**********************************");
+            System.err.println("Message               : \"" + e.getMessage());
+        } finally {
+            Thread.sleep(1000);
+            context.stop();
+        }
+    }
+
+    static class FailIfRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        Map<String, Object> result = new HashMap<>(); // empty object {}
+                        
+                        // Simulate DataWeave: { "result" : "SUCCESS" failIf (isEmpty(result)) }
+                        Map<String, Object> output = new HashMap<>();
+                        
+                        // isEmpty(result) equivalent - empty Map has size 0
+                        output.put("result", FailIf.apply("SUCCESS", 
+                            val -> result.isEmpty(), 
+                            "Failed"));
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+
+ERROR 2026-01-26 10:00:xx,xxx ...
+**********************************
+Message               : "Failed"
+
+
+

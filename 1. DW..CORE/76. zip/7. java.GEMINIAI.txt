@@ -1,0 +1,256 @@
+zip:
+
+
+example 1:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // Inputs
+        List<Integer> list1 = Arrays.asList(0, 1);
+        List<String> list2 = Arrays.asList("a", "b");
+        
+        // Operation: Zip
+        List<List<Object>> zippedList = new ArrayList<>();
+        int length = Math.min(list1.size(), list2.size());
+        
+        // This loop pairs elements (the zip operation)
+        for (int i = 0; i < length; i++) {
+            List<Object> pair = Arrays.asList(list1.get(i), list2.get(i));
+            zippedList.add(pair);
+        }
+        
+        // --- Output Assembly (Standard Java Formatting) ---
+        StringBuilder output = new StringBuilder();
+        output.append("[ ");
+
+        for (int i = 0; i < zippedList.size(); i++) {
+            List<Object> pair = zippedList.get(i);
+            output.append("[ ");
+            
+            // First element (Number)
+            output.append(pair.get(0));
+            output.append(", ");
+            
+            // Second element (String, needs quotes)
+            output.append("\"").append(pair.get(1)).append("\"");
+            
+            output.append(" ]");
+            
+            if (i < zippedList.size() - 1) {
+                output.append(", ");
+            }
+        }
+        
+        output.append(" ]");
+        
+        System.out.println(output.toString());
+    }
+}
+
+
+output:
+
+[ [ 0, "a" ], [ 1, "b" ] ]
+
+---------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    /**
+     * Implements the DataWeave 'zip' function.
+     * Combines two lists into a list of pairs, constrained by the length of the shorter list.
+     */
+    private static List<List<Object>> zip(List<?> list1, List<?> list2) {
+        List<List<Object>> zippedList = new ArrayList<>();
+        int length = Math.min(list1.size(), list2.size());
+        
+        for (int i = 0; i < length; i++) {
+            List<Object> pair = Arrays.asList(list1.get(i), list2.get(i));
+            zippedList.add(pair);
+        }
+        return zippedList;
+    }
+
+    /**
+     * Helper to convert the List<List<Object>> structure into a compact JSON array string.
+     * Example: [[0,"a"],[1,"b"]]
+     */
+    private static String toJsonArray(List<List<Object>> list) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        
+        for (int i = 0; i < list.size(); i++) {
+            List<Object> pair = list.get(i);
+            sb.append("[");
+            
+            // First element (Number)
+            sb.append(pair.get(0));
+            sb.append(",");
+            
+            // Second element (String, needs quotes)
+            sb.append("\"").append(pair.get(1)).append("\"");
+            
+            sb.append("]");
+            
+            if (i < list.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        // Inputs
+        List<Integer> numbers4 = Arrays.asList(0, 1, 2, 3);
+        List<Integer> numbers3 = Arrays.asList(0, 1, 2);
+        List<String> letters4 = Arrays.asList("a", "b", "c", "d");
+        List<String> letters1 = Arrays.asList("a");
+        List<String> letters2 = Arrays.asList("a", "b");
+        
+        // Operations
+        List<List<Object>> zipA = zip(numbers4, letters4); // Length 4
+        List<List<Object>> zipB = zip(numbers4, letters1); // Length 1
+        List<List<Object>> zipC = zip(numbers4, letters2); // Length 2
+        List<List<Object>> zipD = zip(numbers3, letters4); // Length 3
+
+        // --- Output Assembly (Standard Java Formatting) ---
+        // Construct the final JSON object string
+        String outputJson = String.format("{\n" +
+                                            "  \"a\": %s,\n" +
+                                            "  \"b\": %s,\n" +
+                                            "  \"c\": %s,\n" +
+                                            "  \"d\": %s\n" +
+                                          "}",
+                                          toJsonArray(zipA),
+                                          toJsonArray(zipB),
+                                          toJsonArray(zipC),
+                                          toJsonArray(zipD));
+        
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+
+{
+  "a" : [ [ 0, "a" ], [ 1, "b" ], [ 2, "c" ], [ 3, "d" ] ],
+  "b" : [ [ 0, "a" ] ],
+  "c" : [ [ 0, "a" ], [ 1, "b" ] ],
+  "d" : [ [ 0, "a" ], [ 1, "b" ], [ 2, "c" ] ]
+}
+-----------------------------------------------------------
+
+
+
+
+example 3:
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    /**
+     * Helper to implement the DataWeave 'zip' function:
+     * Combines two lists into a list of pairs, constrained by the length of the shorter list.
+     */
+    private static List<List<Object>> zip(List<?> list1, List<?> list2) {
+        List<List<Object>> zippedList = new ArrayList<>();
+        int length = Math.min(list1.size(), list2.size());
+        
+        for (int i = 0; i < length; i++) {
+            List<Object> pair = Arrays.asList(list1.get(i), list2.get(i));
+            zippedList.add(pair);
+        }
+        return zippedList;
+    }
+
+    /**
+     * Helper to convert the complex List<List<...>> structure into a pretty-printed JSON string.
+     */
+    private static String toJsonString(Object obj, int indentLevel) {
+        String indent = "  ".repeat(indentLevel);
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            if (list.isEmpty()) {
+                return "[]";
+            }
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("[\n");
+            
+            for (int i = 0; i < list.size(); i++) {
+                sb.append(indent).append("  ");
+                sb.append(toJsonString(list.get(i), indentLevel + 1));
+                if (i < list.size() - 1) {
+                    sb.append(",");
+                }
+                sb.append("\n");
+            }
+            sb.append(indent).append("]");
+            return sb.toString();
+
+        } else if (obj instanceof String) {
+            return String.format("\"%s\"", obj);
+        } else {
+            return obj.toString();
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        // Inputs (matching myvar)
+        List<String> list1 = Arrays.asList("a", "b");         // Length 2
+        List<Integer> list2 = Arrays.asList(1, 2, 3);         // Length 3
+        List<String> list3 = Arrays.asList("aa", "bb");       // Length 2
+        List<List<?>> list4 = Arrays.asList(                  // Length 3
+            Arrays.asList("A", "B", "C"),
+            Arrays.asList(11, 12),
+            Arrays.asList("aA", "bB")
+        );
+        
+        // Operation: ((list1 zip list2) zip list3) zip list4
+        
+        // 1. (list1 zip list2) -> Result: [[a, 1], [b, 2]]. Length is 2
+        List<List<Object>> result1 = zip(list1, list2);
+        
+        // 2. (result1 zip list3) -> Result: [[[a, 1], aa], [[b, 2], bb]]. Length is 2
+        List<List<Object>> result2 = zip(result1, list3);
+        
+        // 3. (result2 zip list4) -> Result: [[[[a, 1], aa], [A, B, C]], [[[b, 2], bb], [11, 12]]]. 
+        List<List<Object>> finalResult = zip(result2, list4);
+
+        // --- Output Assembly (Standard Java Formatting) ---
+        // This relies on the custom toJsonString to match the pretty-printed JSON structure
+        System.out.println(toJsonString(finalResult, 0));
+    }
+}
+
+
+output:
+
+[
+  [ [ [ "a", 1 ], "aa" ], [ "A", "B", "C" ] ],
+  [ [ [ "b", 2 ], "bb" ], [ 11, 12 ] ]
+]

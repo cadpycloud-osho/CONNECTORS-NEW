@@ -1,0 +1,50 @@
+isLowerCase:
+
+
+input:
+
+import java.util.*;
+
+public class IsLowerCaseConverter {
+    public static boolean isLowerCase(String input) {
+        if (input == null || input.isEmpty()) return false;
+        
+        return input.chars()
+                   .allMatch(Character::isLowerCase);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isLowerCase(null));
+        result.put("b", isLowerCase(""));
+        result.put("c", isLowerCase(" "));
+        result.put("d", isLowerCase("abc"));
+        result.put("e", isLowerCase("aBC"));
+        result.put("f", isLowerCase("a c"));
+        result.put("g", isLowerCase("a1c"));
+        result.put("h", isLowerCase("a/c"));
+        result.put("i", isLowerCase("mulesöft"));  // ö = lowercase
+        result.put("j", isLowerCase("mulesÖft"));  // Ö = uppercase
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": true,
+  "j": false
+}
+
+

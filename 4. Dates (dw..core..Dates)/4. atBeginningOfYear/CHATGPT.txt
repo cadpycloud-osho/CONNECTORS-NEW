@@ -1,0 +1,143 @@
+
+
+
+atBeginningOfYear:
+
+
+
+example 1:
+
+
+input:
+
+@GetMapping("/beginningOfYear1")
+public Map<String, String> atBeginningOfYearExample1() {
+    OffsetDateTime dateTime = OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+    OffsetDateTime startOfYear = dateTime
+            .withDayOfYear(1)
+            .toLocalDate()
+            .atStartOfDay()
+            .atOffset(dateTime.getOffset());
+
+    return Map.of("atBeginningOfYearDateTime", startOfYear.toString());
+}
+
+
+output:
+
+
+
+{
+  "atBeginningOfYearDateTime": "2020-01-01T00:00:00-03:00"
+}
+
+
+-----------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+@GetMapping("/beginningOfYear2")
+public Map<String, String> atBeginningOfYearExample2() {
+    LocalDateTime localDateTime = LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+    LocalDateTime startOfYear = localDateTime
+            .withDayOfYear(1)
+            .toLocalDate()
+            .atStartOfDay();
+
+    return Map.of("atBeginningOfYearLocalDateTime", startOfYear.toString());
+}
+
+
+output:
+
+
+{
+  "atBeginningOfYearLocalDateTime": "2020-01-01T00:00:00"
+}
+
+
+
+-----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+@GetMapping("/beginningOfYear3")
+public Map<String, String> atBeginningOfYearExample3() {
+    LocalDate date = LocalDate.parse("2020-10-06");
+
+    LocalDate startOfYear = date.withDayOfYear(1);
+
+    return Map.of("atBeginningOfYearDate", startOfYear.toString());
+}
+
+
+output:
+
+
+
+{
+  "atBeginningOfYearDate": "2020-01-01"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+functionReturnType:
+
+functionReturnType(t: Type): Type | Null
+
+functionReturnType(t: Type): Type | Null
+Returns the type of a function’s return type. This function fails if the input type is not a Function type.
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::core::Types
+type AFunction = (String, Number) -> Number
+type AFunction2 = () -> Number
+---
+{
+    a: functionReturnType(AFunction),
+    b: functionReturnType(AFunction2)
+}
+
+
+DataWeave
+Output
+{
+  "a": "Number",
+  "b": "Number"
+}
+

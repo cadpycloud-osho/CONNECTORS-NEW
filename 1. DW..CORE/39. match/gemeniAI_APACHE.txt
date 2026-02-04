@@ -1,0 +1,127 @@
+match:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CamelRegexMatch {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String input = exchange.getIn().getBody(String.class);
+                        
+                        // Define Regex with capture groups
+                        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+                        Matcher matcher = pattern.matcher(input);
+
+                        List<String> result = new ArrayList<>();
+                        
+                        if (matcher.find()) {
+                            // group(0) is the full match: "me@mulesoft.com"
+                            result.add(matcher.group(0));
+                            // group(1) is "me"
+                            result.add(matcher.group(1));
+                            // group(2) is "mulesoft"
+                            result.add(matcher.group(2));
+                        }
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert List to JSON Array
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", "me@mulesoft.com");
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  "me@mulesoft.com",
+  "me",
+  "mulesoft"
+]
+
+--------------------------------------------------------
+
+example 2:
+
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+public class CamelFlatMapRegex {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Input variables
+                        List<String> inputs = Arrays.asList(
+                            "192.88.99.0/24", 
+                            "192.168.0.0/16", 
+                            "192.175.48.0/24"
+                        );
+
+                        // Regex logic: Matches strings containing '4' (specifically at the end per your DW source)
+                        // DataWeave match() returns an array if matched, null if not.
+                        // flatMap ignores the nulls and flattens the results.
+                        Pattern pattern = Pattern.compile(".*4");
+
+                        List<String> result = inputs.stream()
+                            .filter(ip -> pattern.matcher(ip).matches())
+                            .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Marshal the resulting List to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+[
+  "192.88.99.0/24",
+  "192.175.48.0/24"
+]
+

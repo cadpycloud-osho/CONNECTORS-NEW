@@ -1,0 +1,54 @@
+months:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Define the fixed input ZonedDateTime (UTC)
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        
+        // Formatter for ZonedDateTime output in ISO 8601 format
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        // --- 1. DateTime Arithmetic ---
+
+        // nextMonth: |2020-10-05T20:22:34.385Z| + months(1)
+        ZonedDateTime nextMonth = baseDateTime.plusMonths(1);
+        
+        // --- 2. Period Construction and Arithmetic ---
+
+        // fourMonthPeriod : months(4)
+        Period fourMonthPeriod = Period.ofMonths(4); // P4M
+
+        // addNegativeValue: months(-1) + months(2)
+        Period negativePeriod = Period.ofMonths(-1);
+        Period twoMonthPeriod = Period.ofMonths(2);
+        
+        Period combinedPeriod = negativePeriod.plus(twoMonthPeriod); // P1M
+        long addNegativeValue = combinedPeriod.toTotalMonths(); // 1
+
+        // --- Final JSON Output ---
+        System.out.println("{");
+        // Use replace() to match DW's preference of omitting ".000" on ISO output
+        System.out.println("  \"nextMonth\": \"" + nextMonth.format(formatter).replace(".000Z", "Z") + "\",");
+        System.out.println("  \"fourMonthPeriod\": \"" + fourMonthPeriod.toString() + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+

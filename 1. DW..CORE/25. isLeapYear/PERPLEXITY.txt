@@ -1,0 +1,144 @@
+isLeapYear:
+
+EXAMPLE 1:
+
+INPUT:
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class LeapYearDatetimeApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LeapYearDatetimeApp.class, args);
+
+        LocalDateTime date2016 = LocalDateTime.parse("2016-10-01T23:57:59");
+        LocalDateTime date2017 = LocalDateTime.parse("2017-10-01T23:57:59");
+
+        List<Boolean> results = Arrays.asList(
+                Year.of(date2016.getYear()).isLeap(),
+                Year.of(date2017.getYear()).isLeap()
+        );
+
+        System.out.println(results); // Output: [true, false]
+    }
+}
+
+OUTPUT:
+
+[true, false]
+_______________________________________________________________________
+EXAMPLE 2:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class LeapYearDateApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LeapYearDateApp.class, args);
+
+        LocalDate date2016 = LocalDate.parse("2016-10-01");
+        LocalDate date2017 = LocalDate.parse("2017-10-01");
+
+        List<Boolean> results = Arrays.asList(
+                Year.of(date2016.getYear()).isLeap(),
+                Year.of(date2017.getYear()).isLeap()
+        );
+
+        System.out.println(results); // Output: [true, false]
+    }
+}
+
+OUTPUT:
+
+[true, false]
+_______________________________________________________________________
+
+EXAMPLE 3:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.time.OffsetDateTime;
+import java.time.Year;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class LeapYearOffsetApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LeapYearOffsetApp.class, args);
+
+        OffsetDateTime date1 = OffsetDateTime.parse("2016-10-01T23:57:59-03:00");
+        OffsetDateTime date2 = OffsetDateTime.parse("2016-10-01T23:57:59Z");
+
+        List<Boolean> results = Arrays.asList(
+                Year.of(date1.getYear()).isLeap(),
+                Year.of(date2.getYear()).isLeap()
+        );
+
+        System.out.println(results); // Output: [true, true]
+    }
+}
+
+
+OUTPUT:
+
+[true, true]
+_______________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

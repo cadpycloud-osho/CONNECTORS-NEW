@@ -1,0 +1,37 @@
+isUriType:
+
+
+
+input:
+
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isUriType(Class<?> type) {
+        return URI.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> AUri = URI.class;
+
+        result.put("a", isUriType(AUri));
+        result.put("b", isUriType(URI.class));
+        result.put("c", isUriType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=true, c=false}
+
+

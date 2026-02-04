@@ -1,0 +1,35 @@
+toBoolean:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        result.put("a", toBoolean("true"));
+        result.put("b", toBoolean("false"));
+        result.put("c", toBoolean("FALSE"));
+        result.put("d", toBoolean("TrUe"));
+
+        System.out.println(result);
+    }
+
+    // Equivalent of DW toBoolean()
+    private static Boolean toBoolean(String value) {
+        return Boolean.parseBoolean(value);
+    }
+}
+
+
+output:
+
+
+{a=true, b=false, c=false, d=true}
+

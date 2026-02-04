@@ -1,0 +1,242 @@
+field:
+
+
+example 1:
+
+
+input:
+
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class SimpleMultipartController {
+    
+    @GetMapping(value = "/simple-multipart", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MultiValueMap<String, String> createSimpleMultipart() {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        
+        // Matches Multipart::field({name:"myFirstPart",value: firstPart})
+        builder.part("myFirstPart", "content for my first part");
+        
+        // Matches Multipart::field("mySecondPart", secondPart)
+        builder.part("mySecondPart", "content for my second part");
+        
+        return builder.build();
+    }
+}
+
+
+output:
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161.1542639222352--
+
+---------------------------------------------------------------
+example 2:
+
+
+input:
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class MultipartController {
+
+    @GetMapping(value = "/dw-multipart", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MultiValueMap<String, HttpEntity<?>> buildMultipart() {
+        // Data matching myOrder
+        String orderJson = """
+        [
+          {
+            "order": 1,
+            "amount": 2
+          },
+          {
+            "order": 32,
+            "amount": 1
+          }
+        ]
+        """;
+
+        // Data matching myClients
+        String clientsXml = """
+        <clients>
+          <client>
+            <id>1</id>
+            <name>Mariano</name>
+          </client>
+          <client>
+            <id>2</id>
+            <name>Shoki</name>
+          </client>
+        </clients>
+        """;
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // order part: name=order, JSON, with filename=order.json
+        builder.part("order", orderJson)
+               .header(HttpHeaders.CONTENT_TYPE, "application/json")
+               .header(
+                   HttpHeaders.CONTENT_DISPOSITION,
+                   "form-data; name=\"order\"; filename=\"order.json\""
+               );
+
+        // clients part: name=clients, XML, no filename
+        builder.part("clients", clientsXml)
+               .header(HttpHeaders.CONTENT_TYPE, "application/xml")
+               .header(
+                   HttpHeaders.CONTENT_DISPOSITION,
+                   "form-data; name=\"clients\""
+               );
+
+        return builder.build();
+    }
+}
+
+
+
+output:
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_8032_681891620.1542560124825--
+
+
+---------------------------------------------------------------
+example 3:
+
+
+input:
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveMultipartController {
+
+    @GetMapping(value = "/multipart-equivalent", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MultiValueMap<String, Object> createMultipart() {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // Matches: Multipart::field("order", myOrder, "application/json", "order.json")
+        builder.part("order", getOrderJson())
+               .header(HttpHeaders.CONTENT_TYPE, "application/json")
+               .header(HttpHeaders.CONTENT_DISPOSITION, 
+                      "form-data; name=\"order\"; filename=\"order.json\"");
+
+        // Matches: Multipart::field("clients", myClients, "application/xml")
+        builder.part("clients", getClientsXml())
+               .header(HttpHeaders.CONTENT_TYPE, "application/xml");
+
+        return builder.build();
+    }
+
+    private String getOrderJson() {
+        return """
+            [
+              {
+                "order": 1,
+                "amount": 2
+              },
+              {
+                "order": 32,
+                "amount": 1
+              }
+            ]
+            """;
+    }
+
+    private String getClientsXml() {
+        return """
+            <clients>
+              <client>
+                <id>1</id>
+                <name>Mariano</name>
+              </client>
+              <client>
+                <id>2</id>
+                <name>Shoki</name>
+              </client>
+            </clients>
+            """;
+    }
+}
+
+
+output:
+
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_4846_2022598837.1542560230901--
+

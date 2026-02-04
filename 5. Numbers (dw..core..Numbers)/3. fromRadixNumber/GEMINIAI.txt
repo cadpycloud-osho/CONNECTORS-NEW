@@ -1,0 +1,77 @@
+fromRadixNumber:
+
+
+input:
+
+package com.example.dataweaveconverter.controller;
+
+import com.example.dataweaveconverter.service.DataWeaveService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/convert")
+public class DataWeaveController {
+
+    private final DataWeaveService dataWeaveService;
+
+    @Autowired
+    public DataWeaveController(DataWeaveService dataWeaveService) {
+        this.dataWeaveService = dataWeaveService;
+    }
+
+    // Define a record for the output structure
+    public record DataWeaveOutput(
+        Integer a,
+        Integer b
+    ) {}
+
+    @GetMapping("/fromRadixNumber")
+    public DataWeaveOutput runDataWeaveLogic() {
+        // The inputs mirror the DataWeave source
+        return new DataWeaveOutput(
+            dataWeaveService.fromRadixNumber("10", 2),
+            dataWeaveService.fromRadixNumber("FF", 16)
+        );
+    }
+}
+
+
+2. The Service Layer
+package com.example.dataweaveconverter.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class DataWeaveService {
+
+    /**
+     * Mimics the DataWeave dw::core::Numbers::fromRadixNumber function.
+     * This is equivalent to Integer.parseInt(String s, int radix) in Java.
+     *
+     * @param numberString The string representation of the number in the given radix.
+     * @param radix The base of the number (e.g., 2 for binary, 16 for hex).
+     * @return The decimal integer equivalent.
+     */
+    public Integer fromRadixNumber(String numberString, int radix) {
+        try {
+            // Integer.parseInt is the direct Java equivalent for base conversion
+            return Integer.parseInt(numberString, radix);
+        } catch (NumberFormatException e) {
+            // In a real application, you might log the error or return a default/null
+            // DataWeave would likely throw an error here for invalid input.
+            throw new IllegalArgumentException("Invalid number string or radix for conversion: " + e.getMessage());
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": 2,
+  "b": 255
+}

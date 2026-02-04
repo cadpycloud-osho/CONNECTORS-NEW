@@ -1,0 +1,55 @@
+isUriType:
+
+isUriType(t: Type): Boolean
+
+Copy link to clipboardisUriType(t: Type): Boolean
+Returns true if the input is the Uri type.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AUri = Uri
+output application/json
+---
+{
+   a: isUriType(AUri),
+   b: isUriType(Uri),
+   c: isUriType(String),
+}
+
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

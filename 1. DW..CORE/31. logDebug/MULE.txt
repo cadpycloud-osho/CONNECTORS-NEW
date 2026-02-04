@@ -1,0 +1,6 @@
+logDebug:
+
+logDebug<T>(prefix: String = "", value: T): T
+
+logDebug<T>(prefix: String = "", value: T): T
+Helper function that logs messages at Debug level.

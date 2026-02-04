@@ -1,0 +1,234 @@
+reduce:
+
+
+example 1:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> list = Arrays.asList(2, 3);
+
+        int result = list.stream()
+                         .reduce((acc, item) -> acc + item)
+                         .orElse(0);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+5
+
+
+-------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> myNums = Arrays.asList(1, 2, 3, 4);
+        List<Integer> myEmptyList = new ArrayList<>();
+
+        int sum = myNums.stream()
+                        .reduce(0, Integer::sum);
+
+        String concat = myNums.stream()
+                              .map(String::valueOf)
+                              .reduce("", String::concat);
+
+        String emptyListResult = myEmptyList.stream()
+                                             .map(String::valueOf)
+                                             .reduce(String::concat)
+                                             .orElse(null);
+
+        System.out.println("{ \"sum\": " + sum +
+                           ", \"concat\": \"" + concat +
+                           "\", \"emptyList\": " + emptyListResult + " }");
+    }
+}
+
+
+output:
+
+{ "sum": 10, "concat": "1234", "emptyList": null }
+
+
+-------------------------------------------------------------
+
+
+
+example 3:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String concat = Arrays.asList("a","b","c","d")
+                .stream()
+                .reduce("z", String::concat);
+
+        int sum = Arrays.asList(0,1,2,3,4,5)
+                .stream()
+                .reduce(3, Integer::sum);
+
+        int multiply = Arrays.asList(2,3,3)
+                .stream()
+                .reduce((a, b) -> a * b)
+                .orElse(0);
+
+        int multiplyAcc = Arrays.asList(2,2,3)
+                .stream()
+                .reduce(3, (a, b) -> a * b);
+
+        System.out.println("{ \"concat\": \"" + concat +
+                "\", \"sum\": " + sum +
+                ", \"multiply\": " + multiply +
+                ", \"multiplyAcc\": " + multiplyAcc + " }");
+    }
+}
+
+
+output:
+
+{ "concat": "zabcd", "sum": 18, "multiply": 18, "multiplyAcc": 36 }
+
+
+-------------------------------------------------------------
+
+
+
+example 4:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> a = Arrays.asList(0,1,2,3,4,5);
+        List<String> b = Arrays.asList("a","b","c","d","e");
+        List<Boolean> d = Arrays.asList(true,false,false,true,true);
+
+        int i = a.stream().reduce(0, Integer::sum);
+        int k = a.stream().reduce(3, Integer::sum);
+        int l = a.stream().findFirst().orElse(0);
+
+        String m = b.stream().reduce("", String::concat);
+        String o = b.stream().reduce("z", String::concat);
+        String p = b.stream().findFirst().orElse(null);
+
+        boolean s = d.stream().reduce(true, (x,y) -> x && y);
+        boolean u = d.stream().reduce(false, (x,y) -> x && y);
+        boolean v = d.stream().findFirst().orElse(true);
+
+        List<Integer> w = Arrays.asList(0,1,2,3,4);
+
+        Integer x = new ArrayList<Integer>().stream().reduce((a1,a2) -> a1).orElse(null);
+        int y = new ArrayList<Integer>().stream().reduce(0, Integer::sum);
+
+        System.out.println("i=" + i);
+        System.out.println("k=" + k);
+        System.out.println("l=" + l);
+        System.out.println("m=" + m);
+        System.out.println("o=" + o);
+        System.out.println("p=" + p);
+        System.out.println("s=" + s);
+        System.out.println("u=" + u);
+        System.out.println("v=" + v);
+        System.out.println("w=" + w);
+        System.out.println("x=" + x);
+        System.out.println("y=" + y);
+    }
+}
+
+
+output:
+
+i:15
+k:18
+l:0
+m:"abcde"
+o:"zabcde"
+p:"a"
+s:false
+u:false
+v:true
+w:[0,1,2,3,4]
+x:null
+y:0
+
+
+-------------------------------------------------------------
+
+
+
+example 5:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        String text = "hello world";
+
+        String reversed = text.chars()
+                .mapToObj(c -> String.valueOf((char)c))
+                .reduce("", (acc, item) -> item + acc);
+
+        System.out.println(reversed);
+    }
+}
+
+
+output:
+
+
+dlrow olleh
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

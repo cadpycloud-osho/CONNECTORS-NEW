@@ -1,0 +1,68 @@
+join:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class CamelJoinExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Left Collection (Users)
+                        List<Map<String, String>> users = List.of(
+                            Map.of("id", "1", "name", "Mariano"),
+                            Map.of("id", "2", "name", "Leandro"),
+                            Map.of("id", "3", "name", "Julian"),
+                            Map.of("id", "5", "name", "Julian")
+                        );
+
+                        // Right Collection (Products)
+                        List<Map<String, String>> products = List.of(
+                            Map.of("ownerId", "1", "name", "DataWeave"),
+                            Map.of("ownerId", "1", "name", "BAT"),
+                            Map.of("ownerId", "3", "name", "DataSense"),
+                            Map.of("ownerId", "4", "name", "SmartConnectors")
+                        );
+
+                        // Java Join Logic: Inner Join
+                        List<Map<String, Object>> joinedResult = users.stream()
+                            .flatMap(user -> products.stream()
+                                .filter(product -> user.get("id").equals(product.get("ownerId")))
+                                .map(product -> Map.of("l", user, "r", product))
+                            )
+                            .toList();
+
+                        exchange.getIn().setBody(joinedResult);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  {"l": {"id": "1", "name": "Mariano"}, "r": {"ownerId": "1", "name": "DataWeave"}},
+  {"l": {"id": "1", "name": "Mariano"}, "r": {"ownerId": "1", "name": "BAT"}},
+  {"l": {"id": "3", "name": "Julian"}, "r": {"ownerId": "3", "name": "DataSense"}}
+]
+

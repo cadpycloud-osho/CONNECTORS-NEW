@@ -1,0 +1,37 @@
+isFunctionType:
+
+
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class FunctionTypeController {
+    
+    @GetMapping("/is-function-type")
+    public Map<String, Boolean> isFunctionType() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // isFunctionType(AFunction) where AFunction = (String) -> String -> true
+        result.put("a", true);
+        
+        // isFunctionType(Boolean) -> false
+        result.put("b", false);
+        
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+
+

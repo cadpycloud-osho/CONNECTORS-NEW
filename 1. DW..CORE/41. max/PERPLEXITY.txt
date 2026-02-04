@@ -1,0 +1,34 @@
+max:
+
+INPUT:
+
+// MaxFunctionApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+
+@SpringBootApplication
+public class MaxFunctionApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MaxFunctionApp.class, args);
+
+        int maxA = Collections.max(Arrays.asList(1, 1000));
+        int maxB = Collections.max(Arrays.asList(1, 2, 3));
+        double maxC = Collections.max(Arrays.asList(1.5, 2.5, 3.5));
+
+        Map<String, Object> result = Map.of(
+            "a", maxA,
+            "b", maxB,
+            "c", maxC
+        );
+        
+        System.out.println(result);  // Output: {a=1000, b=3, c=3.5}
+    }
+}
+
+OUTPUT:
+
+{a=1000, b=3, c=3.5}

@@ -1,0 +1,33 @@
+version:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class VersionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:getVersion")
+            // 1. Using a Processor
+            .process(exchange -> {
+                String camelVersion = exchange.getContext().getVersion();
+                exchange.getIn().setBody(camelVersion);
+            })
+            
+            // 2. Alternatively, using Simple language directly:
+            // .setBody(simple("${camelContext.version}"))
+            
+            .marshal().json();
+    }
+}
+
+
+output:
+
+Output:
+"2.5"
+
+

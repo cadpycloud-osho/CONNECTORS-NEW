@@ -1,0 +1,38 @@
+isPeriodType:
+
+
+
+
+input:
+
+import java.time.Period;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isPeriodType(Object value) {
+        return value instanceof Period;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Period aPeriod = Period.ofDays(1);     // APeriod
+        Period periodType = Period.ofWeeks(1); // Period
+        String str = "test";                   // String
+        
+        result.put("a", isPeriodType(aPeriod));
+        result.put("b", isPeriodType(periodType));
+        result.put("c", isPeriodType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+

@@ -1,0 +1,41 @@
+nameSet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class NameSetRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:nameSet")
+            .process(exchange -> {
+                Map<String, Object> input = Map.of(
+                    "a", true,
+                    "b", 1
+                );
+                
+                // Extract keys as List (matches array output)
+                List<String> names = new ArrayList<>(input.keySet());
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("nameSet", names);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "nameSet": ["a", "b"]
+}
+
+
+

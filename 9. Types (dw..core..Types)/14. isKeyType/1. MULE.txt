@@ -1,0 +1,56 @@
+isKeyType:
+
+isKeyType(t: Type): Boolean
+
+isKeyType(t: Type): Boolean
+Returns true if the input is the Key type.
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AKey = Key
+output application/json
+---
+{
+   a: isKeyType(AKey),
+   b: isKeyType(Key),
+   c: isKeyType(Boolean),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

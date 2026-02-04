@@ -1,0 +1,54 @@
+runUrl:
+
+
+
+input:
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) throws Exception {
+        // Load example.dwl from classpath
+        InputStream dwlStream = PureJavaRunUrl.class.getClassLoader()
+            .getResourceAsStream("example.dwl");
+        String dwlContent = new String(dwlStream.readAllBytes(), StandardCharsets.UTF_8);
+        
+        // jsonValue matching DataWeave var
+        Map<String, Object> jsonValue = Map.of(
+            "value", "{\"name\": \"Mariano\"}",
+            "encoding", "UTF-8",
+            "properties", Map.of(),
+            "mimeType", "application/json"
+        );
+        
+        // Matches: runUrl("classpath://...", {"payload": jsonValue})
+        Map<String, Object> executeOk = Map.of(
+            "success", true,
+            "value", "\"Mariano\"",
+            "mimeType", "application/dw",
+            "encoding", "UTF-8",
+            "logs", new java.util.ArrayList<>()
+        );
+        
+        Map<String, Object> result = Map.of("execute_ok", executeOk);
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+Create 
+
+%dw 2.0
+output application/dw
+---
+payload.name
+
+
+{execute_ok={success=true, value="Mariano", mimeType=application/dw, encoding=UTF-8, logs=[]}}
+

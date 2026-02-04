@@ -1,0 +1,45 @@
+isLocalDateTimeType:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.lang.reflect.Type;
+import com.google.common.reflect.TypeToken;
+
+@RestController
+@RequestMapping("/api")
+public class DateTimeTypeCheckController {
+    
+    @GetMapping("/datetime-type-check")
+    public Map<String, Boolean> checkLocalDateTimeTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        String testString = "test";
+        
+        result.put("a", localDateTime instanceof LocalDateTime);
+        result.put("b", localDateTime instanceof LocalDateTime);
+        result.put("c", testString instanceof LocalDateTime);
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+

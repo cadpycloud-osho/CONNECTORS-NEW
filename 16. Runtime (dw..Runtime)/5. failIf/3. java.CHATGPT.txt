@@ -1,0 +1,86 @@
+failIf:
+
+examples 1:
+
+input:
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, Object> result = Collections.emptyMap(); // {}
+
+        try {
+            // Equivalent to DataWeave failIf
+            if (result.isEmpty()) {
+                throw new RuntimeException("Failed because result is empty");
+            }
+
+            Map<String, String> output = new HashMap<>();
+            output.put("result", "SUCCESS");
+            System.out.println(output);
+
+        } catch (RuntimeException e) {
+            System.err.println("ERROR: " + e.getMessage());
+        }
+    }
+}
+
+
+output:
+
+Pure Java Output
+ERROR: Failed because result is empty
+
+If result had entries:
+Map<String, Object> result = new HashMap<>();
+result.put("key", "value");
+
+
+Output:
+
+{ "result": "SUCCESS" }
+
+----------------------------------------------------------------
+
+
+
+examples 2:
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", "test"); // equivalent to {"a":"test"}
+
+        try {
+            // failIf(isEmpty($))
+            if (result.isEmpty()) {
+                throw new RuntimeException("Failed because result is empty");
+            }
+
+            Map<String, Object> output = new HashMap<>();
+            output.put("result", result);
+
+            System.out.println(output);
+
+        } catch (RuntimeException e) {
+            System.err.println("ERROR: " + e.getMessage());
+        }
+    }
+}
+
+
+output:
+
+{result={a=test}}
+

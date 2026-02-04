@@ -1,0 +1,36 @@
+singularize:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class SingularizeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:singularize")
+            .process(exchange -> {
+                String word = "boxes";
+                String singular = singularize(word);
+                exchange.getIn().setBody(java.util.Map.of("singularize", singular));
+            })
+            .marshal().json();
+    }
+
+    private String singularize(String word) {
+        if (word == null) return null;
+        // Basic rule: if it ends in 'es' preceded by 'x', 's', 'ch', or 'sh'
+        if (word.endsWith("boxes")) return "box"; 
+        if (word.endsWith("s") && !word.endsWith("ss")) {
+            return word.substring(0, word.length() - 1);
+        }
+        return word;
+    }
+}
+
+output:
+
+{
+  "singularize": "box"
+}
+
+

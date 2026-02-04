@@ -1,0 +1,40 @@
+today:
+
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class TodayExample {
+
+    /**
+     * DataWeave equivalent: today()
+     * Returns the current date (LocalDate) from the system clock.
+     * @return The current LocalDate.
+     */
+    public static LocalDate getTodayDate() {
+        // Use the static factory method LocalDate.now()
+        return LocalDate.now();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Current Date (today()) Example ---");
+        
+        // 1. Call the Java function
+        LocalDate today = getTodayDate();
+        
+        // 2. Format the output to match the DataWeave ISO 8601 format ("YYYY-MM-DD")
+        String formattedOutput = today.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        // Note: The date in the output will vary based on the execution time.
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+output:
+
+2025-12-10
+

@@ -1,0 +1,45 @@
+valueSet:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class ValueSetRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getValueSet")
+            .routeId("Value-Set-Extraction-Route")
+            .process(exchange -> {
+                // 1. Source Object: { "a" : true, "b" : 1 }
+                // Use LinkedHashMap to preserve the order of values
+                Map<String, Object> source = new LinkedHashMap<>();
+                source.put("a", true);
+                source.put("b", 1);
+
+                // 2. Logic: valueSet()
+                // Map.values() returns a Collection; we convert to List for the JSON array
+                List<Object> values = new ArrayList<>(source.values());
+
+                // 3. Structure for JSON output
+                Map<String, Object> response = new HashMap<>();
+                response.put("valueSet", values);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Extracted Values: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "valueSet": [true, 1]
+}
+

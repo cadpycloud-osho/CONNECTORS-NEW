@@ -1,0 +1,85 @@
+to:
+
+
+example 1:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.List<Integer> myRange = new java.util.ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            myRange.add(i);
+        }
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("myRange", myRange);
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+{
+  "myRange": [1,2,3,4,5,6,7,8,9,10]
+}
+
+
+
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        String myVar = "Hello World!";
+
+        // indices 2 to 6 (inclusive)
+        String indices2to6 = myVar.substring(2, 7); // substring endIndex is exclusive, so +1
+
+        // indices 6 to end
+        String indicesFromEnd = myVar.substring(6);
+
+        // reversal: full string reversed
+        String reversal = new StringBuilder(myVar).reverse().toString();
+
+        // put results in map
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("indices2to6", indices2to6);
+        result.put("indicesFromEnd", indicesFromEnd);
+        result.put("reversal", reversal);
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+{
+  "indices2to6": "llo W",
+  "indicesFromEnd": "World!",
+  "reversal": "!dlroW olleH"
+}
+
+
+
+--------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

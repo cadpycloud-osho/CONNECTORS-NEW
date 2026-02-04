@@ -1,0 +1,40 @@
+isNamespaceType:
+
+
+
+
+
+input:
+
+import javax.xml.namespace.NamespaceContext;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isNamespaceType(Class<?> type) {
+        return NamespaceContext.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ANamespace = NamespaceContext.class;
+
+        result.put("a", isNamespaceType(ANamespace));
+        result.put("b", isNamespaceType(NamespaceContext.class));
+        result.put("c", isNamespaceType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=true, c=false}
+
+
+

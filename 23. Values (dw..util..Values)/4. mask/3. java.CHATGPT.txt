@@ -1,0 +1,140 @@
+mask:
+
+example 1:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+class User {
+
+    private String name;
+    private String password;
+
+    public User(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "{ \"name\": \"" + name + "\", \"password\": \"" + password + "\" }";
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<User> users = Arrays.asList(
+                new User("Peter Parker", "*****"),
+                new User("Bruce Wayne", "*****")
+        );
+
+        System.out.println("[");
+        for (int i = 0; i < users.size(); i++) {
+            System.out.print("  " + users.get(i));
+            if (i < users.size() - 1) {
+                System.out.println(",");
+            }
+        }
+        System.out.println("\n]");
+    }
+}
+
+output:
+
+[
+  { "name": "Peter Parker", "password": "*****" },
+  { "name": "Bruce Wayne", "password": "*****" }
+]
+
+
+
+--------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Map<String, String>> users = new ArrayList<>();
+
+        Map<String, String> u1 = new HashMap<>();
+        u1.put("name", "Peter Parker");
+        u1.put("password", "spiderman");
+
+        Map<String, String> u2 = new HashMap<>();
+        u2.put("name", "Bruce Wayne");
+        u2.put("password", "batman");
+
+        users.add(u1);
+        users.add(u2);
+
+        // Mask the password field
+        for (Map<String, String> user : users) {
+            user.put("password", "*****");
+        }
+
+        // Print output
+        System.out.println(users);
+    }
+}
+
+
+output:
+
+
+[{name=Peter Parker, password=*****}, {name=Bruce Wayne, password=*****}]
+
+
+
+
+--------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<List<Object>> data = new ArrayList<>();
+        data.add(new ArrayList<>(Arrays.asList(123, true)));
+        data.add(new ArrayList<>(Arrays.asList(456, true)));
+
+        // mask index 1 with false
+        for (List<Object> innerList : data) {
+            if (innerList.size() > 1) {
+                innerList.set(1, false);
+            }
+        }
+
+        System.out.println(data);
+    }
+}
+
+
+
+output:
+
+[[123, false], [456, false]]
+
+
+
+
+--------------------------------------------------------------------------

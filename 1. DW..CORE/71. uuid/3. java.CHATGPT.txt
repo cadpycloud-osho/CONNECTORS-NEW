@@ -1,0 +1,29 @@
+uuid:
+
+
+
+input:
+
+import java.util.UUID;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Generate UUID
+        String uuid = UUID.randomUUID().toString();
+
+        // Print JSON output manually
+        System.out.println("{");
+        System.out.println("  \"uuid\" : \"" + uuid + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "uuid" : "e3b0c442-98fc-4f3b-8a27-6d9a9b4c11d2"
+}
+

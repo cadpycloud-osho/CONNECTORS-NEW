@@ -1,0 +1,36 @@
+underscore:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String underscore(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        String camelToUnderscore = input.replaceAll("([a-z])([A-Z])", "$1_$2");
+        String normalized = camelToUnderscore.replace("-", "_").replace(" ", "_");
+
+        return normalized.toLowerCase();
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", underscore("customer"));
+        result.put("b", underscore("customer-first-name"));
+        result.put("c", underscore("customer NAME"));
+        result.put("d", underscore("customerName"));
+
+        System.out.println(result);
+    }
+}
+
+ouput:
+
+{a=customer, b=customer_first_name, c=customer_name, d=customer_name}
+
+

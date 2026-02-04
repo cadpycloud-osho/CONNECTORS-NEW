@@ -1,0 +1,38 @@
+atan:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathAtanRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateAtan")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Mapping Java's Math.atan to the output structure
+                results.put("atan0", Math.atan(0));
+                results.put("atan13", Math.atan(0.13));
+                results.put("atan-1", Math.atan(-1));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+
+{
+   "atan0": 0.0,
+   "atan13": 0.12927500404814307,
+   "atan-1": -0.7853981633974483
+}

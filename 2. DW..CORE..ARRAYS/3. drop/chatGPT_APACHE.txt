@@ -1,0 +1,37 @@
+drop:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+import java.util.List;
+
+public class DropRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                List<String> users = List.of("Mariano", "Leandro", "Julian");
+
+                // drop first 2 elements
+                List<String> result = users.subList(2, users.size());
+
+                exchange.getIn().setBody(result);
+            })
+            .log("${body}");
+    }
+}
+
+
+
+
+output:
+
+
+[
+  "Julian"
+]

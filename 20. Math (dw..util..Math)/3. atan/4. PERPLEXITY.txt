@@ -1,0 +1,65 @@
+atan:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveMathAtanApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveMathAtanApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/math/atan")
+@RequiredArgsConstructor
+class AtanController {
+    
+    private final MathService mathService;
+    
+    @GetMapping("/test")
+    public Map<String, Double> testAtan() {
+        return mathService.executeAtanTests();
+    }
+}
+
+@Service
+class MathService {
+    
+    public Map<String, Double> executeAtanTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("atan0", atan(0.0));
+        result.put("atan13", atan(0.13));
+        result.put("atan-1", atan(-1.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave atan() equivalent:
+     * Returns arctangent of x (returns values in range (-π/2, π/2))
+     */
+    public Double atan(double x) {
+        return Math.atan(x);
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+{
+  "atan0": 0.0,
+  "atan13": 0.12927500404814307,
+  "atan-1": -0.7853981633974483
+}
+
+
+

@@ -1,0 +1,90 @@
+isLeapYear:
+
+example 1:
+
+input:
+
+from("direct:checkLeapYear")
+    .setBody(exchange -> {
+        // Define our input dates (DateTime objects)
+        def dates = [
+            java.time.LocalDateTime.parse("2016-10-01T23:57:59"),
+            java.time.LocalDateTime.parse("2017-10-01T23:57:59")
+        ]
+        
+        // Map through dates and check if the year is a leap year
+        return dates.collect { dt -> 
+            java.time.Year.of(dt.getYear()).isLeap() 
+        }
+    })
+    .marshal().json() // Formats the output as JSON
+    .to("mock:result");
+
+<setBody>
+    <method bean="dateHelper" method="checkYear('2016-10-01T23:57:59')"/>
+</setBody>
+output:
+
+[ true, false ]
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:checkLeapDate")
+    .setBody(exchange -> {
+        // Defining the input dates as strings (similar to the DW input)
+        def inputs = ["2016-10-01", "2017-10-01"]
+        
+        // Convert strings to LocalDate and check for leap year
+        return inputs.collect { dateStr ->
+            java.time.LocalDate.parse(dateStr).isLeapYear()
+        }
+    })
+    .marshal().json() // Converts the List to a JSON array
+    .to("mock:output");
+
+
+output:
+[ true, false ]
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:start")
+    .setBody(exchange -> {
+        // Defining the inputs with TimeZones
+        def inputs = [
+            "2016-10-01T23:57:59-03:00", 
+            "2016-10-01T23:57:59Z"
+        ]
+        
+        // Map (collect) through inputs, parse as ZonedDateTime, and check leap year
+        return inputs.collect { ts ->
+            java.time.ZonedDateTime.parse(ts).toLocalDate().isLeapYear()
+        }
+    })
+    .marshal().json()
+    .to("mock:result");
+
+
+
+output:
+[ true, true ]
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+unionItems:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class UnionItemsController {
+
+    @GetMapping("/union-items")
+    public Map<String, List<String>> unionItems() {
+        Map<String, List<String>> result = new HashMap<>();
+        
+        // AType = String | Number → unionItems returns ["String", "Number"]
+        result.put("a", Arrays.asList("String", "Number"));
+        
+        return result;
+    }
+}
+
+output:
+
+
+
+{
+  "a": ["String", "Number"]
+}

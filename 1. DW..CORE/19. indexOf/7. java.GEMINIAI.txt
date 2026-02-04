@@ -1,0 +1,106 @@
+indexOf:
+
+exanples 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave arrays are represented as Java Lists
+        List<String> list1 = Arrays.asList("a", "b", "c", "d");
+        List<String> list2 = Arrays.asList("x", "w", "x");
+        List<String> list3 = Arrays.asList("a", "b", "c", "c");
+
+        // The indexOf method finds the index of the first occurrence, or -1 if not found.
+        
+        // present: ["a","b","c","d"] indexOf "c"
+        int presentIndex = list1.indexOf("c");
+        
+        // notPresent: ["x","w","x"] indexOf "c"
+        int notPresentIndex = list2.indexOf("c");
+        
+        // presentMoreThanOnce: ["a","b","c","c"] indexOf "c"
+        // It finds the first 'c' at index 2
+        int presentMoreThanOnceIndex = list3.indexOf("c");
+
+        System.out.println("--- DataWeave indexOf (Array/List) Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{");
+        System.out.println("  \"present\": " + presentIndex + ",");
+        System.out.println("  \"notPresent\": " + notPresentIndex + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnceIndex);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+------------------------------------------------------------
+
+
+exanples 2:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        String str1 = "abcd";
+        String str2 = "xyz";
+        String str3 = "abcdc";
+
+        // The indexOf method finds the index of the first character or substring, or -1 if not found.
+        
+        // present: "abcd" indexOf "c"
+        int presentIndex = str1.indexOf("c"); // Index starts at 0: a(0), b(1), c(2)
+        
+        // notPresent: "xyz" indexOf "c"
+        int notPresentIndex = str2.indexOf("c");
+        
+        // presentMoreThanOnce: "abcdc" indexOf "c"
+        // It finds the first 'c' at index 2
+        int presentMoreThanOnceIndex = str3.indexOf("c");
+
+        System.out.println("--- DataWeave indexOf (String) Conversion ---");
+        System.out.println("Output:");
+        System.out.println("{");
+        System.out.println("  \"present\": " + presentIndex + ",");
+        System.out.println("  \"notPresent\": " + notPresentIndex + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnceIndex);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 2
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

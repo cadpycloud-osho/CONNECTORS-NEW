@@ -1,0 +1,60 @@
+orElseTry:
+
+orElseTry<T, R>(previous: TryResult<T>, orElse: () -> R): TryResult<T | R>
+
+orElseTry<T, R>(previous: TryResult<T>, orElse: () -> R): TryResult<T | R>
+Function to use with try to chain multiple try requests.
+
+
+Source
+%dw 2.0
+import * from dw::Runtime
+var user = {}
+var otherUser = {}
+output application/json
+---
+{
+    a: try(() -> user.name!) orElseTry otherUser.name!,
+    b: try(() -> user.name!) orElseTry "No User Name"
+}
+DataWeave
+Output
+{
+  "a": {
+    "success": false,
+    "error": {
+      "kind": "KeyNotFoundException",
+      "message": "There is no key named 'name'",
+      "location": "\n9|     a: try(() -> user.name!) orElseTry otherUser.name!,\n                                          ^^^^^^^^^^^^^^",
+      "stack": [
+        "main (org::mule::weave::v2::engine::transform:9:40)"
+      ]
+    }
+  },
+  "b": {
+    "success": true,
+    "result": "No User Name"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

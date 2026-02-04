@@ -1,0 +1,249 @@
+sizeOf:
+
+
+example 1:
+
+input:
+
+@GetMapping("/size1")
+public Map<String, Integer> size1() {
+    return Map.of("result", List.of("a","b","c").size());
+}
+
+output:
+
+
+{ "result": 3 }
+
+
+----------------------------------------------------------------------
+
+example 2:
+
+input:
+
+@GetMapping("/size2")
+public Map<String, Object> size2() {
+    return Map.of(
+        "arraySizes", Map.of(
+            "size3", List.of(1,2,3).size(),
+            "size2", List.of(List.of(1,2,3), List.of(4)).size(),
+            "size0", List.of().size()
+        )
+    );
+}
+
+output:
+
+
+{
+  "arraySizes": { "size3": 3, "size2": 2, "size0": 0 }
+}
+
+
+----------------------------------------------------------------------
+
+example 3:
+
+input:
+
+@GetMapping("/size3")
+public Map<String, Integer> size3() {
+    return Map.of("result", Map.of("a",1,"b",2).size());
+}
+
+output:
+
+{ "result": 2 }
+
+
+
+----------------------------------------------------------------------
+
+
+example 4:
+
+input:
+
+@GetMapping("/size4")
+public Map<String,Object> size4() {
+    return Map.of(
+        "objectSizes", Map.of(
+            "sizeIs2", Map.of("a",1,"b",2).size(),
+            "sizeIs0", Map.of().size()
+        )
+    );
+}
+
+output:
+
+{
+  "objectSizes": { "sizeIs2": 2, "sizeIs0": 0 }
+}
+
+
+
+----------------------------------------------------------------------
+
+example 5:
+
+input:
+
+@GetMapping("/size5")
+public Map<String,String> size5() {
+    String str = "my word";
+    return Map.of(
+        "BinarySizeOf", str.getBytes().length + " " + str.length(),
+        "StringSizeOf", str.length() + " " + str.length()
+    );
+}
+
+output:
+
+{
+  "BinarySizeOf": "9 9",
+  "StringSizeOf": "9 9"
+}
+
+
+
+----------------------------------------------------------------------
+
+
+example 6:
+
+input:
+
+@GetMapping("/size6")
+public Map<String,Integer> size6() {
+    return Map.of("result", "abc".length());
+}
+
+output:
+
+{ "result": 3 }
+
+
+
+----------------------------------------------------------------------
+
+
+example 7:
+
+input:
+
+@GetMapping("/size7")
+public Map<String,Integer> size7() {
+    return Map.of(
+        "sizeOfSting2", "my string".length(),
+        "sizeOfEmptyString", "".length(),
+        "sizeOfNumber", 1
+    );
+}
+
+output:
+
+
+{
+  "sizeOfSting2": 9,
+  "sizeOfEmptyString": 0,
+  "sizeOfNumber": 1
+}
+
+
+----------------------------------------------------------------------
+
+
+example 8:
+
+input:
+
+@GetMapping("/size8")
+public Map<String,Integer> size8() {
+    return Map.of("a", Period.ofDays(3).getDays());
+}
+
+output:
+
+{ "a": 3 }
+
+
+
+----------------------------------------------------------------------
+
+
+example 9:
+
+input:
+
+@GetMapping("/size9")
+public Map<String,Integer> size9() {
+    return Map.of("a", "2025-07-13T18:06:59.314033Z".length());
+}
+
+output:
+
+
+{ "a": 27 }
+
+
+----------------------------------------------------------------------
+
+
+example 10:
+
+input:
+
+@GetMapping("/size10")
+public Map<String,Integer> size10() {
+    return Map.of("a", "2025-07-13T18:06:59.314033".length());
+}
+
+output:
+
+
+{ "a": 26 }
+
+
+----------------------------------------------------------------------
+
+
+example 11:
+
+input:
+
+@GetMapping("/size11")
+public Map<String,Integer> size11() {
+    return Map.of(
+        "a", String.valueOf(123).length(),
+        "b", String.valueOf(123.45).length()
+    );
+}
+
+output:
+
+
+{ "a": 3, "b": 6 }
+
+
+----------------------------------------------------------------------
+
+
+example 12:
+
+input:
+
+@GetMapping("/size12")
+public Map<String,Integer> size12() {
+    return Map.of("a", 1, "b", 1);
+}
+
+output:
+
+
+{ "a": 1, "b": 1 }
+
+
+----------------------------------------------------------------------
+
+

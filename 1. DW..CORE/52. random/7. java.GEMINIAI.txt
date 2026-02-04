@@ -1,0 +1,51 @@
+random:
+
+
+input:
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+    // Class name changed to Main for generic execution compatibility
+
+    public static void main(String[] args) {
+        
+        // 1. Define the operation: random() * 1000
+        // Math.random() returns a double between 0.0 (inclusive) and 1.0 (exclusive).
+        double randomValue = Math.random() * 1000; 
+
+        // 2. Assemble the final data structure: { "price": randomValue } (using standard Map)
+        Map<String, Double> outputMap = new HashMap<>();
+        outputMap.put("price", randomValue); 
+
+        // 3. Manually format the result into the required pretty-printed JSON
+        String outputJson = formatMapAsPrettyJson(outputMap);
+        
+        System.out.println(outputJson);
+    }
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Double> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Assuming only one entry: "price"
+        Map.Entry<String, Double> entry = map.entrySet().iterator().next();
+        
+        // Use full double precision to match the output style
+        sb.append("  \"").append(entry.getKey()).append("\": ").append(entry.getValue()); 
+        
+        sb.append("\n}");
+        return sb.toString();
+    }
+}
+
+output:
+
+{
+  "price" : 928.123456789123
+}
+

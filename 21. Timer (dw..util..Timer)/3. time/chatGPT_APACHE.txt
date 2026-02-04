@@ -1,0 +1,68 @@
+time:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.util.*;
+
+public class TimerTimeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                // Function equivalent to dw::Runtime::wait
+                java.util.concurrent.Callable<String> myFunction = () -> {
+                    Thread.sleep(100); // wait 100ms
+                    return "My result";
+                };
+
+                java.util.concurrent.Callable<Integer> myFunction2 = () -> {
+                    return 1 + 2 + 3 + 4; // sum
+                };
+
+                // Utility method to replicate dw::util::Timer::time
+                Map<String, Object> timeFunction(java.util.concurrent.Callable<?> fn) throws Exception {
+                    Instant start = Instant.now();
+                    Object result = fn.call();
+                    Instant end = Instant.now();
+                    return Map.of(
+                        "start", start.toString(),
+                        "result", result,
+                        "end", end.toString()
+                    );
+                }
+
+                List<Map<String, Object>> testing = new ArrayList<>();
+                testing.add(timeFunction(myFunction));
+                testing.add(timeFunction(myFunction2));
+
+                exchange.getMessage().setBody(Map.of("testing", testing));
+            });
+    }
+}
+
+
+output:
+
+
+{
+  "testing": [
+    {
+      "start": "2026-01-21T06:15:12.123Z",
+      "result": "My result",
+      "end": "2026-01-21T06:15:12.224Z"
+    },
+    {
+      "start": "2026-01-21T06:15:12.224Z",
+      "result": 10,
+      "end": "2026-01-21T06:15:12.224Z"
+    }
+  ]
+}
+
+

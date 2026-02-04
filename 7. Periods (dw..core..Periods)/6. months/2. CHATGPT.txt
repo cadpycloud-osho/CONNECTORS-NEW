@@ -1,0 +1,71 @@
+months:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.Period;
+
+@RestController
+public class PeriodController {
+
+    @GetMapping("/period")
+    public PeriodResponse getPeriodDetails() {
+
+        ZonedDateTime dateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        ZonedDateTime nextMonth = dateTime.plusMonths(1);
+
+        Period fourMonthPeriod = Period.ofMonths(4);
+
+        // months(-1) + months(2) => results in months(1)
+        Period addNegativeValue = Period.ofMonths(-1).plus(Period.ofMonths(2));
+
+        return new PeriodResponse(
+                nextMonth.format(DateTimeFormatter.ISO_ZONED_DATE_TIME),
+                fourMonthPeriod.toString(),
+                addNegativeValue.getMonths()
+        );
+    }
+}
+
+class PeriodResponse {
+    private String nextMonth;
+    private String fourMonthPeriod;
+    private int addNegativeValue;
+
+    public PeriodResponse(String nextMonth, String fourMonthPeriod, int addNegativeValue) {
+        this.nextMonth = nextMonth;
+        this.fourMonthPeriod = fourMonthPeriod;
+        this.addNegativeValue = addNegativeValue;
+    }
+
+    public String getNextMonth() {
+        return nextMonth;
+    }
+
+    public String getFourMonthPeriod() {
+        return fourMonthPeriod;
+    }
+
+    public int getAddNegativeValue() {
+        return addNegativeValue;
+    }
+}
+
+
+output:
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+
+

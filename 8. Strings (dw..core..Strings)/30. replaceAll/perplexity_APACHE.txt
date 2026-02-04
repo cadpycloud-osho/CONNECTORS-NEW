@@ -1,0 +1,39 @@
+replaceAll:
+
+
+input:
+
+import java.util.*;
+
+public class ReplaceAllConverter {
+    public static String replaceAll(String text, String target, String replacement) {
+        if (text == null) return null;
+        if (target == null || target.isEmpty() || !text.contains(target)) {
+            return text;
+        }
+        return text.replaceAll(target, replacement);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", replaceAll("Mariano", "a", "A"));
+        result.put("b", replaceAll("AAAA", "AAA", "B"));
+        result.put("c", replaceAll(null, "aria", "A"));
+        result.put("d", replaceAll("Mariano", "j", "Test"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+   "a": "MAriAno",
+   "b": "BA",
+   "c": null,
+   "d": "Mariano"
+}
+
+
+

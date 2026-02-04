@@ -1,0 +1,114 @@
+toTime:
+
+example 1:
+
+
+
+input:
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String input = "13:44:12.283-08:00";
+        
+        OffsetTime resultA = parseWithMultipleFormats(input);
+        String errorMessageB = parseWithSingleFormat(input);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", resultA);
+        result.put("b", errorMessageB);
+        
+        System.out.println(result);
+    }
+    
+    private static OffsetTime parseWithMultipleFormats(String input) {
+        DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+        try {
+            return OffsetTime.parse(input, fmt1);
+        } catch (DateTimeParseException e) {
+            DateTimeFormatter fmt2 = DateTimeFormatter.ofPattern("HH:mm:ss.nXXX");
+            return OffsetTime.parse(input, fmt2);
+        }
+    }
+    
+    private static String parseWithSingleFormat(String input) {
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss.nXXX");
+            OffsetTime.parse(input, fmt);
+            return null;
+        } catch (DateTimeParseException e) {
+            return "Could not find a valid formatter for '" + input + "'";
+        }
+    }
+}
+
+output:
+
+Result: {a=13:44:12.000000283-08:00, b=Could not find a valid formatter for '13:44:12.283-08:00'}
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Equivalent to DataWeave 'a'
+        OffsetTime resultA = OffsetTime.parse("23:57:59Z");
+
+        // Equivalent to DataWeave 'b'
+        OffsetTime resultB = parseWithFlexibleFraction("13:44:12.283-08:00");
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", resultA);
+        result.put("b", resultB);
+
+        System.out.println("Result: " + result);
+    }
+
+    private static OffsetTime parseWithFlexibleFraction(String input) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("HH:mm:ss")
+                .optionalStart()
+                .appendLiteral('.')
+                .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+                .optionalEnd()
+                .appendOffset("+HH:MM", "Z")
+                .toFormatter();
+
+        try {
+            return OffsetTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            // DW-style failure → null
+            return null;
+        }
+    }
+}
+
+
+output:
+
+Result: {a=23:57:59Z, b=13:44:12.000000283-08:00}
+
+--------------------------------------------------------------
+

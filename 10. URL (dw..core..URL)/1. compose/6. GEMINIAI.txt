@@ -1,0 +1,64 @@
+compose:
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class UrlComposeController {
+
+    private static final String URL_PATH = "content folder";
+
+    /**
+     * Helper method mirroring DataWeave's URL::compose logic.
+     * Encodes path segments correctly into a final URL string.
+     */
+    private String composeUrl(String scheme, String authority, List<String> segments) throws URISyntaxException {
+        // 1. Join path segments. Note: the URI constructor below will handle the encoding.
+        String path = "/" + String.join("/", segments);
+        
+        // 2. The URI constructor handles encoding of the path component.
+        URI uri = new URI(scheme, authority, path, null, null);
+        
+        return uri.toASCIIString();
+    }
+
+    @GetMapping("/compose-url")
+    public Map<String, String> getComposedUrl() {
+        
+        String encodedURL;
+        
+        try {
+            // Mimics the DataWeave path components
+            List<String> segments = List.of(URL_PATH, "page.html");
+            
+            encodedURL = composeUrl("http", "examplewebsite.com", segments);
+            
+        } catch (URISyntaxException e) {
+            // Handle error in a real app (e.g., throw a 500 status)
+            encodedURL = "URI Syntax Error";
+        }
+
+        // Map the results to match the desired JSON structure
+        Map<String, String> output = new HashMap<>();
+        output.put("encodedURL", encodedURL);
+        
+        return output; 
+    }
+}
+output:
+
+
+{
+  "encodedURL": "http://examplewebsite.com/content%20folder/page.html"
+}

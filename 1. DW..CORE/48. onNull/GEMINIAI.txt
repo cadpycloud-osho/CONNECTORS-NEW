@@ -1,0 +1,68 @@
+onNull:
+
+
+
+input:
+
+
+package com.example.datareduction;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class DataWeaveEmulatorController {
+
+    // Define the structure of the output object to match the desired JSON output
+    public static class OutputResponse {
+        private Object onNull;
+
+        public OutputResponse(Object onNull) {
+            this.onNull = onNull;
+        }
+        
+        // Getter and Setter for Jackson serialization
+        public Object getOnNull() { return onNull; }
+        public void setOnNull(Object onNull) { this.onNull = onNull; }
+    }
+    
+    /**
+     * Emulates the DataWeave logic:
+     * 1. Attempt to reduce a list (if not null).
+     * 2. If the input list is null, return the default "Empty Text".
+     */
+    @PostMapping("/process-data")
+    public OutputResponse processData(@RequestBody(required = false) List<List<String>> input) {
+        
+        // This check is the equivalent of the final 'onNull "Empty Text"'
+        if (input == null) {
+            // DataWeave Output triggered because the input array was null.
+            return new OutputResponse("Empty Text"); 
+        }
+
+        // --- DataWeave Reduce and Then Logic (Only executed if input is NOT null) ---
+        
+        // DataWeave: reduce ((item, accumulator) -> item ++ accumulator)
+        // Java: Flattening the list of lists into a single list
+        List<String> combinedList = input.stream()
+            .flatMap(List::stream)
+            .toList();
+            
+        // DataWeave: then ((result) -> sizeOf(result))
+        // Java: Calculate the size (length) of the combined list
+        int size = combinedList.size();
+
+        // If the input was not null, the result would be the size.
+        return new OutputResponse(size);
+    }
+}
+
+output:
+
+{
+  "onNull": "Empty Text"
+}

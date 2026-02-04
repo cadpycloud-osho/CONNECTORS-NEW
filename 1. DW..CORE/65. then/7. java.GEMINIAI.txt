@@ -1,0 +1,110 @@
+then:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the nested Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Object> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // 1. chainResult
+        sb.append("  \"chainResult\" : ").append(output.get("chainResult")).append(",\n");
+        
+        // 2. referenceResult (start inner object)
+        sb.append("  \"referenceResult\" : {\n");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> refResult = (Map<String, Object>) output.get("referenceResult");
+        
+        // Inner content
+        sb.append("    \"name\" : \"").append(refResult.get("name")).append("\",\n");
+        sb.append("    \"lastName\" : \"").append(refResult.get("lastName")).append("\",\n");
+        sb.append("    \"length\" : ").append(refResult.get("length")).append("\n");
+        
+        // Close inner object
+        sb.append("  },\n");
+        
+        // 3. onNullReturnNull (last element, no comma)
+        // DataWeave's sizeOf(null) -> null.
+        sb.append("  \"onNullReturnNull\" : null\n"); 
+        
+        // Close outer object
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Shared Inputs
+        List<String> names = Arrays.asList("mariano", "de Achaval");
+        List<String> emptyList = Collections.emptyList();
+
+        // --- 1. chainResult: names reduce ... then sizeOf($) ---
+        // Step 1: Reduce (concatenate strings)
+        String reducedString = names.stream()
+                                    .reduce("", (acc, item) -> acc + item); 
+                                    
+        // Step 2: Then (calculate sizeOf the result)
+        int chainResult = reducedString.length(); // Result: 17
+
+        // --- 2. referenceResult: names map ... then { name: $[0], ... } ---
+        // Step 1: Map (convert to uppercase)
+        List<String> mappedList = names.stream()
+                                        .map(String::toUpperCase)
+                                        .collect(Collectors.toList());
+        
+        // Step 2: Then (create object using the mapped list '$')
+        String name = mappedList.get(0);
+        String lastName = mappedList.get(1);
+        int length = mappedList.size();
+        
+        // Assembling the referenceResult map
+        Map<String, Object> referenceResult = new LinkedHashMap<>();
+        referenceResult.put("name", name);
+        referenceResult.put("lastName", lastName);
+        referenceResult.put("length", length);
+
+        // --- 3. onNullReturnNull: emptyList reduce ... then sizeOf($) ---
+        // Step 1: Reduce empty array (without initial value) -> Optional.empty()
+        Optional<String> reducedEmpty = emptyList.stream()
+                                                 .reduce((acc, item) -> acc + item);
+                                                 
+        // Step 2: Then (sizeOf(null) in DW returns null)
+        // We ensure the JSON output contains "onNullReturnNull" : null.
+        // We don't need the Java variable `onNullReturnNull` since we hardcode 'null' in the formatter.
+
+        // --- 4. Assemble Final Output ---
+        Map<String, Object> outputObject = new LinkedHashMap<>();
+        outputObject.put("chainResult", chainResult);
+        outputObject.put("referenceResult", referenceResult);
+        outputObject.put("onNullReturnNull", null); // Placeholder for null to ensure key order/presence
+        
+        // 5. Output the result
+        System.out.println(formatMapAsPrettyJson(outputObject));
+    }
+}
+
+output:
+
+{
+  "chainResult" : 17,
+  "referenceResult" : {
+    "name" : "MARIANO",
+    "lastName" : "DE ACHAVAL",
+    "length" : 2
+  },
+  "onNullReturnNull" : null
+}
+

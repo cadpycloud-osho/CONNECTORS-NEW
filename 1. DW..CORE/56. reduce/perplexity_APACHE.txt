@@ -1,0 +1,277 @@
+reduce:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.List;
+
+public class ReduceSumRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:reduceSum")
+            .process(exchange -> {
+                // Simulate DataWeave input array [2, 3]
+                List<Integer> numbers = Arrays.asList(2, 3);
+                
+                // DataWeave reduce ($ + $$) → Java reduce equivalent
+                int result = numbers.stream()
+                    .reduce(0, Integer::sum);  // 2+3 = 5
+                
+                exchange.getIn().setBody(result);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+5
+
+
+----------------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class ReduceMultipleRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:reduceMultiple")
+            .process(exchange -> {
+                List<Integer> myNums = Arrays.asList(1, 2, 3, 4);
+                List<Object> myEmptyList = Arrays.asList();
+                
+                // sum: myNums reduce ($$ + $) → 1+2+3+4 = 10
+                int sum = myNums.stream().reduce(0, Integer::sum);
+                
+                // concat: myNums reduce ($$ ++ $) → "1"+"2"+"3"+"4" = "1234"  
+                String concat = myNums.stream()
+                    .map(String::valueOf)
+                    .reduce("", String::concat);
+                
+                // emptyList: myEmptyList reduce → null
+                Object emptyList = myEmptyList.isEmpty() ? null : "non-empty";
+                
+                exchange.getIn().setBody(
+                    Map.of("sum", sum, "concat", concat, "emptyList", emptyList)
+                );
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "sum": 10,
+  "concat": "1234", 
+  "emptyList": null
+}
+
+
+----------------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class ReduceWithInitRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:reduceWithInit")
+            .process(exchange -> {
+                // concat: ["a","b","c","d"] reduce ((item, acc="z") -> acc ++ item)
+                String concat = Arrays.stream(new String[]{"a", "b", "c", "d"})
+                    .reduce("z", (acc, item) -> acc + item);  // "zabcd"
+                
+                // sum: [0,1,2,3,4,5] reduce ((item, acc=3) -> acc + item)  
+                int sum = Arrays.stream(new int[]{0, 1, 2, 3, 4, 5})
+                    .reduce(3, Integer::sum);  // 3+0+1+2+3+4+5 = 18
+                
+                // multiply: [2,3,3] reduce ((item, acc) -> acc * item) 
+                // implicit acc starts with first element (2)
+                int multiply = Arrays.stream(new int[]{2, 3, 3})
+                    .reduce(1, (acc, item) -> acc * item);  // 1*2*3*3 = 18
+                
+                // multiplyAcc: [2,2,3] reduce ((item, acc=3) -> acc * item)
+                int multiplyAcc = Arrays.stream(new int[]{2, 2, 3})
+                    .reduce(3, (acc, item) -> acc * item);  // 3*2*2*3 = 36
+                
+                exchange.getIn().setBody(Map.of(
+                    "concat", concat,
+                    "sum", sum,
+                    "multiply", multiply,
+                    "multiplyAcc", multiplyAcc
+                ));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "concat": "zabcd",
+  "sum": 18, 
+  "multiply": 18,
+  "multiplyAcc": 36
+}
+
+
+----------------------------------------------------------------
+
+example 4:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class ComprehensiveReduceRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:comprehensiveReduce")
+            .process(exchange -> {
+                List<Integer> nums = Arrays.asList(0, 1, 2, 3, 4, 5);
+                List<String> letters = Arrays.asList("a", "b", "c", "d", "e");
+                List<Map<String, String>> objects = Arrays.asList(
+                    Map.of("letter", "a"), Map.of("letter", "b"), Map.of("letter", "c")
+                );
+                List<Boolean> bools = Arrays.asList(true, false, false, true, true);
+                
+                Map<String, Object> result = new HashMap<>();
+                
+                // reduce $$ → first element
+                result.put("a", nums.get(0));                    // 0
+                result.put("b", letters.get(0));                 // "a"  
+                result.put("d", objects.get(0));                 // {"letter": "a"}
+                result.put("h", bools.get(0));                   // true
+                result.put("l", nums.get(0));                    // 0
+                result.put("p", letters.get(0));                 // "a"
+                result.put("r", objects.get(0));                 // {"letter": "a"}
+                result.put("v", bools.get(0));                   // true
+                
+                // reduce ((item, acc="z") -> acc ++ item.letter)
+                result.put("c", objects.stream()
+                    .reduce("z", (acc, obj) -> acc + obj.get("letter"), String::concat)); // "zabc"
+                
+                // reduce ($$ and $), reduce ((item, acc) -> acc and item)
+                result.put("e", bools.stream().reduce(true, Boolean::logicalAnd));  // false
+                result.put("f", bools.stream().reduce(bools.get(0), Boolean::logicalAnd)); // false
+                result.put("s", bools.stream().reduce(true, Boolean::logicalAnd));  // false
+                result.put("t", bools.stream().reduce(bools.get(0), Boolean::logicalAnd)); // false
+                
+                // reduce ((item, acc=false) -> acc and item)
+                result.put("g", bools.stream().reduce(false, Boolean::logicalAnd)); // false
+                result.put("u", bools.stream().reduce(false, Boolean::logicalAnd)); // false
+                
+                // Numeric reductions
+                result.put("i", nums.stream().reduce(0, Integer::sum));           // 15
+                result.put("j", nums.stream().reduce(nums.get(0), Integer::sum));  // 15
+                result.put("k", nums.stream().reduce(3, Integer::sum));           // 18
+                
+                // String reductions  
+                result.put("m", letters.stream().reduce("", String::concat));     // "abcde"
+                result.put("n", letters.stream().reduce(letters.get(0), String::concat)); // "abcde"
+                result.put("o", letters.stream().reduce("z", String::concat));    // "zabcde"
+                
+                // Empty array cases
+                result.put("x", null);  // reduce $$ on empty → null
+                result.put("y", 0);     // reduce ((item,acc=0) -> acc + item) → 0
+                
+                // Complex object reduction → pluck values
+                result.put("w", Arrays.stream(new int[]{0,1,2,3,4})
+                    .mapToObj(i -> Map.of("a", i))
+                    .reduce(new HashMap<>(), (acc, obj) -> {
+                        acc.putAll(obj); return acc;
+                    }, (m1, m2) -> { m1.putAll(m2); return m1; })
+                    .values().stream().map(v -> v.get("a")).collect(Collectors.toList()));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "a": 0, "b": "a", "c": "zabc", "d": {"letter": "a"},
+  "e": false, "f": false, "g": false, "h": true,
+  "i": 15, "j": 15, "k": 18, "l": 0,
+  "m": "abcde", "n": "abcde", "o": "zabcde", "p": "a",
+  "q": "zabc", "r": {"letter": "a"},
+  "s": false, "t": false, "u": false, "v": true,
+  "w": [0,1,2,3,4], "x": null, "y": 0
+}
+
+
+----------------------------------------------------------------
+
+example 5:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class StringReverseReduceRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:stringReverse")
+            .process(exchange -> {
+                String input = "hello world";
+                
+                // DataWeave reduce: char-by-char prepend to accumulator
+                String reversed = input.chars()
+                    .mapToObj(ch -> String.valueOf((char) ch))
+                    .reduce("", (acc, item) -> item + acc);  // item ++ acc semantics
+                
+                exchange.getIn().setBody(reversed);
+            })
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+"dlrow olleh"
+
+
+----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

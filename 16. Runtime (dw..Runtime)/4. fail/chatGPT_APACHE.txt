@@ -1,0 +1,43 @@
+fail:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Object> result = new ArrayList<>();
+
+        if (result.size() <= 0) {
+            throw new RuntimeException("Data was empty");
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+
+from("direct:start")
+    .process(exchange -> {
+        List<?> result = new ArrayList<>();
+        if (result.isEmpty()) {
+            throw new RuntimeException("Data was empty");
+        }
+        exchange.getMessage().setBody(result);
+    });
+
+
+
+
+output:
+
+Exception in thread "main" java.lang.RuntimeException: Data was empty
+    at Main.main(Main.java:9)
+
+
+
+

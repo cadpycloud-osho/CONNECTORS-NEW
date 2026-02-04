@@ -1,0 +1,40 @@
+
+valuesOf:
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Original map
+        Map<String, Object> data = Map.of(
+            "a", true,
+            "b", 1
+        );
+
+        // Get values
+        Object[] values = data.values().toArray();
+
+        // Print JSON output manually
+        System.out.println("{");
+        System.out.println("  \"valuesOf\" : [ " + values[0] + ", " + values[1] + " ]");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "valuesOf" : [ true, 1 ]
+}
+
+
+
+
+

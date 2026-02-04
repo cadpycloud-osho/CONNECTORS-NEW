@@ -1,0 +1,166 @@
+failIf:
+
+
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+// Mapped to a client error status (e.g., 400 Bad Request)
+@ResponseStatus(HttpStatus.BAD_REQUEST) 
+public class ConditionalFailureException extends RuntimeException {
+    public ConditionalFailureException(String message) {
+        super(message);
+    }
+}
+
+examples 1:
+
+input:
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class ConditionalValidationService {
+
+    /**
+     * Helper method replicating the functional failIf.
+     * Takes the final value to be returned and checks a condition.
+     * @param value The value that would be returned if successful.
+     * @param condition The condition to test.
+     * @param message The error message if the condition is true.
+     * @return The original value, if the condition is false.
+     * @throws ConditionalFailureException if the condition is true.
+     */
+    public String failIfCondition(String value, boolean condition, String message) {
+        if (condition) {
+            throw new ConditionalFailureException(message);
+        }
+        return value;
+    }
+
+    /**
+     * Executes the DW logic: { "result" : "SUCCESS" failIf (isEmpty(result)) }
+     */
+    public Map<String, String> processData() {
+        // 1. Replicates the 'result' variable from DW (isEmpty(result) is TRUE)
+        Map<String, Object> dataToCheck = Map.of(); // An empty map
+        String successValue = "SUCCESS";
+
+        // 2. Perform the assignment and conditional check in one logical step:
+        // Value: "SUCCESS"
+        // Condition: isEmpty(dataToCheck) -> TRUE
+        
+        String finalValue = failIfCondition(
+            successValue, 
+            dataToCheck.isEmpty(), // Condition: isEmpty(result)
+            "Failed"               // Implicit error message in DW output
+        );
+
+        // 3. This line is only reached if failIfCondition did NOT throw an exception
+        return Map.of("result", finalValue);
+    }
+}
+
+// Example usage:
+public class SpringBootFailIfExample {
+    public static void main(String[] args) {
+        ConditionalValidationService service = new ConditionalValidationService();
+
+        try {
+            service.processData();
+            // This line is skipped
+        } catch (ConditionalFailureException e) {
+            System.err.println("--- Spring Boot Failure Simulation ---");
+            System.err.println("Exception Type: " + e.getClass().getSimpleName());
+            System.err.println("Message: \"" + e.getMessage() + "\"");
+            // The resulting HTTP status would be 400 BAD_REQUEST
+        }
+    }
+}
+
+
+output:
+
+
+
+--- Spring Boot Failure Simulation ---
+Exception Type: ConditionalFailureException
+Message: "Failed"
+----------------------------------------------------------------
+
+
+
+examples 2:
+
+input:
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+// Mapped to a client error status for consistency
+@ResponseStatus(HttpStatus.BAD_REQUEST) 
+public class DataWeaveValidationException extends RuntimeException {
+    public DataWeaveValidationException(String message) {
+        super(message);
+    }
+}
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class ValidationService {
+
+    /**
+     * Replicates the functional 'failIf' logic (guard clause).
+     * Stops execution if the condition is true.
+     */
+    public static void failIf(boolean condition, String message) {
+        if (condition) {
+            throw new DataWeaveValidationException(message);
+        }
+    }
+
+    /**
+     * Executes the DW logic: { "result" : result failIf isEmpty($) }
+     */
+    public Map<String, Object> processData() {
+        // 1. Replicates 'var result = {"a":"test"}'
+        Map<String, String> resultVar = Map.of("a", "test");
+
+        // 2. Replicates the condition: isEmpty($) which evaluates to isEmpty(resultVar)
+        boolean condition = resultVar.isEmpty(); // condition is FALSE
+
+        // 3. Replicates the failIf functional call: result failIf condition
+        // Since condition is FALSE, no exception is thrown.
+        failIf(condition, "Result data was empty"); 
+
+        // 4. Returns the final object structure: { "result" : resultVar }
+        return Map.of("result", resultVar);
+    }
+}
+
+
+// Example usage:
+public class SpringBootExample {
+    public static void main(String[] args) {
+        ValidationService service = new ValidationService();
+        
+        try {
+            Map<String, Object> output = service.processData();
+            System.out.println("--- Spring Boot Output ---");
+            System.out.println(output);
+        } catch (DataWeaveValidationException e) {
+            // This block is skipped because the condition is false.
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}
+
+
+output:
+
+--- Spring Boot Output ---
+{result={a=test}}
+

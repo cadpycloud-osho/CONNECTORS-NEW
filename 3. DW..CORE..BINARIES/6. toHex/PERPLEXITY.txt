@@ -1,0 +1,40 @@
+toHex:
+
+
+INPUT:
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.apache.commons.codec.binary.Hex;
+import java.util.HashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class ToHexDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ToHexDemoApplication.class, args);
+    }
+}
+
+@RestController
+class ToHexController {
+    
+    @GetMapping("/toHex")
+    public Map<String, String> toHexExample() {
+        // "Mule" as bytes
+        byte[] myBinary = "Mule".getBytes();
+        String hexResult = Hex.encodeHexString(myBinary);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("binaryToHex", hexResult);
+        
+        return result;
+    }
+}
+
+OUTPUT:
+
+{
+  "binaryToHex": "4D756C65"
+}

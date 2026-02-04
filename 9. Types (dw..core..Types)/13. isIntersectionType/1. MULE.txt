@@ -1,0 +1,49 @@
+isIntersectionType:
+
+isIntersectionType(t: Type): Boolean
+
+isIntersectionType(t: Type): Boolean
+Returns true if the input type is the Intersection type.
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = {name: String} & {age: Number}
+output application/json
+---
+{
+   a: isIntersectionType(AType),
+   b: isIntersectionType(Boolean),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

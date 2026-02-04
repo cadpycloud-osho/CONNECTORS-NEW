@@ -1,0 +1,55 @@
+isTypeType:
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static boolean isTypeType(Object value) {
+        return value instanceof Class;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Class<?> aType = String.class;     // AType
+        Class<?> typeType = Integer.class; // Type
+        String str = "test";               // String
+        
+        result.put("a", isTypeType(aType));
+        result.put("b", isTypeType(typeType));
+        result.put("c", isTypeType(str));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

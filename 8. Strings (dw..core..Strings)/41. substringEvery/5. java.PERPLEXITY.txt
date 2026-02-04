@@ -1,0 +1,41 @@
+substringEvery:
+
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> result = substringEvery("substringEvery", 3);
+        System.out.println(Arrays.toString(result.toArray()));
+    }
+    
+    public static List<String> substringEvery(String input, int size) {
+        if (input == null || size <= 0) {
+            return Arrays.asList();
+        }
+        
+        int length = input.length();
+        int numParts = (length + size - 1) / size;
+        String[] parts = new String[numParts];
+        
+        for (int i = 0; i < numParts; i++) {
+            int start = i * size;
+            int end = Math.min(start + size, length);
+            parts[i] = input.substring(start, end);
+        }
+        
+        return Arrays.asList(parts);
+    }
+}
+
+
+
+Output:
+
+
+[sub, str, ing, Eve, ry]

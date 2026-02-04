@@ -1,0 +1,109 @@
+runUrl:
+
+<dependency>
+    <groupId>org.mule.weave</groupId>
+    <artifactId>runtime-core</artifactId>
+    <version>X.Y.Z</version> </dependency>
+
+%dw 2.0
+output application/json
+---
+payload.name
+
+input:
+
+import org.mule.weave.v2.runtime.WeaveRuntime;
+import org.mule.weave.v2.runtime.WeaveRuntimeService;
+import org.mule.weave.v2.runtime.logging.SystemLogger;
+import org.mule.weave.v2.runtime.utils.ResourceResolver;
+import org.mule.weave.v2.runtime.WeaveResult;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Optional;
+
+@Component
+public class RunUrlService implements CommandLineRunner {
+
+    private final WeaveRuntime runtime;
+    private final ResourceLoader resourceLoader;
+
+    private static final String SCRIPT_PATH = "classpath:org/mule/weave/v2/engine/runtime_runUrl/example.dwl";
+    private static final String SCRIPT_ID = "example.dwl"; 
+
+    // --- Data Definition (Simulating the 'jsonValue' variable) ---
+    private static final Map<String, Object> JSON_VALUE = Map.of(
+        "value", "{\"name\": \"Mariano\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8),
+        "encoding", "UTF-8",
+        "properties", Map.of(),
+        "mimeType", "application/json"
+    );
+
+    public RunUrlService(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+        // Initialize the Weave Runtime
+        this.runtime = WeaveRuntimeService.service().createRuntime(
+            ResourceResolver.empty(), new SystemLogger(), Optional.empty()
+        );
+    }
+
+    /**
+     * Executes the DW script loaded from the classpath, replicating runUrl().
+     * @param payloadInput The input payload for the script.
+     * @return The execution result (a WeaveResult object).
+     */
+    public WeaveResult executeScriptFromUrl(Object payloadInput) throws IOException {
+        // 1. Read the script content from the classpath
+        String scriptContent;
+        try (InputStream is = resourceLoader.getResource(SCRIPT_PATH).getInputStream()) {
+            scriptContent = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+        // 2. Prepare the resources map (containing the main script)
+        Map<String, String> resources = Map.of(SCRIPT_ID, scriptContent);
+        
+        // 3. Prepare the input variables (the DW context)
+        Map<String, Object> variables = Map.of("payload", payloadInput);
+
+        // 4. Execute the script synchronously and return the result object
+        return runtime.execute(SCRIPT_ID, resources, variables);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("--- Spring Boot DataWeave runUrl Simulation ---");
+        
+        // Execute the DW script
+        WeaveResult result = executeScriptFromUrl(JSON_VALUE);
+        
+        // Format the output to match the expected DW structure
+        Map<String, Object> output = Map.of(
+            "execute_ok", Map.of(
+                "success", result.isSuccess(),
+                "value", result.getValue().toString(), // Convert byte[] or stream to String
+                "mimeType", result.getMimeType().orElse("application/dw"),
+                "encoding", result.getEncoding().orElse("UTF-8"),
+                "logs", result.getLogs().getMessages()
+            )
+        );
+        
+        System.out.println(output);
+    }
+}
+
+output:
+
+--- Spring Boot DataWeave runUrl Simulation ---
+{
+  "execute_ok": {
+    "success": true,
+    "value": "Mariano", 
+    "mimeType": "application/json", // Note: The DW output shows application/dw, but the script is application/json
+    "encoding": "UTF-8",
+    "logs": []
+  }
+}

@@ -1,0 +1,208 @@
+file:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultipartFileProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String filePath = "src/main/resources/orders.xml"; // Camel classpath resource
+        
+        // Read file content (equivalent to DataWeave file reference)
+        String fileContent = Files.readString(Paths.get(filePath));
+        
+        // DataWeave output structure: {headers: {...}, content: "..."}
+        Map<String, Object> result = new HashMap<>();
+        
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("Content-Type", "application/xml");
+        
+        Map<String, Object> contentDisposition = new HashMap<>();
+        contentDisposition.put("name", "file");
+        contentDisposition.put("filename", "orders.xml");
+        headers.put("Content-Disposition", contentDisposition);
+        
+        result.put("headers", headers);
+        result.put("content", fileContent);
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:multipartFile")
+    .process(new MultipartFileProcessor())
+    .log("${body}");
+
+output:
+
+{
+  "headers": {
+    "Content-Type": "application/xml",
+    "Content-Disposition": {
+      "name": "file",
+      "filename": "orders.xml"
+    }
+  },
+  "content": "<?xml version='1.0' encoding='UTF-8'?>\n<orders>\n  <order>\n    <item>\n      <id>1001</id>\n      <qty>1</qty>\n      <price>$100</price>\n    </item>\n    <item>\n      <id>2001</id>\n      <qty>2</qty>\n      <price>$50</price>\n    </item>\n  </order>\n</orders>"
+}
+
+
+
+-----------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+public class MultipartFormFileProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String ordersFilePath = "src/main/resources/orders.xml";
+        String boundary = "------=_Part_5349_1228640551.1560391284935";
+        
+        // Read file content
+        String fileContent = Files.readString(Paths.get(ordersFilePath));
+        
+        StringBuilder multipartBody = new StringBuilder();
+        
+        // Multipart::file{ name: "file", path: ordersFilePath, mime: "application/xml", fileName: "myorders.xml" }
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/xml\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"file\"; filename=\"myorders.xml\"\r\n\r\n");
+        multipartBody.append(fileContent).append("\r\n");
+        
+        // Closing boundary
+        multipartBody.append(boundary).append("--\r\n");
+        
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary.substring(6));
+        exchange.getIn().setBody(multipartBody.toString());
+    }
+}
+
+from("direct:multipartFormFile")
+    .process(new MultipartFormFileProcessor());
+
+
+
+output:
+
+
+------=_Part_5349_1228640551.1560391284935
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_5349_1228640551.1560391284935--
+
+
+-----------------------------------------------------
+
+example 3:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+public class MultipartJsonFileProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String myClientsPath = "src/main/resources/myClients.json";
+        String boundary = "------=_Part_1586_1887987980.1542569342438";
+        
+        // Read JSON file content
+        String fileContent = Files.readString(Paths.get(myClientsPath));
+        
+        StringBuilder multipartBody = new StringBuilder();
+        
+        // Multipart::file("myFile", myClients, 'application/json', "partMyClients.json")
+        multipartBody.append(boundary).append("\r\n");
+        multipartBody.append("Content-Type: application/json\r\n");
+        multipartBody.append("Content-Disposition: form-data; name=\"myFile\"; filename=\"partMyClients.json\"\r\n\r\n");
+        multipartBody.append(fileContent).append("\r\n");
+        
+        // Closing boundary
+        multipartBody.append(boundary).append("--\r\n");
+        
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary.substring(6));
+        exchange.getIn().setBody(multipartBody.toString());
+    }
+}
+
+from("direct:multipartJsonFile")
+    .process(new MultipartJsonFileProcessor());
+
+output:
+
+------=_Part_1586_1887987980.1542569342438
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+   clients: {
+     client: {
+       id: 1,
+       name: "Mariano"
+     },
+     client: {
+       id: 2,
+       name: "Shoki"
+     }
+   }
+}
+------=_Part_1586_1887987980.1542569342438--
+
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

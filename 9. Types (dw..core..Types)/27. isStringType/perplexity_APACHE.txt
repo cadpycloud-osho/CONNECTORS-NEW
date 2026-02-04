@@ -1,0 +1,55 @@
+isStringType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveStringTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processStringChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processStringChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AString = String (type alias)
+        result.put("a", isStringType(String.class));
+        
+        // Built-in String type
+        result.put("b", isStringType(String.class));
+        
+        // Boolean - not String
+        result.put("c", isStringType(Boolean.class));
+        
+        return result;
+    }
+    
+    private boolean isStringType(Class<?> type) {
+        // DataWeave String type check equivalent
+        // Returns true for String and its aliases
+        return type == String.class || 
+               CharSequence.class.isAssignableFrom(type) ||
+               "String".equals(type.getSimpleName());
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

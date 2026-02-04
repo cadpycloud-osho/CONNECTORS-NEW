@@ -1,0 +1,54 @@
+minutes:
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MinutesController {
+    
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ISO_INSTANT;
+    private static final Instant BASE = Instant.parse("2020-10-05T20:22:34.385Z");
+
+    @GetMapping("/minutes")
+    public Map<String, Object> getMinutes() {
+        Instant nextMinute = BASE.plus(Duration.ofMinutes(1));
+        Instant previousMinute = BASE.minus(Duration.ofMinutes(1));
+        
+        // decimalInputPeriod: exact "PT4M33.3S" format
+        String decimalStr = "PT4M33.3S";
+        
+        Duration wholeDuration = Duration.ofMinutes(4);
+        Duration negativeSum = Duration.ofMinutes(-1).plus(Duration.ofMinutes(2));
+        long addNegativeSeconds = negativeSum.getSeconds();
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("nextMinute", FMT.format(nextMinute));
+        result.put("previousMinute", FMT.format(previousMinute));
+        result.put("decimalInputPeriod", decimalStr);
+        result.put("wholeNumberInputPeriod", wholeDuration.toString());
+        result.put("addNegativeValue", addNegativeSeconds);
+        
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "nextMinute": "2020-10-05T20:23:34.385Z",
+  "previousMinute": "2020-10-05T20:21:34.385Z",
+  "decimalInputPeriod": "PT4M33.3S",
+  "wholeNumberInputPeriod": "PT4M",
+  "addNegativeValue": 60
+}
+

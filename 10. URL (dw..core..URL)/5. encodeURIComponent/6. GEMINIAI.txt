@@ -1,0 +1,106 @@
+encodeURIComponent:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriEncodeCompareController {
+
+    private static final String INPUT_1_SPACE = " PATH/ TO /ENCODE ";
+    private static final String INPUT_2_RESERVED = ";,/?:@&=";
+    private static final String INPUT_3_UNRESERVED = "-_.!~*'()";
+
+    private static final String RESERVED_CHARS = ":;,/?@&$";
+
+    /**
+     * Simulates DataWeave's URL::encodeURIComponent
+     */
+    private String encodeURIComponent(String input) {
+        try {
+            // URLEncoder encodes space to '+'
+            String encoded = URLEncoder.encode(input, StandardCharsets.UTF_8.toString());
+            // Fix spaces from '+' to '%20'
+            return encoded.replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            return "Encoding Error";
+        }
+    }
+
+    /**
+     * Simulates DataWeave's URL::encodeURI
+     */
+    private String encodeUri(String input) {
+        String encodedComponent = encodeURIComponent(input);
+        
+        // Manually decode characters that encodeURI must preserve
+        for (char c : RESERVED_CHARS.toCharArray()) {
+            try {
+                // Get the percent-encoded version of the reserved character
+                String encodedChar = URLEncoder.encode(String.valueOf(c), StandardCharsets.UTF_8.toString());
+                
+                // Replace the percent-encoded sequence back to the literal character, 
+                // but only if it's not the dollar sign which may not have been encoded initially
+                if (c == '$' && !encodedComponent.contains(encodedChar)) continue;
+                
+                encodedComponent = encodedComponent.replace(encodedChar, String.valueOf(c));
+                
+            } catch (UnsupportedEncodingException e) {
+                // Should not happen
+            }
+        }
+        return encodedComponent;
+    }
+
+    @GetMapping("/encode-comparison")
+    public Map<String, Map<String, String>> getEncodedComparison() {
+        
+        // 1. Encoding with Spaces
+        String comp1 = encodeURIComponent(INPUT_1_SPACE);
+        String uri1 = encodeUri(INPUT_1_SPACE);
+
+        // 2. Encoding Reserved Characters
+        String comp2 = encodeURIComponent(INPUT_2_RESERVED);
+        String uri2 = encodeUri(INPUT_2_RESERVED);
+
+        // 3. Encoding Unreserved Characters (should not change)
+        String comp3 = encodeURIComponent(INPUT_3_UNRESERVED);
+        String uri3 = encodeUri(INPUT_3_UNRESERVED);
+
+        // Map the results to the inner JSON structure
+        Map<String, String> innerMap = new HashMap<>();
+        innerMap.put("encodeURIComponent", comp1);
+        innerMap.put("encodeURI", uri1);
+        innerMap.put("encodeURIComponent_to_hex", comp2);
+        innerMap.put("encodeURI_not_to_hex", uri2);
+        innerMap.put("encodeURIComponent_not_encoded", comp3);
+        innerMap.put("encodeURI_not_encoded", uri3);
+        
+        // Map the final output structure: { "comparing_encode_functions_output": {...} }
+        Map<String, Map<String, String>> output = new HashMap<>();
+        output.put("comparing_encode_functions_output", innerMap);
+        
+        return output; 
+    }
+}
+output:
+
+{
+  "comparing_encode_functions_output": {
+    "encodeURIComponent": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURI": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURIComponent_to_hex": "%3B%2C%2F%3F%3A%40%26%3D",
+    "encodeURI_not_to_hex": ";,/?:@&=",
+    "encodeURIComponent_not_encoded": "-_.!~*'()",
+    "encodeURI_not_encoded": "-_.!~*'()"
+  }
+}

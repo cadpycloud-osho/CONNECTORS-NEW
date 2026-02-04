@@ -1,0 +1,26 @@
+dateTime:
+
+
+
+input:
+
+@GetMapping("/newDateTime")
+public Map<String, String> createNewDateTime() {
+
+    OffsetDateTime dateTime = OffsetDateTime.of(
+            2012, 10, 11, 12, 30, 40, 0,
+            ZoneOffset.of("-03:00")
+    );
+
+    return Map.of("newDateTime", dateTime.toString());
+}
+
+
+
+
+output:
+
+
+{
+  "newDateTime": "2012-10-11T12:30:40-03:00"
+}

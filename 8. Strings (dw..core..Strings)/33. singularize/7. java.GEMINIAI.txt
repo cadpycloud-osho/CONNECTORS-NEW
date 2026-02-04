@@ -1,0 +1,69 @@
+singularize:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    /**
+     * Implements a minimal version of DataWeave's 'singularize' 
+     * focusing on the 'es' removal rule for 'boxes'.
+     */
+    public static String singularize(String word) {
+        if (word == null || word.isEmpty()) {
+            return word;
+        }
+        
+        String lowerWord = word.toLowerCase();
+
+        // Rule: Nouns ending in 'es' preceded by s, x, z, ch, sh (e.g., 'boxes') drop 'es'
+        if (lowerWord.endsWith("es") && word.length() > 2) {
+            // Check for stem ending in x, which is the case for "boxes" -> "box"
+            if (lowerWord.endsWith("xes") || lowerWord.endsWith("ses") || 
+                lowerWord.endsWith("zes") || lowerWord.endsWith("ches") || 
+                lowerWord.endsWith("shes")) {
+                
+                // Return the original word minus the last two characters ("es")
+                return word.substring(0, word.length() - 2);
+            }
+        }
+        
+        // Default rule for simple 's' plurals (e.g., "cats" -> "cat")
+        if (lowerWord.endsWith("s") && !lowerWord.endsWith("ss") && word.length() > 1) {
+            return word.substring(0, word.length() - 1);
+        }
+
+        return word;
+    }
+
+    public static void main(String[] args) {
+        String input = "boxes";
+        
+        // 1. Get the singularized result
+        String singularizedResult = singularize(input);
+        
+        // 2. Format the result into the required JSON structure
+        Map<String, String> outputMap = new LinkedHashMap<>();
+        outputMap.put("singularize", singularizedResult);
+
+        String jsonOutput = outputMap.entrySet().stream()
+            .map(entry -> String.format("  \"%s\": \"%s\"", entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(",\n"));
+            
+        System.out.println("{");
+        System.out.println(jsonOutput);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "singularize": "box"
+}
+

@@ -1,0 +1,20 @@
+
+endsWith:
+
+
+input:
+
+from("direct:endsWithExample")
+.setBody(simple("["
+    + "${body} == null ? false : 'Mariano' endsWith 'no', "
+    + "${body} == null ? false : 'Mariano' endsWith 'to'"
+    + "]"));
+
+
+
+output:
+
+[ true, false ]
+
+
+

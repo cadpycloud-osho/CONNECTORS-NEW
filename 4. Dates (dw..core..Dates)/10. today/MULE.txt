@@ -1,0 +1,23 @@
+today:
+
+today(): Date
+
+today(): Date
+Returns the date for today as a Date type.
+
+
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+today()
+
+DataWeave
+Output
+"2021-05-15"

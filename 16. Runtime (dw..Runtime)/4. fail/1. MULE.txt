@@ -1,0 +1,52 @@
+fail:
+
+fail(message: String = 'Error'): Nothing
+
+fail(message: String = 'Error'): Nothing
+Throws an exception with the specified message.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::Runtime
+var result = []
+output application/json
+---
+if(sizeOf(result) <= 0) fail('Data was empty') else result
+
+
+DataWeave
+Output
+ERROR 2018-07-29 11:47:44,983 ...
+*********************************
+Message               : "Data was empty
+...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+minutes:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MinutesArithmeticRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateMinutes")
+            .routeId("Minutes-Arithmetic-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+                Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+
+                // 1. Logic: + minutes(1)
+                results.put("nextMinute", base.plus(Duration.ofMinutes(1)).toString());
+
+                // 2. Logic: - minutes(1)
+                results.put("previousMinute", base.minus(Duration.ofMinutes(1)).toString());
+
+                // 3. Decimal Input: minutes(4.555)
+                // 4.555 * 60 = 273.3 seconds -> PT4M33.3S
+                results.put("decimalInputPeriod", toDurationFromMinutes(4.555).toString());
+
+                // 4. Whole Number: minutes(4)
+                results.put("wholeNumberInputPeriod", Duration.ofMinutes(4).toString());
+
+                // 5. Negative Arithmetic: (-1m) + (2m) = 1m (60 seconds)
+                Duration combined = Duration.ofMinutes(-1).plus(Duration.ofMinutes(2));
+                results.put("addNegativeValue", combined.getSeconds());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Minutes Result: ${body}");
+    }
+
+    /**
+     * Converts decimal minutes to Java Duration
+     * Formula: minutes * 60 * 1000 (milliseconds)
+     */
+    private Duration toDurationFromMinutes(double minutes) {
+        long millis = Math.round(minutes * 60 * 1000);
+        return Duration.ofMillis(millis);
+    }
+}
+
+
+output:
+
+{
+   "nextMinute": "2020-10-05T20:23:34.385Z",
+   "previousMinute": "2020-10-05T20:21:34.385Z",
+   "decimalInputPeriod": "PT4M33.3S",
+   "wholeNumberInputPeriod": "PT4M",
+   "addNegativeValue": 60
+}
+
+

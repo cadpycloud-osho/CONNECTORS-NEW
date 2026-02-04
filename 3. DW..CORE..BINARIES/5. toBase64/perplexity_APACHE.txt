@@ -1,0 +1,28 @@
+toBase64:
+
+input:
+
+from("direct:gravatar")
+    .process(exchange -> {
+        String email = "achaval@gmail.com";
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] checksum = md.digest(email.getBytes(StandardCharsets.UTF_8));
+        String md5Hex = HexFormat.of().formatHex(checksum);
+        String gravatarUrl = "https://www.gravatar.com/avatar/" + md5Hex;
+        
+        byte[] imageBytes = RestTemplateBuilder
+            .get()
+            .build()
+            .getForObject(gravatarUrl, byte[].class);
+            
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+        exchange.getIn().setBody(base64Image);
+    });
+
+
+
+output:
+
+
+/9j/4AAQSkZJRgABAQEAYABgAAD//...
+

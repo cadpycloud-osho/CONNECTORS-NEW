@@ -1,0 +1,33 @@
+everyCharacter:
+
+
+input:
+
+import java.util.*;
+import java.util.function.Predicate;
+
+public class EveryCharacterConverter {
+    public static boolean everyCharacter(String input, Predicate<Character> predicate) {
+        if (input == null) return false;
+        return input.chars()
+                   .mapToObj(c -> (char)c)
+                   .allMatch(predicate);
+    }
+    
+    public static void main(String[] args) {
+        String input = "12 34  56";
+        boolean result = everyCharacter(input, c -> c == ' ' || Character.isDigit(c));
+        
+        Map<String, Boolean> output = new LinkedHashMap<>();
+        output.put("result", result);
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{"result": true}
+
+

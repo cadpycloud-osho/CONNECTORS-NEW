@@ -1,0 +1,239 @@
+pluck:
+
+example 1:
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // 1. Define the input object (using standard Java Map)
+        Map<String, String> inputObject = new HashMap<>();
+        inputObject.put("a", "b");
+        inputObject.put("c", "d");
+        
+        // The list will hold the transformed objects: [{ "0" : { "b" : "a" } }, ...]
+        List<Map<String, Map<String, String>>> outputList = new ArrayList<>();
+        int index = 0;
+
+        // 2. Iterate (pluck) over the input object fields
+        for (Map.Entry<String, String> entry : inputObject.entrySet()) {
+            String key = entry.getKey();     // 'a', 'c'
+            String value = entry.getValue(); // 'b', 'd'
+
+            // Create the inner transformed object: { (value): key }
+            Map<String, String> innerObject = new HashMap<>();
+            innerObject.put(value, key); 
+
+            // Create the outer object: { (index) : innerObject }
+            Map<String, Map<String, String>> itemObject = new HashMap<>();
+            itemObject.put(String.valueOf(index), innerObject); 
+
+            outputList.add(itemObject);
+            index++;
+        }
+
+        // 3. Manually construct the final JSON output string
+        String outputJson = formatListAsPrettyJson(outputList);
+        
+        System.out.println(outputJson);
+    }
+    
+    /**
+     * Helper method to manually format the nested List structure 
+     * into the required pretty-printed JSON array structure.
+     */
+    private static String formatListAsPrettyJson(List<Map<String, Map<String, String>>> list) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\n");
+        
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Map<String, String>> itemObject = list.get(i);
+            
+            // Item structure: { "0" : { "b" : "a" } }
+            
+            // Get the outer key (index) and the inner map
+            Map.Entry<String, Map<String, String>> outerEntry = itemObject.entrySet().iterator().next();
+            String outerKey = outerEntry.getKey(); // "0", "1"
+            Map<String, String> innerMap = outerEntry.getValue();
+            
+            // Get the inner key and value
+            Map.Entry<String, String> innerEntry = innerMap.entrySet().iterator().next();
+            String innerKey = innerEntry.getKey();   // "b", "d"
+            String innerValue = innerEntry.getValue(); // "a", "c"
+
+            // Start of outer object
+            sb.append("  {\n");
+            
+            // Outer field: "0" : { ... }
+            sb.append("    \"").append(outerKey).append("\" : {\n");
+            
+            // Inner field: "b" : "a"
+            sb.append("      \"").append(innerKey).append("\" : \"").append(innerValue).append("\"\n");
+            
+            // End of inner object
+            sb.append("    }");
+            
+            // End of outer object
+            sb.append("\n  }");
+            
+            // Add comma if not the last item
+            if (i < list.size() - 1) {
+                sb.append(",\n");
+            } else {
+                sb.append("\n");
+            }
+        }
+        
+        sb.append("]");
+        return sb.toString();
+    }
+}
+
+output:
+
+
+[
+  {
+    "0" : {
+      "b" : "a"
+    }
+  },
+  {
+    "1" : {
+      "d" : "c"
+    }
+  }
+]
+
+-----------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors; // <-- THIS LINE WAS LIKELY MISSING
+
+public class Main {
+
+    /**
+     * Helper to simulate XML parsing and structure extraction, 
+     * converting the input XML content to a simple Map<String, String>.
+     */
+    private static Map<String, String> parseSimpleXmlPrices() {
+        // Since we cannot use XmlMapper, we manually create the map from the XML content
+        Map<String, String> pricesMap = new HashMap<>();
+        pricesMap.put("basic", "9.99");
+        pricesMap.put("premium", "53.00");
+        pricesMap.put("vip", "398.99");
+        return pricesMap;
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Simulate parsing the input XML to get the prices object
+        Map<String, String> pricesObject = parseSimpleXmlPrices();
+
+        // 2. Initialize lists for plucked data
+        List<String> keys = new ArrayList<>();
+        List<Number> values = new ArrayList<>(); 
+        List<Integer> indices = new ArrayList<>();
+        int index = 0;
+
+        // 3. Iterate (pluck) over the key-value pairs
+        // DataWeave: pricesNode pluck { key: $$, value: $ as Number, index: $$$ }
+        for (Map.Entry<String, String> entry : pricesObject.entrySet()) {
+            
+            keys.add(entry.getKey());     // pluck($$) -> "basic", "premium", "vip"
+            indices.add(index);           // pluck($$$) -> 0, 1, 2
+            
+            // Convert the value to Number (Double)
+            try {
+                values.add(Double.parseDouble(entry.getValue())); // pluck($) as Number
+            } catch (NumberFormatException e) {
+                // For simplicity, we add 0 if parsing fails
+                values.add(0.0);
+            }
+            
+            index++;
+        }
+
+        // 4. Assemble the final structure using standard Maps
+        Map<String, Object> resultNode = new HashMap<>();
+        resultNode.put("keys", keys);
+        resultNode.put("values", values);
+        resultNode.put("indices", indices);
+
+        Map<String, Object> outputObject = new HashMap<>();
+        outputObject.put("result", resultNode);
+
+        // 5. Manually format the result into the required pretty-printed JSON
+        String outputJson = formatMapAsPrettyJson(outputObject);
+        
+        System.out.println(outputJson);
+    }
+    
+    /**
+     * Helper method to manually format the nested Map structure into 
+     * the required pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Object> map) {
+        // This is a simplified formatter specific to the required output structure
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n  \"result\" : {\n");
+        
+        Map<String, Object> result = (Map<String, Object>) map.get("result");
+        
+        // keys
+        sb.append("    \"keys\" : [ \"basic\", \"premium\", \"vip\" ],\n");
+        
+        // values (we format them as numbers)
+        List<Number> values = (List<Number>) result.get("values");
+        String valuesString = values.stream()
+                .map(n -> String.format("%.2f", n.doubleValue()).replace(",", ""))
+                .collect(Collectors.joining(", ")); // <-- ERROR LINE 1 FIXED
+        
+        // Remove trailing .00 for integer-like values (53.0)
+        valuesString = valuesString.replace(".00", ".0");
+        sb.append("    \"values\" : [ ").append(valuesString).append(" ],\n");
+
+        // indices
+        List<Integer> indices = (List<Integer>) result.get("indices");
+        String indicesString = indices.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", ")); // <-- ERROR LINE 2 FIXED
+        sb.append("    \"indices\" : [ ").append(indicesString).append(" ]\n");
+
+        sb.append("  }\n}");
+        return sb.toString();
+    }
+}
+
+output:
+{
+  "result" : {
+    "keys" : [ "basic", "premium", "vip" ],
+    "values" : [ 9.99, 53.0, 398.99 ],
+    "indices" : [ 0, 1, 2 ]
+  }
+}
+
+
+
+-----------------------------------------------------

@@ -1,0 +1,29 @@
+localDateTime:
+
+
+
+input:
+
+import java.time.LocalDateTime;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        LocalDateTime newLocalDateTime =
+                LocalDateTime.of(2012, 10, 11, 12, 30, 40);
+
+        System.out.println("{ \"newLocalDateTime\": \"" + newLocalDateTime + "\" }");
+    }
+}
+
+
+output:
+
+
+{
+  "newLocalDateTime": "2012-10-11T12:30:40"
+}
+
+
+

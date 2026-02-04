@@ -1,0 +1,24 @@
+flatMap:
+
+
+
+input:
+
+from("direct:flatMapExample")
+.setBody(constant(List.of(
+    List.of(3, 5),
+    List.of(0.9, 5.5)
+)))
+
+.split(body())
+    .split(body())
+        .aggregate(constant(true),
+            new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+output:
+
+[3, 5, 0.9, 5.5]
+

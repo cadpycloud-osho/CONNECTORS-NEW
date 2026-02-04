@@ -1,0 +1,58 @@
+encodeURIComponent:
+
+
+input:
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    private static String encodeURIComponent(String s) throws UnsupportedEncodingException {
+        return URLEncoder.encode(s, "UTF-8")
+                .replaceAll("\\+", "%20")
+                .replaceAll("%21", "!")
+                .replaceAll("%27", "'")
+                .replaceAll("%28", "(")
+                .replaceAll("%29", ")")
+                .replaceAll("%7E", "~");
+    }
+
+    private static String encodeURI(String s) throws UnsupportedEncodingException {
+        String encoded = encodeURIComponent(s);
+        encoded = encoded.replace("%3B", ";")
+                         .replace("%2C", ",")
+                         .replace("%2F", "/")
+                         .replace("%3F", "?")
+                         .replace("%3A", ":")
+                         .replace("%40", "@")
+                         .replace("%26", "&")
+                         .replace("%3D", "=");
+        return encoded;
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        Map<String, String> inner = new LinkedHashMap<>();
+
+        inner.put("encodeURIComponent", encodeURIComponent(" PATH/ TO /ENCODE "));
+        inner.put("encodeURI", encodeURI(" PATH/ TO /ENCODE "));
+        inner.put("encodeURIComponent_to_hex", encodeURIComponent(";,/?:@&="));
+        inner.put("encodeURI_not_to_hex", encodeURI(";,/?:@&="));
+        inner.put("encodeURIComponent_not_encoded", encodeURIComponent("-_.!~*'()"));
+        inner.put("encodeURI_not_encoded", encodeURI("-_.!~*'()"));
+
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
+        result.put("comparing_encode_functions_output", inner);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{comparing_encode_functions_output={encodeURIComponent=%20PATH/%20TO%20/ENCODE%20, encodeURI=%20PATH/%20TO%20/ENCODE%20, encodeURIComponent_to_hex=%3B%2C%2F%3F%3A%40%26%3D, encodeURI_not_to_hex=;,/?:@&=, encodeURIComponent_not_encoded=-_.!~*'(), encodeURI_not_encoded=-_.!~*'()}}
+

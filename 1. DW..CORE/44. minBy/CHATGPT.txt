@@ -1,0 +1,126 @@
+minBy:
+
+EXAMPLE 1:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@SpringBootApplication
+@RestController
+public class MinByController {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MinByController.class, args);
+    }
+
+    @GetMapping("/minby-object")
+    public Map<String, Integer> getMinByObject() {
+        List<Map<String, Integer>> list = Arrays.asList(
+            Map.of("a", 1),
+            Map.of("a", 2),
+            Map.of("a", 3)
+        );
+
+        Map<String, Integer> result = list.stream()
+                .min(Comparator.comparing(item -> item.get("a")))
+                .orElse(null);
+
+        return result;
+    }
+}
+
+
+
+OUTPUT:
+
+{ "a": 1 }
+
+
+----------------------------------------------------------------
+
+EXAMPLE 2:
+
+INPUT:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+@RestController
+public class MinByDateTimeController {
+
+    @GetMapping("/minby-datetime")
+    public Map<String, Object> getMinByDateTime() {
+
+        String myDateTime1 = "2017-10-01T22:57:59-03:00";
+        String myDateTime2 = "2018-10-01T23:57:59-03:00";
+
+        // Convert to ZonedDateTime
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        ZonedDateTime dt1 = ZonedDateTime.parse(myDateTime1, formatter);
+        ZonedDateTime dt2 = ZonedDateTime.parse(myDateTime2, formatter);
+
+        // byDateTime
+        String byDateTime = Stream.of(myDateTime1, myDateTime2)
+                .min(String::compareTo)
+                .orElse(null);
+
+        // byDate
+        String byDate = Stream.of(dt1.toLocalDate(), dt2.toLocalDate())
+                .min(LocalDate::compareTo)
+                .orElse(null)
+                .toString();
+
+        // byTime
+        String byTime = Stream.of(dt1.toOffsetTime(), dt2.toOffsetTime())
+                .min(OffsetTime::compareTo)
+                .orElse(null)
+                .toString();
+
+        // aBoolean
+        Boolean aBoolean = Stream.of(true, false, (0 > 1), (1 > 0))
+                .min(Boolean::compareTo)
+                .orElse(null);
+
+        // emptyArray
+        Object emptyArray = null;
+
+        return Map.of(
+            "myMinBy", Map.of(
+                "byDateTime", byDateTime,
+                "byDate", byDate,
+                "byTime", byTime,
+                "aBoolean", aBoolean,
+                "emptyArray", emptyArray
+            )
+        );
+    }
+}
+
+
+OUTPUT:
+
+{
+  "myMinBy": {
+    "byDateTime": "2017-10-01T22:57:59-03:00",
+    "byDate": "2017-10-01",
+    "byTime": "22:57:59-03:00",
+    "aBoolean": false,
+    "emptyArray": null
+  }
+}
+
+

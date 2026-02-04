@@ -1,0 +1,56 @@
+functionParamTypes:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class FunctionIntrospectionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:inspectFunction")
+            .process(exchange -> {
+                // In Java, we inspect a specific method to get param types
+                Method method = SampleFunctions.class.getMethod("aFunction", String.class, Integer.class);
+                
+                List<Map<String, Object>> paramDetails = new ArrayList<>();
+                for (Parameter p : method.getParameters()) {
+                    paramDetails.add(Map.of(
+                        "paramType", p.getType().getSimpleName(),
+                        "optional", false // Java params are mandatory by default
+                    ));
+                }
+
+                exchange.getIn().setBody(Map.of("a", paramDetails));
+            })
+            .marshal().json();
+    }
+}
+
+class SampleFunctions {
+    // Equivalent to (String, Number) -> Number
+    public Integer aFunction(String s, Integer n) { return n; }
+}
+
+
+output:
+
+{
+   "a": [
+     {
+       "paramType": "String",
+       "optional": false
+     },
+     {
+       "paramType": "Integer",
+       "optional": false
+     }
+   ]
+}
+
+

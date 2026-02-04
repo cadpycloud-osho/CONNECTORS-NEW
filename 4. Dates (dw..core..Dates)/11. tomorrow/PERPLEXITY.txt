@@ -1,0 +1,24 @@
+tomorrow:
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/tomorrow")
+    public Map<String, String> getTomorrow() {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("tomorrow", tomorrow.toString());
+        return result;
+    }
+}
+
+output:
+
+
+{
+  "tomorrow": "2025-12-11"
+}

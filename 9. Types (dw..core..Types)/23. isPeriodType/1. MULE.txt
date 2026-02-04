@@ -1,0 +1,55 @@
+isPeriodType:
+
+isPeriodType(t: Type): Boolean
+
+isPeriodType(t: Type): Boolean
+Returns true if the input is the Period type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type APeriod = Period
+output application/json
+---
+{
+   a: isPeriodType(APeriod),
+   b: isPeriodType(Period),
+   c: isPeriodType(String),
+}
+
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

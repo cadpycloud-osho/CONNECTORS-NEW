@@ -1,0 +1,62 @@
+leftPad:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class LeftPadController {
+    
+    @GetMapping(value = "/left-pad", produces = MediaType.APPLICATION_JSON_VALUE)
+    public LeftPadResponse leftPadChecks() {
+        return new LeftPadResponse(
+            leftPad(null, 3),
+            leftPad("", 3),
+            leftPad("bat", 5),
+            leftPad("bat", 3),
+            leftPad("bat", -1)
+        );
+    }
+    
+    private String leftPad(String input, int length) {
+        if (input == null) {
+            return null;
+        }
+        if (length <= input.length()) {
+            return input;
+        }
+        StringBuilder sb = new StringBuilder();
+        int pads = length - input.length();
+        for (int i = 0; i < pads; i++) {
+            sb.append(" ");
+        }
+        sb.append(input);
+        return sb.toString();
+    }
+    
+    public static class LeftPadResponse {
+        public final String a, b, c, d, e;
+        
+        public LeftPadResponse(String a, String b, String c, String d, String e) {
+            this.a = a; this.b = b; this.c = c; this.d = d; this.e = e;
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}
+

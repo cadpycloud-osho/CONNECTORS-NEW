@@ -1,0 +1,27 @@
+charCode:
+
+
+input:
+
+
+import org.json.JSONObject;
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "Mule";
+        char firstChar = input.charAt(0);
+        int charCode = (int) firstChar;
+        
+        JSONObject json = new JSONObject();
+        json.put("charCode", charCode);
+        
+        System.out.println(json.toString());
+    }
+}
+
+
+output:
+
+{ "charCode" : 77 }
+
+

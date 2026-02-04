@@ -1,0 +1,22 @@
+date:
+
+
+input:
+
+from("direct:newDate")
+    .process(exchange -> {
+        LocalDate newDate = LocalDate.of(2012, 10, 11);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("newDate", newDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+{
+  "newDate": "2012-10-11"
+}
+

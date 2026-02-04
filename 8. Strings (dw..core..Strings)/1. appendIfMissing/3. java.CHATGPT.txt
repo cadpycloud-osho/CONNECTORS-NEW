@@ -1,0 +1,35 @@
+appendIfMissing:
+
+
+input:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("a: " + appendIfMissing(null, ""));
+        System.out.println("b: " + appendIfMissing("abc", ""));
+        System.out.println("c: " + appendIfMissing("", "xyz"));
+        System.out.println("d: " + appendIfMissing("abc", "xyz"));
+        System.out.println("e: " + appendIfMissing("abcxyz", "xyz"));
+    }
+
+    public static String appendIfMissing(String input, String suffix) {
+        if (input == null) return null;
+        if (suffix == null || suffix.isEmpty()) return input;
+        if (input.endsWith(suffix)) return input;
+        return input + suffix;
+    }
+}
+
+
+output:
+
+a: null
+b: abc
+c: xyz
+d: abcxyz
+e: abcxyz
+
+

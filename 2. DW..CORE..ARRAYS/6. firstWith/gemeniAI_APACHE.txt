@@ -1,0 +1,79 @@
+firstWith:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+
+public class CamelFirstWithExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave Variable: List of Maps
+                        List<Map<String, String>> users = List.of(
+                            Map.of("name", "Mariano", "lastName", "Achaval"),
+                            Map.of("name", "Ana", "lastName", "Felisatti"),
+                            Map.of("name", "Mariano", "lastName", "de Sousa")
+                        );
+
+                        // Find first user named "Mariano"
+                        Map<String, String> resultA = users.stream()
+                            .filter(u -> "Mariano".equals(u.get("name")))
+                            .findFirst()
+                            .orElse(null); // Return null if not found
+
+                        // Find first user named "Peter"
+                        Map<String, String> resultB = users.stream()
+                            .filter(u -> "Peter".equals(u.get("name")))
+                            .findFirst()
+                            .orElse(null);
+
+                        exchange.getIn().setBody(Map.of(
+                            "a", resultA != null ? resultA : "null",
+                            "b", resultB != null ? resultB : "null"
+                        ));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+from("direct:extractUser")
+    // Use a Bean to keep the Stream logic out of the main route
+    .setHeader("SelectedUser", method(UserService.class, "findFirstMariano"))
+    .choice()
+        .when(header("SelectedUser").isNotNull())
+            .to("direct:process")
+        .otherwise()
+            .log("No matching user found")
+    .end();
+
+output:
+
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+
+

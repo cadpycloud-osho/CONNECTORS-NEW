@@ -1,0 +1,117 @@
+atBeginningOfYear:
+
+example 1:
+
+
+input:
+
+from("direct:atBeginningOfYearDateTime")
+.process(exchange -> {
+
+    // Input DateTime with ZoneOffset
+    java.time.OffsetDateTime input =
+            java.time.OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+    // Beginning of the year (set month/day to Jan 1, time to 00:00:00.000)
+    java.time.OffsetDateTime result =
+            input.withDayOfYear(1)
+                 .withHour(0)
+                 .withMinute(0)
+                 .withSecond(0)
+                 .withNano(0);
+
+    // JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("atBeginningOfYearDateTime", result.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+{
+  "atBeginningOfYearDateTime": "2020-01-01T00:00:00-03:00"
+}
+
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+from("direct:atBeginningOfYearLocalDateTime")
+.process(exchange -> {
+
+    // Input LocalDateTime
+    java.time.LocalDateTime input = java.time.LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+    // Beginning of the year (Jan 1, 00:00:00)
+    java.time.LocalDateTime result = input
+            .withDayOfYear(1)
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0);
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("atBeginningOfYearLocalDateTime", result.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+{
+  "atBeginningOfYearLocalDateTime": "2020-01-01T00:00:00"
+}
+
+
+
+---------------------------------------------------------
+
+example 3:
+
+
+input:
+
+from("direct:atBeginningOfYearDate")
+.process(exchange -> {
+
+    // Input LocalDate
+    java.time.LocalDate input = java.time.LocalDate.parse("2020-10-06");
+
+    // Beginning of the year (Jan 1)
+    java.time.LocalDate result = input.withDayOfYear(1);
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("atBeginningOfYearDate", result.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+{
+  "atBeginningOfYearDate": "2020-01-01"
+}
+
+
+
+---------------------------------------------------------
+
+
+
+
+
+
+
+

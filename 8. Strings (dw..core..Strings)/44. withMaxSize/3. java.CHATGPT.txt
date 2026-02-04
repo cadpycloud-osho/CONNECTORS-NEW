@@ -1,0 +1,36 @@
+withMaxSize:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String withMaxSizeDW(String input, int maxSize) {
+        if (input == null) return null;
+        if (maxSize <= 0 || maxSize >= input.length()) return input;
+        return input.substring(0, maxSize);
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", withMaxSizeDW("123", 10));
+        result.put("b", withMaxSizeDW("123", 3));
+        result.put("c", withMaxSizeDW("123", 2));
+        result.put("d", withMaxSizeDW("123", 0));
+        result.put("e", withMaxSizeDW(null, 23));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=123, b=123, c=12, d=123, e=null}
+
+

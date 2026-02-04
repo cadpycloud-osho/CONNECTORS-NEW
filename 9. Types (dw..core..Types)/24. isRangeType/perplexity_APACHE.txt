@@ -1,0 +1,61 @@
+isRangeType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
+public class DataWeaveRangeTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processRangeChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processRangeChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ARange = Range (type alias)
+        result.put("a", isRangeType(Range.class));
+        
+        // Built-in Range type
+        result.put("b", isRangeType(Range.class));
+        
+        // String - not Range
+        result.put("c", isRangeType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isRangeType(Class<?> type) {
+        // DataWeave Range type check equivalent (like 1..10)
+        // Returns true for Range and its aliases
+        return type == Range.class || 
+               "Range".equals(type.getSimpleName()) ||
+               type.getName().contains("Range") ||
+               List.class.isAssignableFrom(type);
+    }
+    
+    // Range interface equivalent for DataWeave Range type simulation (1..10)
+    private interface Range extends List {}
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

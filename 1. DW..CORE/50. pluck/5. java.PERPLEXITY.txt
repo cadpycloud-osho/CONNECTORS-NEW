@@ -1,0 +1,138 @@
+pluck:
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Input object using Map
+        Map<String, String> input = new HashMap<>();
+        input.put("a", "b");
+        input.put("c", "d");
+        
+        List<Map<String, Object>> result = new ArrayList<>();
+        List<String> keys = new ArrayList<>(input.keySet());
+        int index = 0;
+        
+        for (String key : keys) {
+            String value = input.get(key);
+            
+            // pluck (value,key,index) -> { (index) : { (value):key} }
+            Map<String, Object> outer = new HashMap<>();
+            Map<String, String> inner = new HashMap<>();
+            inner.put(value, key);
+            outer.put(String.valueOf(index), inner);
+            result.add(outer);
+            index++;
+        }
+        
+        // Manual JSON output - avoid complex casting
+        System.out.print("[");
+        for (int i = 0; i < result.size(); i++) {
+            Map<String, Object> item = result.get(i);
+            String idx = (String) item.keySet().iterator().next();
+            @SuppressWarnings("unchecked")
+            Map<String, String> inner = (Map<String, String>) item.get(idx);
+            String innerKey = inner.keySet().iterator().next();
+            System.out.print("{\"");
+            System.out.print(idx);
+            System.out.print("\":{\"");
+            System.out.print(innerKey);
+            System.out.print("\":\"");
+            System.out.print(inner.get(innerKey));
+            System.out.print("\"}}");
+            if (i < result.size() - 1) {
+                System.out.print(",");
+            }
+        }
+        System.out.println("]");
+    }
+}
+
+
+
+output:
+
+[{"0":{"b":"a"}},{"1":{"d":"c"}}]
+
+
+
+-----------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+import java.util.*;
+import java.io.StringReader;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Parse XML: read("<xml>", "application/xml")
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        StringReader reader = new StringReader(
+            "<prices><basic>9.99</basic><premium>53.00</premium><vip>398.99</vip></prices>");
+        InputSource is = new InputSource(reader);
+        Document doc = builder.parse(is);
+        
+        Element prices = (Element) doc.getElementsByTagName("prices").item(0);
+        NodeList children = prices.getChildNodes();
+        
+        // Manual JSON construction
+        List<String> keys = new ArrayList<>();
+        List<Double> values = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+        
+        // pluck equivalents over XML children
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element elem = (Element) node;
+                
+                keys.add(elem.getTagName());           // pluck($$) - keys
+                values.add(Double.parseDouble(elem.getTextContent())); // pluck($) as Number
+                indices.add(i);                        // pluck($$$) - indices
+            }
+        }
+        
+        // Manual JSON output
+        System.out.print("{\"result\":{");
+        System.out.print("\"keys\":[");
+        for (int i = 0; i < keys.size(); i++) {
+            System.out.print("\"" + keys.get(i) + "\"");
+            if (i < keys.size() - 1) System.out.print(",");
+        }
+        System.out.print("],\"values\":[");
+        for (int i = 0; i < values.size(); i++) {
+            System.out.print(values.get(i));
+            if (i < values.size() - 1) System.out.print(",");
+        }
+        System.out.print("],\"indices\":[");
+        for (int i = 0; i < indices.size(); i++) {
+            System.out.print(indices.get(i));
+            if (i < indices.size() - 1) System.out.print(",");
+        }
+        System.out.println("]}}");
+    }
+}
+
+
+
+
+output:
+
+
+{"result":{"keys":["basic","premium","vip"],"values":[9.99,53.0,398.99],"indices":[0,1,2]}}
+
+
+-----------------------------------------------------

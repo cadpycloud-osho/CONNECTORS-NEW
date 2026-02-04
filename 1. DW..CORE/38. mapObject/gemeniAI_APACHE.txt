@@ -1,0 +1,210 @@
+mapObject:
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class CamelMapObjectExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // Source Object: {"a":"b","c":"d"}
+                        Map<String, String> input = new LinkedHashMap<>();
+                        input.put("a", "b");
+                        input.put("c", "d");
+
+                        // Result Object
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        AtomicInteger index = new AtomicInteger(0);
+
+                        // Logic: (value, key, index) -> { (index) : { (value) : key } }
+                        input.forEach((key, value) -> {
+                            Map<String, String> nestedMap = new LinkedHashMap<>();
+                            nestedMap.put(value, key); // Swapping key and value
+                            
+                            result.put(String.valueOf(index.getAndIncrement()), nestedMap);
+                        });
+
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert the final Map to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+{
+  "0": { "b": "a" },
+  "1": { "d": "c" }
+}
+
+-----------------------------------------------------------------
+
+example 2:
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.component.jacksonxml.JacksonXMLDataFormat;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelXmlPriceTransform {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        // Setup XML Data Format
+        JacksonXMLDataFormat xmlFormat = new JacksonXMLDataFormat();
+        xmlFormat.setUnmarshalType(Map.class);
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // 1. Unmarshal XML to Map
+                    .unmarshal(xmlFormat)
+                    
+                    // 2. MapObject Equivalent Logic
+                    .process(exchange -> {
+                        Map<String, Object> body = exchange.getIn().getBody(Map.class);
+                        Map<String, Object> result = new LinkedHashMap<>();
+
+                        body.forEach((key, value) -> {
+                            // Convert String to Double, add 5, and format to ##.00
+                            double originalPrice = Double.parseDouble(value.toString());
+                            String formattedPrice = String.format("%.2f", originalPrice + 5);
+                            result.put(key, formattedPrice);
+                        });
+
+                        exchange.getIn().setBody(result);
+                    })
+                    
+                    // 3. Marshal back to XML (wrapped in a root 'prices' element)
+                    .marshal(xmlFormat)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        
+        String inputXml = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                          "<prices>\n" +
+                          "    <basic>9.99</basic>\n" +
+                          "    <premium>53</premium>\n" +
+                          "    <vip>398.99</vip>\n" +
+                          "</prices>";
+
+        context.createProducerTemplate().sendBody("direct:start", inputXml);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+<dependency>
+    <groupId>org.apache.camel</groupId>
+    <artifactId>camel-jacksonxml</artifactId>
+    <version>4.x.x</version>
+</dependency>
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+  <basic>14.99</basic>
+  <premium>58.00</premium>
+  <vip>403.99</vip>
+</prices>
+
+-----------------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.component.jacksonxml.JacksonXMLDataFormat;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelEmptyXmlRoute {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        // Setup XML Data Format
+        JacksonXMLDataFormat xmlFormat = new JacksonXMLDataFormat();
+        xmlFormat.setUnmarshalType(Map.class);
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // 1. Unmarshal XML to Map (Results in an empty Map for <prices></prices>)
+                    .unmarshal(xmlFormat)
+                    
+                    // 2. Logic: Attempt to iterate, but nothing happens if Map is empty
+                    .process(exchange -> {
+                        Map<String, Object> body = exchange.getIn().getBody(Map.class);
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        
+                        if (body != null) {
+                            body.forEach((key, value) -> {
+                                // Mathematical logic would go here
+                                result.put(key, value);
+                            });
+                        }
+                        
+                        exchange.getIn().setBody(result);
+                    })
+                    
+                    // 3. Marshal back to XML
+                    .marshal(xmlFormat)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        
+        // Input: Empty prices tag
+        String inputXml = "<?xml version='1.0' encoding='UTF-8'?>\n<prices></prices>";
+
+        context.createProducerTemplate().sendBody("direct:start", inputXml);
+        
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+-----------------------------------------------------------------

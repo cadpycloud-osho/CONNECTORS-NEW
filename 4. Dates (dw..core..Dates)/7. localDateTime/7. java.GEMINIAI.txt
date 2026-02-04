@@ -1,0 +1,79 @@
+localDateTime:
+
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Constructs a LocalDateTime from explicit date and time components.
+     * This mimics the DataWeave 'localDateTime({...})' function.
+     * @param year The year component.
+     * @param month The month component (1-12).
+     * @param day The day component (1-31).
+     * @param hour The hour component (0-23).
+     * @param minute The minute component (0-59).
+     * @param second The second component (0-59).
+     * @return The resulting local date-time string in ISO 8601 format (YYYY-MM-DDTHH:MM:SS).
+     */
+    public static String createNewLocalDateTime(
+            int year, int month, int day, int hour, int minute, int second) {
+        
+        // 1. Construct the date-time object (DW: localDateTime({...}))
+        // LocalDateTime.of() is the direct Java equivalent
+        LocalDateTime newLocalDateTime = LocalDateTime.of(
+            year, month, day, hour, minute, second
+        );
+        
+        // 2. Format the date-time to the standard ISO output (DW output format)
+        // DateTimeFormatter.ISO_LOCAL_DATE_TIME produces the "YYYY-MM-DDTHH:MM:SS" format
+        return newLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // Input values from the DW source
+        int year = 2012;
+        int month = 10;
+        int day = 11;
+        int hour = 12;
+        int minutes = 30;
+        int seconds = 40;
+        
+        // Calculate the new local date-time string
+        String newLocalDateTimeString = createNewLocalDateTime(
+            year, month, day, hour, minutes, seconds
+        );
+        
+        // 3. Format the final JSON output
+        String jsonOutput = String.format("{\n  \"newLocalDateTime\": \"%s\"\n}", newLocalDateTimeString);
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Input Components: 2012-10-11 12:30:40 (No Offset)");
+        System.out.println("ISO Date-Time String: " + newLocalDateTimeString);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+output:
+
+
+{
+  "newLocalDateTime": "2012-10-11T12:30:40"
+}
+
+

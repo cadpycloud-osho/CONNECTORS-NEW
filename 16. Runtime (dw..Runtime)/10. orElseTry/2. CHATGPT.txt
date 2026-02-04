@@ -1,0 +1,107 @@
+orElseTry:
+
+
+input:
+
+package com.example.demo.model;
+
+public class TryResult<T> {
+    public boolean success;
+    public T result;
+    public ErrorInfo error;
+
+    public static class ErrorInfo {
+        public String kind;
+        public String message;
+
+        public ErrorInfo(String kind, String message) {
+            this.kind = kind;
+            this.message = message;
+        }
+    }
+
+    public static <T> TryResult<T> success(T value) {
+        TryResult<T> tr = new TryResult<>();
+        tr.success = true;
+        tr.result = value;
+        return tr;
+    }
+
+    public static <T> TryResult<T> failure(String kind, String message) {
+        TryResult<T> tr = new TryResult<>();
+        tr.success = false;
+        tr.error = new ErrorInfo(kind, message);
+        return tr;
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.model.TryResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class OrElseTryController {
+
+    @GetMapping("/orElseTry")
+    public Map<String, TryResult<Object>> getOrElseTry() {
+
+        Map<String, Object> user = new HashMap<>();
+        Map<String, Object> otherUser = new HashMap<>();
+
+        Map<String, TryResult<Object>> result = new HashMap<>();
+
+        // a: try(() -> user.name!) orElseTry otherUser.name!
+        try {
+            Object value = user.get("name");
+            if (value == null) throw new KeyNotFoundException("There is no key named 'name'");
+            result.put("a", TryResult.success(value));
+        } catch (KeyNotFoundException e1) {
+            try {
+                Object value2 = otherUser.get("name");
+                if (value2 == null) throw new KeyNotFoundException("There is no key named 'name'");
+                result.put("a", TryResult.success(value2));
+            } catch (KeyNotFoundException e2) {
+                result.put("a", TryResult.failure("KeyNotFoundException", e2.getMessage()));
+            }
+        }
+
+        // b: try(() -> user.name!) orElseTry "No User Name"
+        try {
+            Object value = user.get("name");
+            if (value == null) throw new KeyNotFoundException("There is no key named 'name'");
+            result.put("b", TryResult.success(value));
+        } catch (KeyNotFoundException e1) {
+            result.put("b", TryResult.success("No User Name"));
+        }
+
+        return result;
+    }
+
+    static class KeyNotFoundException extends RuntimeException {
+        public KeyNotFoundException(String msg) { super(msg); }
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "success": false,
+    "error": {
+      "kind": "KeyNotFoundException",
+      "message": "There is no key named 'name'"
+    }
+  },
+  "b": {
+    "success": true,
+    "result": "No User Name"
+  }
+}
+
+
+

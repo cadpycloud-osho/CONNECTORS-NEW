@@ -1,0 +1,30 @@
+attr:
+
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class DataWeaveAttrProcessor {
+    public static Map<String, Object> attr(String namespaceUri, String attrName) {
+        // DataWeave: attr(ns0, "myAttr")
+        return new LinkedHashMap<String, Object>() {{
+            put("kind", "Attribute");
+            put("namespace", namespaceUri);    // "http://acme.com/fo"
+            put("selector", attrName);         // "myAttr"
+        }};
+    }
+}
+
+
+
+
+output:
+
+{
+   "kind": "Attribute",
+   "namespace": "http://acme.com/fo",
+   "selector": "myAttr"
+}
+

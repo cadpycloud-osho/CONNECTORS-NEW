@@ -1,0 +1,52 @@
+fail:
+
+
+input:
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class EmptyDataController {
+    
+    @GetMapping("/check-data")
+    public List<String> checkData() {
+        List<String> result = List.of(); // Empty list matching DataWeave var result = []
+        
+        // Matches: if(sizeOf(result) <= 0) fail('Data was empty') else result
+        if (result.size() <= 0) {
+            throw new EmptyDataException("Data was empty");
+        }
+        return result;
+    }
+}
+
+class EmptyDataException extends RuntimeException {
+    public EmptyDataException(String message) {
+        super(message);
+    }
+}
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(EmptyDataException.class)
+    public ResponseEntity<String> handleEmptyData(EmptyDataException ex) {
+        // Matches DataWeave ERROR output format
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body("ERROR: " + ex.getMessage());
+    }
+}
+
+
+output:
+
+HTTP 400 Bad Request
+ERROR: Data was empty
+

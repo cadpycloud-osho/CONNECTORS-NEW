@@ -1,0 +1,125 @@
+atBeginningOfMonth:
+
+example 1:
+
+input:
+
+
+from("direct:atBeginningOfMonthDateTime")
+.process(exchange -> {
+
+    // Input ZonedDateTime (with timezone)
+    java.time.ZonedDateTime input =
+        java.time.ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+    // atBeginningOfMonth equivalent
+    java.time.ZonedDateTime beginningOfMonth =
+        input
+            .withDayOfMonth(1)
+            .toLocalDate()
+            .atStartOfDay(input.getZone());
+
+    // Prepare output
+    java.util.Map<String, Object> result = new java.util.HashMap<>();
+    result.put(
+        "atBeginningOfMonthDateTime",
+        beginningOfMonth.toString()
+    );
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+output:
+
+
+{
+  "atBeginningOfMonthDateTime": "2020-10-01T00:00:00-03:00"
+}
+
+
+
+------------------------------------------------
+
+
+example 2:
+
+input:
+
+
+from("direct:atBeginningOfMonthLocalDateTime")
+.process(exchange -> {
+
+    // Input LocalDateTime (no timezone)
+    java.time.LocalDateTime input =
+        java.time.LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+    // atBeginningOfMonth equivalent
+    java.time.LocalDateTime beginningOfMonth =
+        input
+            .withDayOfMonth(1)
+            .toLocalDate()
+            .atStartOfDay();
+
+    // Prepare output
+    java.util.Map<String, Object> result = new java.util.HashMap<>();
+    result.put(
+        "atBeginningOfMonthLocalDateTime",
+        beginningOfMonth.toString()
+    );
+
+    exchange.getIn().setBody(result);
+});
+
+
+
+output:
+
+
+{
+  "atBeginningOfMonthLocalDateTime": "2020-10-01T00:00:00"
+}
+
+
+
+------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:atBeginningOfMonthDate")
+.process(exchange -> {
+
+    // Input Date (equivalent to |2020-10-06|)
+    java.time.LocalDate inputDate =
+            java.time.LocalDate.parse("2020-10-06");
+
+    // atBeginningOfMonth equivalent
+    java.time.LocalDate resultDate =
+            inputDate.withDayOfMonth(1);
+
+    // Build JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("atBeginningOfMonthDate", resultDate.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+
+output:
+
+{
+  "atBeginningOfMonthDate": "2020-10-01"
+}
+
+
+
+
+------------------------------------------------
+
+

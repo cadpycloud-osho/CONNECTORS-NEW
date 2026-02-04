@@ -1,0 +1,227 @@
+isEmpty:
+
+COMMON HELPER (used in all examples)
+
+
+import java.util.*;
+
+public class Main {
+
+    public static boolean isEmpty(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String) {
+            return ((String) value).isEmpty();
+        }
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).isEmpty();
+        }
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        }
+        return false;
+    }
+}
+
+EXAMPLE 1:
+
+
+
+input:
+
+COMMON HELPER (used in all examples)
+
+
+
+import java.util.*;
+
+public class Main {
+
+    // Utility method similar to DataWeave isEmpty
+    public static boolean isEmpty(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String) {
+            return ((String) value).isEmpty();
+        }
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).isEmpty();
+        }
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        boolean result1 = isEmpty("");        // true
+        boolean result2 = isEmpty("data");    // false
+
+        List<Boolean> output = Arrays.asList(result1, result2);
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+[true, false]
+
+----------------------------------------------------------------
+
+
+
+EXAMPLE 2:
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+
+    // isEmpty utility method (DataWeave-like)
+    public static boolean isEmpty(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String) {
+            return ((String) value).isEmpty();
+        }
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).isEmpty();
+        }
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        List<Boolean> result = Arrays.asList(
+                isEmpty(""),
+                isEmpty("DataWeave")
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+[true, false]
+
+
+----------------------------------------------------------------
+
+EXAMPLE 3:
+
+
+
+input:
+
+
+
+import java.util.*;
+
+public class Main {
+
+    // DataWeave-like isEmpty method
+    public static boolean isEmpty(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String) {
+            return ((String) value).isEmpty();
+        }
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).isEmpty();
+        }
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> emptyMap = new HashMap<>();
+        Map<String, String> filledMap = new HashMap<>();
+        filledMap.put("name", "DataWeave");
+
+        List<Boolean> result = Arrays.asList(
+                isEmpty(emptyMap),
+                isEmpty(filledMap)
+        );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+[true, false]
+
+
+----------------------------------------------------------------
+
+
+EXAMPLE 4:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    // DataWeave-like isEmpty method
+    public static boolean isEmpty(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String) {
+            return ((String) value).isEmpty();
+        }
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).isEmpty();
+        }
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("nullValue", isEmpty(null));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+{nullValue=true}
+
+
+----------------------------------------------------------------
+
+
+
+
+
+
+
+

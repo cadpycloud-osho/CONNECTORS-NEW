@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "To"
+      ],
+      "properties": {
+        "From": {
+          "$ref": "#/definitions/From"
+        },
+        "To": {
+          "$ref": "#/definitions/To"
+        },
+        "Options": {
+          "$ref": "#/definitions/Options"
+        }
+      }
+    },
+    "From": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "Address": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      }
+    },
+    "To": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "Address",
+        "SubscriberKey"
+      ],
+      "properties": {
+        "Address": {
+          "type": "string"
+        },
+        "SubscriberKey": {
+          "type": "string"
+        },
+        "ContactAttributes": {
+          "$ref": "#/definitions/ContactAttributes"
+        }
+      }
+    },
+    "ContactAttributes": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "SubscriberAttributes": {
+          "$ref": "#/definitions/SubscriberAttributes"
+        }
+      }
+    },
+    "SubscriberAttributes": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "Region": {
+          "type": "string"
+        },
+        "City": {
+          "type": "string"
+        },
+        "State": {
+          "type": "string"
+        }
+      }
+    },
+    "Options": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "RequestType": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

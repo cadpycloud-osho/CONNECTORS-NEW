@@ -1,0 +1,93 @@
+props:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DwPropsTest {
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new PropsRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class PropsRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Simulate dw::Runtime::props() - returns all Java system properties
+                        Properties props = System.getProperties();
+                        
+                        // Create result matching DataWeave structure
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("props", props);
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+
+Output:
+{
+  "props" : {
+    "java.version" : "17.0.10",
+    "java.vendor" : "Oracle Corporation",
+    "java.home" : "/Library/Java/JavaVirtualMachines/jdk-17.0.10.jdk/Contents/Home",
+    "java.vm.specification.version" : "17",
+    "java.vm.version" : "17.0.10+11",
+    "java.vm.name" : "Java HotSpot(TM) 64-Bit Server VM",
+    "java.vm.info" : "mixed mode, sharing",
+    "java.ext.dirs" : "/Users/.../Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk-17.0.10.jdk/Contents/Home/lib",
+    "java.class.path" : "...",
+    "java.library.path" : "/usr/lib:/System/Library/Frameworks/JavaVM.framework:/Library/Java/JavaVirtualMachines/jdk-17.0.10.jdk/Contents/Home/lib/server",
+    "user.name" : "your-username",
+    "user.home" : "/Users/your-username",
+    "user.dir" : "/path/to/your/project",
+    "user.timezone" : "America/Los_Angeles",
+    "os.name" : "Mac OS X",
+    "os.version" : "14.2.1",
+    "os.arch" : "aarch64",
+    "file.separator" : "/",
+    "path.separator" : ":",
+    "line.separator" : "\n",
+    "file.encoding" : "UTF-8",
+    "sun.jnu.encoding" : "UTF-8",
+    "sun.boot.class.path" : "...",
+    "sun.java.launcher" : "MANAGEMENT_CONSOLE",
+    "sun.management.compiler" : "HotSpot 64-Bit Tiered Compilers"
+  }
+}
+
+
+
+
+
+
+

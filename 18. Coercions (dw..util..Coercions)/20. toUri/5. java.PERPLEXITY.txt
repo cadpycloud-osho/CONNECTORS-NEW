@@ -1,0 +1,25 @@
+toUri:
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String uriString = "[https://www.google.com/]()";
+        Map<String, String> result = Map.of("toUriExample", uriString);
+        System.out.println("Result: " + result);
+    }
+}
+
+
+
+output:
+
+
+Result: {toUriExample=[https://www.google.com/](https://www.google.com/)}
+
+

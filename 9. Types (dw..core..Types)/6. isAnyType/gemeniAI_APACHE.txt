@@ -1,0 +1,43 @@
+isAnyType:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class AnyTypeCheckRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkAnyType")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Equivalent to 'type AAny = Any'
+                Class<?> aAny = Object.class; 
+                Class<?> stringType = String.class;
+
+                results.put("a", isAnyType(aAny));
+                results.put("b", isAnyType(Object.class));
+                results.put("c", isAnyType(stringType));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    private boolean isAnyType(Class<?> clazz) {
+        // In Java, Object is the equivalent to DataWeave's 'Any'
+        return clazz != null && clazz.equals(Object.class);
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

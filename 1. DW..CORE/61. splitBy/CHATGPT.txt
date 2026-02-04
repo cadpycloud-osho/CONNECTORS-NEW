@@ -1,0 +1,167 @@
+splitBy:
+
+
+example 1:
+
+
+
+input:
+
+
+@GetMapping("/split1")
+public List<String> splitExample1() {
+    return Arrays.asList("192.88.99.0/24".split("[./]"));
+}
+
+
+output:
+
+@GetMapping("/split1")
+public List<String> splitExample1() {
+    return Arrays.asList("192.88.99.0/24".split("[./]"));
+}
+
+------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+@GetMapping("/split2")
+public Map<String, Object> splitExample2() {
+
+    Map<String, Object> map = new HashMap<>();
+
+    map.put("split1", Arrays.asList("a-b-c".split(".b.")));
+    map.put("split2", Arrays.asList("hello world".split("\\s")));
+    map.put("split3", Arrays.asList("no match".split("^s"))); 
+    map.put("split4", Arrays.asList("no match".split("^n.."))); 
+    map.put("split5", Arrays.asList("a1b2c3d4A1B2C3D".split("[0-9A-Z]")));
+
+    return Map.of("splitters", map);
+}
+
+
+
+output:
+{
+  "splitters": {
+    "split1": ["a", "c"],
+    "split2": ["hello", "world"],
+    "split3": ["no match"],
+    "split4": ["", "match"],
+    "split5": ["a", "b", "c", "d"]
+  }
+}
+
+
+------------------------------------------------------------------
+example 3:
+
+
+
+input:
+
+@GetMapping("/split3")
+public String splitExample3() {
+    return "192.88.99.0".split("\\.")[0];
+}
+
+
+
+output:
+
+"192"
+
+------------------------------------------------------------------
+example 4:
+
+
+
+input:
+
+
+@GetMapping("/split4")
+public List<String> splitExample4() {
+    return Arrays.asList(
+       "root.sources.data.`test.branch.BranchSource`.source.traits"
+       .split("[.](?=(?:[^`]*`[^`]*`)*[^`]*$)")
+    );
+}
+
+
+output:
+
+[
+ "root",
+ "sources",
+ "data",
+ "`test.branch.BranchSource`",
+ "source",
+ "traits"
+]
+
+------------------------------------------------------------------
+example 5:
+
+
+input:
+
+
+@GetMapping("/split5")
+public List<String> splitExample5() {
+    return Arrays.asList("192.88.99.0".split("\\."));
+}
+
+
+output:
+
+["192", "88", "99", "0"]
+
+------------------------------------------------------------------
+
+example 6:
+
+
+input:
+
+@GetMapping("/split6")
+public Map<String, Object> splitExample6() {
+
+    Map<String, Object> map = new HashMap<>();
+    map.put("split1", Arrays.asList("a-b-c".split("-")));
+    map.put("split2", Arrays.asList("hello world".split("")));
+    map.put("split3", Arrays.asList("first,middle,last".split(",")));
+    map.put("split4", Arrays.asList("no split".split("NO")));
+
+    return Map.of("splitters", map);
+}
+
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a", "b", "c"],
+    "split2": ["h","e","l","l","o","","w","o","r","l","d"],
+    "split3": ["first","middle","last"],
+    "split4": ["no split"]
+  }
+}
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+

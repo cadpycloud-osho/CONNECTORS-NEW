@@ -1,0 +1,121 @@
+atBeginningOfYear:
+
+
+example 1:
+
+
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        OffsetDateTime input =
+            OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+        OffsetDateTime result =
+            OffsetDateTime.of(
+                input.getYear(),
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                input.getOffset()
+            );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+2020-01-01T00:00-03:00
+
+
+
+------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+
+input:
+
+import java.time.LocalDateTime;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        LocalDateTime input =
+            LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+        LocalDateTime result =
+            LocalDateTime.of(
+                input.getYear(),
+                1,
+                1,
+                0,
+                0,
+                0
+            );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+2020-01-01T00:00
+
+
+
+------------------------------------------------------------
+
+
+
+
+example 3:
+
+
+
+input:
+
+import java.time.LocalDate;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        LocalDate input = LocalDate.parse("2020-10-06");
+
+        LocalDate result =
+            LocalDate.of(
+                input.getYear(),
+                1,
+                1
+            );
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+2020-01-01
+
+
+
+------------------------------------------------------------

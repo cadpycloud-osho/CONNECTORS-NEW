@@ -1,0 +1,57 @@
+toHex:
+
+
+
+input:
+
+import java.math.BigInteger;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: toHex(-1), toHex(bigNumber), etc.
+        String a = toHex(-1L);
+        String b = toHex(new BigInteger("100000000000000000000000000000000000000000000000000000000000000"));
+        String c = toHex(0L);
+        String d = toHex((BigInteger) null);
+        String e = toHex(15L);
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"a\": " + quoteIfNotNull(a) + ",");
+        System.out.println("  \"b\": " + quoteIfNotNull(b) + ",");
+        System.out.println("  \"c\": " + quoteIfNotNull(c) + ",");
+        System.out.println("  \"d\": " + (d == null ? "null" : "\"" + d + "\"") + ",");
+        System.out.println("  \"e\": " + quoteIfNotNull(e));
+        System.out.println("}");
+    }
+    
+    // DataWeave "toHex(number)" equivalent
+    public static String toHex(long value) {
+        if (value == 0) return "0";
+        return (value < 0 ? "-" : "") + Long.toHexString(Math.abs(value));
+    }
+    
+    public static String toHex(BigInteger value) {
+        if (value == null) return null;
+        if (value.equals(BigInteger.ZERO)) return "0";
+        return (value.signum() < 0 ? "-" : "") + value.abs().toString(16);
+    }
+    
+    private static String quoteIfNotNull(String s) {
+        return s == null ? "null" : "\"" + s + "\"";
+    }
+}
+
+
+
+output:
+
+{
+  "a": "-1",
+  "b": "3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "f"
+}
+
+

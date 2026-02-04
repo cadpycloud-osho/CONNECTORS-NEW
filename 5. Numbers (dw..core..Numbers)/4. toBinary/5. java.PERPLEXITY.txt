@@ -1,0 +1,52 @@
+toBinary:
+
+
+
+input:
+
+import java.math.BigInteger;
+
+public class Main {
+    public static void main(String[] args) {
+        String a = toBinary(-2L);
+        String b = toBinary(new BigInteger("100000000000000000000000000000000000000000000000000000000000000"));
+        String c = toBinary(0L);
+        String d = toBinary((BigInteger) null);
+        String e = toBinary(2L);
+
+        System.out.println("{");
+        System.out.println("  \"a\": " + (a == null ? "null" : "\"" + a + "\"") + ",");
+        System.out.println("  \"b\": " + (b == null ? "null" : "\"" + b + "\"") + ",");
+        System.out.println("  \"c\": " + (c == null ? "null" : "\"" + c + "\"") + ",");
+        System.out.println("  \"d\": " + (d == null ? "null" : "\"" + d + "\"") + ",");
+        System.out.println("  \"e\": " + (e == null ? "null" : "\"" + e + "\""));
+        System.out.println("}");
+    }
+
+    // Overload for long
+    public static String toBinary(long value) {
+        return Long.toBinaryString(value);
+    }
+
+    // Overload for BigInteger / nullable
+    public static String toBinary(BigInteger value) {
+        if (value == null) {
+            return null;
+        }
+        return value.toString(2);
+    }
+}
+
+
+
+output:
+
+{
+  "a": "-10",
+  "b": "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "10"
+}
+
+

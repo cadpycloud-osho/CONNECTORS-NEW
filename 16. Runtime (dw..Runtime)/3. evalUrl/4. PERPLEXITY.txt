@@ -1,0 +1,91 @@
+evalUrl:
+
+
+
+Files needed:
+%dw 2.0
+output application/json
+---
+payload.name default "Mariano"
+
+
+input:
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+@RestController
+public class EvalUrlController {
+
+    @GetMapping(value = "/eval-url-test", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> evalUrlTest() throws IOException {
+        Map<String, Object> result = new HashMap<>();
+        
+        // Simulate classpath://org/mule/weave/v2/engine/runtime_evalUrl/example.dwl
+        // Assuming example.dwl contains: payload.name default "Mariano"
+        Resource exampleDwl = new ClassPathResource("example.dwl");
+        String dwlContent = new String(exampleDwl.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        
+        // execute_ok: evalUrl with payload variable
+        Map<String, Object> jsonValue = Map.of(
+            "value", "{\"name\": \"Mariano\"}",
+            "encoding", "UTF-8",
+            "properties", new HashMap<>(),
+            "mimeType", "application/json"
+        );
+        Map<String, Object> vars1 = Map.of("payload", jsonValue);
+        result.put("execute_ok", simulateEval(dwlContent, vars1));
+        
+        // execute_ok_withValue: evalUrl with direct value
+        Map<String, Object> vars2 = Map.of("payload", Map.of("name", "Mariano"));
+        result.put("execute_ok_withValue", simulateEval(dwlContent, vars2));
+        
+        return result;
+    }
+    
+    private Map<String, Object> simulateEval(String dwlContent, Map<String, Object> vars) {
+        // Simulate DataWeave processing: extract name from payload
+        String name = "Mariano"; // Default from example.dwl logic
+        if (vars.containsKey("payload")) {
+            Object payload = vars.get("payload");
+            if (payload instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> payloadMap = (Map<String, Object>) payload;
+                if (payloadMap.containsKey("name")) {
+                    name = payloadMap.get("name").toString();
+                } else if (payloadMap.containsKey("value")) {
+                    name = payloadMap.get("value").toString().split("\"")[3]; // Extract from JSON string
+                }
+            }
+        }
+        return Map.of(
+            "success", true,
+            "value", name,
+            "logs", new ArrayList<>()
+        );
+    }
+}
+
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  },
+  "execute_ok_withValue": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  }
+}
+

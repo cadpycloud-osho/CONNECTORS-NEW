@@ -1,0 +1,66 @@
+substringBefore:
+
+
+
+input:
+
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String substringBeforeDW(String input, String delimiter) {
+        if (input == null) return null;                 // DW rule
+        if (delimiter == null || delimiter.equals(""))  // DW rule
+            return "";
+
+        int index = input.indexOf(delimiter);
+
+        if (index == -1) return "";                     // Not found → ""
+        
+        return input.substring(0, index);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class SubstringBeforeController {
+
+    @GetMapping("/substringbefore")
+    public Map<String, String> substringBeforeExample() {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.substringBeforeDW(null, "'"));
+        result.put("b", StringUtils.substringBeforeDW("", "-"));
+        result.put("c", StringUtils.substringBeforeDW("abc", "b"));
+        result.put("d", StringUtils.substringBeforeDW("abc", "c"));
+        result.put("e", StringUtils.substringBeforeDW("abc", "d"));
+        result.put("f", StringUtils.substringBeforeDW("abc", ""));
+
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab",
+  "e": "",
+  "f": ""
+}
+
+

@@ -1,0 +1,82 @@
+splitAt:
+
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        String[] users = {"Mariano", "Leandro", "Julian"};
+        int splitIndex = 1;
+        
+        String left = "[\"Mariano\"]";
+        String right = "[\"Leandro\", \"Julian\"]";
+        
+        String result = String.format(
+            "{\n  \"l\": %s,\n  \"r\": %s\n}",
+            left, right
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+  "l": [
+    "Mariano"
+  ],
+  "r": [
+    "Leandro",
+    "Julian"
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+Java Streams Version
+Functional split using Streams with limit and skip operations.
+
+java
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        int splitIndex = 1;
+        
+        List<String> left = users.stream()
+                                .limit(splitIndex)
+                                .collect(Collectors.toList());
+        
+        List<String> right = users.stream()
+                                 .skip(splitIndex)
+                                 .collect(Collectors.toList());
+        
+        String result = String.format(
+            "{\n  \"l\": %s,\n  \"r\": %s\n}",
+            left.toString().replace(" ", ""),
+            right.toString().replace(" ", "")
+        );
+        System.out.println(result);
+    }
+}
+
+
+Output: {"l": [Mariano], "r": [Leandro, Julian]}

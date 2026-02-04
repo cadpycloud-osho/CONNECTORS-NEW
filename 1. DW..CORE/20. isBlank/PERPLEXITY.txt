@@ -1,0 +1,55 @@
+isBlank:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class IsBlankExampleApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IsBlankExampleApp.class, args);
+
+        String someString = "something";
+        String nullString = null;
+        String nonExistingValue = null; // simulate payload non-existing
+
+        // Helper method to replicate DataWeave isBlank logic (null, empty, or whitespace only)
+        boolean isBlank(String str) {
+            return str == null || str.trim().isEmpty();
+        }
+
+        // Outputs
+        System.out.println("{");
+        System.out.println("  \"emptyString\": " + isBlank("") + ",");
+        System.out.println("  \"stringWithSpaces\": " + isBlank("      ") + ",");
+        System.out.println("  \"textString\": " + isBlank(someString) + ",");
+        System.out.println("  \"somePayloadValue\": " + isBlank(nonExistingValue) + ",");
+        System.out.println("  \"nullString\": " + isBlank(nullString) + ",");
+
+        System.out.println("  \"notEmptyTextString\": " + !isBlank(" 1234") + ",");
+        System.out.println("  \"notEmptyTextStringTwo\": " + !isBlank("") );
+        System.out.println("}");
+    }
+
+    // Helper method definition outside main (Java 8+)
+    private static boolean isBlank(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "emptyString": true,
+  "stringWithSpaces": true,
+  "textString": false,
+  "somePayloadValue": true,
+  "nullString": true,
+  "notEmptyTextString": true,
+  "notEmptyTextStringTwo": false
+}
+

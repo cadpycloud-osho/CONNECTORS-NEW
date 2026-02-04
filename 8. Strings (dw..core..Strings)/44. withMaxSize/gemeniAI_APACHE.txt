@@ -1,0 +1,52 @@
+withMaxSize:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MaxSizeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:limitLength")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                results.put("a", dwMaxSize("123", 10));
+                results.put("b", dwMaxSize("123", 3));
+                results.put("c", dwMaxSize("123", 2));
+                results.put("d", dwMaxSize("123", 0));
+                results.put("e", dwMaxSize(null, 23));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    private String dwMaxSize(String str, int max) {
+        if (str == null) return null;
+        // DataWeave behavior: if max is 0, return the original string
+        if (max <= 0) return str;
+        // Otherwise, truncate from the left
+        return StringUtils.left(str, max);
+    }
+}
+
+
+output:
+
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}
+
+
+

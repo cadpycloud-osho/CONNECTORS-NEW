@@ -1,0 +1,59 @@
+encodeURI:
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class EncodeUriRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                String input1 = "http://asd/ text to decode /%/\"\\/text";
+                String input2 = "http://:;,/?:@&=$_-_.!~*'()";
+
+                // encodeURI behavior (encode path parts, keep URI-reserved characters)
+                String encoded1 = encodeURI(input1);
+                String encoded2 = encodeURI(input2);
+
+                String body =
+                    "{"
+                  + "\"encodeURI\": \"" + encoded1 + "\","
+                  + "\"not_encoded\": \"" + encoded2 + "\""
+                  + "}";
+
+                exchange.getMessage().setBody(body);
+            });
+    }
+
+    private static String encodeURI(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8)
+                .replace("+", "%20")
+                .replace("%3A", ":")
+                .replace("%2F", "/")
+                .replace("%3F", "?")
+                .replace("%40", "@")
+                .replace("%26", "&")
+                .replace("%3D", "=")
+                .replace("%24", "$")
+                .replace("%2C", ",")
+                .replace("%3B", ";");
+    }
+}
+
+
+
+output:
+
+{
+  "encodeURI": "http://asd/%20text%20to%20decode%20/%25/%22%5C/text",
+  "not_encoded": "http://:;,/?:@&=$_-_.!~*'()"
+}
+
+
+
+

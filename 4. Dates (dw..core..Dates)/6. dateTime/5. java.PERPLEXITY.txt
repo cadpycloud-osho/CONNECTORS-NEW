@@ -1,0 +1,38 @@
+dateTime:
+
+
+
+input:
+
+import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: dateTime({year: 2012, month: 10, day: 11, hour: 12, minutes: 30, seconds: 40, timeZone: |-03:00|})
+        OffsetDateTime newDateTime = OffsetDateTime.of(
+            2012, 10, 11,    // year, month, day
+            12, 30, 40, 0,   // hour, minute, second, nano
+            ZoneOffset.ofHours(-3)  // timeZone: |-03:00|
+        );
+        
+        // Output as JSON structure matching DataWeave
+        String output = newDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        System.out.println("{");
+        System.out.println("  \"newDateTime\": \"" + output + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "newDateTime": "2012-10-11T12:30:40-03:00"
+}
+
+

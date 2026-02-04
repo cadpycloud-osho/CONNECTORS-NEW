@@ -1,0 +1,25 @@
+localDateTime:
+
+
+
+input:
+
+@GetMapping("/newLocalDateTime")
+public Map<String, String> createLocalDateTime() {
+
+    LocalDateTime newLocalDateTime = LocalDateTime.of(
+            2012, 10, 11,
+            12, 30, 40
+    );
+
+    return Map.of("newLocalDateTime", newLocalDateTime.toString());
+}
+
+
+output:
+
+{
+  "newLocalDateTime": "2012-10-11T12:30:40"
+}
+
+

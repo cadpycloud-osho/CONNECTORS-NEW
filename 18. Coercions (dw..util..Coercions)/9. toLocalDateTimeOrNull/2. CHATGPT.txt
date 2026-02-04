@@ -1,0 +1,68 @@
+toLocalDateTimeOrNull:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class LocalDateTimeCoercionController {
+
+    @GetMapping("/localDateTime")
+    public Map<String, Object> getLocalDateTime() {
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("a", toLocalDateTimeOrNull(
+                "2003-10-01 23:57:59",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ss",
+                        "uuuu-MM-dd HH:mm:ss"
+                }
+        ));
+
+        result.put("b", toLocalDateTimeOrNull(
+                "2003-10-01 23:57:59",
+                new String[]{
+                        "uuuu/MM/dd HH:mm:ss"
+                }
+        ));
+
+        return result;
+    }
+
+    // Equivalent of DW toLocalDateTimeOrNull()
+    private LocalDateTime toLocalDateTimeOrNull(String value, String[] formats) {
+
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                return LocalDateTime.parse(value, formatter);
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+
+{
+  "a": "2003-10-01T23:57:59",
+  "b": null
+}
+
+

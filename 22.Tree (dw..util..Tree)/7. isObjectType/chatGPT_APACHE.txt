@@ -1,0 +1,62 @@
+isObjectType:
+
+
+input:
+
+import java.util.*;
+
+public class IsObjectTypeExample {
+
+    public static void main(String[] args) {
+
+        // Example arrays of tree nodes
+        List<Map<String, Object>> aList = Arrays.asList(
+                node("OBJECT_TYPE", "user", null),
+                node("ATTRIBUTE_TYPE", "name", null)
+        );
+
+        List<Map<String, Object>> bList = Arrays.asList(
+                node("OBJECT_TYPE", "user", null),
+                node("OBJECT_TYPE", "name", null)
+        );
+
+        List<Map<String, Object>> cList = Arrays.asList(
+                node("OBJECT_TYPE", "user", null)
+        );
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("a", isObjectType(aList));
+        output.put("b", isObjectType(bList));
+        output.put("c", isObjectType(cList));
+
+        System.out.println(output);
+    }
+
+    private static Map<String, Object> node(String kind, Object selector, String namespace) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("kind", kind);
+        map.put("selector", selector);
+        map.put("namespace", namespace);
+        return map;
+    }
+
+    private static boolean isObjectType(List<Map<String, Object>> nodes) {
+        for (Map<String, Object> node : nodes) {
+            if ("OBJECT_TYPE".equals(node.get("kind"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+
+

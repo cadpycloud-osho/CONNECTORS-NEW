@@ -1,0 +1,46 @@
+metadataOf:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MetadataRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:getMetadata")
+            .process(exchange -> {
+                // Representing the type AType with its metadata
+                // In Java, metadata is often stored in a Map or via Annotations
+                Map<String, String> aTypeMetadata = new LinkedHashMap<>();
+                aTypeMetadata.put("format", "YYYY-MM-dd");
+
+                Map<String, Object> result = new LinkedHashMap<>();
+
+                // Logic: Extract the metadata associated with the reference
+                result.put("a", metadataOf(aTypeMetadata));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private Object metadataOf(Map<String, String> metadata) {
+        // Returns the metadata object/map directly
+        return metadata;
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "format": "YYYY-MM-dd"
+  }
+}
+
+

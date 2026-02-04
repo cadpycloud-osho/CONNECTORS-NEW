@@ -1,0 +1,100 @@
+divideBy:
+
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+
+public class ArrayDivider {
+
+    /**
+     * Replicates the DataWeave 'divideBy' function.
+     * Splits a list into chunks of the specified size.
+     */
+    public static <T> List<List<T>> divideList(List<T> sourceList, int chunkSize) {
+        if (sourceList == null || sourceList.isEmpty() || chunkSize <= 0) {
+            return new ArrayList<>();
+        }
+
+        List<List<T>> dividedList = new ArrayList<>();
+        int sourceSize = sourceList.size();
+
+        for (int i = 0; i < sourceSize; i += chunkSize) {
+            // Calculate the end index for the subList (ensuring it doesn't exceed the list size)
+            int endIndex = Math.min(i + chunkSize, sourceSize);
+            
+            // Get the sublist (the chunk)
+            List<T> chunk = sourceList.subList(i, endIndex);
+            
+            // Add the chunk to the main list
+            dividedList.add(chunk);
+        }
+        return dividedList;
+    }
+
+    public static void main(String[] args) {
+        // --- 1. { "divideBy2" : [1, 2, 3, 4, 5] divideBy 2 } ---
+        List<Integer> list1 = Arrays.asList(1, 2, 3, 4, 5);
+        List<List<Integer>> result1 = divideList(list1, 2);
+        
+        System.out.println("--- divideBy2: [1, 2, 3, 4, 5] ---");
+        System.out.println("Output (divideBy2): " + result1);
+        System.out.println();
+
+
+        // --- 2. { "divideBy2" : [1, 2, 3, 4, 5, 6] divideBy 2 } ---
+        List<Integer> list2 = Arrays.asList(1, 2, 3, 4, 5, 6);
+        List<List<Integer>> result2 = divideList(list2, 2);
+        
+        System.out.println("--- divideBy2: [1, 2, 3, 4, 5, 6] ---");
+        System.out.println("Output (divideBy2): " + result2);
+        System.out.println();
+
+
+        // --- 3. { "divideBy3" : [1, 2, 3, 4, 5] divideBy 3 } ---
+        List<Integer> list3 = Arrays.asList(1, 2, 3, 4, 5);
+        List<List<Integer>> result3 = divideList(list3, 3);
+        
+        System.out.println("--- divideBy3: [1, 2, 3, 4, 5] ---");
+        System.out.println("Output (divideBy3): " + result3);
+    }
+}
+
+output:
+
+
+"divideBy2": [ [ 1, 2 ], [ 3, 4 ], [ 5 ] ]
+
+
+"divideBy2": [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]
+
+"divideBy3": [ [ 1, 2, 3 ], [ 4, 5 ] ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

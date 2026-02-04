@@ -1,0 +1,25 @@
+tomorrow:
+
+input:
+
+from("direct:getTomorrow")
+.process(exchange -> {
+
+    // Get tomorrow's date
+    java.time.LocalDate tomorrow = java.time.LocalDate.now().plusDays(1);
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("tomorrow", tomorrow.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+{
+  "tomorrow": "2021-05-16"
+}
+
+

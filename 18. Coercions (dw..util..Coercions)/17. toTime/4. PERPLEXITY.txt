@@ -1,0 +1,130 @@
+toTime:
+
+example 1:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.Map;
+
+public class TimeParsingApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(TimeParsingApp.class, args);
+    }
+
+    @GetMapping("/to-time")
+    public Map<String, Object> toTime() {
+        String input = "13:44:12.283-08:00";
+        
+        // Equivalent to DataWeave 'a' - multiple format fallback
+        OffsetTime resultA = parseWithMultipleFormats(input);
+        
+        // Equivalent to DataWeave 'b' - single format error
+        String errorMessageB = parseWithSingleFormat(input);
+        
+        return Map.of(
+            "a", resultA,
+            "b", errorMessageB
+        );
+    }
+    
+    private OffsetTime parseWithMultipleFormats(String input) {
+        // Try first format: HH:mm:ss.xxx (milliseconds)
+        DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+        try {
+            return OffsetTime.parse(input, fmt1);
+        } catch (DateTimeParseException e) {
+            // Fallback to second format: HH:mm:ss.nxxx (nanoseconds)
+            DateTimeFormatter fmt2 = new DateTimeFormatterBuilder()
+                .appendPattern("HH:mm:ss.")
+                .appendFraction(java.time.temporal.ChronoField.NANO_OF_SECOND, 1, 9, true)
+                .appendOffset("+HH:MM", "Z")
+                .toFormatter();
+            return OffsetTime.parse(input, fmt2);
+        }
+    }
+    
+    private String parseWithSingleFormat(String input) {
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm:ss.SSSXXX");
+            OffsetTime.parse(input, fmt);
+            return null;
+        } catch (DateTimeParseException e) {
+            return "Could not find a valid formatter for '" + input + "'";
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": "13:44:12.000000283-08:00",
+  "b": "Could not find a valid formatter for '13:44:12.283-08:00'"
+}
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.Map;
+
+public class ToTimeApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ToTimeApp.class, args);
+    }
+
+    @GetMapping("/to-time")
+    public Map<String, OffsetTime> toTime() {
+        // Equivalent to DataWeave 'a' - default ISO parsing
+        OffsetTime resultA = OffsetTime.parse("23:57:59Z");
+        
+        // Equivalent to DataWeave 'b' - explicit HH:mm:ss.nxxx format
+        OffsetTime resultB = parseWithNxxxFormat("13:44:12.283-08:00");
+        
+        return Map.of(
+            "a", resultA,
+            "b", resultB
+        );
+    }
+    
+    private OffsetTime parseWithNxxxFormat(String input) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+            .appendPattern("HH:mm:ss.")
+            .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+            .appendOffset("+HH:mm", "Z")
+            .toFormatter();
+        return OffsetTime.parse(input, formatter);
+    }
+}
+
+
+output:
+{
+  "a": "23:57:59Z",
+  "b": "13:44:12.000000283-08:00"
+}
+
+
+--------------------------------------------------------------

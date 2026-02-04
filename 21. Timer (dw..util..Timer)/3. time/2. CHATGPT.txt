@@ -1,0 +1,86 @@
+time:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class TimerController {
+
+    @GetMapping("/timer")
+    public Map<String, Object> timerExample() {
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("testing", List.of(
+                time(this::myFunction),
+                time(this::myFunction2)
+        ));
+
+        return response;
+    }
+
+    // Equivalent of dw::Runtime::wait("My result",100)
+    private String myFunction() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {}
+        return "My result";
+    }
+
+    private Integer myFunction2() {
+        return List.of(1, 2, 3, 4).stream().mapToInt(Integer::intValue).sum();
+    }
+
+    // Equivalent of dw::util::Timer::time()
+    private Map<String, Object> time(SupplierWithException<?> supplier) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        Instant start = Instant.now();
+        Object value = supplier.get();
+        Instant end = Instant.now();
+
+        result.put("start", start.toString());
+        result.put("result", value);
+        result.put("end", end.toString());
+
+        return result;
+    }
+
+    @FunctionalInterface
+    interface SupplierWithException<T> {
+        T get();
+    }
+}
+
+
+output:
+
+
+{
+  "testing": [
+    {
+      "start": "2018-10-05T19:23:01.490Z",
+      "result": "My result",
+      "end": "2018-10-05T19:23:01.591Z"
+    },
+    {
+      "start": "2018-10-05T19:23:01.591Z",
+      "result": 10,
+      "end": "2018-10-05T19:23:01.591Z"
+    }
+  ]
+}
+
+
+

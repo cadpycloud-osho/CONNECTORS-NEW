@@ -1,0 +1,33 @@
+max:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MaxController {
+
+    @GetMapping("/max-values")
+    public Map<String, Number> getMaxValues() {
+        Map<String, Number> response = new HashMap<>();
+        response.put("a", Collections.max(Arrays.asList(1, 1000)));
+        response.put("b", Collections.max(Arrays.asList(1, 2, 3)));
+        response.put("c", Collections.max(Arrays.asList(1.5, 2.5, 3.5)));
+        return response;
+    }
+}
+
+OUTPUT:
+
+{
+  "a": 1000,
+  "b": 3,
+  "c": 3.5
+}

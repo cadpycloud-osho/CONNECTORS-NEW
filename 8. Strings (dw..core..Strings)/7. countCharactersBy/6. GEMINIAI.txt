@@ -1,0 +1,53 @@
+countCharactersBy:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class CharacterCountController {
+
+    /**
+     * Custom method to emulate DataWeave's countCharactersBy(isNumeric($)) function.
+     * Counts the number of numeric digits in a string.
+     */
+    private int countNumericCharacters(String input) {
+        if (input == null) {
+            return 0;
+        }
+        
+        long count = input.chars() // Get an IntStream of character codes
+                          .filter(Character::isDigit) // Filter based on the isDigit condition
+                          .count();                   // Count the remaining elements
+                          
+        return (int) count;
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression: 
+     * "42 = 11 * 2 + 20" countCharactersBy isNumeric($)
+     */
+    @GetMapping("/count-numeric-chars")
+    public Map<String, Integer> getNumericCharacterCount() {
+        // The hardcoded input string from the DataWeave example
+        String inputString = "42 = 11 * 2 + 20";
+        
+        int numericCount = countNumericCharacters(inputString);
+        
+        // Return the result in the desired JSON format
+        return Collections.singletonMap("countCharactersByNumeric", numericCount);
+    }
+}
+
+output:
+
+
+{
+  "countCharactersByNumeric": 7
+}
+

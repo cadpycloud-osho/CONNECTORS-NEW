@@ -1,0 +1,30 @@
+
+slice:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class SliceController {
+
+    @GetMapping("/slice")
+    public List<Integer> sliceExample() {
+
+        List<Integer> arr = Arrays.asList(0, 1, 2, 3, 4, 5);
+
+        // slice: from index 1 (inclusive) to index 4 (exclusive)
+        List<Integer> sliced = arr.subList(1, 4);
+
+        return sliced;
+    }
+}
+
+
+output:
+
+[1, 2, 3]

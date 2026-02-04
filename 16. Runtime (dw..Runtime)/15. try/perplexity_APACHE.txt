@@ -1,0 +1,134 @@
+try:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DwTryFailTest {
+
+    // TryResult exactly matching DataWeave structure
+    static class TryResult<T> {
+        boolean success;
+        T result;
+        Map<String, Object> error;
+
+        static <T> TryResult<T> success(T value) {
+            TryResult<T> res = new TryResult<>();
+            res.success = true;
+            res.result = value;
+            return res;
+        }
+
+        static <T> TryResult<T> failure(String kind, String message, String location, List<String> stack) {
+            TryResult<T> res = new TryResult<>();
+            res.success = false;
+            res.error = new LinkedHashMap<>();
+            res.error.put("kind", kind);
+            res.error.put("message", message);
+            res.error.put("location", location);
+            res.error.put("stack", stack);
+            return res;
+        }
+    }
+
+    // Simulate dw::Runtime::fail()
+    static void fail(String message) {
+        throw new RuntimeException(message);
+    }
+
+    // randomNumber() function simulation
+    static String randomNumber() {
+        if (Math.random() > 0.5) {
+            fail("This function is failing");
+        }
+        return "OK";
+    }
+
+    // dw::Runtime::try() simulation
+    static <T> TryResult<T> dwTry(java.util.function.Supplier<T> supplier) {
+        try {
+            return TryResult.success(supplier.get());
+        } catch (Exception e) {
+            return TryResult.failure(
+                "UserException",
+                e.getMessage(),
+                "Unknown location",
+                Arrays.asList(
+                    "fail (anonymous:0:0)",
+                    "myFunction (anonymous:1:114)",
+                    "main (anonymous:1:179)"
+                )
+            );
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new TryFailRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class TryFailRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Simulate try(() -> randomNumber())
+                        TryResult<String> result = dwTry(DwTryFailTest::randomNumber);
+
+                        // Convert to map for JSON output
+                        Map<String, Object> output = new LinkedHashMap<>();
+                        output.put("success", result.success);
+                        
+                        if (result.success) {
+                            output.put("result", result.result);
+                        } else {
+                            output.put("error", result.error);
+                        }
+
+                        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(output);
+                        exchange.getIn().setBody(json);
+                        System.out.println("Output:\n" + json);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+{
+  "success" : false,
+  "error" : {
+    "kind" : "UserException",
+    "message" : "This function is failing",
+    "location" : "Unknown location",
+    "stack" : [ "fail (anonymous:0:0)", "myFunction (anonymous:1:114)", "main (anonymous:1:179)" ]
+  }
+}
+
+{
+  "success" : true,
+  "result" : "OK"
+}
+
+
+

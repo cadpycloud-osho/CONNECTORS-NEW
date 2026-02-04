@@ -1,0 +1,27 @@
+locationString:
+
+
+
+input:
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class LocationStringController {
+
+    @GetMapping(value = "/location-string-a", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String locationStringA() {
+        // Matches: locationString(a) where var a = 123
+        return "\"var a = 123\"";
+    }
+}
+
+
+output:
+
+"var a = 123"
+
+
+

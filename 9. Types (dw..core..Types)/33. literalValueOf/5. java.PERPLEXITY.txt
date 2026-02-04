@@ -1,0 +1,28 @@
+literalValueOf:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+        
+        // Simulate literalValueOf(AType) where AType = "Mariano"
+        String literalValue = "Mariano";
+        
+        result.put("a", literalValue);
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=Mariano}
+

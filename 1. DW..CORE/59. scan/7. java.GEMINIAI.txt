@@ -1,0 +1,151 @@
+scan:
+
+
+example 1:
+
+
+input:
+
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Input string and pattern
+        String input = "www.mulesoft.com";
+        // Pattern: /([w]*)\.([a-z]*)\.([a-z]*)/
+        // Java regex must escape the literal dots: ([w]*)\.([a-z]*)\.([a-z]*)
+        String regex = "([w]*)\\.([a-z]*)\\.([a-z]*)";
+        
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        // List to hold the flattened results
+        List<String> flattenedResults = new ArrayList<>();
+
+        // 1. Perform Scan (Matcher.find() loop)
+        if (matcher.find()) {
+            // Group 0: Full Match ("www.mulesoft.com")
+            flattenedResults.add(matcher.group(0));
+            
+            // Capture Groups (Group 1, 2, 3)
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                flattenedResults.add(matcher.group(i));
+            }
+        }
+        
+        // 2. --- Assemble Output ---
+        
+        // Manually format the result into the required pretty-printed JSON array string.
+        // Format: [ "value1", "value2", ... ]
+        
+        // Map the list of strings to a list of quoted strings
+        String quotedValues = flattenedResults.stream()
+            .map(s -> "\"" + s + "\"")
+            .collect(Collectors.joining(", "));
+            
+        String outputJson = "[ " + quotedValues + " ]";
+
+        // 3. Output the result
+        System.out.println(outputJson);
+    }
+}
+output:
+
+[ "www.mulesoft.com", "www", "mulesoft", "com" ]
+
+----------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the List of Lists into a pretty-printed JSON array string.
+     */
+    private static String formatListAsPrettyJson(List<List<String>> list) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\n");
+        
+        for (int i = 0; i < list.size(); i++) {
+            List<String> innerList = list.get(i);
+            
+            // Start inner array: [
+            sb.append("  [ "); 
+            
+            for (int j = 0; j < innerList.size(); j++) {
+                // Quote all string elements
+                sb.append("\"").append(innerList.get(j)).append("\"");
+                if (j < innerList.size() - 1) {
+                    sb.append(", ");
+                }
+            }
+            // End inner array: ]
+            sb.append(" ]");
+            
+            if (i < list.size() - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+        }
+        
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Input string and pattern
+        String input = "anypt@mulesoft.com,max@mulesoft.com";
+        // Regex: /([a-z]*)@([a-z]*).com/ -> Java regex must escape the literal dot
+        String regex = "([a-z]*)@([a-z]*)\\.com";
+        
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        // List to hold the final array of arrays (List<List<String>>)
+        List<List<String>> outerList = new ArrayList<>();
+
+        // 1. Perform Scan (Matcher.find() loop)
+        while (matcher.find()) {
+            List<String> innerList = new ArrayList<>();
+            
+            // Group 0: Full Match
+            innerList.add(matcher.group(0)); // e.g., "anypt@mulesoft.com"
+            
+            // Group 1: Username part
+            innerList.add(matcher.group(1)); // e.g., "anypt"
+            
+            // Group 2: Domain part (before .com)
+            innerList.add(matcher.group(2)); // e.g., "mulesoft"
+            
+            // Add the inner array (the single match) to the outer array
+            outerList.add(innerList);
+        }
+
+        // 2. Output the result
+        System.out.println(formatListAsPrettyJson(outerList));
+    }
+}
+
+output:
+
+[
+  [ "anypt@mulesoft.com", "anypt", "mulesoft" ],
+  [ "max@mulesoft.com", "max", "mulesoft" ]
+]
+
+----------------------------------------------------------

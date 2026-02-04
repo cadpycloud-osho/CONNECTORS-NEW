@@ -1,0 +1,32 @@
+everyCharacter:
+
+
+
+input:
+
+
+public class Main {
+
+    public static boolean isValid(String input) {
+        for (char c : input.toCharArray()) {
+            if (!(c == ' ' || Character.isDigit(c))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        String input = "12 34  56";
+        boolean result = isValid(input);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+true
+

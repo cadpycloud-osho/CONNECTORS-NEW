@@ -1,0 +1,48 @@
+isBooleanType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BooleanTypeCheckRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkBooleanType")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Equivalent to 'type ABoolean = Boolean'
+                Class<?> aBoolean = Boolean.class; 
+                Class<?> stringType = String.class;
+
+                results.put("a", isBooleanType(aBoolean));
+                results.put("b", isBooleanType(Boolean.class));
+                results.put("c", isBooleanType(stringType));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    private boolean isBooleanType(Class<?> clazz) {
+        // Checks for both the wrapper class and the primitive
+        return clazz != null && (clazz.equals(Boolean.class) || clazz.equals(boolean.class));
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

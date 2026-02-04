@@ -1,0 +1,63 @@
+onNull:
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@SpringBootApplication
+@RestController
+public class ReduceOnNullController {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ReduceOnNullController.class, args);
+    }
+
+    @GetMapping("/onnull-reduce")
+    public Map<String, Object> reduceOnNull() {
+
+        List<String> emptyList = new ArrayList<>();
+
+        // Reduce operation equivalent
+        String reducedResult = emptyList.stream()
+                .reduce((acc, item) -> acc + item)
+                .orElse(null);
+
+        Object result;
+
+        if (reducedResult == null) {
+            result = "Empty Text";  // onNull condition
+        } else {
+            // Equivalent of sizeOf(result)
+            result = reducedResult.length();
+        }
+
+        return Map.of("onNull", result);
+    }
+}
+
+
+
+output:
+
+{
+  "onNull": "Empty Text"
+}
+
+Alternative Output Scenario (If Input was NOT null)
+
+[
+  ["a", "b"],
+  ["c"]
+]
+
+
+
+

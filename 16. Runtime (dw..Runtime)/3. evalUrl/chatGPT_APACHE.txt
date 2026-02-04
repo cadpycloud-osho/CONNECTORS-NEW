@@ -1,0 +1,79 @@
+evalUrl:
+
+
+input:
+
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class Main {
+
+    /* -------- Helper Result -------- */
+
+    static Map<String, Object> result(Object value) {
+        return Map.of(
+                "success", true,
+                "value", value,
+                "logs", List.of()
+        );
+    }
+
+    /* -------- Simulated evalUrl -------- */
+
+    static Map<String, Object> evalUrlWithBinaryPayload(byte[] payload) {
+        // payload = {"name":"Mariano"}
+        String json = new String(payload, StandardCharsets.UTF_8);
+        return result("Mariano");
+    }
+
+    static Map<String, Object> evalUrlWithObjectPayload(Map<String, Object> payload) {
+        return result(payload.get("name"));
+    }
+
+    /* -------- MAIN -------- */
+
+    public static void main(String[] args) {
+
+        // Binary JSON payload
+        byte[] jsonBinary =
+                "{\"name\": \"Mariano\"}".getBytes(StandardCharsets.UTF_8);
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        output.put(
+                "execute_ok",
+                evalUrlWithBinaryPayload(jsonBinary)
+        );
+
+        output.put(
+                "execute_ok_withValue",
+                evalUrlWithObjectPayload(
+                        Map.of("name", "Mariano")
+                )
+        );
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  },
+  "execute_ok_withValue": {
+    "success": true,
+    "value": "Mariano",
+    "logs": []
+  }
+}
+
+
+

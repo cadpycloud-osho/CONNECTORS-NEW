@@ -1,0 +1,121 @@
+toDate:
+
+example 1:
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("a", parseDate(
+                "2023-28-03",
+                Arrays.asList(
+                        new Formatter("yyyy/MM/dd", null),
+                        new Formatter("yyyy-dd-MM", Locale.US)
+                )
+        ));
+
+        result.put("b", tryParseWithError(
+                "2023-28-03",
+                Collections.singletonList(
+                        new Formatter("yyyy/MM/dd", null)
+                )
+        ));
+
+        System.out.println(result);
+    }
+
+    static String parseDate(String value, List<Formatter> formatters) {
+        for (Formatter f : formatters) {
+            try {
+                DateTimeFormatter dtf = f.locale == null
+                        ? DateTimeFormatter.ofPattern(f.pattern)
+                        : DateTimeFormatter.ofPattern(f.pattern, f.locale);
+
+                LocalDate date = LocalDate.parse(value, dtf);
+                return date.toString();
+            } catch (Exception ignored) {}
+        }
+        throw new RuntimeException("Could not find a valid formatter for '" + value + "'");
+    }
+
+    static String tryParseWithError(String value, List<Formatter> formatters) {
+        try {
+            parseDate(value, formatters);
+            return null;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    static class Formatter {
+        String pattern;
+        Locale locale;
+
+        Formatter(String pattern, Locale locale) {
+            this.pattern = pattern;
+            this.locale = locale;
+        }
+    }
+}
+
+
+output:
+
+{a=2023-03-28, b=Could not find a valid formatter for '2023-28-03'}
+
+
+
+
+----------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // toDate("2015-10-01")
+        LocalDate a = LocalDate.parse("2015-10-01");
+
+        // toDate("2003/10/01","uuuu/MM/dd")
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+        LocalDate b = LocalDate.parse("2003/10/01", formatter);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("a", a.toString());
+        result.put("b", b.toString());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+
+{a=2015-10-01, b=2003-10-01}
+
+
+
+
+
+
+
+

@@ -1,0 +1,105 @@
+encodeURIComponent:
+
+
+input:
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // Reserved URI characters that encodeURI must PRESERVE but encodeURIComponent must ENCODE.
+    private static final String RESERVED_CHARS = ":;,/?@&$";
+    
+    /**
+     * Simulates DataWeave's URL::encodeURIComponent (Encodes ALL reserved chars).
+     * Uses URLEncoder (which encodes space to +) and then fixes + to %20.
+     */
+    public static String encodeURIComponent(String input) {
+        try {
+            // 1. URLEncoder encodes space to '+' and leaves unreserved characters alone.
+            String encoded = URLEncoder.encode(input, StandardCharsets.UTF_8.toString());
+            
+            // 2. Fix spaces from '+' to '%20' for strict URI component encoding standard.
+            //    (URLEncoder also leaves certain component chars like !'()~ unencoded, matching DW)
+            return encoded.replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            return "Encoding Error";
+        }
+    }
+
+    /**
+     * Simulates DataWeave's URL::encodeURI (Preserves reserved chars like :, /, ?, etc.).
+     * Uses encodeURIComponent logic and then manually DECODES the preserved reserved characters.
+     */
+    public static String encodeUri(String input) {
+        String encodedComponent = encodeURIComponent(input);
+        
+        // Custom logic to revert encoding for characters that encodeURI preserves
+        for (char c : RESERVED_CHARS.toCharArray()) {
+            try {
+                // Encode the character itself (e.g., ':' -> %3A) and replace it with the literal char
+                String encodedChar = URLEncoder.encode(String.valueOf(c), StandardCharsets.UTF_8.toString());
+                
+                // Special handling for the dollar sign ($) which is preserved but is not usually encoded by URLEncoder
+                if (c == '$' && !encodedComponent.contains(encodedChar)) continue;
+                
+                // Replace the percent-encoded sequence back to the literal character
+                encodedComponent = encodedComponent.replace(encodedChar, String.valueOf(c));
+                
+            } catch (UnsupportedEncodingException e) {
+                // Should not happen with UTF-8
+            }
+        }
+        return encodedComponent;
+    }
+
+    public static void main(String[] args) {
+        
+        // Input strings from DataWeave source
+        String input1_space = " PATH/ TO /ENCODE ";
+        String input2_reserved = ";,/?:@&=";
+        String input3_unreserved = "-_.!~*'()";
+        
+        // --- Execution ---
+        
+        String comp1 = encodeURIComponent(input1_space); 
+        String uri1 = encodeUri(input1_space); 
+        
+        String comp2 = encodeURIComponent(input2_reserved); 
+        String uri2 = encodeUri(input2_reserved);
+        
+        String comp3 = encodeURIComponent(input3_unreserved); 
+        String uri3 = encodeUri(input3_unreserved); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"comparing_encode_functions_output\": {");
+        System.out.println("    \"encodeURIComponent\": \"" + comp1 + "\",");
+        System.out.println("    \"encodeURI\": \"" + uri1 + "\",");
+        System.out.println("    \"encodeURIComponent_to_hex\": \"" + comp2 + "\",");
+        System.out.println("    \"encodeURI_not_to_hex\": \"" + uri2 + "\",");
+        System.out.println("    \"encodeURIComponent_not_encoded\": \"" + comp3 + "\",");
+        System.out.println("    \"encodeURI_not_encoded\": \"" + uri3 + "\"");
+        System.out.println("  }");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "comparing_encode_functions_output": {
+    "encodeURIComponent": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURI": "%20PATH/%20TO%20/ENCODE%20",
+    "encodeURIComponent_to_hex": "%3B%2C%2F%3F%3A%40%26%3D",
+    "encodeURI_not_to_hex": ";,/?:@&=",
+    "encodeURIComponent_not_encoded": "-_.!~*'()",
+    "encodeURI_not_encoded": "-_.!~*'()"
+  }
+}

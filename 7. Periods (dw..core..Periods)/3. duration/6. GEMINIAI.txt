@@ -1,0 +1,101 @@
+duration:
+
+
+input:
+
+A. The Model (POJO)
+
+import lombok.Data; // Requires Lombok dependency
+
+@Data
+public class Main {
+    private String dayAfterDateTime;
+    private String dayAndHourBeforeDateTime;
+    private String pointInTimeBefore;
+    private String emptyDuration;
+    private String constructDuration;
+    private long selectHoursFromDuration;
+    private String decimalAsPeriod;
+    private long addNegativeValue;
+}
+B. The Service (Business Logic)
+
+
+import org.springframework.stereotype.Service;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class DurationService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+
+    public DurationResult calculateDuration() {
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        DurationResult result = new DurationResult();
+        
+        // --- DateTime Arithmetic ---
+        Duration oneDayOneHour = Duration.ofDays(1).plusHours(1);
+        Duration complexDuration = Duration.ofDays(1).plusHours(1).plusMinutes(20).plusSeconds(10);
+        
+        // Use replace() to match DataWeave's output format preference
+        result.setDayAfterDateTime(baseDateTime.plusDays(1).format(instantFormatter).replace(".000Z", "Z"));
+        result.setDayAndHourBeforeDateTime(baseDateTime.minus(oneDayOneHour).format(instantFormatter).replace(".000Z", "Z"));
+        result.setPointInTimeBefore(baseDateTime.minus(complexDuration).format(instantFormatter).replace(".000Z", "Z"));
+
+        // --- Duration Construction and Extraction ---
+        Duration constructed = Duration.ofDays(4).plusHours(11).plusMinutes(28);
+
+        result.setEmptyDuration(Duration.ZERO.toString()); // PT0S
+        result.setConstructDuration(constructed.toString()); // PT107H28M
+        
+        // Extracting the component hours (11)
+        result.setSelectHoursFromDuration(Duration.ofHours(11).toHoursPart()); 
+
+        // 30.5 seconds
+        result.setDecimalAsPeriod(Duration.ofMillis(30500).toString()); // PT30.5S
+
+        // 1 minute + (-1 second) = 59 seconds
+        Duration combinedDuration = Duration.ofMinutes(1).plusSeconds(-1);
+        result.setAddNegativeValue(combinedDuration.getSeconds()); // 59
+
+        return result;
+    }
+}
+C. The Controller (REST Endpoint)
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DurationController {
+
+    private final DurationService durationService;
+
+    public DurationController(DurationService durationService) {
+        this.durationService = durationService;
+    }
+
+    @GetMapping("/api/duration-calculations")
+    public DurationResult getCalculatedDurations() {
+        // Spring Boot automatically converts the DurationResult object to JSON
+        return durationService.calculateDuration();
+    }
+}
+Spring Boot Output (When accessing /api/duration-calculations)
+JSON
+
+{
+  "dayAfterDateTime": "2020-10-06T20:22:34.385Z",
+  "dayAndHourBeforeDateTime": "2020-10-04T19:22:34.385Z",
+  "pointInTimeBefore": "2020-10-04T19:02:24.385Z",
+  "emptyDuration": "PT0S",
+  "constructDuration": "PT107H28M",
+  "selectHoursFromDuration": 11,
+  "decimalAsPeriod": "PT30.5S",
+  "addNegativeValue": 59
+}
+
+

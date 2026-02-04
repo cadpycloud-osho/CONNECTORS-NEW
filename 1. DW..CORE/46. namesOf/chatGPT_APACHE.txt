@@ -1,0 +1,19 @@
+namesOf:
+
+input:
+
+from("direct:namesOfExample")
+.setBody(simple(
+    "{ \"namesOf\": ${[ 'a','b'] } }"
+));
+If the object is dynamic in payload:
+
+.setBody(simple(
+    "{ \"namesOf\": ${body.keySet()} }"
+));
+
+output:
+
+
+{ "namesOf" : ["a","b"] }
+

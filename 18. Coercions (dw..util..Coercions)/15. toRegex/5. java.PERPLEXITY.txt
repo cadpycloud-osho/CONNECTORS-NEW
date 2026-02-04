@@ -1,0 +1,30 @@
+toRegex:
+
+
+input:
+
+import java.util.regex.Pattern;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        // Equivalent to DataWeave toRegex("a-Z")
+        Pattern regex1 = Pattern.compile("a-Z");
+        
+        // Equivalent to DataWeave toRegex("0-9+")
+        Pattern regex2 = Pattern.compile("0-9+");
+        
+        System.out.println("Result: " + Map.of(
+            "toRegexEx1", regex1.pattern(),
+            "toRegexEx2", regex2.pattern()
+        ));
+    }
+}
+
+
+output:
+
+
+Result: {toRegexEx1=a-Z, toRegexEx2=0-9+}
+

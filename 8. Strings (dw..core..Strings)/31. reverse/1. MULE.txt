@@ -1,0 +1,35 @@
+reverse:
+
+reverse(text: String): String
+
+reverse(text: String): String
+Reverses sequence of characters in a string.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+ {
+     a: reverse("Mariano"),
+     b: reverse(null),
+     c: reverse("")
+ }
+DataWeave
+Output
+{
+  "a": "onairaM",
+  "b": null,
+  "c": ""
+}
+
+
+
+
+
+
+
+

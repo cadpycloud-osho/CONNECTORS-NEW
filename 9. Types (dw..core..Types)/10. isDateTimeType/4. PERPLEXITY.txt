@@ -1,0 +1,42 @@
+isDateTimeType:
+
+
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DateTimeTypeController {
+    
+    @GetMapping("/is-datetime-type")
+    public Map<String, Boolean> isDateTimeType() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // isDateTimeType(ADateTime) where ADateTime = DateTime -> true
+        result.put("a", true);
+        
+        // isDateTimeType(DateTime) -> true
+        result.put("b", true);
+        
+        // isDateTimeType(String) -> false
+        result.put("c", false);
+        
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

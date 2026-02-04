@@ -1,0 +1,31 @@
+
+
+isArrayType:
+
+input:
+
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // Simulates isArrayType(AType) where AType = Array<String>
+        result.put("a", true);
+        
+        // Simulates isArrayType(Boolean)
+        result.put("b", false);
+        
+        System.out.println(result);
+    }
+}
+
+
+
+Output:
+
+
+{a=true, b=false}

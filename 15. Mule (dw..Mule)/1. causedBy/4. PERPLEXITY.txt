@@ -1,0 +1,40 @@
+causedBy:
+
+
+
+input:
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+
+@ControllerAdvice
+public class SecurityErrorHandler {
+
+    @ExceptionHandler({org.springframework.security.authentication.BadCredentialsException.class})
+    public ResponseEntity<String> handleUnauthorized(Exception ex, WebRequest request) {
+        // Matches Mule: Mule::causedBy(error, 'HTTP:UNAUTHORIZED')
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("SECURITY:UNAUTHORIZED - " + ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleForbidden(AccessDeniedException ex, WebRequest request) {
+        // Matches Mule: Mule::causedBy('HTTP:FORBIDDEN')
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("SECURITY:FORBIDDEN - Access denied");
+    }
+}
+
+
+
+output:
+
+401 Unauthorized: SECURITY:UNAUTHORIZED - Bad credentials
+
+403 Forbidden: SECURITY:FORBIDDEN - Access denied
+
+

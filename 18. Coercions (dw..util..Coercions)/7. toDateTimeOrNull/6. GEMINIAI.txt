@@ -1,0 +1,88 @@
+toDateTimeOrNull:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveToDateTimeOrNullConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceDateTimeString = "2003-10-01 23:57:59Z";
+
+    /**
+     * Mimics DataWeave's toDateTimeOrNull() behavior with chained formatters.
+     * Tries each formatter. Returns the parsed ZonedDateTime upon success, or null if all fail.
+     */
+    private ZonedDateTime toDateTimeOrNull(String dateTimeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return ZonedDateTime.parse(dateTimeString, formatter);
+            } catch (DateTimeParseException e) {
+                // DataWeave's behavior: swallow the exception and continue to the next formatter
+            }
+        }
+        // If the loop completes without a successful parse, return null
+        return null; 
+    }
+
+    public String getDateTimeParsingJson() throws IOException {
+        // Define formatters. Using 'X' for the 'Z' (Zulu time) zone indicator.
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ssX", Locale.US);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ssX", Locale.US);
+        
+        // --- Logic for Key 'a' (Success after chain) ---
+        // Try formatter1 (fails), then formatter2 (succeeds)
+        ZonedDateTime parsedDateA = toDateTimeOrNull(sourceDateTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Failure) ---
+        // Only try formatter1 (fails), resulting in null
+        ZonedDateTime parsedDateB = toDateTimeOrNull(sourceDateTimeString, formatter1);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes ZonedDateTime as a standard ISO string or null.
+        if (parsedDateA != null) {
+             root.put("a", parsedDateA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        if (parsedDateB != null) {
+             root.put("b", parsedDateB.toString());
+        } else {
+             root.putNull("b");
+        }
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToDateTimeOrNullConverter converter = new DataWeaveToDateTimeOrNullConverter();
+        try {
+            String jsonOutput = converter.getDateTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "2003-10-01T23:57:59Z",
+  "b" : null
+}
+

@@ -1,0 +1,19 @@
+pow:
+
+pow(base: Number, power: Number): Number
+
+pow(base: Number, power: Number): Number
+Raises the value of a base number to the specified power.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+[ (2 pow 3), (3 pow 2), (7 pow 3) ]
+
+DataWeave
+Output
+[ 8, 9, 343 ]

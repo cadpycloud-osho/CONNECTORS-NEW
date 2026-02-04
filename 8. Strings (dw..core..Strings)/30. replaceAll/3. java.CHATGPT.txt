@@ -1,0 +1,35 @@
+replaceAll:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String replaceAllDW(String input, String search, String replace) {
+        if (input == null) return null;
+        if (search == null || search.isEmpty()) return input;
+
+        return input.replace(search, replace);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", replaceAllDW("Mariano", "a", "A"));
+        result.put("b", replaceAllDW("AAAA", "AAA", "B"));
+        result.put("c", replaceAllDW(null, "aria", "A"));
+        result.put("d", replaceAllDW("Mariano", "j", "Test"));
+
+        System.out.println(result);
+    }
+}
+
+output:
+
+{a=MAriAno, b=BA, c=null, d=Mariano}
+

@@ -1,0 +1,52 @@
+functionReturnType:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Pure Java method to mimic the DataWeave functionReturnType.
+     */
+    public static String getFunctionReturnType(String functionTypeName) {
+        
+        // Emulating the introspection based on the DW type definitions
+        // Both AFunction and AFunction2 return Number
+        return switch (functionTypeName) {
+            case "AFunction", "AFunction2" -> "Number";
+            default -> "Unknown";
+        };
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Define the input types (mimicking the DW function type aliases)
+        final String AFunction = "AFunction";
+        final String AFunction2 = "AFunction2";
+
+        // 2. Perform the transformation
+        String resultA = getFunctionReturnType(AFunction);
+        String resultB = getFunctionReturnType(AFunction2);
+
+        // 3. Structure the final output map: { "a": resultA, "b": resultB }
+        Map<String, String> output = new HashMap<>();
+        output.put("a", resultA);
+        output.put("b", resultB);
+
+        // 4. Print the result to the console
+        System.out.println("DataWeave Output Emulation:");
+        // Simple print of the Map structure (looks like JSON key-value pairs)
+        System.out.println(output.toString().replace("=", ": "));
+    }
+}
+
+output:
+{
+  "a": "Number",
+  "b": "Number"
+}
+
+

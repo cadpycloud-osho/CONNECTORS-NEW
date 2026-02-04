@@ -1,0 +1,94 @@
+toNumberOrNull:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+
+public class DataWeaveToNumberOrNullConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceNumberString = "0.005";
+
+    /**
+     * Mimics DataWeave's toNumberOrNull() behavior with chained formatters.
+     * Returns the parsed number (as Double) upon success, or null if all formatters fail.
+     */
+    private Double toNumberOrNull(String numberString, String... formatPatterns) {
+        for (String pattern : formatPatterns) {
+            try {
+                if (pattern.equals(".00")) {
+                    // Java DecimalFormat recognizes ".00" as a valid pattern.
+                    DecimalFormat format = new DecimalFormat(pattern);
+                    format.setParseBigDecimal(true);
+                    return format.parse(numberString).doubleValue(); 
+                } else if (pattern.equals("seconds")) {
+                    // Simulate failure for non-standard DataWeave unit formats
+                    throw new ParseException("Invalid format for parsing.", 0);
+                } else {
+                    // Default parsing for other explicit formats
+                    DecimalFormat format = new DecimalFormat(pattern);
+                    return format.parse(numberString).doubleValue();
+                }
+            } catch (ParseException e) {
+                // DataWeave's behavior: swallow the exception and continue to the next formatter
+            }
+        }
+        // If the loop completes without a successful parse, return null
+        return null; 
+    }
+
+    public String getNumberParsingJson() throws IOException {
+        
+        // --- Logic for Key 'a' (Success after chain) ---
+        // Try "seconds" (fails), then ".00" (succeeds)
+        Double parsedNumberA = toNumberOrNull(sourceNumberString, "seconds", ".00");
+
+        // --- Logic for Key 'b' (Failure) ---
+        // Only try "seconds" (fails), resulting in null
+        Double parsedNumberB = toNumberOrNull(sourceNumberString, "seconds");
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes Double or null.
+        if (parsedNumberA != null) {
+             root.put("a", parsedNumberA);
+        } else {
+             root.putNull("a");
+        }
+       
+        if (parsedNumberB != null) {
+             root.put("b", parsedNumberB);
+        } else {
+             root.putNull("b");
+        }
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToNumberOrNullConverter converter = new DataWeaveToNumberOrNullConverter();
+        try {
+            String jsonOutput = converter.getNumberParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : 0.005,
+  "b" : null
+}
+

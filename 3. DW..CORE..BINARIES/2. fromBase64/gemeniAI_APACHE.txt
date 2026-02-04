@@ -1,0 +1,38 @@
+fromBase64:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class Base64ToBinaryRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // This route assumes the incoming message body is a Base64 encoded string
+        from("direct:decodeBase64")
+            .routeId("Base64-to-Binary-Route")
+            
+            // 1. Unmarshal from Base64 to a raw byte array (binary)
+            // This is the direct equivalent of fromBase64(payload)
+            .unmarshal().base64()
+            
+            // 2. Log the result
+            // Note: Printing binary directly to a log may show as a byte array reference 
+            // or raw characters depending on your console settings.
+            .log("Decoded Binary Length: ${body.length} bytes")
+            
+            // 3. Optional: Set a header to mimic 'application/octet-stream'
+            .setHeader("Content-Type", constant("application/octet-stream"))
+            
+            .to("mock:result");
+    }
+}
+
+
+
+output:
+
+
+
+

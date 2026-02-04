@@ -1,0 +1,57 @@
+takeWhile:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LinkedHashMap;
+
+public class ObjectTakeWhileRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:takeWhileObj")
+            .process(exchange -> {
+                LinkedHashMap<String, Integer> obj = new LinkedHashMap<>();
+                obj.put("a", 1);  // ✓ 1 < 3
+                obj.put("b", 2);  // ✓ 2 < 3  
+                obj.put("c", 5);  // ✗ 5 ≥ 3 → STOP
+                obj.put("d", 1);  // ignored
+                
+                // Find first failure index
+                AtomicInteger index = new AtomicInteger(0);
+                int splitIndex = obj.entrySet().stream()
+                    .takeWhile(entry -> entry.getValue() < 3)
+                    .peek(e -> index.incrementAndGet())
+                    .count();
+                
+                // Take prefix up to (but not including) first failure
+                Map<String, Integer> result = obj.entrySet().stream()
+                    .limit(splitIndex)
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> v2,
+                        LinkedHashMap::new
+                    ));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{
+  "a": 1,
+  "b": 2
+}
+
+
+
+

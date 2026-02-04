@@ -1,0 +1,65 @@
+indexWhere:
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class IndexWhereExample {
+
+    /**
+     * Replicates the DataWeave 'indexWhere' function.
+     * Finds the index of the first element that satisfies the predicate.
+     *
+     * @param sourceList The list to search through.
+     * @param predicate The condition to test elements against.
+     * @return The index of the first match, or -1 if no match is found.
+     */
+    public static <T> int indexWhere(List<T> sourceList, Predicate<T> predicate) {
+        if (sourceList == null || sourceList.isEmpty()) {
+            return -1;
+        }
+
+        // Use a standard loop for efficient index tracking and short-circuiting
+        for (int i = 0; i < sourceList.size(); i++) {
+            T item = sourceList.get(i);
+            if (predicate.test(item)) {
+                return i; // Return the index immediately upon first match
+            }
+        }
+        
+        return -1; // Return -1 if the loop completes without finding a match
+    }
+
+    public static void main(String[] args) {
+        // Input List
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // --- Scenario 1: Match found ---
+        // DataWeave Logic: users indexWhere (item) -> item startsWith "Jul"
+        int index1 = indexWhere(users, item -> item.startsWith("Jul")); 
+        
+        System.out.println("--- Scenario 1: Match Found (startsWith 'Jul') ---");
+        System.out.println("Input List: " + users);
+        System.out.println("Condition: startsWith \"Jul\"");
+        System.out.println("Output (indexWhere): " + index1);
+        
+        System.out.println();
+
+        // --- Scenario 2: No match found (to demonstrate -1) ---
+        // DataWeave Logic Equivalent: users indexWhere (item) -> item startsWith "Peter"
+        int index2 = indexWhere(users, item -> item.startsWith("Peter"));
+
+        System.out.println("--- Scenario 2: No Match Found (startsWith 'Peter') ---");
+        System.out.println("Input List: " + users);
+        System.out.println("Condition: startsWith \"Peter\"");
+        System.out.println("Output (indexWhere): " + index2);
+    }
+}
+
+output:
+
+2

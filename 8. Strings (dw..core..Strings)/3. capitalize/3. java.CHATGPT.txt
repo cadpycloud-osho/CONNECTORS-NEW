@@ -1,0 +1,46 @@
+capitalize:
+
+input:
+
+
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        System.out.println("a: " + capitalizeDw("customer"));
+        System.out.println("b: " + capitalizeDw("customer_first_name"));
+        System.out.println("c: " + capitalizeDw("customer NAME"));
+        System.out.println("d: " + capitalizeDw("customerName"));
+        System.out.println("e: " + capitalizeDw("a*s_b’s"));
+    }
+
+    private static String capitalizeDw(String text) {
+        String[] parts = text.split("(?=[A-Z])|_|\\s");
+        StringBuilder result = new StringBuilder();
+        int index = 0;
+
+        for (String part : parts) {
+            if (!part.isEmpty()) {
+                result.append(Character.toUpperCase(part.charAt(0)))
+                      .append(part.substring(1).toLowerCase());
+            }
+            if (index < text.length() &&
+                (text.charAt(index) == '_' || text.charAt(index) == ' ')) {
+                result.append(" ");
+            }
+            index += part.length() + 1;
+        }
+        return result.toString().replace("_", " ");
+    }
+}
+
+
+
+output:
+
+a: Customer
+b: Customer First Name
+c: Customer Name
+d: Customer Name
+e: A*S B’S

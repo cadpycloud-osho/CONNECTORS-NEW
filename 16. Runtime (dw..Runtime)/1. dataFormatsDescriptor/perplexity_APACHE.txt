@@ -1,0 +1,223 @@
+dataFormatsDescriptor:
+
+input:
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.spi.DataFormatResolver;
+import org.apache.camel.model.DataFormatDefinition;
+import org.apache.camel.support.dataformat.JacksonDataFormat;
+import org.apache.camel.support.dataformat.JibxDataFormat;
+import org.apache.camel.dataformat.xmljson.XmlJsonDataFormat;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.*;
+
+public class DataFormatsDescriptor {
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new DataFormatsRoute());
+        context.start();
+
+        // Simulate sending a message to trigger the route
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class DataFormatsRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        List<Map<String, Object>> formats = new ArrayList<>();
+
+                        // JSON DataFormat
+                        Map<String, Object> json = new LinkedHashMap<>();
+                        json.put("id", "json");
+                        json.put("binary", false);
+                        json.put("defaultEncoding", "UTF-8");
+                        json.put("extensions", Arrays.asList(".json"));
+                        json.put("defaultMimeType", "application/json");
+                        json.put("acceptedMimeTypes", Arrays.asList("application/json"));
+
+                        List<Map<String, Object>> readerProps = new ArrayList<>();
+                        Map<String, Object> streaming = new LinkedHashMap<>();
+                        streaming.put("name", "streaming");
+                        streaming.put("optional", true);
+                        streaming.put("defaultValue", false);
+                        streaming.put("description", "Used for streaming input (use only if entries are accessed sequentially).");
+                        streaming.put("possibleValues", Arrays.asList(true, false));
+                        readerProps.add(streaming);
+                        json.put("readerProperties", readerProps);
+
+                        List<Map<String, Object>> writerProps = new ArrayList<>();
+                        Map<String, Object> writeAttrs = new LinkedHashMap<>();
+                        writeAttrs.put("name", "writeAttributes");
+                        writeAttrs.put("optional", true);
+                        writeAttrs.put("defaultValue", false);
+                        writeAttrs.put("description", "Indicates that if a key has attributes, they are going to be added as children key-value pairs of the key that contains them. The attribute new key name will start with @.");
+                        writeAttrs.put("possibleValues", Arrays.asList(true, false));
+                        writerProps.add(writeAttrs);
+
+                        Map<String, Object> skipNull = new LinkedHashMap<>();
+                        skipNull.put("name", "skipNullOn");
+                        skipNull.put("optional", true);
+                        skipNull.put("defaultValue", "None");
+                        skipNull.put("description", "Indicates where is should skips null values if any or not. By default it doesn't skip.");
+                        skipNull.put("possibleValues", Arrays.asList("arrays", "objects", "everywhere"));
+                        writerProps.add(skipNull);
+                        json.put("writerProperties", writerProps);
+
+                        formats.add(json);
+
+                        // XML DataFormat
+                        Map<String, Object> xml = new LinkedHashMap<>();
+                        xml.put("id", "xml");
+                        xml.put("binary", false);
+                        xml.put("extensions", Arrays.asList(".xml"));
+                        xml.put("defaultMimeType", "application/xml");
+                        xml.put("acceptedMimeTypes", Arrays.asList("application/xml"));
+
+                        List<Map<String, Object>> xmlReaderProps = new ArrayList<>();
+                        Map<String, Object> supportDtd = new LinkedHashMap<>();
+                        supportDtd.put("name", "supportDtd");
+                        supportDtd.put("optional", true);
+                        supportDtd.put("defaultValue", true);
+                        supportDtd.put("description", "Whether DTD handling is enabled or disabled; disabling means both internal and external subsets will just be skipped unprocessed.");
+                        supportDtd.put("possibleValues", Arrays.asList(true, false));
+                        xmlReaderProps.add(supportDtd);
+
+                        Map<String, Object> xmlStreaming = new LinkedHashMap<>();
+                        xmlStreaming.put("name", "streaming");
+                        xmlStreaming.put("optional", true);
+                        xmlStreaming.put("defaultValue", false);
+                        xmlStreaming.put("description", "Used for streaming input (use only if entries are accessed sequentially).");
+                        xmlStreaming.put("possibleValues", Arrays.asList(true, false));
+                        xmlReaderProps.add(xmlStreaming);
+
+                        Map<String, Object> maxEntity = new LinkedHashMap<>();
+                        maxEntity.put("name", "maxEntityCount");
+                        maxEntity.put("optional", true);
+                        maxEntity.put("defaultValue", 1);
+                        maxEntity.put("description", "The maximum number of entity expansions. The limit is in place to avoid Billion Laughs attacks.");
+                        maxEntity.put("possibleValues", new ArrayList<>());
+                        xmlReaderProps.add(maxEntity);
+                        xml.put("readerProperties", xmlReaderProps);
+
+                        List<Map<String, Object>> xmlWriterProps = new ArrayList<>();
+                        Map<String, Object> writeDecl = new LinkedHashMap<>();
+                        writeDecl.put("name", "writeDeclaration");
+                        writeDecl.put("optional", true);
+                        writeDecl.put("defaultValue", true);
+                        writeDecl.put("description", "Indicates whether to write the XML header declaration or not.");
+                        writeDecl.put("possibleValues", Arrays.asList(true, false));
+                        xmlWriterProps.add(writeDecl);
+
+                        Map<String, Object> indent = new LinkedHashMap<>();
+                        indent.put("name", "indent");
+                        indent.put("optional", true);
+                        indent.put("defaultValue", true);
+                        indent.put("description", "Indicates whether to indent the code for better readability or to compress it into a single line.");
+                        indent.put("possibleValues", Arrays.asList(true, false));
+                        xmlWriterProps.add(indent);
+                        xml.put("writerProperties", xmlWriterProps);
+
+                        formats.add(xml);
+
+                        ObjectMapper mapper = new ObjectMapper();
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(formats);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+Output:
+[
+  {
+    "id" : "json",
+    "binary" : false,
+    "defaultEncoding" : "UTF-8",
+    "extensions" : [ ".json" ],
+    "defaultMimeType" : "application/json",
+    "acceptedMimeTypes" : [ "application/json" ],
+    "readerProperties" : [ {
+      "name" : "streaming",
+      "optional" : true,
+      "defaultValue" : false,
+      "description" : "Used for streaming input (use only if entries are accessed sequentially).",
+      "possibleValues" : [ true, false ]
+    } ],
+    "writerProperties" : [ {
+      "name" : "writeAttributes",
+      "optional" : true,
+      "defaultValue" : false,
+      "description" : "Indicates that if a key has attributes, they are going to be added as children key-value pairs of the key that contains them. The attribute new key name will start with @.",
+      "possibleValues" : [ true, false ]
+    }, {
+      "name" : "skipNullOn",
+      "optional" : true,
+      "defaultValue" : "None",
+      "description" : "Indicates where is should skips null values if any or not. By default it doesn't skip.",
+      "possibleValues" : [ "arrays", "objects", "everywhere" ]
+    } ]
+  },
+  {
+    "id" : "xml",
+    "binary" : false,
+    "extensions" : [ ".xml" ],
+    "defaultMimeType" : "application/xml",
+    "acceptedMimeTypes" : [ "application/xml" ],
+    "readerProperties" : [ {
+      "name" : "supportDtd",
+      "optional" : true,
+      "defaultValue" : true,
+      "description" : "Whether DTD handling is enabled or disabled; disabling means both internal and external subsets will just be skipped unprocessed.",
+      "possibleValues" : [ true, false ]
+    }, {
+      "name" : "streaming",
+      "optional" : true,
+      "defaultValue" : false,
+      "description" : "Used for streaming input (use only if entries are accessed sequentially).",
+      "possibleValues" : [ true, false ]
+    }, {
+      "name" : "maxEntityCount",
+      "optional" : true,
+      "defaultValue" : 1,
+      "description" : "The maximum number of entity expansions. The limit is in place to avoid Billion Laughs attacks.",
+      "possibleValues" : [ ]
+    } ],
+    "writerProperties" : [ {
+      "name" : "writeDeclaration",
+      "optional" : true,
+      "defaultValue" : true,
+      "description" : "Indicates whether to write the XML header declaration or not.",
+      "possibleValues" : [ true, false ]
+    }, {
+      "name" : "indent",
+      "optional" : true,
+      "defaultValue" : true,
+      "description" : "Indicates whether to indent the code for better readability or to compress it into a single line.",
+      "possibleValues" : [ true, false ]
+    } ]
+  }
+]
+
+
+

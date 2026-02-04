@@ -1,0 +1,42 @@
+attr:
+
+
+input:
+
+public class Main {
+
+    static class AttributeDescriptor {
+        String kind;
+        String namespace;
+        String selector;
+
+        AttributeDescriptor(String namespace, String selector) {
+            this.kind = "Attribute";
+            this.namespace = namespace;
+            this.selector = selector;
+        }
+
+        @Override
+        public String toString() {
+            return "{kind=" + kind +
+                   ", namespace=" + namespace +
+                   ", selector=" + selector + "}";
+        }
+    }
+
+    public static void main(String[] args) {
+
+        // Equivalent of DW: attr(ns0, "myAttr")
+        AttributeDescriptor attr =
+                new AttributeDescriptor("http://acme.com/foo", "myAttr");
+
+        System.out.println(attr);
+    }
+}
+
+
+output:
+
+{kind=Attribute, namespace=http://acme.com/foo, selector=myAttr}
+
+

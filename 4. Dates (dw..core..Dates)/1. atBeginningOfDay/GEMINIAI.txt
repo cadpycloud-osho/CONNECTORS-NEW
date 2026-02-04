@@ -1,0 +1,85 @@
+atBeginningOfDay:
+
+
+example 1:
+
+
+input:
+
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class DateUtils {
+
+    /**
+     * DataWeave equivalent: atBeginningOfDay(dateTime: DateTime): DateTime
+     * Truncates a ZonedDateTime to the beginning of the day (00:00:00) 
+     * while preserving the original timezone offset.
+     * * @param zonedDateTime The ZonedDateTime to truncate.
+     * @return The ZonedDateTime at 00:00:00.
+     */
+    public static ZonedDateTime atBeginningOfDay(ZonedDateTime zonedDateTime) {
+        // Use truncatedTo(ChronoUnit.DAYS) to set time to 00:00:00.000
+        return zonedDateTime.truncatedTo(ChronoUnit.DAYS);
+    }
+
+    /**
+     * DataWeave equivalent: atBeginningOfDay(localDateTime: LocalDateTime): LocalDateTime
+     * Truncates a LocalDateTime to the beginning of the day (00:00:00) 
+     * without any timezone information.
+     * * @param localDateTime The LocalDateTime to truncate.
+     * @return The LocalDateTime at 00:00:00.
+     */
+    public static LocalDateTime atBeginningOfDay(LocalDateTime localDateTime) {
+        // Use truncatedTo(ChronoUnit.DAYS) to set time to 00:00:00.000
+        return localDateTime.truncatedTo(ChronoUnit.DAYS);
+    }
+}
+output:
+
+
+Output (formatted): 2020-10-06T00:00:00-03:00
+--------------------------------------------------------------
+
+
+example 2:
+
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
+// --- DateUtils Class Method Used for this example ---
+// public static LocalDateTime atBeginningOfDay(LocalDateTime localDateTime) {
+//     return localDateTime.truncatedTo(ChronoUnit.DAYS);
+// }
+// ----------------------------------------------------
+
+public class LocalDateTimeExample {
+
+    public static void main(String[] args) {
+        
+        // 1. Setup the input: 2020-10-06T18:23:20.351 (no offset)
+        LocalDateTime inputLocalDateTime = LocalDateTime.of(
+            2020, 10, 6, 18, 23, 20, 351000000
+        );
+        
+        // 2. Call the Java function (implementation of atBeginningOfDay)
+        LocalDateTime resultLocalDateTime = inputLocalDateTime.truncatedTo(ChronoUnit.DAYS);
+
+        // 3. Output formatting to match DataWeave's ISO 8601 format
+        String formattedOutput = resultLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+        System.out.println("Source Input: " + inputLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+output:
+
+Output (formatted): 2020-10-06T00:00:00
+
+
+

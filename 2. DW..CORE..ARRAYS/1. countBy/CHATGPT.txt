@@ -1,0 +1,22 @@
+countBy:
+
+input:
+
+@GetMapping("/countBy")
+public Map<String, Integer> countEvenNumbers() {
+    int[] numbers = {1, 2, 3, 4};
+
+    long count = Arrays.stream(numbers)
+                       .filter(n -> n % 2 == 0)
+                       .count();
+
+    return Map.of("countBy", (int) count);
+}
+
+output:
+
+{
+  "countBy": 2
+}
+
+

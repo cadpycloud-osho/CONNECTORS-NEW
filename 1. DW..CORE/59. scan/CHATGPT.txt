@@ -1,0 +1,92 @@
+scan:
+
+example 1:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.regex.*;
+
+@RestController
+public class RegexController {
+
+    @GetMapping("/regex1")
+    public List<String> regexExample1() {
+        String input = "www.mulesoft.com";
+        String pattern = "([w]*)\\.([a-z]*)\\.([a-z]*)";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(input);
+
+        List<String> result = new ArrayList<>();
+        if (m.find()) {
+            result.add(m.group(0)); // Full match
+            result.add(m.group(1)); // Group 1
+            result.add(m.group(2)); // Group 2
+            result.add(m.group(3)); // Group 3
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+[
+  "www.mulesoft.com",
+  "www",
+  "mulesoft",
+  "com"
+]
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+@GetMapping("/regex2")
+public List<List<String>> regexExample2() {
+    String input = "anypt@mulesoft.com,max@mulesoft.com";
+    String pattern = "([a-z]*)@([a-z]*)\\.com";
+
+    Pattern r = Pattern.compile(pattern);
+    Matcher m = r.matcher(input);
+
+    List<List<String>> results = new ArrayList<>();
+
+    while (m.find()) {
+        List<String> entry = new ArrayList<>();
+        entry.add(m.group(0)); // Full match
+        entry.add(m.group(1)); // Username
+        entry.add(m.group(2)); // Domain
+        results.add(entry);
+    }
+
+    return results;
+}
+
+
+output:
+
+[
+  [
+    "anypt@mulesoft.com",
+    "anypt",
+    "mulesoft"
+  ],
+  [
+    "max@mulesoft.com",
+    "max",
+    "mulesoft"
+  ]
+]
+
+---------------------------------------------------------------

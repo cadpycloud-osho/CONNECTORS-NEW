@@ -1,0 +1,62 @@
+toDateTimeOrNull:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+
+@RestController
+public class DateTimeOrNullController {
+    
+    @GetMapping("/datetime-or-null")
+    public DateTimeOrNullResponse getDateTimeOrNull() {
+        ZonedDateTime dateA = safeParse("2003-10-01 23:57:59Z", createMultiFormatter());
+        ZonedDateTime dateB = safeParse("2003-10-01 23:57:59Z", 
+                                       DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ssz"));
+        
+        return new DateTimeOrNullResponse(dateA, dateB);
+    }
+    
+    private ZonedDateTime safeParse(String input, DateTimeFormatter formatter) {
+        try {
+            return ZonedDateTime.parse(input, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+    
+    private DateTimeFormatter createMultiFormatter() {
+        return new DateTimeFormatterBuilder()
+            .appendPattern("yyyy/MM/dd HH:mm:ssz")
+            .orAppendPattern("yyyy-MM-dd HH:mm:ssz")
+            .toFormatter();
+    }
+    
+    public static class DateTimeOrNullResponse {
+        public ZonedDateTime a;
+        public ZonedDateTime b;
+        
+        public DateTimeOrNullResponse(ZonedDateTime a, ZonedDateTime b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+}
+
+
+output:
+
+{
+  "a": "2003-10-01T23:57:59Z",
+  "b": null
+}
+
+

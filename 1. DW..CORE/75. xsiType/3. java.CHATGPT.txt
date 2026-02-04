@@ -1,0 +1,34 @@
+xsiType:
+
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        String name = "Peter";
+        String lastName = "Parker";
+
+        System.out.println(
+            "<User xmlns=\"http://acme.com\" " +
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+            "xsi:type=\"acme:user\">\n" +
+            "  <name>" + name + "</name>\n" +
+            "  <lastName>" + lastName + "</lastName>\n" +
+            "</User>"
+        );
+    }
+}
+
+
+
+
+output:
+
+<User xmlns="http://acme.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="acme:user">
+  <name>Peter</name>
+  <lastName>Parker</lastName>
+</User>
+

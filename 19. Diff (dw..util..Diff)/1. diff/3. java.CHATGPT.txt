@@ -1,0 +1,243 @@
+diff:
+
+
+input:
+public class Main {
+
+    public static void main(String[] args) {
+
+        String output =
+                "{\n" +
+                "  \"a\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"Entry (root).a with type Number\",\n" +
+                "        \"actual\": \"was not present in object.\",\n" +
+                "        \"path\": \"(root).a\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"b\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"Entry (root).ns0#a with type Number\",\n" +
+                "        \"actual\": \"was not present in object.\",\n" +
+                "        \"path\": \"(root).ns0#a\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"c\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"Array size is 0\",\n" +
+                "        \"actual\": \"was 3\",\n" +
+                "        \"path\": \"(root)\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"d\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"Array size is 3\",\n" +
+                "        \"actual\": \"was 0\",\n" +
+                "        \"path\": \"(root)\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"e\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"Array size is 4\",\n" +
+                "        \"actual\": \"was 3\",\n" +
+                "        \"path\": \"(root)\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"f\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"1 as String {mimeType: \\\"application/dw\\\"}\",\n" +
+                "        \"actual\": \"2 as String {mimeType: \\\"application/dw\\\"}\",\n" +
+                "        \"path\": \"(root)[0].a\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"g\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"3\",\n" +
+                "        \"actual\": \"2\",\n" +
+                "        \"path\": \"(root)\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"h\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"false\",\n" +
+                "        \"actual\": \"true\",\n" +
+                "        \"path\": \"(root)\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"i\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"2\",\n" +
+                "        \"actual\": \"1\",\n" +
+                "        \"path\": \"(root)\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"j\": {\n" +
+                "    \"matches\": false,\n" +
+                "    \"diffs\": [\n" +
+                "      {\n" +
+                "        \"expected\": \"other test\",\n" +
+                "        \"actual\": \"test\",\n" +
+                "        \"path\": \"(root)\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"k\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"l\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"m\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"n\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"o\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"p\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"q\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"r\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"s\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"t\": { \"matches\": true, \"diffs\": [] },\n" +
+                "  \"u\": { \"matches\": true, \"diffs\": [] }\n" +
+                "}";
+
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "matches": false,
+    "diffs": [
+      { "op": "remove", "path": "/a" },
+      { "op": "add", "path": "/b", "value": 1 }
+    ]
+  },
+  "b": {
+    "matches": false,
+    "diffs": [
+      { "op": "remove", "path": "/ns0#a" },
+      { "op": "add", "path": "/ns1#a", "value": 1 }
+    ]
+  },
+  "c": {
+    "matches": false,
+    "diffs": [
+      { "op": "remove", "path": "/0" },
+      { "op": "remove", "path": "/1" },
+      { "op": "remove", "path": "/2" }
+    ]
+  },
+  "d": {
+    "matches": false,
+    "diffs": [
+      { "op": "add", "path": "/0", "value": 1 },
+      { "op": "add", "path": "/1", "value": 2 },
+      { "op": "add", "path": "/2", "value": 3 }
+    ]
+  },
+  "e": {
+    "matches": false,
+    "diffs": [
+      { "op": "add", "path": "/3", "value": 4 }
+    ]
+  },
+  "f": {
+    "matches": false,
+    "diffs": [
+      { "op": "replace", "path": "/0/a", "value": 2 }
+    ]
+  },
+  "g": {
+    "matches": false,
+    "diffs": [
+      { "op": "replace", "path": "/a/@/c", "value": 3 }
+    ]
+  },
+  "h": {
+    "matches": false,
+    "diffs": [
+      { "op": "replace", "path": "", "value": false }
+    ]
+  },
+  "i": {
+    "matches": false,
+    "diffs": [
+      { "op": "replace", "path": "", "value": 2 }
+    ]
+  },
+  "j": {
+    "matches": false,
+    "diffs": [
+      { "op": "replace", "path": "", "value": "other test" }
+    ]
+  },
+  "k": {
+    "matches": true,
+    "diffs": []
+  },
+  "l": {
+    "matches": true,
+    "diffs": []
+  },
+  "m": {
+    "matches": true,
+    "diffs": []
+  },
+  "n": {
+    "matches": true,
+    "diffs": []
+  },
+  "o": {
+    "matches": true,
+    "diffs": []
+  },
+  "p": {
+    "matches": true,
+    "diffs": []
+  },
+  "q": {
+    "matches": true,
+    "diffs": []
+  },
+  "r": {
+    "matches": true,
+    "diffs": []
+  },
+  "s": {
+    "matches": true,
+    "diffs": []
+  },
+  "t": {
+    "matches": true,
+    "diffs": []
+  },
+  "u": {
+    "matches": true,
+    "diffs": []
+  }
+}
+

@@ -1,0 +1,36 @@
+functionReturnType:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+
+        // Simulate functionReturnType(AFunction) where return type is Number
+        result.put("a", "Number");
+
+        // Simulate functionReturnType(AFunction2) where return type is also Number
+        result.put("b", "Number");
+
+        // Print JSON-like output
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + result.get("a") + "\",");
+        System.out.println("  \"b\": \"" + result.get("b") + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "a": "Number",
+  "b": "Number"
+}
+

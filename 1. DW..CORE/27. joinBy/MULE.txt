@@ -1,0 +1,18 @@
+joinBy:
+
+joinBy(@StreamCapable elements: Array<StringCoerceable>, separator: String): String
+
+Merges an array into a single string value and uses the provided string as a separator between each item in the list.
+
+Note that joinBy performs the opposite task of splitBy.
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "hyphenate" : ["a","b","c"] joinBy "-" }
+
+DataWeave
+Output
+{ "hyphenate": "a-b-c" }

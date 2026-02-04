@@ -1,0 +1,196 @@
+dataFormatsDescriptor:
+
+
+
+
+input:
+
+@RestController
+public class DataFormatController {
+
+    @GetMapping("/data-formats")
+    public List<Map<String, Object>> getDataFormats() {
+
+        List<Map<String, Object>> formats = new ArrayList<>();
+
+        // ======================== JSON FORMAT =========================
+        Map<String, Object> json = new LinkedHashMap<>();
+        json.put("id", "json");
+        json.put("binary", false);
+        json.put("defaultEncoding", "UTF-8");
+        json.put("extensions", List.of(".json"));
+        json.put("defaultMimeType", "application/json");
+        json.put("acceptedMimeTypes", List.of("application/json"));
+
+        List<Map<String, Object>> jsonReaderProps = new ArrayList<>();
+        jsonReaderProps.add(Map.of(
+                "name", "streaming",
+                "optional", true,
+                "defaultValue", false,
+                "description", "Used for streaming input (use only if entries are accessed sequentially).",
+                "possibleValues", List.of(true, false)
+        ));
+        json.put("readerProperties", jsonReaderProps);
+
+        List<Map<String, Object>> jsonWriterProps = new ArrayList<>();
+        jsonWriterProps.add(Map.of(
+                "name", "writeAttributes",
+                "optional", true,
+                "defaultValue", false,
+                "description", "Indicates that if a key has attributes, they are going to be added as children key-value pairs of the key that contains them. The attribute new key name will start with @.",
+                "possibleValues", List.of(true, false)
+        ));
+        jsonWriterProps.add(Map.of(
+                "name", "skipNullOn",
+                "optional", true,
+                "defaultValue", "None",
+                "description", "Indicates where is should skips null values if any or not. By default it doesn't skip.",
+                "possibleValues", List.of("arrays", "objects", "everywhere")
+        ));
+        json.put("writerProperties", jsonWriterProps);
+
+
+        // ======================== XML FORMAT =========================
+        Map<String, Object> xml = new LinkedHashMap<>();
+        xml.put("id", "xml");
+        xml.put("binary", false);
+        xml.put("extensions", List.of(".xml"));
+        xml.put("defaultMimeType", "application/xml");
+        xml.put("acceptedMimeTypes", List.of("application/xml"));
+
+        // Reader props
+        List<Map<String, Object>> xmlReaderProps = new ArrayList<>();
+        xmlReaderProps.add(Map.of(
+                "name", "supportDtd",
+                "optional", true,
+                "defaultValue", true,
+                "description", "Whether DTD handling is enabled or disabled; disabling means both internal and external subsets will just be skipped unprocessed.",
+                "possibleValues", List.of(true, false)
+        ));
+        xmlReaderProps.add(Map.of(
+                "name", "streaming",
+                "optional", true,
+                "defaultValue", false,
+                "description", "Used for streaming input (use only if entries are accessed sequentially).",
+                "possibleValues", List.of(true, false)
+        ));
+        xmlReaderProps.add(Map.of(
+                "name", "maxEntityCount",
+                "optional", true,
+                "defaultValue", 1,
+                "description", "The maximum number of entity expansions. The limit is in place to avoid Billion Laughs attacks.",
+                "possibleValues", List.of()
+        ));
+        xml.put("readerProperties", xmlReaderProps);
+
+        // Writer props
+        List<Map<String, Object>> xmlWriterProps = new ArrayList<>();
+        xmlWriterProps.add(Map.of(
+                "name", "writeDeclaration",
+                "optional", true,
+                "defaultValue", true,
+                "description", "Indicates whether to write the XML header declaration or not.",
+                "possibleValues", List.of(true, false)
+        ));
+        xmlWriterProps.add(Map.of(
+                "name", "indent",
+                "optional", true,
+                "defaultValue", true,
+                "description", "Indicates whether to indent the code for better readability or to compress it into a single line.",
+                "possibleValues", List.of(true, false)
+        ));
+        xml.put("writerProperties", xmlWriterProps);
+
+        formats.add(json);
+        formats.add(xml);
+
+        return formats;
+    }
+}
+
+
+output:
+
+[
+  {
+    "id": "json",
+    "binary": false,
+    "defaultEncoding": "UTF-8",
+    "extensions": [".json"],
+    "defaultMimeType": "application/json",
+    "acceptedMimeTypes": ["application/json"],
+    "readerProperties": [
+      {
+        "name": "streaming",
+        "optional": true,
+        "defaultValue": false,
+        "description": "Used for streaming input (use only if entries are accessed sequentially).",
+        "possibleValues": [true, false]
+      }
+    ],
+    "writerProperties": [
+      {
+        "name": "writeAttributes",
+        "optional": true,
+        "defaultValue": false,
+        "description": "Indicates that if a key has attributes, they are going to be added as children key-value pairs of the key that contains them. The attribute new key name will start with @.",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "skipNullOn",
+        "optional": true,
+        "defaultValue": "None",
+        "description": "Indicates where is should skips null values if any or not. By default it doesn't skip.",
+        "possibleValues": ["arrays", "objects", "everywhere"]
+      }
+    ]
+  },
+  {
+    "id": "xml",
+    "binary": false,
+    "extensions": [".xml"],
+    "defaultMimeType": "application/xml",
+    "acceptedMimeTypes": ["application/xml"],
+    "readerProperties": [
+      {
+        "name": "supportDtd",
+        "optional": true,
+        "defaultValue": true,
+        "description": "Whether DTD handling is enabled or disabled; disabling means both internal and external subsets will just be skipped unprocessed.",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "streaming",
+        "optional": true,
+        "defaultValue": false,
+        "description": "Used for streaming input (use only if entries are accessed sequentially).",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "maxEntityCount",
+        "optional": true,
+        "defaultValue": 1,
+        "description": "The maximum number of entity expansions. The limit is in place to avoid Billion Laughs attacks.",
+        "possibleValues": []
+      }
+    ],
+    "writerProperties": [
+      {
+        "name": "writeDeclaration",
+        "optional": true,
+        "defaultValue": true,
+        "description": "Indicates whether to write the XML header declaration or not.",
+        "possibleValues": [true, false]
+      },
+      {
+        "name": "indent",
+        "optional": true,
+        "defaultValue": true,
+        "description": "Indicates whether to indent the code for better readability or to compress it into a single line.",
+        "possibleValues": [true, false]
+      }
+    ]
+  }
+]
+
+

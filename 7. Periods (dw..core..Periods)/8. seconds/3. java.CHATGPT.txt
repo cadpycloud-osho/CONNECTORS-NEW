@@ -1,0 +1,36 @@
+seconds:
+
+
+input:
+
+import java.time.Instant;
+import java.time.Duration;
+
+public class Main {
+    public static void main(String[] args) {
+        Instant inputTime = Instant.parse("2020-10-05T20:22:34.385Z");
+
+        Instant nextSecond = inputTime.plusSeconds(1);
+        Instant previousSecond = inputTime.minusSeconds(1);
+        Duration decimalInputPeriod = Duration.ofMillis((long) (4.555 * 1000));
+        Duration wholeNumberInputPeriod = Duration.ofSeconds(4);
+        long addNegativeValue = Duration.ofSeconds(-1).plusSeconds(2).getSeconds();
+
+        System.out.println("nextSecond: " + nextSecond);
+        System.out.println("previousSecond: " + previousSecond);
+        System.out.println("decimalInputPeriod: " + decimalInputPeriod);
+        System.out.println("wholeNumberInputPeriod: " + wholeNumberInputPeriod);
+        System.out.println("addNegativeValue: " + addNegativeValue);
+    }
+}
+
+
+output:
+
+
+nextSecond: 2020-10-05T20:22:35.385Z
+previousSecond: 2020-10-05T20:22:33.385Z
+decimalInputPeriod: PT4.555S
+wholeNumberInputPeriod: PT4S
+addNegativeValue: 1
+

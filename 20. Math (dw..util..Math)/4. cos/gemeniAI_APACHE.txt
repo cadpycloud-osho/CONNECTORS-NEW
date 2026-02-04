@@ -1,0 +1,39 @@
+cos:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MathCosRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateCos")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Java's Math.cos expects radians, matching DataWeave's behavior
+                results.put("cos0", Math.cos(0));
+                results.put("cos13", Math.cos(0.13));
+                results.put("cos-1", Math.cos(-1));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "cos0": 1.0,
+  "cos13": 0.9915618937147881,
+  "cos-1": 0.5403023058681398
+}
+
+
+

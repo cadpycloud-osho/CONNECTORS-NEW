@@ -1,0 +1,40 @@
+isOdd:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class IsOddController {
+
+    private boolean isOdd(int number) {
+        return number % 2 != 0;
+    }
+
+    @GetMapping("/check-odd")
+    public Map<String, List<Boolean>> checkOddValues() {
+
+        List<Boolean> resultList = List.of(
+                isOdd(0),
+                isOdd(1),
+                isOdd(2 + 2)
+        );
+
+        Map<String, List<Boolean>> result = new LinkedHashMap<>();
+        result.put("isOdd", resultList);
+
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+{
+  "isOdd": [ false, true, false ]
+}
+

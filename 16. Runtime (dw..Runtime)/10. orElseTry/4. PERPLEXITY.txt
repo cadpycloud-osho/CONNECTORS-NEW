@@ -1,0 +1,73 @@
+orElseTry:
+
+
+input:
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class OrElseTryController {
+
+    @GetMapping(value = "/orelse-try", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> orElseTryTest() {
+        Map<String, String> user = Map.of();      // Empty
+        Map<String, String> otherUser = Map.of(); // Empty
+
+        // Matches: try(() -> user.name!) orElseTry otherUser.name!
+        Object a = safeGet(() -> user.get("name"), 
+                          () -> otherUser.get("name"));
+
+        // Matches: try(() -> user.name!) orElseTry "No User Name"
+        Object b = safeGet(() -> user.get("name"), 
+                          () -> "No User Name");
+
+        return Map.of("a", a, "b", b);
+    }
+
+    private Object safeGet(java.util.function.Supplier<String> primary, 
+                          java.util.function.Supplier<Object> fallback) {
+        try {
+            String primaryResult = primary.get();
+            if (primaryResult != null) return primaryResult;
+        } catch (Exception e) {
+            try {
+                return fallback.get();
+            } catch (Exception fallbackEx) {
+                // Matches orElseTry second failure behavior
+                return Map.of(
+                    "success", false,
+                    "error", Map.of(
+                        "kind", "KeyNotFoundException",
+                        "message", "There is no key named 'name'",
+                        "location", "a: try(() -> user.name!) orElseTry otherUser.name!",
+                        "stack", List.of("main (9:40)")
+                    )
+                );
+            }
+        }
+        return "No User Name"; // Fallback if primary null but no exception
+    }
+}
+
+
+output:
+{
+  "a": {
+    "success": false,
+    "error": {
+      "kind": "KeyNotFoundException",
+      "message": "There is no key named 'name'",
+      "location": "a: try(() -> user.name!) orElseTry otherUser.name!",
+      "stack": ["main (9:40)"]
+    }
+  },
+  "b": {
+    "success": true,
+    "result": "No User Name"
+  }
+}
+

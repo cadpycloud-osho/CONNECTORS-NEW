@@ -1,0 +1,43 @@
+failIf:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        if (result.isEmpty()) {
+            throw new RuntimeException("Failed");
+        }
+
+        Map<String, Object> output = Map.of(
+                "result", "SUCCESS"
+        );
+
+        System.out.println(output);
+    }
+}
+
+from("direct:start")
+    .process(e -> {
+        Map<String, Object> result = new HashMap<>();
+        if (result.isEmpty()) {
+            throw new RuntimeException("Failed");
+        }
+        e.getMessage().setBody(Map.of("result", "SUCCESS"));
+    });
+
+
+output:
+
+Exception in thread "main" java.lang.RuntimeException: Failed
+    at Main.main(Main.java:11)
+
+
+
+

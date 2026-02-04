@@ -1,0 +1,77 @@
+toHex:
+
+
+
+input:
+
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    /**
+     * Converts a byte array into its hexadecimal string representation.
+     * This mimics the DataWeave 'toHex()' function.
+     * @param bytes The raw byte array.
+     * @return The hexadecimal string.
+     */
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        // Iterate through each byte
+        for (byte b : bytes) {
+            // "%02X" formats the byte as two uppercase hexadecimal characters,
+            // padding with a leading zero if necessary.
+            hexString.append(String.format("%02X", b));
+        }
+        return hexString.toString();
+    }
+
+    /**
+     * Executes the full DataWeave transformation.
+     */
+    public static String runDataWeaveTransformation() {
+        // --- 1. DW Variable Assignment & Binary Conversion ---
+        // Equivalent to: var myBinary = "Mule" as Binary
+        
+        // Convert the string "Mule" to its byte array representation using UTF-8 (or US-ASCII, which is the same for these characters)
+        byte[] myBinary = "Mule".getBytes(StandardCharsets.UTF_8); // myBinary = {0x4D, 0x75, 0x6C, 0x65}
+        
+        // The DataWeave 'var testType = typeOf(myBinary)' would resolve to "Binary"
+
+        // --- 2. DW toHex Operation ---
+        // Equivalent to: "binaryToHex" : toHex(myBinary)
+        String hexOutput = bytesToHex(myBinary); // hexOutput = "4D756C65"
+        
+        // --- 3. JSON Output Generation ---
+        String jsonOutput = String.format("{\n  \"binaryToHex\": \"%s\"\n}", hexOutput);
+
+        // Print intermediate steps for clarity
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Input String: \"Mule\"");
+        System.out.println("Raw Bytes: { 0x" + bytesToHex(myBinary) + " }");
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "binaryToHex": "4D756C65"
+}
+
+
+
+
+
+

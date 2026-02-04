@@ -1,0 +1,35 @@
+reverse:
+
+input:
+
+import java.util.*;
+
+public class ReverseConverter {
+    public static String reverse(String text) {
+        if (text == null) return null;
+        if (text.isEmpty()) return "";
+        return new StringBuilder(text).reverse().toString();
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", reverse("Mariano"));
+        result.put("b", reverse(null));
+        result.put("c", reverse(""));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": "onairaM",
+  "b": null,
+  "c": ""
+}
+
+

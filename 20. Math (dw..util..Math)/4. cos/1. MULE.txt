@@ -1,0 +1,52 @@
+cos:
+
+cos(angle: Number): Number
+
+cos(angle: Number): Number
+Returns the trigonometric cosine of an angle from a given number of radians.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Math
+output application/json
+---
+{
+  "cos0": cos(0),
+  "cos13": cos(0.13),
+  "cos-1": cos(-1)
+}
+
+
+
+DataWeave
+Output
+{
+  "cos0": 1.0,
+  "cos13": 0.9915618937147881,
+  "cos-1": 0.5403023058681398
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,32 @@
+round:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class RoundController {
+
+    @GetMapping("/roundValues")
+    public List<Integer> roundValues() {
+        List<Double> numbers = Arrays.asList(1.2, 4.6, 3.5);
+
+        List<Integer> rounded = new ArrayList<>();
+        for (Double num : numbers) {
+            rounded.add((int) Math.round(num)); // Java rounding matches DataWeave round
+        }
+
+        return rounded;
+    }
+}
+
+
+output:
+
+
+[1, 5, 4]
+

@@ -1,0 +1,48 @@
+nameSet:
+
+
+input:
+
+package com.example.nameset;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@SpringBootApplication
+public class NameSetApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(NameSetApplication.class, args);
+    }
+}
+
+@RestController
+class NameSetController {
+
+    @GetMapping("/name-set")
+    public Map<String, Object> getNameSet() {
+        Map<String, Object> sampleMap = new LinkedHashMap<>();
+        sampleMap.put("a", true);
+        sampleMap.put("b", 1);
+
+        List<String> nameSet = new ArrayList<>(sampleMap.keySet());
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("nameSet", nameSet);
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "nameSet": ["a", "b"]
+}
+
+

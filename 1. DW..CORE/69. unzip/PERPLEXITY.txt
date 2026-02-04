@@ -1,0 +1,160 @@
+unzip:
+
+
+example 1:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+public class UnzipExample1Controller {
+
+    @GetMapping("/unzipExample1")
+    public List<List<Object>> unzipExample1() {
+        List<List<Object>> input = Arrays.asList(
+                Arrays.asList(0, "a"),
+                Arrays.asList(1, "b"),
+                Arrays.asList(2, "c"),
+                Arrays.asList(3, "d")
+        );
+
+        List<List<Object>> result = unzip(input);
+        return result;
+    }
+
+    private List<List<Object>> unzip(List<List<Object>> input) {
+        int maxColumns = 0;
+        for (List<Object> row : input) {
+            if (row.size() > maxColumns) {
+                maxColumns = row.size();
+            }
+        }
+
+        List<List<Object>> output = new ArrayList<>();
+        for (int col = 0; col < maxColumns; col++) {
+            List<Object> colList = new ArrayList<>();
+            for (List<Object> row : input) {
+                // Add only if column exists in this row
+                if (col < row.size()) {
+                    colList.add(row.get(col));
+                }
+            }
+            output.add(colList);
+        }
+        return output;
+    }
+}
+
+output:
+
+[
+  [0, 1, 2, 3],
+  ["a", "b", "c", "d"]
+]
+
+------------------------------------------------------------------
+
+
+
+
+
+example 2:
+
+input:
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+public class UnzipExample2Controller {
+
+    @GetMapping("/unzipExample2")
+    public List<Object> unzipExample2() {
+        List<List<Object>> input = Arrays.asList(
+                Arrays.asList(0, "a"),
+                Arrays.asList(1, "a", "foo"),
+                Arrays.asList(2),
+                Arrays.asList(3, "a")
+        );
+
+        // Extract first element of each inner list
+        return input.stream()
+                .map(row -> row.get(0))
+                .collect(Collectors.toList());
+    }
+}
+
+
+output:
+
+[0, 1, 2, 3]
+
+------------------------------------------------------------------
+
+
+
+
+example 3:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+public class UnzipExample3Controller {
+
+    @GetMapping("/unzipExample3")
+    public List<List<Object>> unzipExample3() {
+        List<List<Object>> input = Arrays.asList(
+                Arrays.asList(0, "a", "W"),
+                Arrays.asList(1, "b", "X"),
+                Arrays.asList(2, "c", "Y"),
+                Arrays.asList(3, "d", "Z")
+        );
+
+        return unzip(input);
+    }
+
+    private List<List<Object>> unzip(List<List<Object>> input) {
+        int maxColumns = 0;
+        for (List<Object> row : input) {
+            if (row.size() > maxColumns) {
+                maxColumns = row.size();
+            }
+        }
+
+        List<List<Object>> output = new ArrayList<>();
+        for (int col = 0; col < maxColumns; col++) {
+            List<Object> colList = new ArrayList<>();
+            for (List<Object> row : input) {
+                colList.add(row.get(col));
+            }
+            output.add(colList);
+        }
+        return output;
+    }
+}
+
+output:
+
+[
+  [0,1,2,3],
+  ["a","b","c","d"],
+  ["W","X","Y","Z"]
+]
+
+------------------------------------------------------------------

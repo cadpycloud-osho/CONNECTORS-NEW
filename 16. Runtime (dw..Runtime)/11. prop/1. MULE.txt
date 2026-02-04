@@ -1,0 +1,39 @@
+prop:
+
+prop(propertyName: String): String | Null
+
+prop(propertyName: String): String | Null
+Returns the value of the property with the specified name or null if the property is not defined.
+
+
+
+Source
+%dw 2.0
+import * from dw::Runtime
+output application/dw
+---
+{ "props" : prop("user.timezone") }
+
+
+
+DataWeave
+Output
+{ props: "America/Los_Angeles" as String {class: "java.lang.String"} }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

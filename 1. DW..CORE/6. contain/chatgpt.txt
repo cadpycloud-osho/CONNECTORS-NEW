@@ -1,0 +1,226 @@
+contains
+contains<T>(@StreamCapable items: Array<T>, element: Any): Boolean
+Returns true if an input contains a given value, false if not.
+input:
+
+1. package com.example.demo;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class XmlContainsApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(XmlContainsApplication.class, args);
+    }
+}
+
+
+REST Controller
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class XmlContainsController {
+
+    @GetMapping("/check")
+    public Map<String, Boolean> checkContainsItem() throws Exception {
+
+        String xml =
+            "<root>" +
+            "<order><items>155</items></order>" +
+            "<order><items>30</items></order>" +
+            "<order><items>15</items></order>" +
+            "<order><items>5</items></order>" +
+            "<order><items>4</items><items>7</items></order>" +
+            "<order><items>1</items><items>3</items></order>" +
+            "<order>null</order>" +
+            "</root>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        NodeList itemsList = doc.getElementsByTagName("items");
+
+        boolean contains3 = false;
+        for (int i = 0; i < itemsList.getLength(); i++) {
+            if ("3".equals(itemsList.item(i).getTextContent())) {
+                contains3 = true;
+                break;
+            }
+        }
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("ContainsRequestedItem", contains3);
+
+        return response;
+    }
+}
+
+
+
+Output:
+
+{
+  "ContainsRequestedItem": true
+}
+
+
+------------------------------------------------------------------------
+
+example 2:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+REST Controller (Accepts XML, Returns JSON)
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class ContainsController {
+
+    @PostMapping(
+        value = "/contains",
+        consumes = "application/xml",
+        produces = "application/json"
+    )
+    public Map<String, Boolean> checkContains(@RequestBody String xml) throws Exception {
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document =
+            builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        // Extract value
+        String myString =
+            document.getElementsByTagName("mystring").item(0).getTextContent();
+
+        // DataWeave equivalent logic
+        boolean result = myString.contains("me");
+
+        // JSON response
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("ContainsString", result);
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "ContainsRequestedItem": true
+}
+
+
+----------------------------------------------------------------------
+input:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+package com.example.demo.controller;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Document;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class ContainsController {
+
+    @PostMapping(
+        value = "/contains",
+        consumes = "application/xml",
+        produces = "application/json"
+    )
+    public Map<String, Boolean> checkContains(@RequestBody String xml)
+            throws Exception {
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document =
+            builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        // Extract value
+        String myString =
+            document.getElementsByTagName("mystring").item(0).getTextContent();
+
+        // contains logic
+        boolean result = myString.contains("me");
+
+        // Response
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("ContainsString", result);
+
+        return response;
+    }
+}
+
+
+
+
+output:
+
+{
+  "ContainsString": true
+}
+
+

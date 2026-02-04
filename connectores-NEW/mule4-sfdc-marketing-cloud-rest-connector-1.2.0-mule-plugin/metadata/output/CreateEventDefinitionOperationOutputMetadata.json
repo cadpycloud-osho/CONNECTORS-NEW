@@ -1,0 +1,201 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "arguments",
+        "automationId",
+        "category",
+        "createdBy",
+        "createdDate",
+        "dataExtensionId",
+        "dataExtensionName",
+        "eventDefinitionKey",
+        "filterDefinitionId",
+        "id",
+        "interactionCount",
+        "isVisibleInPicker",
+        "metaData",
+        "mode",
+        "modifiedBy",
+        "modifiedDate",
+        "name",
+        "publishedInteractionCount",
+        "schema",
+        "type"
+      ],
+      "properties": {
+        "arguments": {
+          "$ref": "#/definitions/arguments"
+        },
+        "automationId": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "number"
+        },
+        "createdDate": {
+          "type": "string"
+        },
+        "dataExtensionId": {
+          "type": "string"
+        },
+        "dataExtensionName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "eventDefinitionKey": {
+          "type": "string"
+        },
+        "filterDefinitionId": {
+          "type": "string"
+        },
+        "filterDefinitionTemplate": {
+          "type": "string"
+        },
+        "iconUrl": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "interactionCount": {
+          "type": "number"
+        },
+        "isVisibleInPicker": {
+          "type": "boolean"
+        },
+        "metaData": {
+          "type": "object"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "modifiedBy": {
+          "type": "number"
+        },
+        "modifiedDate": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "publishedInteractionCount": {
+          "type": "number"
+        },
+        "schema": {
+          "$ref": "#/definitions/eventSchema"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "arguments": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "dataExtensionId",
+        "eventDefinitionId",
+        "eventDefinitionKey",
+        "serializedObjectType"
+      ],
+      "properties": {
+        "criteria": {
+          "type": "string"
+        },
+        "dataExtensionId": {
+          "type": "string"
+        },
+        "eventDefinitionId": {
+          "type": "string"
+        },
+        "eventDefinitionKey": {
+          "type": "string"
+        },
+        "serializedObjectType": {
+          "type": "string"
+        }
+      }
+    },
+    "eventSchema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "fields",
+        "id",
+        "isPlatformObject",
+        "name",
+        "sendableCustomObjectField",
+        "sendableSubscriberField"
+      ],
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventSchemaField"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "isPlatformObject": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sendableCustomObjectField": {
+          "type": "string"
+        },
+        "sendableSubscriberField": {
+          "type": "string"
+        }
+      }
+    },
+    "eventSchemaField": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "dataType",
+        "defaultValue",
+        "isDevicePreference",
+        "isNullable",
+        "isPrimaryKey",
+        "maxLength",
+        "name"
+      ],
+      "properties": {
+        "dataType": {
+          "type": "string"
+        },
+        "defaultValue": {
+          "type": "string"
+        },
+        "isDevicePreference": {
+          "type": "boolean"
+        },
+        "isNullable": {
+          "type": "boolean"
+        },
+        "isPrimaryKey": {
+          "type": "boolean"
+        },
+        "maxLength": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

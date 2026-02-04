@@ -1,0 +1,31 @@
+time:
+
+
+input:
+
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Create time 12:30:40 with offset -03:00
+        OffsetTime newTime = OffsetTime.of(12, 30, 40, 0, ZoneOffset.of("-03:00"));
+
+        Map<String, String> result = new HashMap<>();
+        result.put("newTime", newTime.toString());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{newTime=12:30:40-03:00}
+

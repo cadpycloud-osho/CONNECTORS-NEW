@@ -1,0 +1,40 @@
+fromHex:
+
+
+INPUT:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Base64;
+
+@RestController
+public class HexToBinaryController {
+
+    @GetMapping("/hexToBinary")
+    public String convertHexToBinary() {
+
+        String hex = "4D756C65";
+
+        // Convert hex to byte array
+        byte[] bytes = new byte[hex.length() / 2];
+        for (int i = 0; i < hex.length(); i += 2) {
+            bytes[i / 2] = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
+        }
+
+        // Convert to Base64 (same output as DataWeave)
+        String base64 = Base64.getEncoder().encodeToString(bytes);
+
+        return "{ \"hexToBinary\" : \"" + base64 + "\" }";
+    }
+}
+
+
+OUTPUT:
+
+{
+  "hexToBinary": "TXVsZQ=="
+}
+

@@ -1,0 +1,108 @@
+evalUrl:
+
+<dependency>
+    <groupId>org.mule.weave</groupId>
+    <artifactId>runtime-core</artifactId>
+    <version>X.Y.Z</version> </dependency>
+
+
+%dw 2.0
+output application/dw
+---
+payload.name
+
+input:
+
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    // ---- Simulated WeaveResult (like Mule) ----
+    static class WeaveResult {
+        boolean success;
+        Object value;
+        String mimeType;
+        String encoding;
+        List<String> logs;
+
+        WeaveResult(boolean success, Object value) {
+            this.success = success;
+            this.value = value;
+            this.mimeType = "application/dw";
+            this.encoding = "UTF-8";
+            this.logs = List.of();
+        }
+
+        @Override
+        public String toString() {
+            return "WeaveResult(" +
+                    "success=" + success +
+                    ", value=" + value +
+                    ", mimeType=" + mimeType +
+                    ", encoding=" + encoding +
+                    ", logs=" + logs +
+                    ")";
+        }
+    }
+
+    // ---- Execution Logic ----
+    public static WeaveResult execute(Object payload) {
+
+        if (payload instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) payload;
+
+            // Case 1: Mule-style payload with byte[]
+            if (map.containsKey("value")) {
+                byte[] bytes = (byte[]) map.get("value");
+                String json = new String(bytes, StandardCharsets.UTF_8);
+                String name = extractName(json);
+                return new WeaveResult(true, name);
+            }
+
+            // Case 2: Normal Java Map
+            if (map.containsKey("name")) {
+                return new WeaveResult(true, map.get("name"));
+            }
+        }
+
+        return new WeaveResult(false, null);
+    }
+
+    // ---- Minimal JSON parsing (no libraries) ----
+    private static String extractName(String json) {
+        int idx = json.indexOf("\"name\"");
+        if (idx == -1) return null;
+
+        int colon = json.indexOf(":", idx);
+        int start = json.indexOf("\"", colon + 1);
+        int end = json.indexOf("\"", start + 1);
+
+        return json.substring(start + 1, end);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> JSON_VALUE = Map.of(
+            "value", "{\"name\": \"Mariano\"}".getBytes(StandardCharsets.UTF_8),
+            "encoding", "UTF-8",
+            "properties", Map.of(),
+            "mimeType", "application/json"
+        );
+
+        System.out.println("--- Pure Java DataWeave EvalUrl Simulation ---");
+
+        System.out.println("execute_ok Result: " + execute(JSON_VALUE));
+        System.out.println("execute_ok_withValue Result: " + execute(Map.of("name", "Mariano")));
+    }
+}
+
+
+
+output:
+
+--- Pure Java DataWeave EvalUrl Simulation ---
+execute_ok Result: WeaveResult(success=true, value=Mariano, mimeType=application/dw, encoding=UTF-8, logs=[])
+execute_ok_withValue Result: WeaveResult(success=true, value=Mariano, mimeType=application/dw, encoding=UTF-8, logs=[])

@@ -1,0 +1,65 @@
+lookup:
+
+
+input:
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class Flow2Service {
+
+    /**
+     * Replicates Mule 'flow2' logic.
+     * Takes an input map (representing the payload set in flow1) 
+     * and processes it.
+     * @param inputData The input map containing the 'test' key.
+     * @return The processed string payload.
+     */
+    public String processFlow2(String inputData) {
+        // Equivalent to: <set-payload value='#[payload.test ++ "world"]' />
+        String payload = inputData + " world";
+        
+        // Equivalent to: <logger level="INFO" doc:name="Logger" message='#[payload]'/>
+        System.out.println("Flow2 Logger: " + payload);
+        
+        return payload;
+    }
+}
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class Flow1Controller {
+
+    private final Flow2Service flow2Service;
+
+    @Autowired
+    public Flow1Controller(Flow2Service flow2Service) {
+        this.flow2Service = flow2Service;
+    }
+
+    /**
+     * Replicates Mule 'flow1' logic.
+     * @return The final output from flow2.
+     */
+    @GetMapping("/source")
+    public String handleFlow1() {
+        // Equivalent to: <ee:set-payload><![CDATA[%dw 2.0 output application/json --- Mule::lookup('flow2', {test:'hello '})]]></ee:set-payload>
+        
+        // 1. Prepare data for lookup (the variable passed to flow2)
+        String inputForFlow2 = "hello "; // The value of payload.test in flow2
+        
+        // 2. Synchronous call (Mule::lookup('flow2', ...))
+        String finalResult = flow2Service.processFlow2(inputForFlow2);
+        
+        // 3. Return the result as JSON (as requested by the DataWeave output type)
+        return finalResult;
+    }
+}
+
+output:
+
+
+B. Spring Boot OutputWhen accessing the endpoint GET /source:ComponentActionOutputflow2ServiceLogs the resultFlow2 Logger: hello world (printed to console/log)flow1ControllerReturns the final stringHTTP Response Body: "hello world"

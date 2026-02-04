@@ -1,0 +1,98 @@
+toDateTime:
+
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter multiFormatter = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy/MM/dd HH:mm:ssz")
+            .orAppendPattern("yyyy-MM-dd HH:mm:ssz")
+            .toFormatter();
+        
+        ZonedDateTime dateA = null;
+        String errorB = null;
+        
+        try {
+            dateA = ZonedDateTime.parse("2003-10-01 23:57:59Z", multiFormatter);
+        } catch (DateTimeParseException e) {
+            errorB = "Could not find a valid formatter for '2003-10-01 23:57:59Z'";
+        }
+        
+        System.out.println("{\"a\":\"" + (dateA != null ? dateA.toString() : null) + 
+                          "\",\"b\":\"" + errorB + "\"}");
+    }
+}
+
+
+output:
+
+{"a":"2003-10-01T23:57:59Z","b":"Could not find a valid formatter for '2003-10-01 23:57:59Z'"}
+
+
+
+
+----------------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.time.Instant;
+import java.time.ZonedDateTime;
+
+public class Main {
+    public static void main(String[] args) {
+        ZonedDateTime fromEpoch = ZonedDateTime.ofInstant(Instant.ofEpochSecond(1443743879), 
+                                                         java.time.ZoneOffset.UTC);
+        ZonedDateTime fromMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(1443743879000L), 
+                                                          java.time.ZoneOffset.UTC);
+        
+        System.out.println("{\"fromEpoch\":\"" + fromEpoch + "\",\"fromMillis\":\"" + fromMillis + "\"}");
+    }
+}
+
+
+output:
+
+{"fromEpoch":"2015-10-01T23:57:59Z","fromMillis":"2015-10-01T23:57:59Z"}
+
+
+----------------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        ZonedDateTime dateA = ZonedDateTime.parse("2015-10-01T23:57:59Z");
+        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssz");
+        ZonedDateTime dateB = ZonedDateTime.parse("2003-10-01 23:57:59Z", formatterB);
+        
+        System.out.println("{\"a\":\"" + dateA + "\",\"b\":\"" + dateB + "\"}");
+    }
+}
+
+
+output:
+
+{"a":"2015-10-01T23:57:59Z","b":"2003-10-01T23:57:59Z"}
+
+
+

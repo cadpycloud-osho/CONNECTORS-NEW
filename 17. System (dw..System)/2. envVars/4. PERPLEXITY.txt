@@ -1,0 +1,41 @@
+
+envVars():
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class EnvController {
+    
+    @Value("${SHELL:}")
+    private String shellVar;
+    
+    @GetMapping("/envVars")
+    public EnvResponse getEnvVars() {
+        return new EnvResponse(shellVar.isEmpty() ? null : shellVar);
+    }
+    
+    public static class EnvResponse {
+        public String envVars;
+        
+        public EnvResponse(String envVars) {
+            this.envVars = envVars;
+        }
+    }
+}
+
+
+output:
+
+{
+  "envVars": "/bin/bash"
+}
+
+
+

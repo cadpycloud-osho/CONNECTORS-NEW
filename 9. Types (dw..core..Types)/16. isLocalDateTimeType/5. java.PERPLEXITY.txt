@@ -1,0 +1,33 @@
+isLocalDateTimeType:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Object testString = "test";  // Changed to Object
+        
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("a", localDateTime instanceof LocalDateTime);
+        result.put("b", localDateTime instanceof LocalDateTime);
+        result.put("c", testString instanceof LocalDateTime);
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=true, b=true, c=false}
+
+
+
+
+

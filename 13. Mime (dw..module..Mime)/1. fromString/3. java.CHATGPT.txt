@@ -1,0 +1,132 @@
+fromString:
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String mime = "application/json";
+
+        String[] parts = mime.split("/");
+
+        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("type", parts[0]);
+        result.put("subtype", parts[1]);
+        result.put("parameters", params);
+
+        Map<String, Object> finalOut = Map.of(
+                "success", true,
+                "result", result
+        );
+
+        System.out.println(finalOut);
+    }
+}
+
+
+output:
+{success=true, result={type=application, subtype=json, parameters={}}}
+
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String mime = "multipart/form-data; boundary=the-boundary";
+
+        String[] parts = mime.split(";");
+        String[] types = parts[0].trim().split("/");
+
+        Map<String, Object> params = new HashMap<>();
+
+        String[] keyVal = parts[1].trim().split("=");
+        params.put(keyVal[0], keyVal[1]);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("type", types[0]);
+        result.put("subtype", types[1]);
+        result.put("parameters", params);
+
+        Map<String, Object> finalOut = Map.of(
+                "success", true,
+                "result", result
+        );
+
+        System.out.println(finalOut);
+    }
+}
+
+output:
+
+{success=true, result={type=multipart, subtype=form-data, parameters={boundary=the-boundary}}}
+
+------------------------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String mime = "Invalid MIME type";
+
+        if (!mime.contains("/")) {
+            Map<String, Object> error = Map.of(
+                    "success", false,
+                    "error", Map.of(
+                            "message", "Unable to find a sub type in `Invalid MIME type`."
+                    )
+            );
+
+            System.out.println(error);
+            return;
+        }
+    }
+}
+
+
+output:
+
+
+{success=false, error={message=Unable to find a sub type in `Invalid MIME type`.}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,30 @@
+isOdd:
+
+
+isOdd(number: Number): Boolean
+
+Returns true if the number or numeric result of a mathematical operation is odd, false if not.
+
+
+Source
+%dw 2.0
+output  application/json
+---
+{ "isOdd" : [ isOdd(0), isOdd(1), isOdd(2+2) ] }
+
+DataWeave
+Output
+{ "isOdd": [ false, true, false ] }
+
+
+
+
+
+
+
+
+
+
+
+
+

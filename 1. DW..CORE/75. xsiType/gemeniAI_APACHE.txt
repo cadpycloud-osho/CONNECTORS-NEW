@@ -1,0 +1,48 @@
+xsiType:
+
+
+input:
+
+import jakarta.xml.bind.annotation.*;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelXsiTypeExample {
+
+    @XmlRootElement(name = "user")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    // This handles the xmlns:acme definition
+    public static class User {
+        public String name = "Peter";
+        public String lastName = "Parker";
+
+        // Manually adding the xsi:type attribute to match DW behavior
+        @XmlAttribute(name = "type", namespace = "http://www.w3.org/2001/XMLSchema-instance")
+        public String xsiType = "acme:user";
+    }
+
+    public static void main(String[] args) throws Exception {
+        DefaultCamelContext context = new DefaultCamelContext();
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .marshal().jaxb() // Marshals the POJO to XML
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", new User());
+        context.stop();
+    }
+}
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<user xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="acme:user">
+    <name>Peter</name>
+    <lastName>Parker</lastName>
+</user>
+

@@ -1,0 +1,61 @@
+readLinesWith:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class BinaryLinesRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:readBinaryLines")
+            .routeId("Binary-Lines-Route")
+            .process(exchange -> {
+                // 1. Define the raw input (mimicking application/octet-stream)
+                String rawInput = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n";
+                byte[] content = rawInput.getBytes("UTF-8"); // This is our Binary type
+
+                // 2. logic: content readLinesWith "UTF-8"
+                // Convert binary back to string and split by newline
+                String contentStr = new String(content, "UTF-8");
+                List<String> lines = Arrays.stream(contentStr.split("\\r?\\n"))
+                                           .collect(Collectors.toList());
+
+                // 3. Construct the result Map
+                Map<String, Object> result = new HashMap<>();
+                result.put("lines", lines);
+                // typeOf(content) in DW for octet-stream is "Binary"
+                result.put("showType", "Binary"); 
+
+                exchange.getIn().setBody(result);
+            })
+            // 4. Marshal the Map to JSON
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+  "lines": [
+    "Line 1",
+    "Line 2",
+    "Line 3",
+    "Line 4",
+    "Line 5"
+  ],
+  "showType": "Binary"
+}
+
+
+
+

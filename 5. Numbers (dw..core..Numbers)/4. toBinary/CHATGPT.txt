@@ -1,0 +1,55 @@
+toBinary:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class BinaryController {
+
+    @GetMapping("/binary")
+    public Map<String, Object> toBinaryExamples() {
+
+        Map<String, Object> response = new HashMap<>();
+
+        // a: Negative number -> Java adds "-" manually to bin string
+        response.put("a", "-" + Integer.toBinaryString(2));
+
+        // b: Very large number -> use BigInteger
+        BigInteger bigNum = new BigInteger("100000000000000000000000000000000000000000000000000000000000000");
+        response.put("b", bigNum.toString(2)); // Convert to base 2 string
+
+        // c: Zero
+        response.put("c", Integer.toBinaryString(0));
+
+        // d: Null => Java should return null
+        response.put("d", null);
+
+        // e: Positive integer
+        response.put("e", Integer.toBinaryString(2));
+
+        return response;
+    }
+}
+
+
+ouput:
+
+
+{
+  "a": "-10",
+  "b": "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "10"
+}
+

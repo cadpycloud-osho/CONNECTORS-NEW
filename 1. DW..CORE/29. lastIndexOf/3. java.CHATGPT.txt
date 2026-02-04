@@ -1,0 +1,82 @@
+lastIndexOf:
+
+
+example 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> list1 = Arrays.asList("a", "b", "c", "d");
+        List<String> list2 = Arrays.asList("x", "w", "x");
+        List<String> list3 = Arrays.asList("a", "b", "c", "c");
+
+        int present = list1.lastIndexOf("c");
+        int notPresent = list2.lastIndexOf("c");
+        int presentMoreThanOnce = list3.lastIndexOf("c");
+
+        System.out.println("{");
+        System.out.println("  \"present\": " + present + ",");
+        System.out.println("  \"notPresent\": " + notPresent + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnce);
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 3
+}
+
+
+
+--------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String s1 = "abcd";
+        String s2 = "xyz";
+        String s3 = "abcdc";
+
+        int present = s1.lastIndexOf("c");
+        int notPresent = s2.lastIndexOf("c");
+        int presentMoreThanOnce = s3.lastIndexOf("c");
+
+        System.out.println("{");
+        System.out.println("  \"present\": " + present + ",");
+        System.out.println("  \"notPresent\": " + notPresent + ",");
+        System.out.println("  \"presentMoreThanOnce\": " + presentMoreThanOnce);
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "present": 2,
+  "notPresent": -1,
+  "presentMoreThanOnce": 4
+}
+
+
+--------------------------------------------------

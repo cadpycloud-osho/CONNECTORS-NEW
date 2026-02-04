@@ -1,0 +1,80 @@
+seconds:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SecondsProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        ZonedDateTime dateTime =
+                ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        // nextSecond
+        result.put(
+                "nextSecond",
+                dateTime.plusSeconds(1).toString()
+        );
+
+        // previousSecond
+        result.put(
+                "previousSecond",
+                dateTime.minusSeconds(1).toString()
+        );
+
+        // decimalInputPeriod: seconds(4.555)
+        Duration decimalSeconds = Duration.ofMillis(4555);
+        result.put(
+                "decimalInputPeriod",
+                decimalSeconds.toString()
+        );
+
+        // wholeNumberInputPeriod: seconds(4)
+        Duration wholeSeconds = Duration.ofSeconds(4);
+        result.put(
+                "wholeNumberInputPeriod",
+                wholeSeconds.toString()
+        );
+
+        // addNegativeValue: seconds(-1) + seconds(2)
+        Duration addNegative =
+                Duration.ofSeconds(-1).plusSeconds(2);
+
+        result.put(
+                "addNegativeValue",
+                addNegative.getSeconds()
+        );
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+
+from("direct:start")
+    .process(new SecondsProcessor())
+    .to("log:seconds-example");
+
+
+output:
+
+{
+  "nextSecond": "2020-10-05T20:22:35.385Z",
+  "previousSecond": "2020-10-05T20:22:33.385Z",
+  "decimalInputPeriod": "PT4.555S",
+  "wholeNumberInputPeriod": "PT4S",
+  "addNegativeValue": 1
+}
+
+
+
+

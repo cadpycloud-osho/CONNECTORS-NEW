@@ -1,0 +1,75 @@
+substringAfter:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String substringAfterDW(String input, String delimiter) {
+
+        // DW behaviour
+        if (input == null) return null;
+
+        if (delimiter == null) delimiter = "";
+
+        // if delimiter = "" → return entire string
+        if (delimiter.isEmpty()) {
+            return input;
+        }
+
+        int index = input.indexOf(delimiter);
+
+        // delimiter not found → return ""
+        if (index == -1) {
+            return "";
+        }
+
+        // return substring after the delimiter
+        return input.substring(index + delimiter.length());
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class SubstringAfterController {
+
+    @GetMapping("/substringAfter")
+    public Map<String, String> substringAfterExamples() {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.substringAfterDW(null, "'"));
+        result.put("b", StringUtils.substringAfterDW("", "-"));
+        result.put("c", StringUtils.substringAfterDW("abc", "b"));
+        result.put("d", StringUtils.substringAfterDW("abcba", "b"));
+        result.put("e", StringUtils.substringAfterDW("abc", "d"));
+        result.put("f", StringUtils.substringAfterDW("abc", ""));
+
+        return result;
+    }
+}
+
+
+
+
+output:
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "cba",
+  "e": "",
+  "f": "abc"
+}
+

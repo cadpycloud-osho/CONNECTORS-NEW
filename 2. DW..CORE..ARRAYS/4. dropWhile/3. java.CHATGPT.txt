@@ -1,0 +1,32 @@
+dropWhile:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Integer> arr = Arrays.asList(0, 1, 3, 2, 1);
+
+        // Equivalent of DataWeave: arr dropWhile $ < 3
+        List<Integer> result = arr.stream()
+                                  .dropWhile(n -> n < 3)
+                                  .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+[3, 2, 1]
+
+

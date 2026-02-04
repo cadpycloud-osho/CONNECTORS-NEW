@@ -1,0 +1,28 @@
+lines:
+
+
+input:
+
+
+import java.util.Arrays;
+
+public class Main {
+
+    public static String[] lines(String input) {
+        if (input == null) return new String[0];
+        return input.split("\\r?\\n", -1); // include empty lines
+    }
+
+    public static void main(String[] args) {
+        String input = "hello world\n\nhere   data-weave";
+        String[] result = lines(input);
+
+        System.out.println(Arrays.toString(result));
+    }
+}
+
+
+OUTPUT:
+
+
+[hello world, , here   data-weave]

@@ -1,0 +1,266 @@
+update:
+
+example 1:
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, String> map = new HashMap<>();
+        map.put("name", "Mariano");
+
+        map.put("name", "Data Weave"); // overwrites previous value
+
+        System.out.println(map);
+    }
+}
+
+
+
+output:
+{name=Data Weave}
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Mariano");
+
+        // Update field("name")
+        payload.put("name", "Data Weave");
+
+        System.out.println(payload);
+    }
+}
+
+
+output:
+
+{name=Data Weave}
+
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> list = new ArrayList<>(List.of(1, 2, 3));
+        list.set(1, 5);
+
+        System.out.println(list);
+    }
+}
+
+
+
+
+
+output:
+
+[1, 5, 3]
+
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        list.add(new HashMap<>(Map.of("role", "a", "name", "spiderman")));
+        list.add(new HashMap<>(Map.of("role", "b", "name", "batman")));
+
+        list.forEach(m -> m.put("role", "Super Hero"));
+
+        System.out.println(list);
+    }
+}
+
+
+
+output:
+
+[{
+   "role": "Super Hero",
+   "name": "spiderman"
+ },
+ {
+   "role": "Super Hero",
+   "name": "batman"
+}]
+
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+        List<Integer> payload = new ArrayList<>(List.of(1, 2, 3));
+
+        // update index(1)
+        payload.set(1, 5);
+
+        System.out.println(payload);
+    }
+}
+
+
+output:
+
+[1, 5, 3]
+
+
+---------------------------------------------------------------
+
+
+
+
+example 6:
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, Object> user = new HashMap<>();
+        user.put("name", "Mariano");
+
+        Map<String, Object> root = new HashMap<>();
+        root.put("user", user);
+
+        ((Map<String, Object>) root.get("user")).put("name", "Data Weave");
+
+        System.out.println(root);
+    }
+}
+
+
+
+output:
+
+
+{
+  "user": {
+    "name": "Data Weave"
+  }
+}
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+input:
+
+import java.io.ByteArrayInputStream;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+
+        String xml = """
+        <users>
+          <user>
+            <name>Phoebe</name>
+            <language>French</language>
+          </user>
+          <user>
+            <name>Joey</name>
+            <language>English</language>
+          </user>
+        </users>
+        """;
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document doc = factory.newDocumentBuilder()
+                .parse(new ByteArrayInputStream(xml.getBytes()));
+
+        NodeList languages = doc.getElementsByTagName("language");
+
+        for (int i = 0; i < languages.getLength(); i++) {
+            if ("English".equals(languages.item(i).getTextContent())) {
+                languages.item(i).setTextContent("Gibberish");
+            }
+        }
+
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(doc), new StreamResult(System.out));
+    }
+}
+
+output:
+
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>Gibberish</language>
+  </user>
+</users>
+
+
+---------------------------------------------------------------
+
+
+
+

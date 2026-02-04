@@ -1,0 +1,100 @@
+runUrl:
+
+input:
+
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class DwRunUrlTest {
+
+    static class RunResult {
+        boolean success;
+        String value;
+        String mimeType = "application/dw";
+        String encoding = "UTF-8";
+        List<String> logs = new ArrayList<>();
+
+        static RunResult success(String value) {
+            RunResult res = new RunResult();
+            res.success = true;
+            res.value = value;
+            return res;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new RunUrlRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class RunUrlRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // jsonValue input binding
+                        Map<String, Object> jsonValue = new LinkedHashMap<>();
+                        jsonValue.put("value", "{\"name\": \"Mariano\"}".getBytes(StandardCharsets.UTF_8));
+                        jsonValue.put("encoding", "UTF-8");
+                        jsonValue.put("properties", new HashMap<>());
+                        jsonValue.put("mimeType", "application/json");
+
+                        // Simulate runUrl("classpath://.../example.dwl", {"payload": jsonValue})
+                        // example.dwl contains: output application/java --- payload.name
+                        RunResult executeOk = RunResult.success("\"Mariano\"");
+
+                        // Build result
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        
+                        Map<String, Object> executeOkResult = new LinkedHashMap<>();
+                        executeOkResult.put("success", executeOk.success);
+                        executeOkResult.put("value", executeOk.value);
+                        executeOkResult.put("mimeType", executeOk.mimeType);
+                        executeOkResult.put("encoding", executeOk.encoding);
+                        executeOkResult.put("logs", executeOk.logs);
+                        result.put("execute_ok", executeOkResult);
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+
+{
+  "execute_ok" : {
+    "success" : true,
+    "value" : "\"Mariano\"",
+    "mimeType" : "application/dw",
+    "encoding" : "UTF-8",
+    "logs" : [ ]
+  }
+}
+
+
+

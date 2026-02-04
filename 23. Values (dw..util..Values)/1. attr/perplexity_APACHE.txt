@@ -1,0 +1,44 @@
+attr:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class AttributeMetadataRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getAttrMetadata")
+            .routeId("Attribute-Selector-Route")
+            .process(exchange -> {
+                // 1. Define the parameters (replicating the source)
+                String namespaceUri = "http://acme.com/foo";
+                String attrName = "myAttr";
+
+                // 2. Build the metadata map
+                Map<String, Object> metadata = new LinkedHashMap<>();
+                metadata.put("kind", "Attribute");
+                metadata.put("namespace", namespaceUri);
+                metadata.put("selector", attrName);
+
+                // 3. Set the Map as the body
+                exchange.getIn().setBody(metadata);
+            })
+            .marshal().json()
+            .log("Attribute Metadata: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "kind": "Attribute",
+  "namespace": "http://acme.com/foo",
+  "selector": "myAttr"
+}

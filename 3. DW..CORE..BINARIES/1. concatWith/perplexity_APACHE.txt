@@ -1,0 +1,44 @@
+concatWith:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Base64;
+
+public class BinaryConcatRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:binaryConcat")
+            .process(exchange -> {
+                // "CAFE" hex → bytes [202, 254]
+                byte[] cafeBytes = new byte[]{(byte)0xCA, (byte)0xFE};
+                
+                // "ABCD" hex → bytes [171, 205]
+                byte[] abcdBytes = new byte[]{(byte)0xAB, (byte)0xCD};
+                
+                // Concatenate binaries
+                byte[] combined = new byte[cafeBytes.length + abcdBytes.length];
+                System.arraycopy(cafeBytes, 0, combined, 0, cafeBytes.length);
+                System.arraycopy(abcdBytes, 0, combined, cafeBytes.length, abcdBytes.length);
+                
+                // Base64 encode (matches DataWeave output)
+                String base64Result = Base64.getEncoder().encodeToString(combined);
+                
+                exchange.getIn().setBody(base64Result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+
+output:
+
+"yv6rzQ=="
+
+
+

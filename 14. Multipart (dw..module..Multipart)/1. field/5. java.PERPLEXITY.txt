@@ -1,0 +1,253 @@
+field:
+
+
+example 1:
+
+
+input:
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+    public static void main(String[] args) {
+        String boundary = "_Part_320_1528378161.1542639222352";
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(baos, StandardCharsets.UTF_8), true);
+
+        // First part - matches DataWeave part1
+        writer.printf("------=%s\r\n", boundary);
+        writer.println("Content-Disposition: form-data; name=\"myFirstPart\"");
+        writer.println();
+        writer.println("content for my first part");
+
+        // Second part - matches DataWeave part2  
+        writer.printf("------=%s\r\n", boundary);
+        writer.println("Content-Disposition: form-data; name=\"mySecondPart\"");
+        writer.println();
+        writer.println("content for my second part");
+
+        // Closing boundary
+        writer.printf("------=%s--\r\n", boundary);
+        writer.flush();
+
+        System.out.print(baos.toString(StandardCharsets.UTF_8));
+    }
+}
+
+
+output:
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161.1542639222352--
+
+---------------------------------------------------------------
+example 2:
+
+
+input:
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        // Use the same boundary as in the DataWeave example
+        String boundary = "----=_Part_8032_681891620.1542560124825";
+
+        String orderJson = """
+        [
+          {
+            "order": 1,
+            "amount": 2
+          },
+          {
+            "order": 32,
+            "amount": 1
+          }
+        ]
+        """;
+
+        String clientsXml = """
+        <clients>
+          <client>
+            <id>1</id>
+            <name>Mariano</name>
+          </client>
+          <client>
+            <id>2</id>
+            <name>Shoki</name>
+          </client>
+        </clients>
+        """;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(baos, StandardCharsets.UTF_8),
+            true
+        );
+
+        // Part 1: order (JSON file)
+        writer.append(boundary).append("\r\n");
+        writer.append("Content-Type: application/json").append("\r\n");
+        writer.append("Content-Disposition: form-data; name=\"order\"; filename=\"order.json\"")
+              .append("\r\n");
+        writer.append("\r\n");
+        writer.append(orderJson).append("\r\n");
+
+        // Part 2: clients (XML)
+        writer.append(boundary).append("\r\n");
+        writer.append("Content-Type: application/xml").append("\r\n");
+        writer.append("Content-Disposition: form-data; name=\"clients\"")
+              .append("\r\n");
+        writer.append("\r\n");
+        writer.append(clientsXml).append("\r\n");
+
+        // Closing boundary
+        writer.append(boundary).append("--").append("\r\n");
+        writer.flush();
+
+        // This prints the exact multipart body
+        System.out.print(baos.toString(StandardCharsets.UTF_8));
+    }
+}
+
+
+output:
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_8032_681891620.1542560124825
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_8032_681891620.1542560124825--
+
+
+---------------------------------------------------------------
+example 3:
+
+
+input:
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+    public static void main(String[] args) {
+        String boundary = "_Part_4846_2022598837.1542560230901";
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(baos, StandardCharsets.UTF_8), true);
+
+        // Part 1: order JSON with filename
+        writer.printf("------=%s\r\n", boundary);
+        writer.println("Content-Type: application/json");
+        writer.println("Content-Disposition: form-data; name=\"order\"; filename=\"order.json\"");
+        writer.println();
+        writer.println("""
+            [
+              {
+                "order": 1,
+                "amount": 2
+              },
+              {
+                "order": 32,
+                "amount": 1
+              }
+            ]
+            """);
+
+        // Part 2: clients XML
+        writer.printf("------=%s\r\n", boundary);
+        writer.println("Content-Type: application/xml");
+        writer.println("Content-Disposition: form-data; name=\"clients\"");
+        writer.println();
+        writer.println("""
+            <clients>
+              <client>
+                <id>1</id>
+                <name>Mariano</name>
+              </client>
+              <client>
+                <id>2</id>
+                <name>Shoki</name>
+              </client>
+            </clients>
+            """);
+
+        // Closing boundary
+        writer.printf("------=%s--\r\n", boundary);
+        writer.flush();
+
+        System.out.print(baos.toString(StandardCharsets.UTF_8));
+    }
+}
+
+
+output:
+
+
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/json
+Content-Disposition: form-data; name="order"; filename="order.json"
+
+[
+  {
+    "order": 1,
+    "amount": 2
+  },
+  {
+    "order": 32,
+    "amount": 1
+  }
+]
+------=_Part_4846_2022598837.1542560230901
+Content-Type: application/xml
+Content-Disposition: form-data; name="clients"
+
+<clients>
+  <client>
+    <id>1</id>
+    <name>Mariano</name>
+  </client>
+  <client>
+    <id>2</id>
+    <name>Shoki</name>
+  </client>
+</clients>
+------=_Part_4846_2022598837.1542560230901--

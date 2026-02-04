@@ -1,0 +1,150 @@
+isEmpty:
+
+
+
+EXAMPLE 1:
+
+
+
+input:
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave arrays are represented as Java Lists
+        List<Integer> emptyList = Arrays.asList();
+        
+        // Corrected: Changed 'non-emptyList' to 'nonEmptyList' to remove the illegal hyphen.
+        List<Integer> nonEmptyList = Arrays.asList(1);
+
+        // isEmpty([]) -> uses List.isEmpty()
+        boolean result1 = emptyList.isEmpty();
+        
+        // isEmpty([1]) -> uses List.isEmpty()
+        boolean result2 = nonEmptyList.isEmpty();
+
+        List<Boolean> outputList = Arrays.asList(result1, result2);
+
+        System.out.println("--- DataWeave isEmpty (List) Conversion ---");
+        System.out.println("Output: " + outputList);
+    }
+}
+
+output:
+
+[true, false]
+----------------------------------------------------------------
+
+
+
+EXAMPLE 2:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        String emptyString = "";
+        String nonEmptyString = "DataWeave";
+
+        boolean result1 = emptyString.isEmpty();
+        boolean result2 = nonEmptyString.isEmpty();
+
+        List<Boolean> outputList = Arrays.asList(result1, result2);
+
+        System.out.println("--- DataWeave isEmpty (String) Conversion ---");
+        System.out.println("Output: " + outputList);
+    }
+}
+
+
+
+
+output:
+
+[true, false]
+
+
+----------------------------------------------------------------
+
+EXAMPLE 3:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+
+public class PureJavaIsEmptyExample3 {
+
+    public static void main(String[] args) {
+        // DataWeave objects are represented as Java Maps
+        Map<String, String> emptyMap = Collections.emptyMap();
+        Map<String, String> non-emptyMap = Map.of("name", "DataWeave");
+
+        // isEmpty({}) -> uses Map.isEmpty()
+        boolean result1 = emptyMap.isEmpty();
+        
+        // isEmpty({name: "DataWeave"}) -> uses Map.isEmpty()
+        boolean result2 = non-emptyMap.isEmpty();
+
+        List<Boolean> outputList = Arrays.asList(result1, result2);
+
+        System.out.println("--- DataWeave isEmpty (Object/Map) Conversion ---");
+        System.out.println("Output: " + outputList);
+    }
+}
+
+output:
+
+[true, false]
+----------------------------------------------------------------
+
+
+EXAMPLE 4:
+
+
+
+input:
+
+
+public class Main { // Corrected: Renamed the public class to Main
+
+    public static void main(String[] args) {
+        // DataWeave input
+        String nullValue = null;
+
+        // isEmpty(null) -> In DataWeave, isEmpty(null) returns true.
+        // In Java, this is translated to a null check (value == null).
+        boolean result = (nullValue == null);
+
+        System.out.println("--- DataWeave isEmpty (Null) Conversion ---");
+        System.out.println("Output:");
+        // The required output format is achieved by concatenating the result into a string.
+        System.out.println("{ \"nullValue\": " + result + " }");
+    }
+}
+
+output:
+
+{ "nullValue": true }
+----------------------------------------------------------------
+
+
+
+
+
+
+
+

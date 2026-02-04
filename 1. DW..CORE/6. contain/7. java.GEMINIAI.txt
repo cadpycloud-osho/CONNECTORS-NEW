@@ -1,0 +1,188 @@
+contains:
+
+examples 1:
+
+
+input:
+
+import java.util.List;
+import java.util.Arrays; // FIX: Added this missing import
+import java.util.Map;
+import java.util.ArrayList; // Not strictly needed, but harmless
+
+// Renamed class to Main to resolve common compilation errors in single-file environments
+public class Main { 
+
+    public static void main(String[] args) {
+        // 1. Simulate the DataWeave array path resolution: payload.root.*order.*items
+        // The values extracted from the XML are: 155, 30, 15, 5, 4, 7, 1, 3.
+        List<String> itemsList = Arrays.asList(
+            "155", "30", "15", "5", "4", "7", "1", "3", null // null is allowed in Arrays.asList
+        );
+
+        String itemToFind = "3";
+
+        // 2. Core Logic: Use List.contains()
+        // Checks if the list includes the specific String object.
+        boolean containsItem = itemsList.contains(itemToFind); // True
+
+        // 3. Construct the output Map
+        // Uses Java 9+ Map.of() for simplicity
+        Map<String, Boolean> output = Map.of("ContainsRequestedItem", containsItem);
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(output);
+        
+        // This will print: {ContainsRequestedItem=true}
+        // which matches the requested logic and output format {"ContainsRequestedItem": true}
+    }
+}
+
+
+
+output:
+
+{ContainsRequestedItem: true}
+---------------------------------------------------------------
+
+
+
+examples 2:
+
+
+input:
+
+public class Main { // Renamed the class to 'Main' to resolve the compilation error
+
+    public static void main(String[] args) {
+        String sourceString = "mulesoft";
+        String substring = "mule";
+
+        // 1. Core Logic: Use String.contains()
+        // This method checks if the sourceString contains the specified substring.
+        boolean containsSubstring = sourceString.contains(substring); // True, since "mulesoft" contains "mule"
+
+        // 2. Print the output
+        System.out.println("Output:");
+        // This prints the boolean value 'true'
+        System.out.println(containsSubstring);
+    }
+}
+
+
+output:
+
+true
+---------------------------------------------------------------
+
+
+
+
+examples 3:
+
+
+input:
+
+import java.util.Map;
+
+public class Main { // Renamed the class to 'Main' to resolve the compilation error
+
+    public static void main(String[] args) {
+        // 1. Simulate reading the content of the mystring XML tag
+        String sourceString = "some string"; // Value of payload.root.mystring
+
+        String substring = "me";
+
+        // 2. Core Logic: Use String.contains()
+        // Checks if "some string" contains "me" (which it does).
+        boolean containsSubstring = sourceString.contains(substring); // True
+
+        // 3. Construct the output Map
+        // Uses Java 9+ Map.of()
+        Map<String, Boolean> output = Map.of("ContainsString", containsSubstring);
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(output);
+    }
+}
+
+output:
+
+{ContainsString: true}
+---------------------------------------------------------------
+
+
+
+
+
+examples 4:
+
+
+input:
+
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Main { // Renamed the class to 'Main' to resolve the compilation error
+
+    public static void main(String[] args) {
+        // 1. Simulate reading the content of the mystring XML tag
+        String sourceString = "A very long string"; // Value of payload.root.mystring
+
+        // 2. Define the Regular Expression Pattern
+        // The DW pattern /s[t|p]rin/ means: "s" followed by "t" OR "p", followed by "rin".
+        // The pattern 's[t|p]rin' matches 'strin' in 'string'.
+        String regexPattern = "s[t|p]rin"; 
+        
+        // 3. Core Logic: Use java.util.regex
+        Pattern pattern = Pattern.compile(regexPattern);
+        Matcher matcher = pattern.matcher(sourceString);
+
+        // The find() method checks if any part of the sourceString matches the pattern.
+        boolean containsPattern = matcher.find(); // True, because "strin" is found.
+
+        // 4. Construct the output Map
+        // Uses Java 9+ Map.of()
+        Map<String, Boolean> output = Map.of("ContainsString", containsPattern);
+
+        // Print the output
+        System.out.println("Output:");
+        System.out.println(output);
+    }
+}
+
+output:
+
+{ContainsString: true}
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

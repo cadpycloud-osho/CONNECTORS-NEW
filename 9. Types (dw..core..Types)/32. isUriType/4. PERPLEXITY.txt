@@ -1,0 +1,46 @@
+isUriType:
+
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriTypeController {
+
+    private boolean isUriType(Object value) {
+        return value instanceof URI;
+    }
+
+    @GetMapping("/uri-type-check")
+    public Map<String, Boolean> checkUriTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        URI aUri = URI.create("https://example.com");   // AUri alias
+        URI uriType = URI.create("http://localhost:8080"); // Uri
+        String str = "test";                             // String
+        
+        result.put("a", isUriType(aUri));
+        result.put("b", isUriType(uriType));
+        result.put("c", isUriType(str));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

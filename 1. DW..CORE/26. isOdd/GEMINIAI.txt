@@ -1,0 +1,43 @@
+isOdd:
+
+INPUT:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+public class IsOddExample {
+
+    /**
+     * Custom utility method to replicate DataWeave's isOdd behavior.
+     */
+    public static boolean isOdd(int number) {
+        // A number is odd if the remainder when divided by 2 is 1 (or -1 for negative numbers).
+        // Since the input is non-negative in the example, we check for a non-zero remainder.
+        return number % 2 != 0;
+    }
+
+    public static Map<String, List<Boolean>> calculateOddStatus() {
+        // DataWeave: isOdd(0)
+        boolean result1 = isOdd(0); // false
+        
+        // DataWeave: isOdd(1)
+        boolean result2 = isOdd(1); // true
+        
+        // DataWeave: isOdd(2+2) -> isOdd(4)
+        boolean result3 = isOdd(2 + 2); // false
+        
+        // Return results as a Map (JSON object equivalent)
+        return Map.of("isOdd", Arrays.asList(result1, result2, result3));
+    }
+
+    public static void main(String[] args) {
+        Map<String, List<Boolean>> output = calculateOddStatus();
+        System.out.println("Input Logic: Custom isOdd(n) -> n % 2 != 0");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+OUTPUT:
+
+{isOdd=[false, true, false]}

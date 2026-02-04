@@ -1,0 +1,61 @@
+isNumeric:
+
+
+
+input:
+
+import java.util.*;
+
+public class IsNumericExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> output = new LinkedHashMap<>();
+
+        output.put("a", isNumeric(null));
+        output.put("b", isNumeric(""));
+        output.put("c", isNumeric("  "));
+        output.put("d", isNumeric("123"));
+        output.put("e", isNumeric("१२३")); // Devanagari digits
+        output.put("f", isNumeric("12 3"));
+        output.put("g", isNumeric("ab2c"));
+        output.put("h", isNumeric("12-3"));
+        output.put("i", isNumeric("12.3"));
+        output.put("j", isNumeric("-123"));
+        output.put("k", isNumeric("+123"));
+
+        System.out.println(output);
+    }
+
+    private static boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) return false;
+
+        for (char c : str.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+
+

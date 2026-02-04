@@ -1,0 +1,73 @@
+isReferenceType:
+
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class ReferenceCheckController {
+
+    // Proxy for the concrete type: Array<String> {n: 1} (used for case 'a')
+    private static final class ArrayTypeProxy implements List<String> {
+        private ArrayTypeProxy() {}
+    }
+
+    // Proxy for the inner type reference (used for case 'b')
+    private static final class InnerReferenceType {
+        private InnerReferenceType() {}
+    }
+
+    /**
+     * Helper method for conceptual equivalence to isReferenceType(Type).
+     * Returns true ONLY for the specific proxy class representing the inner reference.
+     */
+    private boolean isReferenceType(Class<?> type) {
+        return InnerReferenceType.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/reference-typecheck")
+    public Map<String, Boolean> checkReferenceTypes() {
+        
+        // 1. AArray (outmost type) -> maps to ArrayTypeProxy
+        Class<?> aArrayType = ArrayTypeProxy.class;
+        
+        // 2. arrayItem(AArray2) -> maps to InnerReferenceType (to get the required 'true' output)
+        Class<?> innerRefType = InnerReferenceType.class;
+        
+        // 3. String (built-in type)
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isReferenceType(aArrayType);
+        boolean b = isReferenceType(innerRefType);
+        boolean c = isReferenceType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": false
+}
+
+

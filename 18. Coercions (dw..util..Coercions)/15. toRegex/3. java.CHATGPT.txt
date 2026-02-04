@@ -1,0 +1,31 @@
+toRegex:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        Pattern toRegexEx1 = Pattern.compile("a-Z");
+        Pattern toRegexEx2 = Pattern.compile("0-9+");
+
+        result.put("toRegexEx1", toRegexEx1.pattern());
+        result.put("toRegexEx2", toRegexEx2.pattern());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{toRegexEx1=a-Z, toRegexEx2=0-9+}
+
+

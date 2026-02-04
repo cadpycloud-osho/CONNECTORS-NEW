@@ -1,0 +1,37 @@
+asin:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("asin0", asinDW(0));
+        result.put("asin13", asinDW(0.13));
+        result.put("asin-1", asinDW(-1));
+        result.put("asin1.1", asinDW(1.1));
+
+        System.out.println(result);
+    }
+
+    // DataWeave-compatible asin
+    private static Double asinDW(double value) {
+        double r = Math.asin(value);
+        return Double.isNaN(r) ? null : r;
+    }
+}
+
+
+output:
+
+{asin0=0.0, asin13=0.1303689797031455, asin-1=-1.5707963267948966, asin1.1=null}
+
+

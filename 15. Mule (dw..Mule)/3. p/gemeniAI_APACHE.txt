@@ -1,0 +1,35 @@
+p:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class PropertiesRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // --- Option 1: Using Simple Language (Declarative) ---
+        // This is the most common and "Camel-native" way.
+        from("timer:start?repeatCount=1")
+            .routeId("simple-property-route")
+            .log("The HTTP Port is: {{http.port}}");
+
+        // --- Option 2: Programmatic Lookup (Inside a Processor) ---
+        // This is the direct equivalent of the Mule::p() function logic.
+        from("direct:lookup")
+            .process(exchange -> {
+                // Accessing the property via the Camel Context
+                String port = exchange.getContext().resolvePropertyPlaceholders("{{http.port}}");
+                
+                System.out.println("Programmatic Lookup: " + port);
+            });
+    }
+}
+
+output:
+
+INFO  simple-property-route - The HTTP Port is: 8081
+
+
+

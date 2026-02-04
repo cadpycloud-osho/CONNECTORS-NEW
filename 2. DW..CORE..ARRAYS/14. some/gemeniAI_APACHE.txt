@@ -1,0 +1,75 @@
+some:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+
+public class CamelSomeExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // "ok" cases: At least one matches
+                        List<Boolean> ok = List.of(
+                            List.of(1, 2, 3).stream().anyMatch(n -> n % 2 == 0),
+                            List.of(1, 2, 3).stream().anyMatch(n -> n % 2 == 0),
+                            List.of(1, 2, 3).stream().anyMatch(n -> n % 2 != 0),
+                            // Short-circuits: stops as soon as it finds 2
+                            List.of(1, 2, 3, 4, 5, 6, 7, 8).stream().anyMatch(n -> n == 2),
+                            List.of(1, 2, 3).stream().anyMatch(n -> n == 1),
+                            List.of(1, 1, 1).stream().anyMatch(n -> n == 1),
+                            List.of(1).stream().anyMatch(n -> n == 1)
+                        );
+
+                        // "err" cases: None match
+                        List<Boolean> err = List.of(
+                            List.of(1, 2, 3).stream().anyMatch(n -> n == 100),
+                            List.of(1).stream().anyMatch(n -> n == 2)
+                        );
+
+                        exchange.getIn().setBody(Map.of("results", List.of(
+                            Map.of("ok", ok),
+                            Map.of("err", err)
+                        )));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+from("direct:batchCheck")
+    .choice()
+        .when(body().method("stream").anyMatch(item -> item.getPriority() > 8))
+            .to("activemq:queue:fast-track")
+        .otherwise()
+            .to("activemq:queue:standard-processing")
+    .end();
+
+output:
+
+{
+  "results": [
+    { "ok": [true, true, true, true, true, true, true] },
+    { "err": [false, false] }
+  ]
+}
+
+
+
+

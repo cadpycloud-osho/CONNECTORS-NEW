@@ -1,0 +1,36 @@
+substringEvery:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SubstringEveryExample {
+
+    public static void main(String[] args) {
+        String input = "substringEvery";
+        List<String> result = substringEvery(input, 3);
+        System.out.println(result);
+    }
+
+    public static List<String> substringEvery(String value, int size) {
+        List<String> parts = new ArrayList<>();
+        if (value == null || size <= 0) {
+            return parts;
+        }
+        for (int i = 0; i < value.length(); i += size) {
+            int end = Math.min(i + size, value.length());
+            parts.add(value.substring(i, end));
+        }
+        return parts;
+    }
+}
+
+
+output:
+
+
+["sub", "str", "ing", "Eve", "ry"]
+
+

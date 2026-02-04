@@ -1,0 +1,41 @@
+isBooleanType:
+
+
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class BooleanTypeController {
+    
+    @GetMapping("/is-boolean-type")
+    public Map<String, Boolean> isBooleanType() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // isBooleanType(ABoolean) where ABoolean = Boolean -> true
+        result.put("a", true);
+        
+        // isBooleanType(Boolean) -> true
+        result.put("b", true);
+        
+        // isBooleanType(String) -> false
+        result.put("c", false);
+        
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

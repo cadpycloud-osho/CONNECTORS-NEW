@@ -1,0 +1,30 @@
+mapString:
+
+
+input:
+
+
+@RestController
+@RequestMapping("/api")
+public class StringTransformController {
+    
+    @GetMapping("/transform")
+    public Map<String, String> transformBalance() {
+        String input = "$234";
+        String result = input.chars()
+            .mapToObj(ch -> Character.isDigit((char) ch) ? '~' : (char) ch)
+            .collect(Collectors.joining());
+        return Map.of("balance", result);
+    }
+}
+
+
+output:
+
+
+{
+  "balance": "$~~~"
+}[web:1][web:11]
+
+
+

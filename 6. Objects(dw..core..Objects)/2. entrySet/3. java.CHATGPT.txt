@@ -1,0 +1,77 @@
+entrySet:
+
+
+input:
+
+import java.util.*;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        String xmlString = "<xml attr=\"x\"><a>true</a><b>1</b></xml>";
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setIgnoringElementContentWhitespace(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new org.xml.sax.InputSource(new java.io.StringReader(xmlString)));
+
+        Element root = doc.getDocumentElement();
+
+        // Extract attributes
+        Map<String, String> attributes = new LinkedHashMap<>();
+        NamedNodeMap attrMap = root.getAttributes();
+        for (int i = 0; i < attrMap.getLength(); i++) {
+            Node attr = attrMap.item(i);
+            attributes.put(attr.getNodeName(), attr.getNodeValue());
+        }
+
+        // Extract child elements
+        Map<String, String> childValues = new LinkedHashMap<>();
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child instanceof Element) {
+                childValues.put(child.getNodeName(), child.getTextContent());
+            }
+        }
+
+        // Build entrySet
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("key", root.getNodeName());
+        entry.put("value", childValues);
+        entry.put("attributes", attributes);
+
+        List<Map<String, Object>> entrySet = new ArrayList<>();
+        entrySet.add(entry);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("entrySet", entrySet);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "entrySet": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+

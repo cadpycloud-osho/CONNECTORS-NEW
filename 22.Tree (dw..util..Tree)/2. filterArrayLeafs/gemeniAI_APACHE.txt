@@ -1,0 +1,73 @@
+filterArrayLeafs:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class TreeFilterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:filterTree")
+            .process(exchange -> {
+                List<Object> myArray = Arrays.asList(
+                    1, 
+                    Map.of("name", Arrays.asList("", true), "test", 213), 
+                    "123", 
+                    null
+                );
+
+                Map<String, Object> result = new LinkedHashMap<>();
+                
+                // Example A: Filter out Nulls and Strings
+                result.put("a", filterArrayLeafs(myArray, (val, path) -> 
+                    !(val == null || val instanceof String)));
+
+                // Example B: Keep only Nulls or the value 1
+                result.put("b", filterArrayLeafs(myArray, (val, path) -> 
+                    (val == null || Integer.valueOf(1).equals(val))));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Recursive helper to mimic DW filterArrayLeafs
+     */
+    private Object filterArrayLeafs(Object node, java.util.function.BiPredicate<Object, List<String>> predicate) {
+        if (node instanceof List) {
+            return ((List<?>) node).stream()
+                .map(item -> filterArrayLeafs(item, predicate)) // Recurse
+                .filter(item -> {
+                    // If it's a leaf (not a Map/List), check the predicate
+                    if (!(item instanceof Map || item instanceof List)) {
+                        return predicate.test(item, null); 
+                    }
+                    return true; // Keep containers, their children were already filtered
+                })
+                .collect(Collectors.toList());
+        } else if (node instanceof Map) {
+            Map<Object, Object> result = new LinkedHashMap<>();
+            ((Map<?, ?>) node).forEach((k, v) -> {
+                result.put(k, filterArrayLeafs(v, predicate));
+            });
+            return result;
+        }
+        return node; // Return leaf as is (filtering happens at the List level)
+    }
+}
+
+output:
+
+{
+  "a": [1, {"name": [true], "test": 213}],
+  "b": [1, {"name": [], "test": 213}, null],
+  "c": {"a": [1]},
+  "d": [{"name": [], "test": 213}]
+}
+
+

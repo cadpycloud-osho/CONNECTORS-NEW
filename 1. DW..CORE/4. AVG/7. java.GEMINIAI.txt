@@ -1,0 +1,57 @@
+avg(values: Array<Number>): Number
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+// Renamed to Main to match the assumed file name (Main.java) and resolve the compilation error.
+public class Main { 
+
+    // Helper method to calculate the average of a List of Numbers (handles mixed types by using double)
+    private static double calculateAverage(List<? extends Number> numbers) {
+        if (numbers == null || numbers.isEmpty()) {
+            return 0.0;
+        }
+
+        // Use streams to sum the double values of all elements in the list
+        double sum = numbers.stream()
+                             .mapToDouble(Number::doubleValue) // Convert to double for accurate summation
+                             .sum();
+
+        // Calculate and return the average
+        return sum / numbers.size();
+    }
+
+    public static void main(String[] args) {
+        // DataWeave Source: { a: avg([1, 1000]), b: avg([1, 2, 3]) }
+
+        // --- Calculation for "a": (1 + 1000) / 2 = 1001 / 2 = 500.5 ---
+        List<Integer> listA = Arrays.asList(1, 1000);
+        double avgA = calculateAverage(listA);
+
+        // --- Calculation for "b": (1 + 2 + 3) / 3 = 6 / 3 = 2.0 ---
+        List<Integer> listB = Arrays.asList(1, 2, 3);
+        double avgB = calculateAverage(listB);
+
+        // 4. Construct the final output structure (Map equivalent to the JSON object)
+        Map<String, Double> output = Map.of(
+            "a", avgA,
+            "b", avgB
+        );
+
+        // Print the result (similar to the DataWeave JSON output)
+        System.out.println("Output:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+{a: 500.5, b: 2.0}
+

@@ -1,0 +1,59 @@
+fromHex:
+
+
+
+input:
+
+import java.util.Base64;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: fromHex("4D756C65")
+        byte[] hexBytes = fromHex("4D756C65");
+        
+        // Convert to Base64 (matches DataWeave output representation)
+        String base64Result = Base64.getEncoder().encodeToString(hexBytes);
+        
+        // Output as JSON-like structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"hexToBinary\": \"" + base64Result + "\" as Binary {base: \"64\"}");
+        System.out.println("}");
+        
+        // Raw bytes for verification
+        System.out.println("\nRaw bytes (hex): " + bytesToHex(hexBytes));
+        System.out.println("Decoded text: " + new String(hexBytes));
+    }
+    
+    // DataWeave "fromHex()" equivalent
+    public static byte[] fromHex(String hexString) {
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length(); i += 2) {
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                                 + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return bytes;
+    }
+    
+    // Utility to display bytes as hex
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+
+{
+  "hexToBinary": "TXVsZQ==" as Binary {base: "64"}
+}
+
+Raw bytes (hex): 4D 75 6C 65
+Decoded text: Mule
+
+
+

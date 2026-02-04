@@ -1,0 +1,47 @@
+
+
+literalValueOf:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    // 1. Define the literal value as a public constant, mimicking the value inside DataWeave type AType.
+    public static final String ATypeLiteralValue = "Mariano";
+
+    /**
+     * Conceptually mirrors DataWeave's literalValueOf(Type).
+     * It returns the single, defined literal value.
+     */
+    public static String literalValueOf(String literalType) {
+        // In a real system, this would look up the value based on the type definition.
+        // Here, we hardcode the return value based on the DataWeave source.
+        return literalType;
+    }
+
+    public static void main(String[] args) {
+        
+        // Define the variable holding the literal value
+        String aType = ATypeLiteralValue; 
+        
+        // --- Execution ---
+        
+        // a: literalValueOf(AType)
+        String a = literalValueOf(aType);
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + a + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": "Mariano"
+}

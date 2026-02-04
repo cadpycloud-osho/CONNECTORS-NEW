@@ -1,0 +1,118 @@
+keysOf:
+
+example 1:
+
+
+input:
+
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> obj = Map.of("a", true, "b", 1);
+        
+        Map<String, List<String>> result = Map.of(
+            "keysOf", keysOf(obj)
+        );
+        
+        System.out.println(result);
+    }
+    
+    public static List<String> keysOf(Map<String, ?> map) {
+        return map.keySet().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+    }
+}
+
+
+output:
+
+{keysOf=[a, b]}
+
+---------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<users xmlns=\"http://test.com\">\n" +
+                    "  <user name=\"Mariano\" lastName=\"Achaval\"/>\n" +
+                    "  <user name=\"Stacey\" lastName=\"Duke\"/>\n" +
+                    "</users>";
+        
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+        
+        NodeList users = doc.getElementsByTagName("user");
+        
+        List<Object> keysOfResult = new ArrayList<>();
+        List<Object> namesOfResult = new ArrayList<>();
+        
+        for (int i = 0; i < users.getLength(); i++) {
+            Element user = (Element) users.item(i);
+            keysOfResult.addAll(keysOf(user));
+            namesOfResult.addAll(namesOf(user));
+        }
+        
+        Map<String, Object> result = Map.of(
+            "keysOfExample", keysOfResult,
+            "namesOfExample", namesOfResult
+        );
+        
+        System.out.println(result);
+    }
+    
+    public static List<Object> keysOf(Element element) {
+        List<Object> result = new ArrayList<>();
+        
+        // Element namespace (equivalent to $.# for element)
+        result.add(element.getNamespaceURI());
+        
+        // Attributes (equivalent to $.@ for attributes)
+        NamedNodeMap attrs = element.getAttributes();
+        Map<String, String> attrMap = new LinkedHashMap<>();
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Attr attr = (Attr) attrs.item(i);
+            attrMap.put(attr.getLocalName(), attr.getValue());
+        }
+        result.add(attrMap);
+        
+        return result;
+    }
+    
+    public static List<Object> namesOf(Element element) {
+        List<Object> result = new ArrayList<>();
+        
+        // Element namespace (null for elements in DataWeave)
+        result.add(null);
+        
+        // Attributes (null for attribute names in DataWeave)
+        NamedNodeMap attrs = element.getAttributes();
+        for (int i = 0; i < attrs.getLength(); i++) {
+            result.add(null);
+        }
+        
+        return result;
+    }
+}
+
+
+
+output:
+
+{keysOfExample=[http://test.com, http://test.com, {name=Mariano, lastName=Achaval}, {name=Stacey, lastName=Duke}], namesOfExample=[null, null, null, null]}
+
+---------------------------------------------------------

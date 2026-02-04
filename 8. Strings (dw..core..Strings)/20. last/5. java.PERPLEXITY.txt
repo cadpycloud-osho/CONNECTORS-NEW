@@ -1,0 +1,22 @@
+last:
+
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "hello world!";
+        int length = input.length();
+        String result = input.substring(Math.max(0, length - 6));
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+
+output:
+
+
+"world!"
+
+

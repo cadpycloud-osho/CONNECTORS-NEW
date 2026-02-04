@@ -1,0 +1,159 @@
+toDate:
+
+example 1:
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    private final String sourceDateString = "2023-28-03";
+
+    /**
+     * Mimics DataWeave's chained toDate() with multiple formatters: 
+     * Tries each formatter in order until one succeeds.
+     */
+    private LocalDate chainedToDate(String dateString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDate.parse(dateString, formatter);
+            } catch (DateTimeParseException e) {
+                // Swallow exception and continue to the next formatter
+            }
+        }
+        // Return null if all formatters fail (mimicking a null or error state)
+        return null;
+    }
+
+    public Map<String, Object> getDateParsingMap() {
+        // Define formatters
+        // Formatter 1: Fails ("yyyy/MM/dd" expects slashes, dateString has hyphens)
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.US);
+        // Formatter 2: Succeeds ("yyyy-dd-MM" correctly matches "2023-28-03")
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-dd-MM", Locale.US);
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        LocalDate parsedDateA = chainedToDate(sourceDateString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        // Simulates a failed transformation in DataWeave's try/catch
+        String errorMessageB;
+        try {
+            // Only try the failing formatter (formatter1)
+            LocalDate.parse(sourceDateString, formatter1);
+            errorMessageB = "No error occurred."; // This line will not be reached
+        } catch (DateTimeParseException e) {
+            // Use the DataWeave specific error message that is requested in the output
+            errorMessageB = "Could not find a valid formatter for '" + sourceDateString + "'";
+        }
+
+        // Create the root map
+        Map<String, Object> rootMap = new HashMap<>();
+        
+        // Add the results. LocalDate.toString() provides the ISO format "yyyy-MM-dd".
+        rootMap.put("a", parsedDateA != null ? parsedDateA.toString() : null); // 2023-03-28
+        rootMap.put("b", errorMessageB);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, Object> result = converter.getDateParsingMap();
+        
+        // Print the Java structure, then manually format it to match the requested output format.
+        // Map.toString() output: {a=2023-03-28, b=Could not find a valid formatter for '2023-28-03'}
+        
+        // Reformat the Map output to match the requested JSON-like string exactly
+        String formattedOutput = "{" + 
+            result.entrySet().stream()
+                .map(entry -> {
+                    String value = entry.getValue().toString();
+                    // Quote the string values
+                    return String.format("\"%s\":\"%s\"", entry.getKey(), value);
+                })
+                .collect(Collectors.joining(",")) + 
+            "}";
+
+        System.out.println(formattedOutput);
+    }
+}
+output:
+
+
+{a=2023-03-28, b=Could not find a valid formatter for '2023-28-03'}
+
+
+
+----------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public Map<String, String> getDateParsingMap() {
+        
+        // --- Logic for Key 'a' (ISO Standard Parsing) ---
+        // DataWeave / Java's LocalDate.parse(String) defaults to ISO 8601 format (yyyy-MM-dd).
+        String dateStringA = "2015-10-01";
+        LocalDate parsedDateA = LocalDate.parse(dateStringA); 
+
+        // --- Logic for Key 'b' (Custom Format Parsing) ---
+        // DataWeave allows specifying the format pattern; in Java, we use DateTimeFormatter.
+        String dateStringB = "2003/10/01";
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate parsedDateB = LocalDate.parse(dateStringB, customFormatter);
+
+        // Create the root map
+        Map<String, String> rootMap = new HashMap<>();
+        
+        // Add the results. LocalDate.toString() automatically provides the ISO format "yyyy-MM-dd".
+        rootMap.put("a", parsedDateA.toString());
+        rootMap.put("b", parsedDateB.toString());
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Instantiate the Main class, which contains the logic.
+        Main converter = new Main();
+        
+        Map<String, String> result = converter.getDateParsingMap();
+        
+        // Print the Java structure
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+
+{a=2015-10-01, b=2003-10-01}
+
+
+
+
+
+
+

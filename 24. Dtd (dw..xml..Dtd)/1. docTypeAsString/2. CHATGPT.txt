@@ -1,0 +1,63 @@
+docTypeAsString:
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class XmlDtdController {
+
+    @GetMapping("/doctype")
+    public String getDocType() {
+        String rootName = "cXML";
+        String systemId = "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd";
+
+        return rootName + " SYSTEM " + systemId;
+    }
+}
+
+
+
+output:
+
+cXML SYSTEM http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd
+
+
+---------------------------------------------------------------------
+
+
+example 2:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DtdController {
+
+    @GetMapping("/doctype")
+    public String getDocType() {
+        String rootName = "html";
+        String publicId = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+        String systemId = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
+
+        return rootName + " PUBLIC " + publicId + " " + systemId;
+    }
+}
+
+
+
+output:
+
+
+html PUBLIC -//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd
+
+
+

@@ -1,0 +1,40 @@
+tan:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MathTanController {
+
+    @GetMapping("/tan")
+    public Map<String, Double> getTanValues() {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("tan0", Math.tan(0));
+        result.put("tan13", Math.tan(0.13));
+        result.put("tan-1", Math.tan(-1));
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "tan0": 0.0,
+  "tan13": 0.13073731800446006,
+  "tan-1": -1.5574077246549023
+}
+

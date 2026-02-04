@@ -1,0 +1,176 @@
+contains:
+
+
+example 1:
+
+
+input:
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.w3c.dom.NodeList;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.StringReader;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+// Name this file 'OrderCheckProcessor.java'
+public class OrderCheckProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String xmlPayload = exchange.getIn().getBody(String.class);
+
+        // 1. Parse the XML payload
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        // NOTE: InputSource(new StringReader(xmlPayload)) handles the XML parsing efficiently
+        Document doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xmlPayload)));
+
+        // 2. Define the XPath to check for the item "3"
+        // This expression selects all 'items' nodes under 'root/order' that have the text value '3'.
+        String xpathExpression = "/root/order/items[text()='3']";
+        
+        // 3. Evaluate the XPath
+        NodeList nodes = (NodeList) XPathFactory.newInstance().newXPath().evaluate(
+            xpathExpression, doc, XPathConstants.NODESET
+        );
+
+        // 4. Determine the boolean result (DataWeave 'contains' check)
+        boolean containsRequestedItem = nodes.getLength() > 0;
+
+        // 5. Construct the final JSON output string
+        String jsonOutput = String.format("{\"ContainsRequestedItem\": %s}", containsRequestedItem);
+
+        // 6. Set the JSON string as the new message body
+        exchange.getIn().setBody(jsonOutput);
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "application/json");
+    }
+}
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://camel.apache.org/schema/spring 
+           http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <bean id="orderCheckProcessor" class="com.example.OrderCheckProcessor"/>
+
+    <camelContext id="dataweave-to-camel-context">
+        <route id="Check-Order-Item-Route">
+            
+            <from uri="direct:startOrderCheck"/>
+
+            <process ref="orderCheckProcessor"/>
+
+            <to uri="log:output"/>
+            
+            <to uri="mock:result"/>
+        </route>
+    </camelContext>
+
+</beans>
+
+output:
+{
+  "ContainsRequestedItem": true
+}
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://camel.apache.org/schema/spring 
+           http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <camelContext id="simple-string-check-context">
+        <route id="String-Contains-Route">
+            
+            <from uri="direct:startStringCheck"/>
+
+            <setBody>
+                <simple>"mulesoft" contains "mule"</simple> 
+                </setBody>
+
+            <transform>
+                <simple>{"ContainsRequestedItem": ${body}}</simple>
+            </transform>
+
+            <to uri="log:result?showBody=true"/>
+            <to uri="mock:result"/>
+        </route>
+    </camelContext>
+
+</beans>
+
+output:
+
+{
+  "ContainsRequestedItem": true
+}
+
+-----------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://camel.apache.org/schema/spring 
+           http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <camelContext id="xpath-string-check-context">
+        <route id="XML-String-Check-Route">
+            
+            <from uri="direct:startStringCheck"/>
+
+            <setHeader headerName="MyStringValue">
+                <xpath>/root/mystring/text()</xpath> 
+                </setHeader>
+
+            <setBody>
+                <simple>${header.MyStringValue} contains "me"</simple>
+                </setBody>
+
+            <transform>
+                <simple>{"ContainsString": ${body}}</simple>
+            </transform>
+
+            <to uri="log:result?showBody=true"/>
+            <to uri="mock:result"/>
+        </route>
+    </camelContext>
+
+</beans>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<root><mystring>some string</mystring></root>
+
+
+output:
+
+{
+  "ContainsString": true
+}
+-----------------------------------------------------------------

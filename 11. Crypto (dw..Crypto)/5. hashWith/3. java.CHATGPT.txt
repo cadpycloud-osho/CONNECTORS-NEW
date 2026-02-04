@@ -1,0 +1,42 @@
+hashWith:
+
+
+input:
+
+import java.security.MessageDigest;
+
+public class Main {
+
+    public static String hashWithMD2(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD2");
+            byte[] hashBytes = md.digest(input.getBytes());
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashBytes) {
+                char c = (char) (b & 0xFF);
+                if (Character.isISOControl(c) || c == '\uFFFD') {
+                    sb.append(String.format("\\u%04x", (int) c));
+                } else {
+                    sb.append(c);
+                }
+            }
+
+            return sb.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void main(String[] args) {
+        String md2 = hashWithMD2("hello");
+        System.out.println("{ \"md2\": \"" + md2 + "\" }");
+    }
+}
+
+
+output:
+
+{ "md2": "\ufffd\u00046s\ufffd1\ufffdh\ufffd}8\u0004\ufffd\u0006U" }
+
+

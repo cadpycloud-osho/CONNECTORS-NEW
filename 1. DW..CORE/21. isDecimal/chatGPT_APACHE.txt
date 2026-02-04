@@ -1,0 +1,19 @@
+isDecimal:
+
+
+input:
+
+from("direct:isDecimalExample")
+.setBody(simple(
+    "["
+  + " ${1.1.toString().contains('.')},"
+  + " ${1.toString().contains('.')},"
+  + " ${'1.1'.contains('.')}"
+  + "]"
+));
+
+
+output:
+
+
+[ true, false, true ]

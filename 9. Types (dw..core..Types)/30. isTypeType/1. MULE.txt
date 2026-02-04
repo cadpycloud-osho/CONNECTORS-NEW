@@ -1,0 +1,85 @@
+isTypeType:
+
+isTypeType(t: Type): Boolean
+
+isTypeType(t: Type): Boolean
+Returns true if the input is the Type type.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = Type
+output application/json
+---
+{
+   a: isTypeType(AType),
+   b: isTypeType(Type),
+   c: isTypeType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

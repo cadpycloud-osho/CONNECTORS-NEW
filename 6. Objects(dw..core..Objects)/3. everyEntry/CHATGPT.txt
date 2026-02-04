@@ -1,0 +1,70 @@
+everyEntry:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class EveryEntryController {
+
+    @GetMapping("/everyEntry")
+    public Map<String, Boolean> evaluateMaps() {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        // a: {} -> true (no entries => true)
+        Map<String, Object> a = new HashMap<>();
+        result.put("a", a.entrySet().stream()
+                .allMatch(entry -> entry.getValue() instanceof String));
+
+        // b: {a: "", b: "123"} -> true
+        Map<String, Object> b = Map.of("a", "", "b", "123");
+        result.put("b", b.entrySet().stream()
+                .allMatch(entry -> entry.getValue() instanceof String));
+
+        // c: {a: "", b: 123} -> false
+        Map<String, Object> c = new HashMap<>();
+        c.put("a", "");
+        c.put("b", 123);
+        result.put("c", c.entrySet().stream()
+                .allMatch(entry -> entry.getValue() instanceof String));
+
+        // d: {a: "", b: 123} -> all keys must == "a" => false
+        Map<String, Object> d = new HashMap<>();
+        d.put("a", "");
+        d.put("b", 123);
+        result.put("d", d.keySet().stream()
+                .allMatch(key -> key.equals("a")));
+
+        // e: {a: ""} -> true (only key is "a")
+        Map<String, Object> e = Map.of("a", "");
+        result.put("e", e.keySet().stream()
+                .allMatch(key -> key.equals("a")));
+
+        // f: null -> treated as true (same as DataWeave)
+        Map<String, Object> f = null;
+        result.put("f", f == null || f.isEmpty());
+
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false,
+  "d": false,
+  "e": true,
+  "f": true
+}
+

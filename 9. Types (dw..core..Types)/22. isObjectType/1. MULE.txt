@@ -1,0 +1,55 @@
+isObjectType:
+
+isObjectType(t: Type): Boolean
+
+isObjectType(t: Type): Boolean
+Returns true if the input is the Object type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = {name: String}
+output application/json
+---
+{
+   a: isObjectType(AType),
+   b: isObjectType(Boolean),
+}
+
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

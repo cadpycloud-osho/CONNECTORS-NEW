@@ -1,0 +1,132 @@
+mapObject:
+
+example 1:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, String> input = new LinkedHashMap<>();
+        input.put("a", "b");
+        input.put("c", "d");
+
+        Map<String, Map<String, String>> result = new LinkedHashMap<>();
+
+        int index = 0;
+        for (Map.Entry<String, String> entry : input.entrySet()) {
+            Map<String, String> inner = new LinkedHashMap<>();
+            inner.put(entry.getValue(), entry.getKey());
+            result.put(String.valueOf(index), inner);
+            index++;
+        }
+
+        System.out.println(result);
+    }
+}
+
+output:
+
+{0={b=a}, 1={d=c}}
+
+
+---------------------------------------------------------------
+
+
+
+example 2:
+
+<prices>
+    <basic>9.99</basic>
+    <premium>53</premium>
+    <vip>398.99</vip>
+</prices>
+
+input:
+
+import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MapObjectExample2 {
+    public static void main(String[] args) {
+
+        Map<String, Double> prices = new LinkedHashMap<>();
+        prices.put("basic", 9.99);
+        prices.put("premium", 53.0);
+        prices.put("vip", 398.99);
+
+        DecimalFormat df = new DecimalFormat("##.00");
+
+        Map<String, String> updatedPrices = new LinkedHashMap<>();
+        for (Map.Entry<String, Double> entry : prices.entrySet()) {
+            double newPrice = entry.getValue() + 5;
+            updatedPrices.put(entry.getKey(), df.format(newPrice));
+        }
+
+        System.out.println(updatedPrices);
+    }
+}
+
+
+output:
+
+
+{basic=14.99, premium=58.00, vip=403.99}
+
+---------------------------------------------------------------
+
+
+
+example 3:
+
+<prices>
+</prices>
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        String xml =
+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<prices>\n" +
+            "</prices>";
+
+        System.out.println(xml);
+    }
+}
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,90 @@
+floor:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // Input values from the DataWeave example
+        double value1 = 1.5;
+        double value2 = 2.2;
+        double value3 = 3.0; // 3 in DW is treated as 3.0 for floor calculation
+
+        // 1. Calculate the floor for each value using Math.floor()
+        // Math.floor() returns a double, so we cast to int to match the DW output [1, 2, 3]
+        int result1 = (int) Math.floor(value1);
+        int result2 = (int) Math.floor(value2);
+        int result3 = (int) Math.floor(value3);
+        
+        // 2. Collect the results into a List (equivalent to the JSON array output)
+        List<Integer> outputList = Arrays.asList(result1, result2, result3);
+
+        System.out.println("--- DataWeave Floor Conversion ---");
+        System.out.println("Input Values: [" + value1 + ", " + value2 + ", " + value3 + "]");
+        System.out.println("Output (Floor List): " + outputList);
+    }
+}
+
+output:
+
+
+Input Values: [1.5, 2.2, 3.0]
+Output (Floor List): [1, 2, 3]
+
+
+
+
+
+
+
+Alternative using Streams
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        List<Double> inputValues = Arrays.asList(1.5, 2.2, 3.0);
+        
+        // Stream the input, apply Math.floor, and cast to int
+        List<Integer> outputList = inputValues.stream()
+            .map(Math::floor)
+            .map(Double::intValue) // Converts the resulting double to int
+            .collect(Collectors.toList());
+
+        System.out.println("--- DataWeave Floor Conversion (Stream) ---");
+        System.out.println("Input Values: " + inputValues);
+        System.out.println("Output (Floor List): " + outputList);
+    }
+}
+
+
+
+output:
+
+
+Input Values: [1.5, 2.2, 3.0]
+Output (Floor List): [1, 2, 3]
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+p:
+
+p(propertyName: String): String
+
+p(propertyName: String): String
+This function returns a string that identifies the value of one of these input properties: Mule property placeholders, System properties, or Environment variables.
+
+
+
+Source
+<flow name="simple">
+ <logger level="INFO" doc:name="Logger"
+   message="#[Mule::p('http.port')]"/>
+</flow>

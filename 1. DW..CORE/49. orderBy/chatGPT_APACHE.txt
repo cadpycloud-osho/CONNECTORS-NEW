@@ -1,0 +1,224 @@
+orderBy:
+
+
+example 1:
+
+input:
+
+from("direct:orderByExample")
+.setBody(constant(
+    List.of(
+        Map.of("letter", "e"),
+        Map.of("letter", "d")
+    )
+))
+.setBody(simple(
+    "${body.stream().sorted((o1,o2) -> o1[letter].compareTo(o2[letter])).toList()}"
+));
+
+
+output:
+
+[
+  { "letter": "d" },
+  { "letter": "e" }
+]
+
+
+----------------------------------------------------------
+
+example 2:
+
+input:
+
+Simpler alternative using one reverse sort:
+
+.setBody(simple(
+    "${body.stream().sorted(Comparator.reverseOrder()).toList()}"
+));
+
+Simpler alternative using one reverse sort:
+
+.setBody(simple(
+    "${body.stream().sorted(Comparator.reverseOrder()).toList()}"
+));
+
+output:
+
+{ "orderDescending": [8,3,1] }
+
+
+----------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:orderByExample")
+.setBody(constant(List.of(3,2,3)))
+.setBody(simple(
+    "${body.stream().sorted().toList()}"
+));
+
+
+output:
+
+[2,3,3]
+
+
+----------------------------------------------------------
+
+example 4:
+
+input:
+
+from("direct:orderByAgeExample")
+.setBody(constant(
+    List.of(
+        Map.of("name", "Santiago", "age", 42),
+        Map.of("name", "Leandro", "age", 29),
+        Map.of("name", "Mariano", "age", 35)
+    )
+))
+.setBody(simple(
+    "${body.stream().sorted((o1,o2) -> Integer.compare(o1[age], o2[age])).toList()}"
+));
+
+
+output:
+
+[
+  { "name": "Leandro", "age": 29 },
+  { "name": "Mariano", "age": 35 },
+  { "name": "Santiago", "age": 42 }
+]
+
+
+----------------------------------------------------------
+
+example 5:
+
+input:
+
+from("direct:orderByDateDescendingExample")
+.setBody(constant(
+    List.of(
+        "2020-10-01T23:57:59.017Z",
+        "2022-12-22T12:12:12.011Z",
+        "2020-10-01T12:40:10.012Z",
+        "2020-10-01T23:57:59.021Z"
+    )
+))
+.setBody(simple(
+    "${body.stream()" +
+    ".sorted((d1,d2) -> Instant.parse(d2).toEpochMilli() <=> Instant.parse(d1).toEpochMilli())" +
+    ".toList()}"
+));
+
+
+output:
+
+[
+  "2022-12-22T12:12:12.011Z",
+  "2020-10-01T23:57:59.021Z",
+  "2020-10-01T23:57:59.017Z",
+  "2020-10-01T12:40:10.012Z"
+]
+
+
+----------------------------------------------------------
+
+example 6:
+
+input:
+
+Source
+%dw 2.0
+var myInput = [
+    {
+        "AccountNumber": "987999321",
+        "NameOnAccount": "QA",
+        "Type": "AAAA",
+        "CDetail": {
+            "Status": "Open"
+        }
+    },
+    {
+        "AccountNumber": "12399978",
+        "NameOnAccount": "QA",
+        "Type": "BBBB",
+        "CDetail": {}
+    },
+    {
+        "AccountNumber": "32199974",
+        "NameOnAccount": "QA",
+        "Type": "CCCC",
+        "CDetail": {}
+    }
+]
+
+
+
+output application/json
+---
+(myInput orderBy $.Type)[-1 to 0]
+
+DataWeave
+Output
+[
+  {
+    "AccountNumber": "32199974",
+    "NameOnAccount": "QA",
+    "Type": "CCCC",
+    "CDetail": {
+
+    }
+  },
+  {
+    "AccountNumber": "12399978",
+    "NameOnAccount": "QA",
+    "Type": "BBBB",
+    "CDetail": {
+
+    }
+  },
+  {
+    "AccountNumber": "987999321",
+    "NameOnAccount": "QA",
+    "Type": "AAAA",
+    "CDetail": {
+      "Status": "Open"
+    }
+  }
+]
+
+
+
+output:
+
+[
+  {
+    "AccountNumber": "32199974",
+    "NameOnAccount": "QA",
+    "Type": "CCCC",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "12399978",
+    "NameOnAccount": "QA",
+    "Type": "BBBB",
+    "CDetail": {}
+  },
+  {
+    "AccountNumber": "987999321",
+    "NameOnAccount": "QA",
+    "Type": "AAAA",
+    "CDetail": {
+      "Status": "Open"
+    }
+  }
+]
+
+
+----------------------------------------------------------
+

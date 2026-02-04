@@ -1,0 +1,41 @@
+tomorrow:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class TomorrowExample {
+
+    /**
+     * DataWeave equivalent: tomorrow()
+     * Calculates the date for the day after the current system date.
+     * @return The LocalDate for tomorrow.
+     */
+    public static LocalDate getTomorrowDate() {
+        // 1. Get the current date
+        LocalDate today = LocalDate.now();
+        // 2. Add one day
+        return today.plusDays(1);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Tomorrow's Date (tomorrow()) Example ---");
+        
+        // 1. Call the Java function
+        LocalDate tomorrow = getTomorrowDate();
+        
+        // 2. Format the output to match the DataWeave ISO 8601 format ("YYYY-MM-DD")
+        String formattedOutput = tomorrow.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        
+        // Note: The output date will be one day after the execution date.
+        System.out.println("Result Output: " + formattedOutput);
+    }
+}
+
+
+output:
+
+
+025-12-11

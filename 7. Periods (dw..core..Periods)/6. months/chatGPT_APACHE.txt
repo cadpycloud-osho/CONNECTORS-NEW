@@ -1,0 +1,61 @@
+months:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MonthsProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        ZonedDateTime baseDateTime =
+                ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        // nextMonth
+        result.put(
+                "nextMonth",
+                baseDateTime.plus(Period.ofMonths(1)).toString()
+        );
+
+        // fourMonthPeriod
+        Period fourMonths = Period.ofMonths(4);
+        result.put("fourMonthPeriod", fourMonths.toString());
+
+        // addNegativeValue: -1 + 2 = 1 month
+        int monthResult =
+                Period.ofMonths(-1)
+                        .plus(Period.ofMonths(2))
+                        .getMonths();
+
+        result.put("addNegativeValue", monthResult);
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:start")
+    .process(new MonthsProcessor())
+    .to("log:months-example");
+
+
+output:
+
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+

@@ -1,0 +1,37 @@
+yesterday:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class YesterdayDateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:getYesterday")
+            .routeId("Yesterday-Date-Route")
+            .process(exchange -> {
+                // 1. Logic: yesterday()
+                // Get today's date and subtract 1 day
+                LocalDate yesterday = LocalDate.now().minusDays(1);
+
+                // 2. Format to ISO-8601 string (yyyy-MM-dd)
+                String result = yesterday.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                // 3. Set the result as the message body
+                exchange.getIn().setBody(result);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Yesterday's Date: ${body}");
+    }
+}
+
+
+output:
+
+
+"2026-01-20"

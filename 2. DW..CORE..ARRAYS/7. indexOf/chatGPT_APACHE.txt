@@ -1,0 +1,22 @@
+indexOf:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+
+        java.util.List<String> users =
+            java.util.List.of("Mariano", "Leandro", "Julian");
+
+        int index = users.indexOf("Julian");
+
+        exchange.getIn().setBody(index);
+    });
+
+
+
+
+output:
+
+2

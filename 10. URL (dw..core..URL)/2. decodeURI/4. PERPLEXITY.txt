@@ -1,0 +1,37 @@
+decodeURI:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriUtils;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DecodeUriController {
+
+    @GetMapping("/decode-uri")
+    public Map<String, String> decodeUri() {
+        Map<String, String> result = new HashMap<>();
+        
+        // decodeURI('http://asd/%20text%20to%20decode%20/text')
+        String encodedUrl = "http://asd/%20text%20to%20decode%20/text";
+        String decodedUrl = UriUtils.decode(encodedUrl, "UTF-8");
+        
+        result.put("decodeURI", decodedUrl);
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "decodeURI": "http://asd/ text to decode /text"
+}
+
+

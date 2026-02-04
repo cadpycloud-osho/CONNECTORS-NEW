@@ -1,0 +1,180 @@
+zip:
+
+
+example 1:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class ZipExample1 {
+    public static void main(String[] args) {
+        List<Integer> list1 = Arrays.asList(0, 1);
+        List<String> list2 = Arrays.asList("a", "b");
+        
+        // Determine the length of the shorter list
+        int minLength = Math.min(list1.size(), list2.size());
+        
+        List<List<Object>> zippedList = new ArrayList<>();
+        
+        // Iterate up to minLength and create pairs
+        for (int i = 0; i < minLength; i++) {
+            List<Object> pair = Arrays.asList(list1.get(i), list2.get(i));
+            zippedList.add(pair);
+        }
+        
+        System.out.println("--- DWL Example 1 Output (Standard Zip) ---");
+        System.out.println(zippedList);
+    }
+}
+
+
+output:
+
+[[0, a], [1, b]]
+------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ZipExample2 {
+    
+    // Helper function to perform the DWL zip logic
+    private static List<List<Object>> zipLists(List<?> list1, List<?> list2) {
+        int minLength = Math.min(list1.size(), list2.size());
+        List<List<Object>> zippedList = new ArrayList<>();
+        
+        for (int i = 0; i < minLength; i++) {
+            List<Object> pair = Arrays.asList(list1.get(i), list2.get(i));
+            zippedList.add(pair);
+        }
+        return zippedList;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> L1_long = Arrays.asList(0, 1, 2, 3);
+        List<Integer> L1_short = Arrays.asList(0, 1, 2);
+        List<String> L2_long = Arrays.asList("a", "b", "c", "d");
+        List<String> L2_short = Arrays.asList("a", "b");
+        List<String> L2_shortest = Arrays.asList("a");
+        
+        Map<String, List<List<Object>>> output = new LinkedHashMap<>();
+        
+        // "a": [0, 1, 2, 3] zip ["a", "b", "c", "d"] -> minLength 4
+        output.put("a", zipLists(L1_long, L2_long));
+        
+        // "b": [0, 1, 2, 3] zip ["a"] -> minLength 1
+        output.put("b", zipLists(L1_long, L2_shortest));
+        
+        // "c": [0, 1, 2, 3] zip ["a", "b"] -> minLength 2
+        output.put("c", zipLists(L1_long, L2_short));
+        
+        // "d": [0, 1, 2] zip ["a", "b", "c", "d"] -> minLength 3
+        output.put("d", zipLists(L1_short, L2_long));
+
+        System.out.println("--- DWL Example 2 Output (Unequal Zipping) ---");
+        System.out.println(output);
+    }
+}
+
+output:
+
+{a=[[0, a], [1, b], [2, c], [3, d]], b=[[0, a]], c=[[0, a], [1, b]], d=[[0, a], [1, b], [2, c]]}
+------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class ZipExample3 {
+
+    // Generic helper function to perform the DWL zip logic
+    private static List<List<Object>> zipLists(List<?> list1, List<?> list2) {
+        int minLength = Math.min(list1.size(), list2.size());
+        List<List<Object>> zippedList = new ArrayList<>();
+        
+        for (int i = 0; i < minLength; i++) {
+            // Note: The element types are preserved, leading to nested lists.
+            List<Object> pair = Arrays.asList(list1.get(i), list2.get(i));
+            zippedList.add(pair);
+        }
+        return zippedList;
+    }
+
+    public static void main(String[] args) {
+        // Define all input lists
+        List<String> list1 = Arrays.asList("a", "b");        // Length 2
+        List<Integer> list2 = Arrays.asList(1, 2, 3);        // Length 3
+        List<String> list3 = Arrays.asList("aa", "bb");      // Length 2
+        List<List<?>> list4 = Arrays.asList(                 // Length 3
+            Arrays.asList("A", "B", "C"), 
+            Arrays.asList(11, 12), 
+            Arrays.asList("aA", "bB")
+        );
+        
+        // --- Step 1: myvar.list1 zip myvar.list2 ---
+        // L1: [ [ "a", 1 ], [ "b", 2 ] ] (Length 2)
+        List<List<Object>> L1 = zipLists(list1, list2); 
+        
+        // --- Step 2: L1 zip myvar.list3 ---
+        // L2: [ [ [ "a", 1 ], "aa" ], [ [ "b", 2 ], "bb" ] ] (Length 2)
+        List<List<Object>> L2 = zipLists(L1, list3);
+        
+        // --- Step 3: L2 zip myvar.list4 ---
+        // L3: [ [ [ [ "a", 1 ], "aa" ], [ "A", "B", "C" ] ], [ [ [ "b", 2 ], "bb" ], [ 11, 12 ] ] ] (Length 2, truncates list4)
+        List<List<Object>> finalOutput = zipLists(L2, list4);
+
+        System.out.println("--- DWL Example 3 Output (Nested Zipping) ---");
+        System.out.println(finalOutput);
+    }
+}
+
+output:
+
+[[[[a, 1], aa], [A, B, C]], [[[b, 2], bb], [11, 12]]]
+------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

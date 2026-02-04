@@ -1,0 +1,39 @@
+first:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class FirstStringController {
+
+    @GetMapping("/first5")
+    public Map<String, String> getFirstFive() {
+        Map<String, String> response = new HashMap<>();
+
+        String input = "hello world!";
+        String result = input.substring(0, 5);
+
+        response.put("output", result);
+
+        return response;
+    }
+}
+
+
+
+output:
+
+
+hello
+
+

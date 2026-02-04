@@ -1,0 +1,43 @@
+currentMilliseconds:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class TimerController {
+
+    /**
+     * Simulates the DataWeave logic for the currentMilliseconds() function.
+     * @return A map containing the current time in milliseconds since the epoch.
+     */
+    @GetMapping("/currentMilliseconds")
+    public Map<String, Long> getCurrentMilliseconds() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Long> output = new LinkedHashMap<>();
+
+        // Java equivalent of currentMilliseconds() is System.currentTimeMillis()
+        long currentMs = System.currentTimeMillis();
+
+        // Simulating the DataWeave call:
+        output.put("currentMilliseconds", currentMs);
+
+        return output;
+    }
+}
+
+
+output:
+
+
+{
+  "currentMilliseconds": 1734179235456
+}
+

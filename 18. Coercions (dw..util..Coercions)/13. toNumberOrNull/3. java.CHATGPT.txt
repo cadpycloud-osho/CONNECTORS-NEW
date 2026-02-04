@@ -1,0 +1,51 @@
+toNumberOrNull:
+
+
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("a", toNumberOrNull("0.005", new String[]{ "seconds", ".00" }));
+        result.put("b", toNumberOrNull("0.005", new String[]{ "seconds" }));
+
+        System.out.println(result);
+    }
+
+    private static Double toNumberOrNull(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                switch (format) {
+                    case ".00":
+                        DecimalFormat df = new DecimalFormat();
+                        df.setMaximumFractionDigits(2);
+                        df.setParseBigDecimal(true);
+                        return df.parse(value).doubleValue();
+                    case "seconds":
+                        if (value.matches("\\d+")) {
+                            return Double.parseDouble(value);
+                        }
+                        break;
+                    default:
+                        return Double.parseDouble(value);
+                }
+            } catch (ParseException | NumberFormatException ignored) {}
+        }
+        return null;
+    }
+}
+
+
+output:
+
+{a=0.005, b=null}
+
+

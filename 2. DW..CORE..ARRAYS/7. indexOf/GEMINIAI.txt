@@ -1,0 +1,41 @@
+indexOf:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class IndexOfExample {
+
+    public static void main(String[] args) {
+        // Input List
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        
+        // --- Scenario 1: Value found ---
+        // DataWeave Logic: indexOf(users, "Julian")
+        String targetValue1 = "Julian";
+        int index1 = users.indexOf(targetValue1); // Returns 2
+        
+        System.out.println("--- Scenario 1: Value Found (Julian) ---");
+        System.out.println("Input List: " + users);
+        System.out.println("Target Value: " + targetValue1);
+        System.out.println("Output (indexOf): " + index1);
+        
+        System.out.println();
+
+        // --- Scenario 2: Value not found (to demonstrate -1) ---
+        // DataWeave Logic Equivalent: indexOf(users, "Peter")
+        String targetValue2 = "Peter";
+        int index2 = users.indexOf(targetValue2); // Returns -1
+
+        System.out.println("--- Scenario 2: Value Not Found (Peter) ---");
+        System.out.println("Input List: " + users);
+        System.out.println("Target Value: " + targetValue2);
+        System.out.println("Output (indexOf): " + index2);
+    }
+}
+
+output:
+
+2

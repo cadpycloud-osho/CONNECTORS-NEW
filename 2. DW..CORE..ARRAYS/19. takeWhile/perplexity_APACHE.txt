@@ -1,0 +1,38 @@
+takeWhile:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class TakeWhileRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:takeWhile")
+            .process(exchange -> {
+                List<Integer> arr = Arrays.asList(0, 1, 2, 1);
+                
+                // takeWhile $ <= 1 → stop at first > 1
+                int splitIndex = IntStream.range(0, arr.size())
+                    .filter(i -> arr.get(i) > 1)
+                    .findFirst()
+                    .orElse(arr.size());
+                
+                List<Integer> result = arr.subList(0, splitIndex);
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[0, 1]
+

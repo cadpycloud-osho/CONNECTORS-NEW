@@ -1,0 +1,49 @@
+atan:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the atan function.
+     * @return A map containing the results of the arc tangent calculations.
+     */
+    @GetMapping("/calculateAtan")
+    public Map<String, Double> calculateAtan() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        // Helper function for atan (direct map to Java's Math.atan)
+        double atan(double x) {
+            // Math.atan returns the arc tangent of a value in the range (-pi/2, pi/2) radians.
+            return Math.atan(x);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("atan0", atan(0));
+        output.put("atan13", atan(0.13));
+        output.put("atan-1", atan(-1));
+
+        return output;
+    }
+}
+
+output:
+
+
+{
+  "atan0": 0.0,
+  "atan13": 0.12927500404814307,
+  "atan-1": -0.7853981633974483
+}
+

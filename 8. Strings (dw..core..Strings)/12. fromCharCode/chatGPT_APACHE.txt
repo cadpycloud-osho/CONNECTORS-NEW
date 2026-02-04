@@ -1,0 +1,30 @@
+fromCharCode:
+
+
+input:
+
+import java.util.*;
+
+public class FromCharCodeExample {
+
+    public static void main(String[] args) {
+
+        Map<String, String> output = new LinkedHashMap<>();
+
+        output.put("fromCharCode", fromCharCode(117));
+
+        System.out.println(output);
+    }
+
+    private static String fromCharCode(int code) {
+        return String.valueOf((char) code);
+    }
+}
+
+
+output:
+
+{ "fromCharCode": "u" }
+
+
+

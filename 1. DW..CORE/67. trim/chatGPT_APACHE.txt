@@ -1,0 +1,87 @@
+trim:
+
+example 1:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        String text = "   my really long  text     ";
+        String trimmed = text.trim(); // equivalent of DataWeave trim()
+
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("trim", trimmed);
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+{
+  "trim": "my really long  text"
+}
+
+
+
+-------------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+
+        String nullStr = null;
+        String emptyStr = "";
+        String blankStr = "     ";
+        String noBlankStr = "abc";
+        String withSpacesStr = "    abc    ";
+
+        // Using Java trim(), handle null safely
+        result.put("null", nullStr != null ? nullStr.trim() : null);
+        result.put("empty", emptyStr != null ? emptyStr.trim() : null);
+        result.put("blank", blankStr != null ? blankStr.trim() : null);
+        result.put("noBlankSpaces", noBlankStr != null ? noBlankStr.trim() : null);
+        result.put("withSpaces", withSpacesStr != null ? withSpacesStr.trim() : null);
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+{
+  "null": null,
+  "empty": "",
+  "blank": "",
+  "noBlankSpaces": "abc",
+  "withSpaces": "abc"
+}
+
+
+
+-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+between:
+
+input:
+
+import java.time.LocalDate;
+import java.time.Period;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Input Dates
+        LocalDate a1 = LocalDate.parse("2010-12-12");
+        LocalDate a2 = LocalDate.parse("2010-12-10");
+
+        LocalDate b1 = LocalDate.parse("2011-12-11");
+        LocalDate b2 = LocalDate.parse("2010-11-10");
+
+        LocalDate c1 = LocalDate.parse("2020-02-29");
+        LocalDate c2 = LocalDate.parse("2020-03-30");
+
+        // Calculate Periods
+        Period a = Period.between(a2, a1);
+        Period b = Period.between(b2, b1);
+        Period c = Period.between(c2, c1); // Note: Reversed order to match DW's negative result
+
+        // Output
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + periodToString(a) + "\",");
+        System.out.println("  \"b\": \"" + periodToString(b) + "\",");
+        System.out.println("  \"c\": \"" + periodToString(c) + "\"");
+        System.out.println("}");
+    }
+
+    private static String periodToString(Period p) {
+        return "P" + p.getYears() + "Y" + p.getMonths() + "M" + p.getDays() + "D";
+    }
+}
+
+
+output:
+
+
+
+{
+  "a": "P0Y0M2D",
+  "b": "P1Y1M1D",
+  "c": "P0Y-1M-1D"
+}

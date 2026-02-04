@@ -1,0 +1,123 @@
+filterObject:
+
+
+example 1:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+Map<String, String> input = new LinkedHashMap<>();
+input.put("a", "apple");
+input.put("b", "banana");
+
+Map<String, String> output = input.entrySet().stream()
+    .filter(entry -> entry.getValue().equals("apple"))
+    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+        (e1, e2) -> e1, LinkedHashMap::new));
+
+System.out.println(output);  // { "a": "apple" }
+
+
+output:
+
+{ a = apple }
+
+
+------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+Map<String, String> input = new LinkedHashMap<>();
+input.put("letter1", "a");
+input.put("letter2", "b");
+input.put("id", "1");
+
+Map<String, String> output = input.entrySet().stream()
+    .filter(entry -> entry.getKey().startsWith("letter"))
+    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+        (e1, e2) -> e1, LinkedHashMap::new));
+
+System.out.println(output);  // { "letter1": "a", "letter2": "b" }
+
+
+output:
+
+{ letter1 = a, letter2 = b }
+
+
+------------------------------------------------------
+
+example 3:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+Map<String, String> input = new LinkedHashMap<>();
+input.put("1", "a");
+input.put("2", "b");
+input.put("3", "c");
+
+List<Map.Entry<String, String>> entries = new ArrayList<>(input.entrySet());
+Map<String, String> output = IntStream.range(0, entries.size())
+    .filter(i -> i < 1)
+    .mapToObj(entries::get)
+    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+        (e1, e2) -> e1, LinkedHashMap::new));
+
+System.out.println(output);  // { "1": "a" }
+
+
+output:
+
+{ 1 = a }
+
+
+------------------------------------------------------
+
+example 4:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+Map<String, String> input = new LinkedHashMap<>();
+input.put("str1", "String 1");
+input.put("str2", "String 2");
+input.put("str3", null);
+input.put("str4", "String 4");
+
+Map<String, String> output = input.entrySet().stream()
+    .filter(entry -> entry.getValue() != null)
+    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+        (e1, e2) -> e1, LinkedHashMap::new));
+
+System.out.println(output);
+
+
+output:
+
+{ str1 = String 1, str2 = String 2, str4 = String 4 }
+
+
+------------------------------------------------------
+

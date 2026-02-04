@@ -1,0 +1,90 @@
+collapse:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class Main {
+
+    /**
+     * Custom method to emulate DataWeave's collapse() function.
+     * Splits a string into substrings based on consecutive, identical characters.
+     */
+    public static List<String> collapseString(String input) {
+        if (input == null || input.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<String> result = new ArrayList<>();
+        int length = input.length();
+        int i = 0; // Start index of the current sequence
+
+        while (i < length) {
+            char currentChar = input.charAt(i);
+            int j = i + 1; // End index of the current sequence (exclusive)
+
+            // Continue moving 'j' as long as the character is the same
+            while (j < length && input.charAt(j) == currentChar) {
+                j++;
+            }
+
+            // The substring from i to j consists of identical, consecutive chars
+            result.add(input.substring(i, j));
+
+            // Move the start index 'i' to the beginning of the next sequence
+            i = j;
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        // The input string with the non-breaking space (\u00A0)
+        String inputString = "a\u00A0 bbabb a";
+
+        List<String> collapsedList = collapseString(inputString);
+
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        
+        // Format the output to match the desired JSON-like structure
+        System.out.print("[");
+        for (int i = 0; i < collapsedList.size(); i++) {
+            System.out.print("\"" + collapsedList.get(i) + "\"");
+            if (i < collapsedList.size() - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println("]");
+    }
+}
+
+
+output:
+
+
+{
+  "collapse": [
+    "a",
+    "  ",
+    "b",
+    " ",
+    "b",
+    "a",
+    "bb",
+    " ",
+    "a"
+  ]
+}
+
+
+
+
+
+
+
+
+
+

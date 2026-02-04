@@ -1,0 +1,1479 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/ProductExt",
+  "definitions": {
+    "ProductExt": {
+      "example": {
+        "name": "irure consequat",
+        "longDescription": "velit ut laboris",
+        "id": null,
+        "productStatus": "nisi in ea dolore pariatur",
+        "description": "laboris in ipsum dolor cupidatat",
+        "productSKU": "veniam sit Lorem",
+        "quantityScheduleType": "minim dolor",
+        "canUseQuantitySchedule": null,
+        "validToDate": "1951-10-01",
+        "brand": [
+          {
+            "id": "Ut",
+            "name": "ad mollit esse",
+            "brandGrade": "occaecat"
+          }
+        ],
+        "stockLedgerValuationAmount": null,
+        "productCatalog": {
+          "name": "amet",
+          "id": "dolore Duis",
+          "activeFromDate": "1996-11-08",
+          "auditInfo": {
+            "createdDate": null,
+            "isDeleted": null,
+            "createdBy": "in laboris in Duis",
+            "updatedDate": null,
+            "updatedBy": "nulla occaecat ad tempor"
+          },
+          "activeToDate": "2004-06-16"
+        },
+        "glAccountCode": "dolor dolore culpa",
+        "isFoodstampPaymentAllowed": true,
+        "isWorkerDiscountAllowed": false,
+        "isSellable": true,
+        "allowPartialRefund": false,
+        "requiresInvididualUnitPricing": true,
+        "minimumAdvertisementAmount": 10993887,
+        "modelNumber": "qui id eiusmod",
+        "externalIds": [
+          "id"
+        ],
+        "isIntellectualPropertyProtected": false,
+        "auditInfo": {
+          "createdDate": "2018-10-20T20:03:50.938Z",
+          "isDeleted": false,
+          "createdBy": "id",
+          "updatedDate": null,
+          "updatedBy": "labore laborum"
+        },
+        "mSRPAmount": 12140607,
+        "masterProduct": [
+          "anim commodo ut proident in"
+        ],
+        "isQuantityEntryRequired": null,
+        "priceBookEntry": {
+          "id": null,
+          "auditInfo": {
+            "createdDate": "1988-07-08T10:04:30.959Z",
+            "isDeleted": true,
+            "createdBy": "do dolore culpa aliquip",
+            "updatedDate": "1947-08-27T18:51:01.167Z",
+            "updatedBy": "reprehenderit"
+          },
+          "servicePeriodCount": null,
+          "useStandardPrice": null,
+          "minRequiredOrderValue": null,
+          "maxRequiredOrderValue": 6532839,
+          "minRequiredQuantity": null,
+          "unitListPrice": null,
+          "isActive": null,
+          "product": [
+            "voluptate nostrud in"
+          ]
+        },
+        "isSellableIndependently": false,
+        "canUseRevenueSchedule": null,
+        "isSerialized": null,
+        "isPartnerDiscountAllowed": false,
+        "isRainCheckAllowed": null,
+        "isAutoProvisionable": null,
+        "minimumAdvertisementAmountStartDate": 38955214,
+        "lotIdentifier": "Ut",
+        "versionNumber": "labore amet aliqua officia consequat",
+        "revenueInstallmentPeriod": "Duis",
+        "manufacturerName": "sint sed",
+        "isQualityVerificationRequired": false,
+        "revenueScheduleType": "aliqua veniam",
+        "isCustomerDiscountAllowed": null,
+        "isDynamicBundle": null,
+        "validForPeriodUOM": [],
+        "externalSourceRecord": "velit non",
+        "revenueInstallmentCount": null,
+        "brandGrade": "Duis veniam",
+        "isManualPriceEntryRequired": null,
+        "isCouponRedemptionAllowed": null,
+        "validFromDate": null,
+        "primaryProductCategory": [
+          "tempor culpa in"
+        ],
+        "primarySalesChannel": [
+          "in reprehenderit"
+        ],
+        "productCategory": {
+          "name": "ex esse dolor",
+          "id": "sunt irure anim dolor reprehenderit",
+          "activeFromDate": "1944-10-11",
+          "parentCategory": [
+            "dolor in dolore mollit"
+          ],
+          "activeToDate": "2004-11-10",
+          "productCatalog": [
+            {
+              "id": "Ut ullamco veniam",
+              "name": "cupidatat laborum magna dolor",
+              "activeFromDate": "1942-04-29",
+              "activeToDate": null,
+              "auditInfo": {
+                "createdDate": "2018-10-07T05:20:00.787Z",
+                "isDeleted": null,
+                "createdBy": "qui aute do",
+                "updatedDate": null,
+                "updatedBy": "laborum Duis"
+              }
+            }
+          ],
+          "auditInfo": {
+            "createdDate": null,
+            "isDeleted": null,
+            "createdBy": "eu mollit veniam",
+            "updatedDate": null,
+            "updatedBy": "sit in ad sed dolore"
+          }
+        },
+        "isSellableWithoutPrice": null,
+        "isMultipleCouponsAllowed": null,
+        "validForPeriodCount": 20614887,
+        "priceChargeType": "laborum",
+        "quantityInstallmentCount": 52525872,
+        "modelYear": null,
+        "isInstallable": null,
+        "isReturnable": true,
+        "disposalType": "culpa aliquip dolore",
+        "standardWarrantyLengthMonth": 24738091,
+        "rewardProgramPointsCount": 47727018,
+        "displayUrl": "nulla ad"
+      },
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "name",
+        "longDescription",
+        "id",
+        "productStatus",
+        "description",
+        "productSKU"
+      ],
+      "properties": {
+        "productCategory": {
+          "type": "object",
+          "description": "Primary product category details for the product",
+          "additionalProperties": true,
+          "required": [
+            "name",
+            "id",
+            "activeFromDate"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/default_45"
+            },
+            "name": {
+              "type": "string"
+            },
+            "productCatalog": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/ProductCatalog"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "activeFromDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "activeToDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "parentCategory": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "auditInfo": {
+              "$ref": "#/definitions/AuditInfo"
+            }
+          }
+        },
+        "productCatalog": {
+          "type": "object",
+          "description": "Primary product catalog details for the product category",
+          "additionalProperties": true,
+          "required": [
+            "name",
+            "id",
+            "activeFromDate"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/default_46"
+            },
+            "name": {
+              "type": "string"
+            },
+            "activeToDate": {
+              "$ref": "#/definitions/default_47"
+            },
+            "activeFromDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "auditInfo": {
+              "$ref": "#/definitions/AuditInfo"
+            }
+          }
+        },
+        "priceBookEntry": {
+          "type": "object",
+          "description": "Primary product price book entry",
+          "additionalProperties": true,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/default_51"
+            },
+            "minRequiredQuantity": {
+              "$ref": "#/definitions/default_53"
+            },
+            "unitListPrice": {
+              "$ref": "#/definitions/default_55"
+            },
+            "product": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "minRequiredOrderValue": {
+              "$ref": "#/definitions/default_56"
+            },
+            "isActive": {
+              "$ref": "#/definitions/default_54"
+            },
+            "maxRequiredOrderValue": {
+              "$ref": "#/definitions/default_50"
+            },
+            "useStandardPrice": {
+              "$ref": "#/definitions/default_48"
+            },
+            "servicePeriodCount": {
+              "$ref": "#/definitions/default_52"
+            },
+            "auditInfo": {
+              "$ref": "#/definitions/AuditInfo_49"
+            }
+          }
+        },
+        "id": {
+          "$ref": "#/definitions/default_14"
+        },
+        "name": {
+          "type": "string"
+        },
+        "quantityScheduleType": {
+          "type": "string"
+        },
+        "disposalType": {
+          "type": "string"
+        },
+        "longDescription": {
+          "type": "string"
+        },
+        "primaryProductCategory": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/ProductCategory"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "minimumAdvertisementAmount": {
+          "$ref": "#/definitions/default_34"
+        },
+        "isBackOrdered": {
+          "$ref": "#/definitions/default_9"
+        },
+        "validForPeriodCount": {
+          "$ref": "#/definitions/default_25"
+        },
+        "isWorkerDiscountAllowed": {
+          "$ref": "#/definitions/default_32"
+        },
+        "allowPartialRefund": {
+          "$ref": "#/definitions/default_12"
+        },
+        "isWeightEntryRequired": {
+          "$ref": "#/definitions/default_38"
+        },
+        "isQuantityEntryRequired": {
+          "$ref": "#/definitions/default_42"
+        },
+        "isSerialized": {
+          "$ref": "#/definitions/default_39"
+        },
+        "rewardProgramPointsCount": {
+          "$ref": "#/definitions/default_26"
+        },
+        "description": {
+          "type": "string"
+        },
+        "revenueInstallmentPeriod": {
+          "type": "string"
+        },
+        "isAutoProvisionable": {
+          "$ref": "#/definitions/default_6"
+        },
+        "isCouponRedemptionAllowed": {
+          "$ref": "#/definitions/default_2"
+        },
+        "isSellableIndependently": {
+          "$ref": "#/definitions/default_30"
+        },
+        "canUseRevenueSchedule": {
+          "$ref": "#/definitions/default_24"
+        },
+        "manufacturerName": {
+          "type": "string"
+        },
+        "isIntellectualPropertyProtected": {
+          "$ref": "#/definitions/default_35"
+        },
+        "modelYear": {
+          "$ref": "#/definitions/default_5"
+        },
+        "isCustomerDiscountAllowed": {
+          "$ref": "#/definitions/default_44"
+        },
+        "productStatus": {
+          "type": "string"
+        },
+        "brandGrade": {
+          "type": "string"
+        },
+        "quantityInstallmentCount": {
+          "$ref": "#/definitions/default_27"
+        },
+        "requiredDepositAmount": {
+          "$ref": "#/definitions/default_7"
+        },
+        "revenueScheduleType": {
+          "type": "string"
+        },
+        "isPreOrderable": {
+          "$ref": "#/definitions/default_18"
+        },
+        "requiresInvididualUnitPricing": {
+          "$ref": "#/definitions/default_31"
+        },
+        "standardWarrantyLengthMonth": {
+          "$ref": "#/definitions/default_1"
+        },
+        "canUseQuantitySchedule": {
+          "$ref": "#/definitions/default_21"
+        },
+        "isInstallable": {
+          "$ref": "#/definitions/default_37"
+        },
+        "isRainCheckAllowed": {
+          "$ref": "#/definitions/default_28"
+        },
+        "minimumAdvertisementAmountStartDate": {
+          "$ref": "#/definitions/default_4"
+        },
+        "maximumOrderQuantityCount": {
+          "$ref": "#/definitions/default_3"
+        },
+        "isMultipleCouponsAllowed": {
+          "$ref": "#/definitions/default_13"
+        },
+        "allowCustomerReturn": {
+          "$ref": "#/definitions/default_20"
+        },
+        "modelNumber": {
+          "type": "string"
+        },
+        "mSRPAmount": {
+          "$ref": "#/definitions/default_16"
+        },
+        "externalSourceRecord": {
+          "type": "string"
+        },
+        "masterProduct": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "isSellable": {
+          "$ref": "#/definitions/default_36"
+        },
+        "validToDate": {
+          "$ref": "#/definitions/default_8"
+        },
+        "priceChargeType": {
+          "type": "string"
+        },
+        "primarySalesChannel": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "isPartnerDiscountAllowed": {
+          "$ref": "#/definitions/default_19"
+        },
+        "revenueInstallmentCount": {
+          "$ref": "#/definitions/default"
+        },
+        "productSKU": {
+          "type": "string"
+        },
+        "quantityInstallmentPeriod": {
+          "$ref": "#/definitions/default_29"
+        },
+        "isManualPriceEntryRequired": {
+          "$ref": "#/definitions/default_11"
+        },
+        "type": {
+          "type": "string"
+        },
+        "isSellableWithoutPrice": {
+          "$ref": "#/definitions/default_33"
+        },
+        "glAccountCode": {
+          "type": "string"
+        },
+        "isReturnable": {
+          "$ref": "#/definitions/default_40"
+        },
+        "displayUrl": {
+          "type": "string"
+        },
+        "validForPeriodUOM": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/UnitOfMeasure"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "versionNumber": {
+          "type": "string"
+        },
+        "brand": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/Brand"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "lotIdentifier": {
+          "type": "string"
+        },
+        "validFromDate": {
+          "$ref": "#/definitions/default_17"
+        },
+        "stockLedgerValuationAmount": {
+          "$ref": "#/definitions/default_23"
+        },
+        "isDynamicBundle": {
+          "$ref": "#/definitions/default_22"
+        },
+        "isQualityVerificationRequired": {
+          "$ref": "#/definitions/default_10"
+        },
+        "requiredDepositPercentage": {
+          "$ref": "#/definitions/default_15"
+        },
+        "isFoodstampPaymentAllowed": {
+          "$ref": "#/definitions/default_43"
+        },
+        "minimumOrderQuantityCount": {
+          "$ref": "#/definitions/default_41"
+        },
+        "externalIds": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/ExternalId"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "default": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_1": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "AuditInfo": {
+      "example": {
+        "isDeleted": true,
+        "createdBy": "commodo minim dolore est",
+        "updatedBy": "dolor quis nulla",
+        "updatedDate": "1950-01-23T19:52:29.659Z",
+        "createdDate": "1950-01-23T19:52:29.659Z"
+      },
+      "description": "Defines standard system audit fields available for most types",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "isDeleted",
+        "createdBy",
+        "updatedBy",
+        "updatedDate",
+        "createdDate"
+      ],
+      "properties": {
+        "createdDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Timestamp of when the entity was created"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Identifies the system or user which created the entity"
+        },
+        "updatedDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Timestamp of when the entity was last updated"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Identifies the system or user which last updated the entity"
+        },
+        "isDeleted": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Indicates whether or not the entity has been soft-deleted"
+        }
+      }
+    },
+    "default_2": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_3": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_4": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_5": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_6": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_7": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_8": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_9": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_10": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_11": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_12": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_13": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_14": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_15": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_16": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_17": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_18": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_19": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_20": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_21": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_22": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_23": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_24": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_25": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_26": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_27": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_28": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_29": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_30": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_31": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_32": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_33": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_34": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_35": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_36": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_37": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_38": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_39": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_40": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_41": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_42": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_43": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_44": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_45": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ProductCatalog": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "name",
+        "activeFromDate"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_46"
+        },
+        "name": {
+          "type": "string"
+        },
+        "activeToDate": {
+          "$ref": "#/definitions/default_47"
+        },
+        "activeFromDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "default_46": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_47": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_48": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "AuditInfo_49": {
+      "example": {
+        "isDeleted": true,
+        "createdBy": "commodo minim dolore est",
+        "updatedBy": "dolor quis nulla",
+        "updatedDate": "1950-01-23T19:52:29.659Z",
+        "createdDate": "1950-01-23T19:52:29.659Z"
+      },
+      "description": "Defines standard system audit fields available for most types",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "isDeleted",
+        "createdBy",
+        "updatedBy",
+        "updatedDate",
+        "createdDate"
+      ],
+      "properties": {
+        "createdDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Timestamp of when the entity was created"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Identifies the system or user which created the entity"
+        },
+        "updatedDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Timestamp of when the entity was last updated"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Identifies the system or user which last updated the entity"
+        },
+        "isDeleted": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Indicates whether or not the entity has been soft-deleted"
+        }
+      }
+    },
+    "default_50": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_51": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_52": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_53": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_54": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_55": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_56": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ProductCategory": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "name",
+        "activeFromDate"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_45"
+        },
+        "name": {
+          "type": "string"
+        },
+        "productCatalog": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/ProductCatalog"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "activeFromDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "activeToDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "parentCategory": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "UnitOfMeasure": {
+      "example": {
+        "pluralName": "irure dolor",
+        "name": "laboris est ipsum",
+        "id": "id1"
+      },
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "pluralName",
+        "name",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_57"
+        },
+        "name": {
+          "type": "string"
+        },
+        "pluralName": {
+          "type": "string"
+        }
+      }
+    },
+    "Brand": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_58"
+        },
+        "name": {
+          "type": "string"
+        },
+        "brandGrade": {
+          "type": "string"
+        },
+        "auditInfo": {
+          "$ref": "#/definitions/AuditInfo"
+        }
+      }
+    },
+    "ExternalId": {
+      "example": {
+        "externalIdType": [
+          {
+            "id": "id1",
+            "name": "adipisicing labore Duis in anim"
+          }
+        ],
+        "externalId": "Ut",
+        "id": "irure proident cillum deserunt dolor",
+        "status": "INVALID",
+        "statusLastChangedDate": "1999-11-26T02:28:11.661Z"
+      },
+      "type": "object",
+      "description": "Defines a structure for referencing an entity in external systems",
+      "additionalProperties": true,
+      "required": [
+        "externalIdType",
+        "externalId",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_59"
+        },
+        "externalId": {
+          "type": "string",
+          "description": "A unique identifier assigned to an entity in another system"
+        },
+        "externalIdType": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/ExternalIdType"
+              }
+            ]
+          },
+          "description": "Identifies the system that owns or otherwise recognizes this unique identifier",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "VALID",
+            "INVALID"
+          ],
+          "description": "Indicates whether this identifier is currently valid or not",
+          "type": "string"
+        },
+        "statusLastChangedDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Date and time of the last change in status"
+        }
+      }
+    },
+    "default_57": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_58": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_59": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ExternalIdType": {
+      "description": "Identifies the external system that owns or otherwise recognizes a particular identifier",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/default_60"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "default_60": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

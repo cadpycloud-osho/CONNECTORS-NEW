@@ -1,0 +1,43 @@
+startsWith:
+
+
+input:
+
+
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class StartsWithExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(StartsWithExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        String baseString = "Mari";
+
+        // 1. "Mari" startsWith("Mar")
+        boolean result1 = baseString.startsWith("Mar"); 
+
+        // 2. "Mari" startsWith("Em")
+        boolean result2 = baseString.startsWith("Em"); 
+
+        // Combine the boolean results into a List (Java equivalent of a JSON Array)
+        List<Boolean> finalOutput = Arrays.asList(result1, result2);
+        
+        System.out.println("--- DWL startsWith Equivalent Output ---");
+        System.out.println(finalOutput); 
+    }
+}
+
+
+
+output:
+
+[true, false]

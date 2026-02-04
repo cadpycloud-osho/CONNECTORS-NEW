@@ -1,0 +1,46 @@
+localDateTime:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ConstructLocalDateTimeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:constructLocalDateTime")
+            .routeId("Construct-Local-DateTime-Route")
+            .process(exchange -> {
+                // 1. Logic: localDateTime({year, month, day, hour, minutes, seconds})
+                // Java's LocalDateTime.of takes (year, month, day, hour, minute, second)
+                LocalDateTime newLocalDateTime = LocalDateTime.of(2012, 10, 11, 12, 30, 40);
+
+                // 2. Format to match DW output style (ISO-8601 without offset)
+                // Pattern excludes nanoseconds to match "2012-10-11T12:30:40"
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                String result = newLocalDateTime.format(formatter);
+
+                // 3. Construct the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("newLocalDateTime", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+output:
+
+{
+   "newLocalDateTime": "2012-10-11T12:30:40"
+}
+

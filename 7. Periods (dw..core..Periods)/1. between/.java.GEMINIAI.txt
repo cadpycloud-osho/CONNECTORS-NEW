@@ -1,0 +1,49 @@
+between:
+
+input:
+
+
+import java.time.LocalDate;
+import java.time.Period;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave: between(end, start) -> Period from start to end
+
+        // Case 'a': between(|2010-12-12|,|2010-12-10|)
+        // Period from 2010-12-10 to 2010-12-12 (2 days)
+        LocalDate startA = LocalDate.of(2010, 12, 10);
+        LocalDate endA = LocalDate.of(2010, 12, 12);
+        Period periodA = Period.between(startA, endA); // P2D
+
+        // Case 'b': between(|2011-12-11|,|2010-11-10|)
+        // Period from 2010-11-10 to 2011-12-11 (1 year, 1 month, 1 day)
+        LocalDate startB = LocalDate.of(2010, 11, 10);
+        LocalDate endB = LocalDate.of(2011, 12, 11);
+        Period periodB = Period.between(startB, endB); // P1Y1M1D
+
+        // Case 'c': between(|2020-02-29|,|2020-03-30|)
+        // Period from 2020-03-30 to 2020-02-29 (Negative period: -1 month, -1 day)
+        // To get the negative period equivalent to the DataWeave output,
+        // we pass the later date as the 'start' and the earlier date as the 'end'.
+        LocalDate startC = LocalDate.of(2020, 3, 30);
+        LocalDate endC = LocalDate.of(2020, 2, 29);
+        Period periodC = Period.between(startC, endC); // P-1M-1D
+
+        // Formatting the output as a JSON-like string
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + periodA.toString() + "\",");
+        System.out.println("  \"b\": \"" + periodB.toString() + "\",");
+        System.out.println("  \"c\": \"" + periodC.toString() + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": "P2D",
+  "b": "P1Y1M1D",
+  "c": "P-1M-1D"
+}

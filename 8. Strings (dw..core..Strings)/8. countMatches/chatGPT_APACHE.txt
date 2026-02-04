@@ -1,0 +1,87 @@
+countMatches:
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class CountMatchesExample {
+
+    public static void main(String[] args) {
+
+        String input = "hello worlo!";
+        String search = "lo";
+
+        int count = countMatches(input, search);
+
+        System.out.println(count);
+    }
+
+    private static int countMatches(String str, String sub) {
+        if (str == null || sub == null || sub.isEmpty()) return 0;
+
+        int count = 0;
+        int idx = 0;
+
+        while ((idx = str.indexOf(sub, idx)) != -1) {
+            count++;
+            idx += sub.length();
+        }
+
+        return count;
+    }
+}
+
+
+output:
+
+2
+
+
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import java.util.regex.*;
+import java.util.*;
+
+public class CountMatchesRegexExample {
+
+    public static void main(String[] args) {
+
+        String input = "hello, ciao!";
+        String regex = "[aeiou]";
+
+        int count = countMatchesRegex(input, regex);
+
+        System.out.println(count);
+    }
+
+    private static int countMatchesRegex(String str, String patternStr) {
+        if (str == null || patternStr == null || patternStr.isEmpty()) return 0;
+
+        Pattern pattern = Pattern.compile(patternStr);
+        Matcher matcher = pattern.matcher(str);
+
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
+    }
+}
+
+
+output:
+
+5
+
+
+
+----------------------------------------------------------

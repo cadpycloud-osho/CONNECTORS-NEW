@@ -1,0 +1,55 @@
+isNumeric:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class IsNumericRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:validateNumeric")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Apache Commons StringUtils matches DataWeave's digit-only logic
+                results.put("a", StringUtils.isNumeric(null));
+                results.put("b", StringUtils.isNumeric(""));
+                results.put("c", StringUtils.isNumeric("  "));
+                results.put("d", StringUtils.isNumeric("123"));
+                results.put("e", StringUtils.isNumeric("१२३")); // Unicode Devanagari digits
+                results.put("f", StringUtils.isNumeric("12 3"));
+                results.put("g", StringUtils.isNumeric("ab2c"));
+                results.put("h", StringUtils.isNumeric("12-3"));
+                results.put("i", StringUtils.isNumeric("12.3"));
+                results.put("j", StringUtils.isNumeric("-123"));
+                results.put("k", StringUtils.isNumeric("+123"));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+

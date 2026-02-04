@@ -1,0 +1,45 @@
+hashWith:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
+public class Md2Route extends RouteBuilder {
+
+    @Override
+    public void configure() {
+
+        from("direct:start")
+            .process(exchange -> {
+
+                byte[] input = "hello".getBytes(StandardCharsets.UTF_8);
+
+                MessageDigest md = MessageDigest.getInstance("MD2");
+                byte[] digest = md.digest(input);
+
+                // DataWeave hashWith(MD2) returns raw Binary, not HEX
+                // Convert raw bytes to ISO-8859-1 string to mimic DataWeave output rendering
+                String binaryString = new String(digest, StandardCharsets.ISO_8859_1);
+
+                exchange.getMessage().setBody(
+                    "{ \"md2\" : \"" + binaryString + "\" }"
+                );
+            });
+    }
+}
+
+
+
+
+output:
+
+{
+  "md2": " \u0004ls \u00031 h }8\u0004 \u0006U"
+}
+
+
+
+

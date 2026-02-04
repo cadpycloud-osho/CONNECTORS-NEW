@@ -1,0 +1,27 @@
+upper:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class UpperFunctionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:upper")
+            .process(exchange -> {
+                String result = "mulesoft".toUpperCase();
+                
+                exchange.getIn().setBody(Map.of("name", result));
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "name": "MULESOFT" }
+
+
+

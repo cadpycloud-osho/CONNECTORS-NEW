@@ -1,0 +1,29 @@
+yesterday
+
+
+
+input:
+
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/yesterday")
+    public Map<String, String> getYesterday() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("yesterday", yesterday.toString());
+        return result;
+    }
+}
+
+
+output:
+
+
+{
+  "yesterday": "2025-12-09"
+}
+
+

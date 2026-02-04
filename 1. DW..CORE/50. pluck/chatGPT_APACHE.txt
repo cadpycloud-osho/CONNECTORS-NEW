@@ -1,0 +1,57 @@
+pluck:
+
+
+example 1:
+
+input:
+from("direct:pluckExample")
+.setBody(constant(Map.of("a", "b", "c", "d")))
+.setBody(simple(
+    "${body.entrySet().stream().map((entry,index) -> " +
+        "{ \"" + "${index}" + "\": { \"" + entry.value + "\": \"" + entry.key + "\" } }" +
+    ").toList()}"
+));
+
+
+
+output:
+
+[
+  { "0": { "b": "a" } },
+  { "1": { "d": "c" } }
+]
+
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:pluckXmlExample")
+.setBody(constant(
+    Map.of("prices", Map.of(
+        "basic", "9.99",
+        "premium", "53.00",
+        "vip", "398.99"
+    ))
+))
+.setBody(simple(
+    "{ \"result\": { " +
+        "\"keys\": ${body[prices].keySet().stream().toList()}, " +
+        "\"values\": ${body[prices].values().stream().map(v -> Double.parseDouble(v)).toList()}, " +
+        "\"indices\": ${IntStream.range(0, body[prices].size()).boxed().toList()} " +
+    "} }"
+));
+
+
+output:
+{
+  "result": {
+    "keys": ["basic", "premium", "vip"],
+    "values": [9.99, 53, 398.99],
+    "indices": [0, 1, 2]
+  }
+}
+
+

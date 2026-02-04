@@ -1,0 +1,75 @@
+scan:
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Pattern pattern = Pattern.compile("([w]*)\\.([a-z]*)\\.([a-z]*)");
+        Matcher matcher = pattern.matcher("www.mulesoft.com");
+        
+        List<String> result = new ArrayList<>();
+        
+        while (matcher.find()) {
+            // flatten: add all capture groups including full match
+            result.add(matcher.group(0)); // full match
+            result.add(matcher.group(1)); // group 1
+            result.add(matcher.group(2)); // group 2
+            result.add(matcher.group(3)); // group 3
+        }
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[www.mulesoft.com, www, mulesoft, com]
+
+
+----------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+        Matcher matcher = pattern.matcher("anypt@mulesoft.com,max@mulesoft.com");
+        
+        List<List<String>> result = new ArrayList<>();
+        
+        while (matcher.find()) {
+            List<String> matchGroups = new ArrayList<>();
+            matchGroups.add(matcher.group(0)); // full match
+            matchGroups.add(matcher.group(1)); // username
+            matchGroups.add(matcher.group(2)); // domain
+            result.add(matchGroups);
+        }
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[[anypt@mulesoft.com, anypt, mulesoft], [max@mulesoft.com, max, mulesoft]]
+
+
+----------------------------------------------------------

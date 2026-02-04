@@ -1,0 +1,56 @@
+logn:
+
+logn(a: Number): Number | NaN
+
+logn(a: Number): Number | NaN
+Returns the natural logarithm (base e) of a number.
+
+If the input value is less than or equal to zero, the result is NaN (or null).
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Math
+output application/json
+---
+{
+   "logn10":  logn(10),
+   "logn13": logn(0.13),
+   "logn-20": logn(-20)
+}
+
+
+DataWeave
+Output
+{
+   "logn10": 2.302585092994046,
+   "logn13": -2.0402208285265546,
+   "logn-20": null
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="dynamics-365-for-operations">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="name">
+                    <description><![CDATA[The identifier of this element used to reference it in other components]]></description>
+                </parameter>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="oauth-client-credentials">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="resource">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[Hostname of the proxy. If this property is not set then no proxy will be used, otherwise a proxy will be used, but a proxy host must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[Port of the proxy. If host is set then this property must be set and cannot be a negative number.]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[Username used to authenticate against the proxy. If this property is not set then no authentication is going to be used against the proxy, otherwise this value must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="clientId">
+                    <description><![CDATA[The OAuth client id as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="clientSecret">
+                    <description><![CDATA[The OAuth client secret as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="tokenUrl">
+                    <description><![CDATA[The service provider's token endpoint URL]]></description>
+                </parameter>
+                <parameter name="scopes">
+                    <description><![CDATA[The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation]]></description>
+                </parameter>
+                <parameter name="objectStore">
+                    <description><![CDATA[A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="oauth2">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="scope">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="resource">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="responseType">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[Hostname of the proxy. If this property is not set then no proxy will be used, otherwise a proxy will be used, but a proxy host must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[Port of the proxy. If host is set then this property must be set and cannot be a negative number.]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[Username used to authenticate against the proxy. If this property is not set then no authentication is going to be used against the proxy, otherwise this value must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[The OAuth consumerKey as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="consumerSecret">
+                    <description><![CDATA[The OAuth consumerSecret as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="authorizationUrl">
+                    <description><![CDATA[The service provider's authorization endpoint URL]]></description>
+                </parameter>
+                <parameter name="accessTokenUrl">
+                    <description><![CDATA[The service provider's accessToken endpoint URL]]></description>
+                </parameter>
+                <parameter name="scopes">
+                    <description><![CDATA[The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation]]></description>
+                </parameter>
+                <parameter name="resourceOwnerId">
+                    <description><![CDATA[The resourceOwnerId which each component should use if it doesn't reference otherwise.]]></description>
+                </parameter>
+                <parameter name="before">
+                    <description><![CDATA[The name of a flow to be executed right before starting the OAuth dance]]></description>
+                </parameter>
+                <parameter name="after">
+                    <description><![CDATA[The name of a flow to be executed right after an accessToken has been received]]></description>
+                </parameter>
+                <parameter name="listenerConfig">
+                    <description><![CDATA[A reference to a <http:listener-config /> to be used in order to create the listener that will catch the access token callback endpoint.]]></description>
+                </parameter>
+                <parameter name="callbackPath">
+                    <description><![CDATA[The path of the access token callback endpoint]]></description>
+                </parameter>
+                <parameter name="authorizePath">
+                    <description><![CDATA[The path of the local http endpoint which triggers the OAuth dance]]></description>
+                </parameter>
+                <parameter name="externalCallbackUrl">
+                    <description><![CDATA[If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback]]></description>
+                </parameter>
+                <parameter name="objectStore">
+                    <description><![CDATA[A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="oauth2-user-password">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="readTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="readTimeoutTimeUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[Hostname of the proxy. If this property is not set then no proxy will be used, otherwise a proxy will be used, but a proxy host must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[Port of the proxy. If host is set then this property must be set and cannot be a negative number.]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[Username used to authenticate against the proxy. If this property is not set then no authentication is going to be used against the proxy, otherwise this value must be specified.]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="username">
+                    <description><![CDATA[Username used to initialize the session]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[Password used to authenticate the user]]></description>
+                </parameter>
+                <parameter name="resource">
+                    <description><![CDATA[The App ID URI of the web API (secured resource).]]></description>
+                </parameter>
+                <parameter name="clientId">
+                    <description><![CDATA[The Application Id assigned to your app when you registered it with Azure AD. You can find this in the Azure Portal. Click Active Directory, click the directory, choose the application, and click Configure.]]></description>
+                </parameter>
+                <parameter name="clientSecret">
+                    <description><![CDATA[The Application Secret that you created in the app registration portal for your app. It should not be used in a native app, because client_secrets cannot be reliably stored on devices. It is required for web apps and web APIs, which have the ability to store the client_secret securely on the server side.]]></description>
+                </parameter>
+                <parameter name="tokenRequestEndpoint">
+                    <description><![CDATA[The endpoint where the authorization request should be sent.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. Default value is 0, which means infinite.]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutTimeUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Dynamics 365 For Operations">
+        <description><![CDATA[]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="acknowledgeExportFromRecurringJob">
+            <description><![CDATA[Operation that performs acknowledgement action for the downloaded data package from a recurring job, as described https://docs.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/data-entities/recurring-integrations]]></description>
+            <parameters>
+                <parameter name="dequeueRecurringJobResponse">
+                    <description><![CDATA[an inputStream containing the required json text (full response of the dequeue recurring job operation)]]></description>
+                </parameter>
+                <parameter name="activityId">
+                    <description><![CDATA[activity id]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="create">
+            <description><![CDATA[Creates a new Entity Create New Entity - https://msdn.microsoft.com/en-us/library/gg328090.aspx Associate Entity upon Creation - https://msdn.microsoft.com/en-us/library/mt607875.aspx#Anchor_4]]></description>
+            <parameters>
+                <parameter name="logicalName">
+                    <description><![CDATA[The logical name of the entity. It is always the Schema Name in lower case.]]></description>
+                </parameter>
+                <parameter name="attributes">
+                    <description><![CDATA[The attributes of the entity to be created as a Map.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="dequeueRecurringJob">
+            <description><![CDATA[Operation that performs dequeue action for the activity specified, as described https://docs.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/data-entities/recurring-integrations]]></description>
+            <parameters>
+                <parameter name="activityId">
+                    <description><![CDATA[activity id]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="executeOperation">
+            <description><![CDATA[Executes a request against https://host_uri/api/Services/service_group_name/service_group_service_name/operation_name]]></description>
+            <parameters>
+                <parameter name="parameters">
+                    <description><![CDATA[parameters of the operation to be executed]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="serviceGroup">
+                    <description><![CDATA[The service group name(first level metadata key)]]></description>
+                </parameter>
+                <parameter name="serviceName">
+                    <description><![CDATA[The service name(second level metadata key)]]></description>
+                </parameter>
+                <parameter name="operation">
+                    <description><![CDATA[The operation name(third level metadata key)]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="exportDataFromRecurringJob">
+            <description><![CDATA[Operation that returns a data package that contains all the data entities that were defined in the data project as described https://docs.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/data-entities/recurring-integrations]]></description>
+            <parameters>
+                <parameter name="downloadUrl">
+                    <description><![CDATA[the url of the data package to be downloaded (can be extracted from the response of the dequeue recurring job operation)]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="importDataRecurringJob">
+            <description><![CDATA[Operation that facilitates submitting data to recurring data jobs]]></description>
+            <parameters>
+                <parameter name="importUriPath">
+                    <description><![CDATA[import URI eg.:/api/connector/enqueue/]]></description>
+                </parameter>
+                <parameter name="activityId">
+                    <description><![CDATA[activity id]]></description>
+                </parameter>
+                <parameter name="entityName">
+                    <description><![CDATA[entity name]]></description>
+                </parameter>
+                <parameter name="in">
+                    <description><![CDATA[the data to be submitted]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="retrieveMultiple">
+            <description><![CDATA[Retrieve Multiple entities by URL]]></description>
+            <parameters>
+                <parameter name="dataQueryURL">
+                    <description><![CDATA[The URL that is going to be used to retrieve the entities]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="retrieveMultipleByQuery">
+            <description><![CDATA[Retrieve Multiple entities by DSQL Query]]></description>
+            <parameters>
+                <parameter name="query">
+                    <description><![CDATA[The DSQL query that is going to be used for retrieve. The query will be transformed in a URL internally.]]></description>
+                </parameter>
+                <parameter name="expand">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="unauthorize">
+            <description><![CDATA[Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again]]></description>
+            <parameters>
+                <parameter name="resourceOwnerId">
+                    <description><![CDATA[The id of the resource owner which access should be invalidated]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources/>
+    <types/>
+</extension-documentation>

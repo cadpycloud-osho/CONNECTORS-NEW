@@ -1,0 +1,51 @@
+literalValueOf:
+
+literalValueOf(t: Type): String | Number | Boolean
+
+literalValueOf(t: Type): String | Number | Boolean
+Returns the value of an input belongs to the Literal type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = "Mariano"
+output application/json
+---
+{
+   a: literalValueOf(AType)
+}
+
+
+DataWeave
+Output
+{
+  "a": "Mariano"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

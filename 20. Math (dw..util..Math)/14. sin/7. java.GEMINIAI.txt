@@ -1,0 +1,82 @@
+sin:
+
+
+
+input:
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    /**
+     * Helper function to replicate DataWeave's sin behavior.
+     * @param x The angle in radians to calculate the sine for.
+     * @return The sine value.
+     */
+    private static double sin(double x) {
+        // Math.sin takes an angle in radians and returns its sine.
+        return Math.sin(x);
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    @SuppressWarnings("unchecked")
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        
+        // Use String.valueOf for Numbers and Booleans to preserve decimal precision
+        if (obj instanceof Number || obj instanceof Boolean) return String.valueOf(obj);
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> toPrettyJson(v, indent + 1))
+                    .map(s -> s.contains("\n") ? s : next + s)
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return String.valueOf(obj);
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Output Simulation ---");
+
+        // Use LinkedHashMap to maintain insertion order.
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        // Simulating the DataWeave calls:
+        output.put("sin0", sin(0));
+        output.put("sin13", sin(0.13));
+        output.put("sin-1", sin(-1));
+
+        // Output the map using the pure Java JSON printer
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+output:
+
+{
+  "sin0": 0.0,
+  "sin13": 0.12963414261969486,
+  "sin-1": -0.8414709848078965
+}
+
+

@@ -1,0 +1,187 @@
+
+example 1:
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+{name: "Mariano"} update "name" with "Data Weave"
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+{
+  "name": "Data Weave"
+}
+
+
+
+
+example 2:
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+{name: "Mariano"} update field("name") with "Data Weave"
+
+
+DataWeave
+Output
+{
+  "name": "Data Weave"
+}
+
+
+example 3:
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+[1,2,3] update 1 with 5
+
+
+DataWeave
+Output
+[
+   1,
+   5,
+   3
+ ]
+
+
+
+example 4:
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+[{role: "a", name: "spiderman"}, {role: "b", name: "batman"}] update "role" with "Super Hero"
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+[{
+   "role": "Super Hero",
+   "name": "spiderman"
+ },
+ {
+   "role": "Super Hero",
+   "name": "batman"
+}]
+
+
+
+
+example 5:
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+[1,2,3] update index(1) with 5
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+[
+   1,
+   5,
+   3
+ ]
+
+
+
+
+example 6:
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/json
+---
+{user: {name: "Mariano"}} update ["user", field("name")] with "Data Weave"
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+{
+   "user": {
+     "name": "Data Weave"
+   }
+ }
+
+
+
+example 7:
+
+
+Source
+%dw 2.0
+import * from dw::util::Values
+output application/xml
+---
+payload update ["users", "user", "language"] with (if ($ == "English") "Gibberish" else $)
+DataWeave
+copy icon
+✓ Copied
+Copy link to clipboardInput
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>English</language>
+  </user>
+</users>
+XML
+copy icon
+✓ Copied
+Copy link to clipboardOutput
+<users>
+  <user>
+    <name>Phoebe</name>
+    <language>French</language>
+  </user>
+  <user>
+    <name>Joey</name>
+    <language>Gibberish</language>
+  </user>
+</users>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

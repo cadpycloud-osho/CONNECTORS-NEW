@@ -1,0 +1,89 @@
+leftJoin:
+
+leftJoin<L <: Object, R <: Object>(left: Array<L>, right: Array<R>, leftCriteria: (leftValue: L) -> String, rightCriteria: (rightValue: R) -> String): Array<{ l: L, r?: R }>
+
+leftJoin<L <: Object, R <: Object>(left: Array<L>, right: Array<R>, leftCriteria: (leftValue: L) -> String, rightCriteria: (rightValue: R) -> String): Array<{ l: L, r?: R }>
+Joins two arrays of objects by a given ID criteria.
+
+leftJoin returns an array all the left items, merged by ID with any right items that meet the joining criteria.
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+var users = [{id: "1", name:"Mariano"},{id: "2", name:"Leandro"},{id: "3", name:"Julian"},{id: "5", name:"Julian"}]
+var products = [{ownerId: "1", name:"DataWeave"},{ownerId: "1", name:"BAT"}, {ownerId: "3", name:"DataSense"}, {ownerId: "4", name:"SmartConnectors"}]
+output application/json
+---
+leftJoin(users, products, (user) -> user.id, (product) -> product.ownerId)
+DataWeave
+Output
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

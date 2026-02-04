@@ -1,0 +1,60 @@
+isStringType:
+
+
+
+input:
+
+import java.lang.String;
+import java.lang.Boolean;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isStringType(Type).
+     * Checks if the provided type is java.lang.String or a subclass/implementation.
+     */
+    public static boolean isStringType(Class<?> type) {
+        return String.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'AString' (which is String)
+        Class<?> aStringClass = String.class;
+
+        // 2. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+
+        // 3. Mimics the type 'Boolean'
+        Class<?> booleanClass = Boolean.class;
+        
+        // --- Execution ---
+        
+        // a: isStringType(AString)
+        boolean a = isStringType(aStringClass); 
+
+        // b: isStringType(String)
+        boolean b = isStringType(stringClass); 
+        
+        // c: isStringType(Boolean)
+        boolean c = isStringType(booleanClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

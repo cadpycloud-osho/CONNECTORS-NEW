@@ -1,0 +1,28 @@
+lower:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class LowerRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:lower")
+            .process(exchange -> {
+                Map<String, String> result = new HashMap<>();
+                result.put("name", "MULESOFT".toLowerCase());
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{ "name": "mulesoft" }
+
+
+

@@ -1,0 +1,26 @@
+joinBy:
+
+
+input:
+from("direct:hyphenate")
+    .setBody(exchange -> {
+        // Define the list
+        def list = ["a", "b", "c"]
+        
+        // Use Groovy's join method
+        def joinedString = list.join("-")
+        
+        // Return as a Map to match the JSON structure
+        return ["hyphenate": joinedString]
+    })
+    .marshal().json() // Converts Map to {"hyphenate": "a-b-c"}
+    .to("mock:result");
+
+
+
+output:
+
+{
+  "hyphenate": "a-b-c"
+}
+

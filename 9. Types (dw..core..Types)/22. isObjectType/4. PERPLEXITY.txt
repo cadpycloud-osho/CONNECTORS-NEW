@@ -1,0 +1,44 @@
+isObjectType:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class ObjectTypeController {
+
+    private boolean isObjectType(Object value) {
+        return value instanceof Map || (value != null && value.getClass().isArray() == false && 
+               value.getClass().getDeclaredFields().length > 0);
+    }
+
+    @GetMapping("/object-type-check")
+    public Map<String, Boolean> checkObjectTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AType = {name: String} - object with fields
+        Map<String, String> aType = Map.of("name", "test");
+        Boolean boolValue = true;
+        
+        result.put("a", isObjectType(aType));
+        result.put("b", isObjectType(boolValue));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

@@ -1,0 +1,103 @@
+filterTree:
+
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.BiPredicate;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = executeFilterTests();
+        System.out.println(result);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> executeFilterTests() {
+        Map<String, Object> inputA = Map.of(
+            "name", "",
+            "lastName", "Achaval",
+            "friends", Arrays.asList(
+                Map.of("id", "", "test", true),
+                Map.of("age", 123),
+                ""
+            )
+        );
+        
+        List<Map<String, Object>> inputC = Arrays.asList(
+            Map.of("name", "Mariano", "friends", Collections.emptyList()),
+            Map.of("test", Arrays.asList(1, 2, 3)),
+            Map.of("dw", "")
+        );
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        // a: filter non-empty strings, preserve everything else
+        result.put("a", filterTree(inputA, (value, path) -> {
+            if (value instanceof String s) {
+                return !s.isEmpty();
+            }
+            return true;
+        }));
+        
+        // b: filter strings on null → null
+        result.put("b", filterTree(null, (value, path) -> value instanceof String));
+        
+        // c: filter non-empty arrays, preserve everything else
+        result.put("c", filterTree(inputC, (value, path) -> {
+            if (value instanceof List<?> a) {
+                return !a.isEmpty();
+            }
+            return true;
+        }));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave Tree.filterTree() equivalent:
+     * Recursively filters tree nodes based on predicate, preserves metadata/structure
+     */
+    @SuppressWarnings("unchecked")
+    public static Object filterTree(Object input, BiPredicate<Object, String> predicate) {
+        if (input == null) return null;
+        
+        if (input instanceof Map) {
+            Map<String, Object> result = new HashMap<>();
+            ((Map<String, Object>) input).forEach((key, value) -> {
+                Object filtered = filterTree(value, predicate);
+                if (filtered != null) {
+                    result.put(key, filtered);
+                }
+            });
+            return result.isEmpty() ? null : result;
+        } else if (input instanceof List) {
+            List<Object> result = new ArrayList<>();
+            ((List<Object>) input).forEach(value -> {
+                Object filtered = filterTree(value, predicate);
+                if (filtered != null) {
+                    result.add(filtered);
+                }
+            });
+            return result.isEmpty() ? null : result;
+        } else {
+            // Leaf node - apply predicate
+            return predicate.test(input, "") ? input : null;
+        }
+    }
+}
+
+
+output:
+
+{
+  a={lastName=Achaval, friends=[{test=true}, {age=123}]},
+  b=null,
+  c=[{name=Mariano}, {test=[1, 2, 3]}, {dw=}]
+}
+
+
+

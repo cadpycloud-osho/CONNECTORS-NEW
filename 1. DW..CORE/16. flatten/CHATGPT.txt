@@ -1,0 +1,129 @@
+FLATTEN:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class FlattenArrayController {
+
+    @GetMapping("/flatten1")
+    public List<Integer> flattenExample1() {
+        List<List<Integer>> nestedArrays = List.of(
+                List.of(1,2,3),
+                List.of(4,5,6),
+                List.of(7,8,9)
+        );
+
+        List<Integer> flattened = new ArrayList<>();
+        nestedArrays.forEach(flattened::addAll);
+
+        return flattened;
+    }
+}
+
+
+OUTPUT:
+
+[1,2,3,4,5,6,7,8,9]
+
+
+________________________________________________________________________
+
+
+INPUT:
+
+class Person {
+    public String name;
+    public int id;
+}
+
+class UserGroup {
+    public String group;
+    public List<Person> myarray;
+}
+
+class MyData {
+    public List<UserGroup> user;
+}
+
+
+Controller Code
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class FlattenObjectController {
+
+    @GetMapping("/flatten2")
+    public List<Person> flattenExample2() {
+
+        // Same as myData in DataWeave Example
+        MyData data = new MyData();
+        data.user = new ArrayList<>();
+
+        UserGroup dev = new UserGroup();
+        dev.group = "dev";
+        dev.myarray = List.of(
+                create("Shoki", 5678),
+                create("Mariano", 9123)
+        );
+
+        UserGroup test = new UserGroup();
+        test.group = "test";
+        test.myarray = List.of(
+                create("Sai", 2001),
+                create("Peter", 2002)
+        );
+
+        data.user.add(dev);
+        data.user.add(test);
+
+        // Flatten the nested list
+        List<Person> flatList = new ArrayList<>();
+        data.user.forEach(u -> flatList.addAll(u.myarray));
+
+        return flatList;
+    }
+
+    private Person create(String name, int id) {
+        Person p = new Person();
+        p.name = name;
+        p.id = id;
+        return p;
+    }
+}
+
+
+OUTPUT:
+
+
+[
+  { "name": "Shoki", "id": 5678 },
+  { "name": "Mariano", "id": 9123 },
+  { "name": "Sai", "id": 2001 },
+  { "name": "Peter", "id": 2002 }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

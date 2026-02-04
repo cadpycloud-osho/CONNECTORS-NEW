@@ -1,0 +1,43 @@
+substringBefore:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String substringBeforeDW(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null || delimiter.equals("")) return "";
+
+        int index = input.indexOf(delimiter);
+        if (index == -1) return "";
+
+        return input.substring(0, index);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", substringBeforeDW(null, "'"));
+        result.put("b", substringBeforeDW("", "-"));
+        result.put("c", substringBeforeDW("abc", "b"));
+        result.put("d", substringBeforeDW("abc", "c"));
+        result.put("e", substringBeforeDW("abc", "d"));
+        result.put("f", substringBeforeDW("abc", ""));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=null, b=, c=a, d=ab, e=, f=}
+
+

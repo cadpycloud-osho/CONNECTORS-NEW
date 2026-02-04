@@ -1,0 +1,112 @@
+distinctBy:
+
+example 1:
+
+input:
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.*;
+import java.io.ByteArrayInputStream;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><order><items>155</items></order><order><items>30</items></order><order><items>15</items></order><order><items>5</items></order><order><items>4</items><items>7</items></order><order><items>1</items><items>3</items></order><order><null/></order></root>";
+        
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        doc.getDocumentElement().normalize();
+        
+        NodeList orders = doc.getElementsByTagName("order");
+        boolean containsRequestedItem = false;
+        
+        for (int i = 0; i < orders.getLength(); i++) {
+            Node order = orders.item(i);
+            NodeList items = order.getChildNodes();
+            for (int j = 0; j < items.getLength(); j++) {
+                Node item = items.item(j);
+                if ("items".equals(item.getNodeName()) && item.getFirstChild() != null) {
+                    try {
+                        int value = Integer.parseInt(item.getFirstChild().getTextContent().trim());
+                        if (value > 10) {
+                            containsRequestedItem = true;
+                            break;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Skip invalid numbers or null
+                    }
+                }
+            }
+            if (containsRequestedItem) break;
+        }
+        
+        System.out.println("{\"ContainsRequestedItem\":" + containsRequestedItem + "}");
+    }
+}
+
+
+
+output:
+
+{"ContainsRequestedItem": true}
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+public class Main {
+    public static void main(String[] args) {
+        String text = "mulesoft";
+        boolean result = text.contains("mule");
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+true
+
+
+---------------------------------------------------------------
+
+
+
+
+example 3:
+
+input:
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.*;
+import java.io.ByteArrayInputStream;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><mystring>some string</mystring></root>";
+        
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        doc.getDocumentElement().normalize();
+        
+        String myString = doc.getElementsByTagName("mystring").item(0).getTextContent();
+        boolean containsString = myString.contains("me");
+        
+        System.out.println("{\"ContainsString\":" + containsString + "}");
+    }
+}
+
+
+output:
+
+ {"ContainsString": true}
+
+

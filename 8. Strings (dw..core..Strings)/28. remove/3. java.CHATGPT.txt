@@ -1,0 +1,27 @@
+remove:
+
+
+input:
+
+public class Main {
+
+    public static String remove(String input, String toRemove) {
+        if (input == null || toRemove == null) return input;
+        return input.replace(toRemove, "");
+    }
+
+    public static void main(String[] args) {
+
+        String input = "lazyness purity state higher-order stateful";
+        String result = remove(input, "state");
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+lazyness purity  higher-order ful
+
+

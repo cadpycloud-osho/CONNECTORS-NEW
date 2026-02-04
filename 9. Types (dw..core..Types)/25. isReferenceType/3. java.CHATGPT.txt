@@ -1,0 +1,38 @@
+isReferenceType:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static boolean isReferenceType(Class<?> type, boolean isReferenced) {
+        return isReferenced;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        boolean AArray_isReferenced = false;
+        boolean arrayItemAArray2_isReferenced = true;
+
+        result.put("a", isReferenceType(String[].class, AArray_isReferenced));
+        result.put("b", isReferenceType(String[].class, arrayItemAArray2_isReferenced));
+        result.put("c", isReferenceType(String.class, false));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=false, b=true, c=false}
+
+
+

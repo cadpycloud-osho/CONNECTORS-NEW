@@ -1,0 +1,267 @@
+mapLeafValues:
+
+example 1:
+input:
+
+
+package com.example.service;
+
+import org.springframework.stereotype.Service;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+@Service
+public class TreeMapperService {
+
+    // Input data structure from DataWeave
+    private final Map<String, Object> INPUT_DATA = Map.of(
+        "user", List.of(
+            Map.of("name", "mariano", "lastName", "achaval")
+        ),
+        "group", "data-weave"
+    );
+
+    // --- Transformation Function replicating (value, path) -> upper(value) ---
+
+    /**
+     * The DataWeave transformation logic: If the value is a String, convert to uppercase; otherwise, return the value unchanged.
+     * The 'path' argument is unused in this specific DataWeave example, so we omit it in the Java function signature for simplicity.
+     */
+    private final BiFunction<Object, List<Object>, Object> LEAF_MAPPER = (value, path) -> {
+        if (value instanceof String) {
+            return ((String) value).toUpperCase();
+        }
+        // Non-string leaves (Number, Boolean, Null) are returned as is.
+        return value;
+    };
+
+    // --- Core Recursive Mapping Logic ---
+
+    /**
+     * Recursively traverses and maps ALL leaf values based on the mapper function.
+     * Replicates the core logic of dw::util::Tree::mapLeafValues.
+     * @param input The current object/list/primitive being processed.
+     * @param mapper The function to apply to leaf nodes.
+     * @return The mapped object structure.
+     */
+    @SuppressWarnings("unchecked")
+    private Object mapLeafValuesRecursive(Object input, BiFunction<Object, List<Object>, Object> mapper, List<Object> currentPath) {
+        
+        // 1. Base Case: Primitives and Null (Leaf Nodes)
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            return mapper.apply(input, currentPath);
+        } 
+        
+        // 2. Recursive Case: Map (Object)
+        else if (input instanceof Map) {
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            originalMap.forEach((key, value) -> {
+                // Add the key to the path for potential use (unused in this example)
+                List<Object> nextPath = new ArrayList<>(currentPath);
+                nextPath.add(key);
+
+                // Recurse on children
+                newMap.put(key, mapLeafValuesRecursive(value, mapper, nextPath));
+            });
+            return newMap;
+        } 
+        
+        // 3. Recursive Case: List (Array)
+        else if (input instanceof List) {
+            List<Object> originalList = (List<Object>) input;
+            
+            return originalList.stream()
+                // Recurse on children (index is part of the path, but simplified here)
+                .map(item -> mapLeafValuesRecursive(item, mapper, currentPath))
+                .collect(Collectors.toList());
+        } 
+        return input; 
+    }
+
+    // --- Public Execution Method ---
+
+    public Map<String, Object> runMapLeafValuesSimulation() {
+        return (Map<String, Object>) mapLeafValuesRecursive(INPUT_DATA, LEAF_MAPPER, List.of());
+    }
+}
+
+
+package com.example.controller;
+
+import com.example.service.TreeMapperService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class TreeController {
+
+    private final TreeMapperService treeMapperService;
+
+    public TreeController(TreeMapperService treeMapperService) {
+        this.treeMapperService = treeMapperService;
+    }
+
+    @GetMapping("/mapLeafValues")
+    public Map<String, Object> getMappedLeafValues() {
+        return treeMapperService.runMapLeafValuesSimulation();
+    }
+}
+
+
+output:
+
+{
+  "user": [
+    {
+      "name": "MARIANO",
+      "lastName": "ACHAVAL"
+    }
+  ],
+  "group": "DATA-WEAVE"
+}
+
+
+
+
+
+
+-----------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+package com.example.service;
+
+import org.springframework.stereotype.Service;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+@Service
+public class TreeMapperService {
+
+    // Input data structure from DataWeave
+    private final Map<String, Object> INPUT_DATA = Map.of(
+        "name", "Mariano",
+        "test", List.of(1, 2, 3)
+    );
+
+    // --- Path Type Checkers (Simplified AST representation) ---
+
+    /** Checks if the last path segment represents an object key access. */
+    @SuppressWarnings("unchecked")
+    private boolean isObjectType(List<String> path) {
+        if (path.isEmpty()) return false;
+        return "OBJECT_TYPE".equals(path.get(path.size() - 1));
+    }
+
+    /** Checks if the last path segment represents an array index access. */
+    @SuppressWarnings("unchecked")
+    private boolean isArrayType(List<String> path) {
+        if (path.isEmpty()) return false;
+        return "ARRAY_TYPE".equals(path.get(path.size() - 1));
+    }
+
+    // --- Transformation Function (LEAF_MAPPER) ---
+
+    private final BiFunction<Object, List<String>, Object> LEAF_MAPPER = (value, path) -> {
+        if (isObjectType(path)) {
+            return "***";
+        } else if (isArrayType(path)) {
+            return "In an array";
+        } else {
+            // Note: DataWeave's "Is an attribute" is the default for non-object/non-array leaves.
+            // Since this structure has no attributes, the default case is the one not matching the above.
+            return "Is an attribute"; 
+        }
+    };
+
+    // --- Core Recursive Mapping Logic ---
+
+    /**
+     * Recursively traverses and maps ALL leaf values.
+     */
+    @SuppressWarnings("unchecked")
+    private Object mapLeafValuesRecursive(Object input, BiFunction<Object, List<String>, Object> mapper, List<String> currentPath) {
+        
+        // 1. Base Case: Primitives and Null (Leaf Nodes)
+        if (input == null || input instanceof Number || input instanceof String || input instanceof Boolean) {
+            return mapper.apply(input, currentPath);
+        } 
+        
+        // 2. Recursive Case: Map (Object)
+        else if (input instanceof Map) {
+            Map<String, Object> originalMap = (Map<String, Object>) input;
+            Map<String, Object> newMap = new LinkedHashMap<>();
+            
+            // Recurse through map entries
+            originalMap.forEach((key, value) -> {
+                // The new path adds the "OBJECT_TYPE" marker for the key access
+                List<String> nextPath = new ArrayList<>(currentPath);
+                nextPath.add("OBJECT_TYPE"); // Simplified path for object key access
+
+                newMap.put(key, mapLeafValuesRecursive(value, mapper, nextPath));
+            });
+            return newMap;
+        } 
+        
+        // 3. Recursive Case: List (Array)
+        else if (input instanceof List) {
+            List<Object> originalList = (List<Object>) input;
+            
+            // The new path adds the "ARRAY_TYPE" marker for index access
+            List<String> nextPath = new ArrayList<>(currentPath);
+            nextPath.add("ARRAY_TYPE"); // Simplified path for array index access
+
+            return originalList.stream()
+                .map(item -> mapLeafValuesRecursive(item, mapper, nextPath))
+                .collect(Collectors.toList());
+        } 
+        return input; 
+    }
+
+    // --- Public Execution Method ---
+
+    public Map<String, Object> runMapLeafValuesSimulation() {
+        return (Map<String, Object>) mapLeafValuesRecursive(INPUT_DATA, LEAF_MAPPER, List.of());
+    }
+}
+package com.example.controller;
+
+import com.example.service.TreeMapperService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class TreeController {
+
+    private final TreeMapperService treeMapperService;
+
+    public TreeController(TreeMapperService treeMapperService) {
+        this.treeMapperService = treeMapperService;
+    }
+
+    @GetMapping("/conditionalMapLeafValues")
+    public Map<String, Object> getMappedLeafValues() {
+        return treeMapperService.runMapLeafValuesSimulation();
+    }
+}
+
+output:
+
+{
+  "name": "***",
+  "test": [
+    "In an array",
+    "In an array",
+    "In an array"
+  ]
+}

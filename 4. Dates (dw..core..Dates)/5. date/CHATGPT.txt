@@ -1,0 +1,20 @@
+date:
+
+
+input:
+
+
+@GetMapping("/newDate")
+public Map<String, String> getNewDate() {
+    LocalDate date = LocalDate.of(2012, 10, 11);
+    return Map.of("newDate", date.toString());
+}
+
+
+output:
+
+
+{
+  "newDate": "2012-10-11"
+}
+

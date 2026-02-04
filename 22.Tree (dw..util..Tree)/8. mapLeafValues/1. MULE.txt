@@ -1,0 +1,66 @@
+mapLeafValues:
+
+mapLeafValues(value: Any, callback: (value: Any, path: Path) -> Any): Any
+
+mapLeafValues(value: Any, callback: (value: Any, path: Path) -> Any): Any
+Maps the terminal (leaf) nodes in the tree.
+
+Leafs nodes cannot have an object or an array as a value.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Tree
+output application/json
+---
+ {
+     user: [{
+         name: "mariano",
+         lastName: "achaval"
+     }],
+     group: "data-weave"
+ } mapLeafValues (value, path) -> upper(value)
+DataWeave
+Output
+{
+   "user": [
+     {
+       "name": "MARIANO",
+       "lastName": "ACHAVAL"
+     }
+   ],
+   "group": "DATA-WEAVE"
+ }
+
+
+
+
+--------------------------------------------------------------
+
+
+
+Source
+%dw 2.0
+output application/json
+import * from dw::util::Tree
+---
+{
+    name: "Mariano",
+    test: [1,2,3]
+} mapLeafValues ((value, path) -> if(isObjectType(path))
+                                        "***"
+                                  else if(isArrayType(path))
+                                        "In an array"
+                                  else "Is an attribute")
+DataWeave
+Output
+{
+  "name": "***",
+  "test": [
+    "In an array",
+    "In an array",
+    "In an array"
+  ]
+}

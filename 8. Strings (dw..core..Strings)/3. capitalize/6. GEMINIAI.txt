@@ -1,0 +1,123 @@
+capitalize:
+
+input:
+
+A. The Helper Method (Core Logic)
+Java
+
+public class StringUtils {
+    /**
+     * Implements DataWeave's capitalize.
+     * Capitalizes the first letter of every word, often after converting common separators (like '_') to spaces.
+     */
+    public static String capitalize(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // 1. Normalize separators: Replace underscores, and look for camelCase boundaries
+        // This is complex: DW seems to convert underscores to spaces, and then inserts a space 
+        // before internal capitalization (camelCase) to treat it as a word boundary.
+        String normalized = input
+            .replaceAll("_", " ") // Convert snake_case to space-separated
+            .replaceAll("([a-z])([A-Z])", "$1 $2"); // Insert space before internal caps (for case 'd')
+
+        // 2. Split the string into words
+        String[] words = normalized.split("\\s+");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (word.isEmpty()) {
+                continue;
+            }
+
+            // Capitalize the first letter of the word
+            result.append(Character.toUpperCase(word.charAt(0)));
+            
+            // Append the rest of the word in its original case
+            if (word.length() > 1) {
+                result.append(word.substring(1));
+            }
+            
+            // Append a space if it's not the last word
+            if (i < words.length - 1) {
+                result.append(" ");
+            }
+        }
+
+        return result.toString().trim();
+    }
+}
+B. The Model (POJO)
+Java
+
+import lombok.Data; 
+
+@Data
+public class CapitalizeResult {
+    private String a;
+    private String b;
+    private String c;
+    private String d;
+    private String e;
+}
+C. The Service (Business Logic)
+Java
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class StringService {
+
+    public CapitalizeResult calculateCapitalize() {
+        CapitalizeResult result = new CapitalizeResult();
+        
+        // "a" : capitalize("customer") -> "Customer"
+        result.setA(StringUtils.capitalize("customer"));
+        
+        // "b" : capitalize("customer_first_name") -> "Customer First Name" (underscores converted to spaces)
+        result.setB(StringUtils.capitalize("customer_first_name"));
+        
+        // "c" : capitalize("customer NAME") -> "Customer Name"
+        result.setC(StringUtils.capitalize("customer NAME"));
+        
+        // "d" : capitalize("customerName") -> "Customer Name" (camelCase boundary detected)
+        result.setD(StringUtils.capitalize("customerName"));
+        
+        // "e" : capitalize("a*s_b’s") -> "A*s B’S" (Separators are preserved or treated as word boundaries)
+        result.setE(StringUtils.capitalize("a*s_b’s"));
+
+        return result;
+    }
+}
+D. The Controller (REST Endpoint)
+Java
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class StringController {
+
+    private final StringService stringService;
+
+    public StringController(StringService stringService) {
+        this.stringService = stringService;
+    }
+
+    @GetMapping("/api/string-capitalize")
+    public CapitalizeResult getStringCapitalizeResults() {
+        return stringService.calculateCapitalize();
+    }
+}
+Spring Boot Output (When accessing /api/string-capitalize)
+JSON
+
+{
+  "a": "Customer",
+  "b": "Customer First Name",
+  "c": "Customer Name",
+  "d": "Customer Name",
+  "e": "A*s B’s"
+}

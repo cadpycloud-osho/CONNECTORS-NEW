@@ -1,0 +1,86 @@
+match:
+
+EXAMPLE 1:
+
+INPUT:
+
+// EmailMatchApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class EmailMatchApp {
+    public static void main(String[] args) {
+        SpringApplication.run(EmailMatchApp.class, args);
+
+        String email = "me@mulesoft.com";
+        Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+        Matcher matcher = pattern.matcher(email);
+        
+        matcher.find();
+        List<String> result = Arrays.asList(
+            matcher.group(0),  // full match
+            matcher.group(1),  // group 1: "me"
+            matcher.group(2)   // group 2: "mulesoft"
+        );
+        
+        System.out.println(result);
+    }
+}
+
+OUTPUT:
+
+[me@mulesoft.com, me, mulesoft]
+
+____________________________________________________________________
+
+EXAMPLE 2:
+
+INPUT:
+
+// IpMatchApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.*;
+import java.util.regex.Pattern;
+
+@SpringBootApplication
+public class IpMatchApp {
+    public static void main(String[] args) {
+        SpringApplication.run(IpMatchApp.class, args);
+
+        List<String> ips = Arrays.asList(
+            "192.88.99.0/24",
+            "192.168.0.0/16", 
+            "192.175.48.0/24"
+        );
+        
+        Pattern pattern = Pattern.compile(".*\\/24");
+        
+        List<String> result = ips.stream()
+            .flatMap(ip -> {
+                if (pattern.matcher(ip).matches()) {
+                    return Stream.of(ip);
+                }
+                return Stream.empty();
+            })
+            .collect(Collectors.toList());
+        
+        System.out.println(result);
+    }
+}
+
+
+OUTPUT:
+
+[192.88.99.0/24, 192.175.48.0/24]

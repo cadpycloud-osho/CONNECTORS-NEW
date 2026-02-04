@@ -1,0 +1,52 @@
+isBlank:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class IsBlankRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkBlank")
+            // 1. Unmarshal payload if we need to check dynamic values
+            .unmarshal().json(JsonLibrary.Jackson)
+
+            // 2. The Pure Camel equivalent of the isBlank logic
+            .transform().groovy("""
+                def someString = "something"
+                def nullString = null
+                
+                return [
+                    "emptyString" : "".isBlank(),
+                    "stringWithSpaces" : "      ".isBlank(),
+                    "textString" : someString.isBlank(),
+                    "somePayloadValue" : (body.nonExistingValue == null || body.nonExistingValue.toString().isBlank()),
+                    "nullString" : (nullString == null || nullString.isBlank()),
+                    
+                    "notEmptyTextString" : !" 1234".isBlank(),
+                    "notEmptyTextStringTwo" : !"".isBlank()
+                ]
+            """)
+
+            // 3. Marshal to JSON to match 'output application/json'
+            .marshal().json(JsonLibrary.Jackson)
+            
+            // 4. Output the result
+            .to("log:output?showBody=true");
+    }
+}
+
+output:
+
+{
+  "emptyString": true,
+  "stringWithSpaces": true,
+  "textString": false,
+  "somePayloadValue": true,
+  "nullString": true,
+  "notEmptyTextString": true,
+  "notEmptyTextStringTwo": false
+}
+

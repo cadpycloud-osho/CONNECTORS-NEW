@@ -1,0 +1,73 @@
+someEntry:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.HashMap;
+
+@RestController
+public class SomeEntryController {
+
+    @GetMapping("/someEntry")
+    public Map<String, Boolean> someEntryExample() {
+
+        Map<String, Boolean> response = new HashMap<>();
+
+        // a: {} (empty) -> no string values
+        response.put("a", Map.<String, Object>of().entrySet()
+                .stream()
+                .anyMatch(e -> e.getValue() instanceof String));
+
+        // b: {a:"", b:"123"} -> contains strings -> true
+        response.put("b", Map.<String, Object>of("a", "", "b", "123")
+                .entrySet()
+                .stream()
+                .anyMatch(e -> e.getValue() instanceof String));
+
+        // c: {a:"", b:123} -> contains at least one string -> true
+        response.put("c", Map.<String, Object>of("a", "", "b", 123)
+                .entrySet()
+                .stream()
+                .anyMatch(e -> e.getValue() instanceof String));
+
+        // d: key == "a" exists -> true
+        response.put("d", Map.<String, Object>of("a", "", "b", 123)
+                .entrySet()
+                .stream()
+                .anyMatch(e -> e.getKey().equals("a")));
+
+        // e: key == "b"? -> false (only "a" exists)
+        response.put("e", Map.<String, Object>of("a", "")
+                .entrySet()
+                .stream()
+                .anyMatch(e -> e.getKey().equals("b")));
+
+        // f: null -> treated as no entries -> false
+        Map<String, Object> nullObj = null;
+        response.put("f", nullObj != null && nullObj.entrySet()
+                .stream()
+                .anyMatch(e -> e.getKey().equals("a")));
+
+        return response;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false
+}
+

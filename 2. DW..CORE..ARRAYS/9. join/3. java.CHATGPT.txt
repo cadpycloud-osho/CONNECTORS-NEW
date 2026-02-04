@@ -1,0 +1,97 @@
+join:
+
+
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    static class User {
+        String id;
+        String name;
+
+        User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    static class Product {
+        String ownerId;
+        String name;
+
+        Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+    }
+
+    static class JoinResult {
+        User l;
+        Product r;
+
+        JoinResult(User l, Product r) {
+            this.l = l;
+            this.r = r;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        List<User> users = Arrays.asList(
+                new User("1", "Mariano"),
+                new User("2", "Leandro"),
+                new User("3", "Julian"),
+                new User("5", "Julian")
+        );
+
+        List<Product> products = Arrays.asList(
+                new Product("1", "DataWeave"),
+                new Product("1", "BAT"),
+                new Product("3", "DataSense"),
+                new Product("4", "SmartConnectors")
+        );
+
+        // Inner join logic
+        List<JoinResult> result =
+                users.stream()
+                        .flatMap(user ->
+                                products.stream()
+                                        .filter(product -> user.id.equals(product.ownerId))
+                                        .map(product -> new JoinResult(user, product))
+                        )
+                        .collect(Collectors.toList());
+
+        // Print output (DataWeave-like JSON)
+        result.forEach(j -> {
+            System.out.println("{");
+            System.out.println("  \"l\": { \"id\": \"" + j.l.id + "\", \"name\": \"" + j.l.name + "\" },");
+            System.out.println("  \"r\": { \"ownerId\": \"" + j.r.ownerId + "\", \"name\": \"" + j.r.name + "\" }");
+            System.out.println("}");
+        });
+    }
+}
+
+
+
+output:
+
+{
+  "l": { "id": "1", "name": "Mariano" },
+  "r": { "ownerId": "1", "name": "DataWeave" }
+}
+{
+  "l": { "id": "1", "name": "Mariano" },
+  "r": { "ownerId": "1", "name": "BAT" }
+}
+{
+  "l": { "id": "3", "name": "Julian" },
+  "r": { "ownerId": "3", "name": "DataSense" }
+}
+
+
+

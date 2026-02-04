@@ -1,0 +1,43 @@
+substringBeforeLast:
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class SubstringBeforeLastController {
+    
+    @GetMapping("/substring-before-last")
+    public Map<String, Object> substringBeforeLastExamples() {
+        return Map.of(
+            "a", substringBeforeLast(null, "'"),
+            "b", substringBeforeLast("", "-"),
+            "c", substringBeforeLast("abc", "b"),
+            "d", substringBeforeLast("abcba", "b"),
+            "e", substringBeforeLast("abc", "d"),
+            "f", substringBeforeLast("abc", "")
+        );
+    }
+    
+    private String substringBeforeLast(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null || delimiter.isEmpty()) return input;
+        
+        int index = input.lastIndexOf(delimiter);
+        return index == -1 ? "" : input.substring(0, index);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "abc",
+  "e": "",
+  "f": "ab"
+}
+
+

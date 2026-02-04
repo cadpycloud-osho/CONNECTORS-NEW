@@ -1,0 +1,32 @@
+fromCharCode:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Collections;
+
+public class FromCharCodeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:fromCode")
+            .process(exchange -> {
+                int code = 117;
+
+                // Logic: Cast the integer to a char and wrap as a String
+                String result = String.valueOf((char) code);
+
+                exchange.getIn().setBody(Collections.singletonMap("fromCharCode", result));
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+
+{
+  "fromCharCode": "u"
+}
+

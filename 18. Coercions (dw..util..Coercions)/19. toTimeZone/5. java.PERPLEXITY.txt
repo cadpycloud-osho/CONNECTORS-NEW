@@ -1,0 +1,47 @@
+toTimeZone:
+
+
+
+
+input:
+
+
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Object> result = Map.of(
+            "toTimeZoneOffset", toTimeZoneOffset(),
+            "toTimeZoneAbbreviation", toTimeZoneAbbreviation(),
+            "toTimeZoneName", toTimeZoneName()
+        );
+        
+        System.out.println("Result: " + result);
+    }
+    
+    private static ZoneOffset toTimeZoneOffset() {
+        // Equivalent to DataWeave toTimeZone("-03:00") → |-03:00|
+        return ZoneOffset.of("-03:00");
+    }
+    
+    private static ZoneOffset toTimeZoneAbbreviation() {
+        // Equivalent to DataWeave toTimeZone("Z") → |Z|
+        return ZoneOffset.UTC;
+    }
+    
+    private static ZoneId toTimeZoneName() {
+        // Equivalent to DataWeave toTimeZone("America/Argentina/Buenos_Aires") → |America/Argentina/Buenos_Aires|
+        return ZoneId.of("America/Argentina/Buenos_Aires");
+    }
+}
+
+
+output:
+
+Result: {toTimeZoneOffset=-03:00, toTimeZoneAbbreviation=Z, toTimeZoneName=America/Argentina/Buenos_Aires}
+
+
+

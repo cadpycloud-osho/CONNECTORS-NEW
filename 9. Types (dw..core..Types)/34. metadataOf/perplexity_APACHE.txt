@@ -1,0 +1,68 @@
+metadataOf:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveMetadataOfRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processMetadata")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Object> processMetadata() {
+        Map<String, Object> result = new HashMap<>();
+        
+        // AType = String {format: "YYYY-MM-dd"}
+        // metadataOf extracts attached metadata {format: "YYYY-MM-dd"}
+        result.put("a", metadataOf(createATypeWithMetadata()));
+        
+        return result;
+    }
+    
+    private Map<String, Object> metadataOf(Object typeWithMetadata) {
+        // DataWeave metadataOf extracts metadata annotations from types
+        // For String {format: "YYYY-MM-dd"}, returns {"format": "YYYY-MM-dd"}
+        if (typeWithMetadata instanceof Map) {
+            Map<?,?> typeMap = (Map<?,?>) typeWithMetadata;
+            // Extract metadata properties (everything after base type definition)
+            Map<String, Object> metadata = new HashMap<>();
+            typeMap.forEach((key, value) -> {
+                if (!"baseType".equals(key)) {
+                    metadata.put((String) key, value);
+                }
+            });
+            return metadata;
+        }
+        return new HashMap<>();
+    }
+    
+    private Map<String, Object> createATypeWithMetadata() {
+        // Simulates DataWeave type: String {format: "YYYY-MM-dd"}
+        Map<String, Object> type = new HashMap<>();
+        type.put("baseType", "String");
+        type.put("format", "YYYY-MM-dd");  // Metadata annotation
+        return type;
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "format": "YYYY-MM-dd"
+  }
+}
+
+
+

@@ -1,0 +1,221 @@
+distinctBy:
+
+example 1:
+
+input:
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+import java.io.StringReader;
+
+/**
+ * Pure Java class to simulate the DataWeave expression:
+ * payload.root.*order.*items contains "3"
+ * * To compile and run:
+ * 1. Save this code as Main.java
+ * 2. Compile: javac Main.java
+ * 3. Run: java Main
+ */
+public class Main { // Renamed the public class to 'Main' to match the expected filename
+
+    // XML Input provided by the user
+    private static final String INPUT_XML = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<root>\n" +
+        "    <order>\n" +
+        "      <items>155</items>\n" +
+        "    </order>\n" +
+        "    <order>\n" +
+        "      <items>30</items>\n" +
+        "    </order>\n" +
+        "    <order>\n" +
+        "      <items>15</items>\n" +
+        "    </order>\n" +
+        "    <order>\n" +
+        "      <items>5</items>\n" +
+        "    </order>\n" +
+        "    <order>\n" +
+        "      <items>4</items>\n" +
+        "      <items>7</items>\n" +
+        "    </order>\n" +
+        "    <order>\n" +
+        "      <items>1</items>\n" +
+        "      <items>3</items>\n" + // This is the node that makes the result 'true'
+        "    </order>\n" +
+        "    <order>\n" +
+        "        null\n" +
+        "    </order>\n" +
+        "</root>";
+
+    /**
+     * Implements the DataWeave logic using standard Java XML/XPath APIs.
+     * @param xmlPayload The XML input string.
+     * @return boolean result of the contains check.
+     */
+    public boolean containsRequestedItem(String xmlPayload) {
+        // XPath: Find any 'items' element under 'order' under 'root' 
+        // whose text content is exactly '3'.
+        String xpathExpression = "/root/order/items[text() = '3']";
+        
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            
+            InputSource is = new InputSource(new StringReader(xmlPayload));
+            Document doc = builder.parse(is);
+
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            XPathExpression expr = xpathFactory.newXPath().compile(xpathExpression);
+
+            NodeList nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
+            return nodeList.getLength() > 0;
+
+        } catch (Exception e) {
+            System.err.println("Error processing XML payload: " + e.getMessage());
+            return false; 
+        }
+    }
+
+    public static void main(String[] args) {
+        Main simulator = new Main();
+        
+        // Execute the logic
+        boolean result = simulator.containsRequestedItem(INPUT_XML);
+        
+        // Output the result in the requested JSON format
+        System.out.println("{ \"ContainsRequestedItem\": " + result + " }");
+    }
+}
+
+output:
+
+{ "ContainsRequestedItem": true }
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+/**
+ * Pure Java class demonstrating the DataWeave logic: "mulesoft" contains("mule")
+ */
+public class StringContainsChecker {
+
+    public static void main(String[] args) {
+        String mainString = "mulesoft";
+        String substring = "mule";
+
+        // The DataWeave 'contains' operator is equivalent to Java's String.contains() method.
+        boolean result = mainString.contains(substring);
+
+        // Output the result in the requested JSON format
+        System.out.println("{ \"result\": " + result + " }");
+    }
+}
+output:
+
+{ "result": true }
+
+
+---------------------------------------------------------------
+
+
+
+
+example 3:
+
+input:
+
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.StringReader;
+
+/**
+ * Pure Java class simulating the DataWeave expression:
+ * { ContainsString : payload.root.mystring contains("me") }
+ * * NOTE: The public class is named 'Main' to satisfy the common
+ * Java compilation requirement when saving the file as Main.java.
+ */
+public class Main {
+
+    // XML Input provided by the user
+    private static final String INPUT_XML = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<root><mystring>some string</mystring></root>";
+    
+    private static final String TARGET_SUBSTRING = "me";
+    private static final String EXTRACT_XPATH = "/root/mystring";
+
+    /**
+     * Executes the DataWeave logic using standard Java XML/XPath APIs.
+     * @param xmlPayload The XML input string.
+     * @return The boolean result of the contains check.
+     */
+    public boolean checkStringContains(String xmlPayload) {
+        
+        try {
+            // 1. Setup XML Parser
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            // Basic security measure for XML processing
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            
+            // 2. Parse XML
+            InputSource is = new InputSource(new StringReader(xmlPayload));
+            Document doc = builder.parse(is);
+
+            // 3. Use XPath (DataWeave equivalent of payload.root.mystring) to extract the text node
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            Node mystringNode = (Node) xpathFactory.newXPath().compile(EXTRACT_XPATH)
+                                    .evaluate(doc, XPathConstants.NODE);
+
+            // Handle cases where the tag is missing or empty
+            String extractedString = (mystringNode != null && mystringNode.getTextContent() != null)
+                                     ? mystringNode.getTextContent()
+                                     : ""; // Default to empty string if node not found
+            
+            // 4. Perform the 'contains' check (DataWeave contains("me") -> Java .contains("me"))
+            return extractedString.contains(TARGET_SUBSTRING);
+
+        } catch (Exception e) {
+            // In case of XML parsing failure
+            System.err.println("Error processing XML payload: " + e.getMessage());
+            return false; 
+        }
+    }
+
+    public static void main(String[] args) {
+        Main checker = new Main();
+        
+        // Execute the logic
+        boolean result = checker.checkStringContains(INPUT_XML);
+        
+        // Output the result in the requested JSON format: { "ContainsString": true }
+        System.out.println("{ \"ContainsString\": " + result + " }");
+    }
+}
+
+output:
+
+
+{ "ContainsString": true }
+
+---------------------------------------------------------------
+

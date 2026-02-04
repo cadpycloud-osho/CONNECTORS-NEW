@@ -1,0 +1,55 @@
+isUriType:
+
+
+
+input:
+
+package com.example.demo.util;
+
+import java.net.URI;
+
+public class TypeUtils {
+
+    public static boolean isUriType(Class<?> type) {
+        return URI.class.isAssignableFrom(type);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class UriTypeController {
+
+    @GetMapping("/isUriType")
+    public Map<String, Boolean> checkUriTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> AUri = URI.class;
+
+        result.put("a", TypeUtils.isUriType(AUri));
+        result.put("b", TypeUtils.isUriType(URI.class));
+        result.put("c", TypeUtils.isUriType(String.class));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

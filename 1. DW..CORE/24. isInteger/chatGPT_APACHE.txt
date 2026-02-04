@@ -1,0 +1,27 @@
+isInteger:
+
+
+input:
+
+from("direct:isInteger")
+.setBody(constant(List.of(1, 2.0, 2.2, "1")))
+
+.split(body())
+    .choice()
+        .when(simple("${body} regex '^-?\\d+(\\.0)?$'"))
+            .setBody(constant(true))
+        .otherwise()
+            .setBody(constant(false))
+    .end()
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+
+output:
+
+[ true, true, false, true ]
+
+

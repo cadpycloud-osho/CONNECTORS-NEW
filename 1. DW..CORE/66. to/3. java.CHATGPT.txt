@@ -1,0 +1,76 @@
+to:
+
+example 1:
+
+input:
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Equivalent of: 1 to 10
+        List<Integer> myRange = IntStream.rangeClosed(1, 10)
+                                         .boxed()
+                                         .collect(Collectors.toList());
+
+        // Print JSON-style output manually
+        System.out.println("{");
+        System.out.println("  \"myRange\" : " + myRange);
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+{
+  "myRange" : [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+}
+
+
+-------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        String myVar = "Hello World!";
+
+        // myVar[2 to 6]
+        String indices2to6 = myVar.substring(2, 7);
+
+        // myVar[6 to end]
+        String indicesFromEnd = myVar.substring(6);
+
+        // reverse entire string
+        String reversal = new StringBuilder(myVar).reverse().toString();
+
+        // Print JSON-style output manually
+        System.out.println("{");
+        System.out.println("  \"indices2to6\" : \"" + indices2to6 + "\",");
+        System.out.println("  \"indicesFromEnd\" : \"" + indicesFromEnd + "\",");
+        System.out.println("  \"reversal\" : \"" + reversal + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+{
+  "indices2to6" : "llo W",
+  "indicesFromEnd" : "World!",
+  "reversal" : "!dlroW olleH"
+}
+
+
+-------------------------------------------------

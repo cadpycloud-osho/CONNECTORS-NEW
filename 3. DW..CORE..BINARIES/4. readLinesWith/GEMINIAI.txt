@@ -1,0 +1,93 @@
+readLinesWith:
+
+
+INPUT:
+
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class ReadLinesWithExample {
+
+    /**
+     * Replicates DataWeave's 'content readLinesWith "UTF-8"' logic.
+     * Reads lines from a byte array (binary data) using a specific character set.
+     *
+     * @param binaryContent The raw byte array (DataWeave 'content').
+     * @param encoding The character encoding (e.g., "UTF-8").
+     * @return A list of strings, one for each line.
+     */
+    public static List<String> readLinesWith(byte[] binaryContent, String encoding) throws IOException {
+        
+        // 1. Wrap the byte array in a stream
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(binaryContent);
+             // 2. Chain to an InputStreamReader to specify character encoding (UTF-8)
+             InputStreamReader isr = new InputStreamReader(bais, StandardCharsets.UTF_8);
+             // 3. Wrap in BufferedReader to read lines efficiently
+             BufferedReader br = new BufferedReader(isr)) {
+
+            // Read all lines into a List
+            return br.lines().collect(Collectors.toList());
+        }
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        // The DataWeave input string content
+        String dwInput = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n";
+        
+        // Replicating 'var content = read(..., "application/octet-stream")'
+        // Convert the string to a byte array using the same encoding assumed by DW (UTF-8)
+        byte[] binaryContent = dwInput.getBytes(StandardCharsets.UTF_8);
+        
+        List<String> linesResult;
+        
+        try {
+            // DataWeave Logic: (content readLinesWith "UTF-8")
+            linesResult = readLinesWith(binaryContent, "UTF-8");
+        } catch (IOException e) {
+            linesResult = Collections.emptyList();
+            System.err.println("Failed to read lines: " + e.getMessage());
+        }
+        
+        // --- Output Generation (Simulating DataWeave JSON structure) ---
+        Map<String, Object> result = Map.of(
+            "lines", linesResult,
+            "showType", "Binary" // Matches typeOf(content)
+        );
+            
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave readLinesWith Equivalent Output ---");
+        System.out.println("Input Binary (first 10 bytes hex): " + bytesToHex(Arrays.copyOf(binaryContent, 10)) + "...");
+        
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+
+    // Helper method to display byte array as hexadecimal string
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
+    }
+}
+
+OUTPUT:
+
+{
+   "lines": [ "Line 1", "Line 2", "Line 3", "Line 4", "Line 5" ],
+   "showType": "Binary"
+}

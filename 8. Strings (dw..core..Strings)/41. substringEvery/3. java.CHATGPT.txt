@@ -1,0 +1,35 @@
+substringEvery:
+
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+    public static List<String> substringEveryDW(String input, int n) {
+        List<String> result = new ArrayList<>();
+        if (input == null || n <= 0) return result;
+
+        int length = input.length();
+        for (int i = 0; i < length; i += n) {
+            int end = Math.min(i + n, length);
+            result.add(input.substring(i, end));
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        String input = "substringEvery";
+        List<String> result = substringEveryDW(input, 3);
+        System.out.println(result);
+    }
+}
+
+output:
+
+[sub, str, ing, Eve, ry]
+
+

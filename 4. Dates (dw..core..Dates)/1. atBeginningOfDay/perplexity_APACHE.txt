@@ -1,0 +1,53 @@
+atBeginningOfDay:
+
+example 1:
+
+input:
+
+from("direct:beginningOfDay")
+    .process(exchange -> {
+        ZonedDateTime input = ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        ZonedDateTime startOfDay = input.truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfDayDateTime", startOfDay.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "atBeginningOfDayDateTime": "2020-10-06T00:00:00-03:00"
+}
+
+
+
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:beginningOfDayLocal")
+    .process(exchange -> {
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        LocalDateTime startOfDay = input.truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfDayLocalDateTime", startOfDay.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "atBeginningOfDayLocalDateTime": "2020-10-06T00:00:00"
+}
+
+
+
+
+--------------------------------------------------------

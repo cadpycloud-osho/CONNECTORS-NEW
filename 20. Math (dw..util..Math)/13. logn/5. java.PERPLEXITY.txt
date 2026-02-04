@@ -1,0 +1,49 @@
+logn:
+
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = executeLognTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Double> executeLognTests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("logn10", logn(10.0));
+        result.put("logn13", logn(0.13));
+        result.put("logn-20", logn(-20.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave logn() equivalent:
+     * Returns natural logarithm (base e) of x, or null if x <= 0
+     */
+    public static Double logn(double x) {
+        // Check domain: x must be > 0
+        if (x <= 0.0) {
+            return null;
+        }
+        return Math.log(x);
+    }
+}
+
+
+output:
+
+{
+  logn10=2.302585092994046,
+  logn13=-2.0402208285265546,
+  logn-20=null
+}
+
+

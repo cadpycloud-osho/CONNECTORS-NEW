@@ -1,0 +1,24 @@
+words:
+
+
+input:
+
+
+@RestController
+@RequestMapping("/api")
+public class WordsController {
+    
+    @GetMapping("/words")
+    public List<String> getWords() {
+        String input = "hello world\nhere\t\t\tdata-weave";
+        return Arrays.stream(input.split("\\s+"))
+                     .filter(s -> !s.isEmpty())
+                     .collect(Collectors.toList());
+    }
+}
+
+output:
+
+["hello", "world", "here", "data-weave"]
+
+

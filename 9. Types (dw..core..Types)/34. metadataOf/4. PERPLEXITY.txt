@@ -1,0 +1,38 @@
+metadataOf:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MetadataController {
+
+    @GetMapping("/metadata-of")
+    public Map<String, Map<String, String>> metadataOf() {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        
+        // AType = String {format: "YYYY-MM-dd"}
+        // metadataOf(AType) extracts the metadata annotation
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("format", "YYYY-MM-dd");
+        
+        result.put("a", metadata);
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "format": "YYYY-MM-dd"
+  }
+}
+
+

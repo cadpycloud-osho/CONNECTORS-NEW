@@ -1,0 +1,34 @@
+take:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+        List<String> result = users.subList(0, Math.min(2, users.size()));
+        
+        String output = "[\n";
+        for (int i = 0; i < result.size(); i++) {
+            if (i > 0) output += ",\n";
+            output += "  \"" + result.get(i) + "\"";
+        }
+        output += "\n]";
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+
+[
+  "Mariano",
+  "Leandro"
+]
+

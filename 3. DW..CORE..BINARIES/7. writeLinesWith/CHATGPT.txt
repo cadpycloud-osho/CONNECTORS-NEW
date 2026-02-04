@@ -1,0 +1,58 @@
+writeLinesWith:
+
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class LineController {
+
+    @GetMapping("/lines")
+    public LineResponse getLines() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= 10; i++) {
+            sb.append("Line ").append(i);
+            if (i < 10) {
+                sb.append("\n");
+            }
+        }
+        return new LineResponse(sb.toString());
+    }
+}
+
+class LineResponse {
+    private String lines;
+
+    public LineResponse(String lines) {
+        this.lines = lines;
+    }
+
+    public String getLines() {
+        return lines;
+    }
+
+    public void setLines(String lines) {
+        this.lines = lines;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "lines": "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+}

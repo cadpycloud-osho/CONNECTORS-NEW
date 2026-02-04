@@ -1,0 +1,69 @@
+someEntry:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave equivalent: someEntry expressions
+        boolean a = someEntry(new HashMap<>(), (value, key) -> value instanceof String);
+        boolean b = someEntry(Map.of("a", "", "b", "123"), (value, key) -> value instanceof String);
+        boolean c = someEntry(Map.of("a", "", "b", 123), (value, key) -> value instanceof String);
+        boolean d = someEntry(Map.of("a", "", "b", 123), (value, key) -> key.toString().equals("a"));
+        boolean e = someEntry(Map.of("a", ""), (value, key) -> key.toString().equals("b"));
+        boolean f = someEntry(null, (value, key) -> key.toString().equals("a"));
+        
+        // Output as JSON structure matching DataWeave
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c + ",");
+        System.out.println("  \"d\": " + d + ",");
+        System.out.println("  \"e\": " + e + ",");
+        System.out.println("  \"f\": " + f);
+        System.out.println("}");
+    }
+    
+    // DataWeave "object someEntry (value, key) -> predicate" equivalent
+    public static <V> boolean someEntry(Map<String, V> obj, EntryPredicate<V> predicate) {
+        // Null object returns false (no entries exist)
+        if (obj == null) {
+            return false;
+        }
+        
+        // Empty object returns false (no entries match)
+        if (obj.isEmpty()) {
+            return false;
+        }
+        
+        // Check if any entry matches
+        return obj.entrySet().stream().anyMatch(entry -> 
+            predicate.test(entry.getValue(), entry.getKey())
+        );
+    }
+    
+    // Functional interface for the predicate
+    @FunctionalInterface
+    interface EntryPredicate<V> {
+        boolean test(V value, String key);
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false
+}
+
+
+

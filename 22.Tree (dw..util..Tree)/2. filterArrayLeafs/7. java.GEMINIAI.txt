@@ -1,0 +1,164 @@
+filterArrayLeafs:
+
+
+
+
+input:
+
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // ---------- Safe input construction ----------
+    private static final List<Object> MY_ARRAY;
+    static {
+        List<Object> temp = new ArrayList<>();
+
+        Map<String, Object> inner = new LinkedHashMap<>();
+        inner.put("name", Arrays.asList("", true));
+        inner.put("test", 213);
+
+        temp.add(1);
+        temp.add(inner);
+        temp.add("123");
+        temp.add(null);
+
+        MY_ARRAY = Collections.unmodifiableList(temp);
+    }
+
+    // a: !(value is Null or value is String)
+    private static final BiPredicate<Object, List<Object>> PREDICATE_A =
+            (value, path) -> !(value == null || value instanceof String);
+
+    // b: (value is Null or value == 1)
+    private static final BiPredicate<Object, List<Object>> PREDICATE_B =
+            (value, path) ->
+                    value == null ||
+                    (value instanceof Number && ((Number) value).intValue() == 1);
+
+    // d: !(Number | String | Boolean)
+    private static final BiPredicate<Object, List<Object>> PREDICATE_D =
+            (value, path) ->
+                    !(value instanceof Number ||
+                      value instanceof String ||
+                      value instanceof Boolean);
+
+    // ---------- Recursive filter ----------
+    @SuppressWarnings("unchecked")
+    private static Object filterArrayLeafsRecursive(
+            Object input,
+            BiPredicate<Object, List<Object>> predicate,
+            List<Object> path) {
+
+        if (input == null ||
+            input instanceof Number ||
+            input instanceof String ||
+            input instanceof Boolean) {
+            return predicate.test(input, path) ? input : null;
+        }
+
+        if (input instanceof Map) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            ((Map<String, Object>) input).forEach((k, v) -> {
+                Object r = filterArrayLeafsRecursive(v, predicate, path);
+                if (r != null) {
+                    result.put(k, r);
+                }
+            });
+            return result;
+        }
+
+        if (input instanceof List) {
+            return ((List<Object>) input).stream()
+                    .map(v -> filterArrayLeafsRecursive(v, predicate, path))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
+
+        return null;
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> next + toPrettyJson(v, indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        output.put("a", filterArrayLeafsRecursive(MY_ARRAY, PREDICATE_A, List.of()));
+        output.put("b", filterArrayLeafsRecursive(MY_ARRAY, PREDICATE_B, List.of()));
+
+        Map<String, Object> cInput = new LinkedHashMap<>();
+        cInput.put("a", Arrays.asList(1, 2));
+        output.put("c", filterArrayLeafsRecursive(cInput, PREDICATE_B, List.of()));
+
+        output.put("d", filterArrayLeafsRecursive(MY_ARRAY, PREDICATE_D, List.of()));
+
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": [
+    1,
+    {
+      "name": [
+        true
+      ],
+      "test": 213
+    }
+  ],
+  "b": [
+    1,
+    {
+      "name": [],
+      "test": 213
+    },
+    null
+  ],
+  "c": {
+    "a": [
+      1
+    ]
+  },
+  "d": [
+    {
+      "name": [],
+      "test": 213
+    }
+  ]
+}
+

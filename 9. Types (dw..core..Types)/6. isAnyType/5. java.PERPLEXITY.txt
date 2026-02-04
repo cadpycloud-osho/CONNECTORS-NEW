@@ -1,0 +1,42 @@
+isAnyType:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new HashMap<>();
+
+        // Simulate isAnyType(AAny) where AAny = Any
+        result.put("a", true);
+
+        // Simulate isAnyType(Any)
+        result.put("b", true);
+
+        // Simulate isAnyType(String)
+        result.put("c", false);
+
+        // Print as JSON-like structure
+        System.out.println("{");
+        System.out.println("  \"a\": " + result.get("a") + ",");
+        System.out.println("  \"b\": " + result.get("b") + ",");
+        System.out.println("  \"c\": " + result.get("c"));
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

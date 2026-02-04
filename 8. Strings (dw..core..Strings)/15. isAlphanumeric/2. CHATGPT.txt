@@ -1,0 +1,62 @@
+isAlphanumeric:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringChecks {
+
+    public static boolean isAlphanumeric(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return false;
+        }
+        return input.matches("^[A-Za-z0-9]+$");
+    }
+}
+
+Spring Boot Controller:
+
+package com.example.demo.controller;
+
+import com.example.demo.util.StringChecks;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class AlphanumericController {
+
+    @GetMapping("/isalphanumeric")
+    public Map<String, Boolean> getAlphanumericResults() {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        result.put("a", StringChecks.isAlphanumeric(null));
+        result.put("b", StringChecks.isAlphanumeric(""));
+        result.put("c", StringChecks.isAlphanumeric("  "));
+        result.put("d", StringChecks.isAlphanumeric("abc"));
+        result.put("e", StringChecks.isAlphanumeric("ab c"));
+        result.put("f", StringChecks.isAlphanumeric("ab2c"));
+        result.put("g", StringChecks.isAlphanumeric("ab-c"));
+
+        return result;
+    }
+}
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": true,
+  "g": false
+}
+
+
+

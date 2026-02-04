@@ -1,0 +1,23 @@
+mod:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        // mod equivalents using % operator
+        int mod1 = 3 % 2;
+        int mod2 = 4 % 2;
+        double mod3 = 2.2 % 2;
+        
+        // Output array format
+        System.out.println("[" + mod1 + ", " + mod2 + ", " + mod3 + "]");
+    }
+}
+
+
+output:
+
+
+[1, 0, 0.2]
+

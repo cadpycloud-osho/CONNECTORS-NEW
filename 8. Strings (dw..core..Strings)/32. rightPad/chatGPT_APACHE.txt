@@ -1,0 +1,56 @@
+rightPad:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class RightPadExample {
+
+    public static void main(String[] args) {
+        System.out.println(result());
+    }
+
+    public static Map<String, String> result() {
+        Map<String, String> map = new LinkedHashMap<>();
+
+        map.put("a", rightPad(null, 3));
+        map.put("b", rightPad("", 3));
+        map.put("c", rightPad("bat", 5));
+        map.put("d", rightPad("bat", 3));
+        map.put("e", rightPad("bat", -1));
+
+        return map;
+    }
+
+    public static String rightPad(String value, int size) {
+        if (value == null) {
+            return null;
+        }
+        if (size <= value.length()) {
+            return value;
+        }
+        StringBuilder sb = new StringBuilder(value);
+        while (sb.length() < size) {
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}
+
+
+

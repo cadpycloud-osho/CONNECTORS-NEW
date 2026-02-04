@@ -1,0 +1,72 @@
+try:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
+import java.util.Random;
+
+public class TryCatchRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:tryRandomNumber")
+            .doTry()
+                .process(exchange -> {
+                    // Equivalent to randomNumber() function
+                    if (new Random().nextDouble() > 0.5) {
+                        throw new RuntimeException("This function is failing");
+                    }
+                    // Success case
+                    exchange.getIn().setBody(Map.of(
+                        "success", true,
+                        "result", "OK"
+                    ));
+                })
+            .doCatch(Exception.class)
+                .process(exchange -> {
+                    Exception e = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                    
+                    // Equivalent to the DataWeave "error" object
+                    Map<String, Object> errorDetails = Map.of(
+                        "kind", "UserException",
+                        "message", e.getMessage(),
+                        "location", "Unknown location",
+                        "stack", java.util.Arrays.stream(e.getStackTrace())
+                                    .limit(3)
+                                    .map(StackTraceElement::toString)
+                                    .toList()
+                    );
+
+                    exchange.getIn().setBody(Map.of(
+                        "success", false,
+                        "error", errorDetails
+                    ));
+                })
+            .end()
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "success": false,
+  "error": {
+    "kind": "UserException",
+    "message": "This function is failing",
+    "location": "Unknown location",
+    "stack": [
+      "org.apache.camel.processor.TryCatchRoute.lambda$configure$0(TryCatchRoute.java:15)",
+      "org.apache.camel.processor.TryProcessor.process(TryProcessor.java:148)",
+      "org.apache.camel.processor.CamelInternalProcessor.process(CamelInternalProcessor.java:383)"
+    ]
+  }
+}
+
+{
+  "success": true,
+  "result": "OK"
+}
+

@@ -1,0 +1,115 @@
+now:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class NowRoute extends RouteBuilder {
+    private static final DateTimeFormatter ISO_FORMAT = 
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX");
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:now")
+            .process(exchange -> {
+                ZonedDateTime nowUtc = ZonedDateTime.now(ZoneId.of("UTC"));
+                ZonedDateTime nowNY = nowUtc.withZoneSameInstant(ZoneId.of("America/New_York"));
+                
+                Map<String, String> result = new LinkedHashMap<>();
+                result.put("nowCalled", nowUtc.format(ISO_FORMAT));
+                result.put("nowCalledSpecificTimeZone", nowNY.format(ISO_FORMAT));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "nowCalled": "2026-01-19T07:30:45.123456Z",
+  "nowCalledSpecificTimeZone": "2026-01-19T02:30:45.123456-05:00"
+}
+
+
+-------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class NowComponentsRoute extends RouteBuilder {
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm:ss");
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:nowComponents")
+            .process(exchange -> {
+                ZonedDateTime now = ZonedDateTime.now();
+                
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("now", now.toString());
+                result.put("epochTime", now.toEpochSecond());
+                result.put("nanoseconds", now.getNano());
+                result.put("milliseconds", now.getNano() / 1_000_000);
+                result.put("seconds", now.getSecond());
+                result.put("minutes", now.getMinute());
+                result.put("hour", now.getHour());
+                result.put("day", now.getDayOfMonth());
+                result.put("month", now.getMonthValue());
+                result.put("year", now.getYear());
+                result.put("quarter", (now.getMonthValue() - 1) / 3 + 1);
+                result.put("dayOfWeek", now.getDayOfWeek().getValue());
+                result.put("dayOfYear", now.getDayOfYear());
+                result.put("offsetSeconds", now.getOffset().getTotalSeconds());
+                result.put("formattedDate", now.format(DATE_FORMAT));
+                result.put("formattedTime", now.format(TIME_FORMAT));
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "now": "2026-01-19T07:42:30.123456789-05:00[America/New_York]",
+  "epochTime": 1737310150,
+  "nanoseconds": 123456789,
+  "milliseconds": 123,
+  "seconds": 30,
+  "minutes": 42,
+  "hour": 7,
+  "day": 19,
+  "month": 1,
+  "year": 2026,
+  "quarter": 1,
+  "dayOfWeek": 1,
+  "dayOfYear": 19,
+  "offsetSeconds": -18000,
+  "formattedDate": "2026-01-19",
+  "formattedTime": "07:42:30"
+}
+
+
+
+

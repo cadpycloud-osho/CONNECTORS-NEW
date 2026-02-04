@@ -1,0 +1,77 @@
+isArrayType:
+
+
+input:
+
+package com.example.typecheck.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class ArrayTypeCheckService {
+
+    // Define constants representing the type names
+    private static final String ARRAY_TYPE_PREFIX = "Array<";
+    private static final String BOOLEAN_TYPE = "Boolean";
+    
+    /**
+     * Helper method to simulate DataWeave's isArrayType() function.
+     * Checks if the type name indicates an array structure.
+     */
+    private boolean isArrayType(String typeName) {
+        // In this emulation, we check if the type name matches known array formats.
+        // A real Java reflection check would use Class.isArray() or Array.class.isAssignableFrom()
+        return typeName.startsWith(ARRAY_TYPE_PREFIX);
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, Boolean> checkTypes() {
+        
+        // Emulating the type definitions and uses from the DW script:
+        // AType is represented as "Array<String>"
+        final String AType = "Array<String>"; 
+        final String Builtin_Boolean = BOOLEAN_TYPE;
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: isArrayType(AType), b: isArrayType(Boolean) }
+        return Map.of(
+            "a", isArrayType(AType),
+            "b", isArrayType(Builtin_Boolean)
+        );
+    }
+}
+package com.example.typecheck.controller;
+
+import com.example.typecheck.service.ArrayTypeCheckService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final ArrayTypeCheckService arrayTypeCheckService;
+
+    public DataWeaveController(ArrayTypeCheckService arrayTypeCheckService) {
+        this.arrayTypeCheckService = arrayTypeCheckService;
+    }
+
+    // Maps to http://localhost:8080/check-array-type
+    @GetMapping("/check-array-type")
+    public Map<String, Boolean> checkArrayType() {
+        // Calls the service method that holds the transformation logic
+        return arrayTypeCheckService.checkTypes();
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": false
+}

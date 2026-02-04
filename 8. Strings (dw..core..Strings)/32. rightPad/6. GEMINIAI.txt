@@ -1,0 +1,79 @@
+rightPad:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class PadController {
+
+    @GetMapping("/pad-conversion")
+    public Map<String, String> convertDataWeaveRightPad() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = PadUtil.rightPad(null, 3);
+        String b = PadUtil.rightPad("", 3);
+        String c = PadUtil.rightPad("bat", 5);
+        String d = PadUtil.rightPad("bat", 3);
+        String e = PadUtil.rightPad("bat", -1);
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'a' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e
+        );
+    }
+}
+
+public class PadUtil {
+
+    /**
+     * Replicates the dw::core::Strings::rightPad function using the default space character.
+     *
+     * @param str The input string (can be null).
+     * @param size The minimum desired length.
+     * @return The padded string, or null if the input string was null.
+     */
+    public static String rightPad(String str, int size) {
+        // 1. DataWeave Rule: If the input string is null, return null.
+        if (str == null) {
+            return null;
+        }
+
+        // 2. If the size is less than or equal to the current length, return the original string.
+        if (size <= str.length()) {
+            return str;
+        }
+
+        // 3. Calculate padding length and append spaces.
+        int pads = size - str.length();
+        StringBuilder sb = new StringBuilder(str);
+        
+        // Create the padding string
+        // In a real application, StringUtils.repeat(' ', pads) would be used.
+        for (int i = 0; i < pads; i++) {
+            sb.append(' '); 
+        }
+
+        return sb.toString();
+    }
+}
+output:
+
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}

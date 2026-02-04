@@ -1,0 +1,72 @@
+toBoolean:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DwToBooleanTest {
+
+    // Simulate dw::util::Coercions::toBoolean(String) - case-insensitive boolean parsing
+    static Boolean toBoolean(String value) {
+        if (value == null) return false;
+        return Boolean.parseBoolean(value.toLowerCase());
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToBooleanRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToBooleanRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Simulate DataWeave: toBoolean() with various cases
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", toBoolean("true"));
+                        result.put("b", toBoolean("false"));
+                        result.put("c", toBoolean("FALSE"));
+                        result.put("d", toBoolean("TrUe"));
+
+                        String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+
+{
+  "a" : true,
+  "b" : false,
+  "c" : false,
+  "d" : true
+}
+
+
+

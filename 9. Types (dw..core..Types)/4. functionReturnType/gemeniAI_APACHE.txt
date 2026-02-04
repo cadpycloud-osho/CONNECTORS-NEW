@@ -1,0 +1,45 @@
+functionReturnType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.lang.reflect.Method;
+import java.util.Map;
+
+public class ReturnTypeIntrospectionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getReturnType")
+            .process(exchange -> {
+                // We inspect the return type of a method in a helper class
+                Method methodA = SampleFunctions.class.getMethod("aFunction", String.class, Integer.class);
+                Method methodB = SampleFunctions.class.getMethod("aFunction2");
+
+                exchange.getIn().setBody(Map.of(
+                    "a", methodA.getReturnType().getSimpleName(),
+                    "b", methodB.getReturnType().getSimpleName()
+                ));
+            })
+            .marshal().json();
+    }
+}
+
+class SampleFunctions {
+    // Equivalent to (String, Number) -> Number
+    public Integer aFunction(String s, Integer n) { return n; }
+
+    // Equivalent to () -> Number
+    public Integer aFunction2() { return 42; }
+}
+
+
+output:
+
+{
+  "a": "Integer",
+  "b": "Integer"
+}
+
+

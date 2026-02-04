@@ -1,0 +1,109 @@
+nodeExists:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> myObject = createSampleData();
+        Map<String, Boolean> result = checkAllNodes(myObject);
+        System.out.println(result);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> createSampleData() {
+        Map<String, Object> user1 = new HashMap<>();
+        user1.put("name", "mariano");
+        user1.put("lastName", "achaval");
+        List<Map<String, Object>> friends1 = Arrays.asList(
+            Map.of("name", "julian"),
+            Map.of("name", "tom")
+        );
+        user1.put("friends", friends1);
+        
+        Map<String, Object> user2 = new HashMap<>();
+        user2.put("name", "leandro");
+        user2.put("lastName", "shokida");
+        List<Map<String, Object>> friends2 = Arrays.asList(
+            Map.of("name", "peter"),
+            Map.of("name", "robert")
+        );
+        user2.put("friends", friends2);
+        
+        List<Map<String, Object>> users = Arrays.asList(user1, user2);
+        Map<String, Object> root = new HashMap<>();
+        root.put("user", users);
+        return root;
+    }
+    
+    public static Map<String, Boolean> checkAllNodes(Map<String, Object> myObject) {
+        Map<String, Boolean> result = new HashMap<>();
+        String[] checks = {"mariano", "julian", "tom", "leandro", "peter", "teo"};
+        for (String name : checks) {
+            result.put(name, nodeExists(myObject, "name", name));
+        }
+        result.put("wrongField", nodeExists(myObject, "wrongField", null));
+        return result;
+    }
+    
+    public static boolean nodeExists(Object obj, String selector, String targetValue) {
+        return search(obj, new ArrayList<>(), selector, targetValue != null, targetValue);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static boolean search(Object value, List<Map<String, Object>> path, 
+                                String targetSelector, boolean checkValue, String targetValue) {
+        if (value instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) value;
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                Map<String, Object> pathElement = Map.of("kind", "Object", "selector", entry.getKey());
+                path.add(new HashMap<>(pathElement));
+                
+                if (search(entry.getValue(), path, targetSelector, checkValue, targetValue)) {
+                    path.remove(path.size() - 1);
+                    return true;
+                }
+                path.remove(path.size() - 1);
+            }
+        } else if (value instanceof List) {
+            List<Object> list = (List<Object>) value;
+            for (int i = 0; i < list.size(); i++) {
+                Map<String, Object> pathElement = Map.of("kind", "Array", "selector", i);
+                path.add(new HashMap<>(pathElement));
+                
+                if (search(list.get(i), path, targetSelector, checkValue, targetValue)) {
+                    path.remove(path.size() - 1);
+                    return true;
+                }
+                path.remove(path.size() - 1);
+            }
+        } else if (!path.isEmpty()) {
+            Map<String, Object> lastPath = path.get(path.size() - 1);
+            String selector = (String) lastPath.get("selector");
+            if (selector.equals(targetSelector) && 
+                (!checkValue || value.equals(targetValue))) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+output:
+
+{
+  "mariano": true,
+  "julian": true,
+  "tom": true,
+  "leandro": true,
+  "peter": true,
+  "wrongField": false,
+  "teo": false
+}
+
+
+
+

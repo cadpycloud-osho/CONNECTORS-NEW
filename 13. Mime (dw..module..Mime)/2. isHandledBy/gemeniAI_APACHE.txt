@@ -1,0 +1,88 @@
+isHandledBy:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MimeMatchingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:matchMime")
+            .routeId("Mime-Matching-Route")
+            .process(exchange -> {
+                // Define our test objects
+                Map<String, Object> json = Map.of("type", "application", "subtype", "json");
+                Map<String, Object> multipart = Map.of("type", "multipart", "subtype", "form-data");
+                Map<String, Object> all = Map.of("type", "*", "subtype", "*");
+                Map<String, Object> wildcardXml = Map.of("type", "application", "subtype", "*+xml");
+                Map<String, Object> soapXml = Map.of("type", "application", "subtype", "soap+xml");
+
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // a: JSON matches JSON
+                results.put("a", isHandledBy(json, json));
+                // b: */json matches application/json
+                results.put("b", isHandledBy(Map.of("type", "*", "subtype", "json"), json));
+                // c: application/* matches application/json
+                results.put("c", isHandledBy(Map.of("type", "application", "subtype", "*"), json));
+                // d: */* matches multipart
+                results.put("d", isHandledBy(all, multipart));
+                // e: multipart does NOT match */* (Direction matters: Pattern vs Target)
+                results.put("e", isHandledBy(multipart, all));
+                // f: JSON does NOT match multipart
+                results.put("f", isHandledBy(json, multipart));
+                // g: *+xml matches soap+xml
+                results.put("g", isHandledBy(wildcardXml, soapXml));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    /**
+     * Logic: Returns true if 'target' is handled by 'pattern'
+     */
+    private boolean isHandledBy(Map<String, Object> pattern, Map<String, Object> target) {
+        String pType = (String) pattern.get("type");
+        String pSub = (String) pattern.get("subtype");
+        String tType = (String) target.get("type");
+        String tSub = (String) target.get("subtype");
+
+        // 1. Check Type
+        boolean typeMatch = pType.equals("*") || pType.equalsIgnoreCase(tType);
+        
+        // 2. Check Subtype
+        boolean subMatch = false;
+        if (pSub.equals("*")) {
+            subMatch = true;
+        } else if (pSub.contains("*+")) {
+            // Handle Suffix Matching (e.g., *+xml)
+            String suffix = pSub.substring(pSub.indexOf("+"));
+            subMatch = tSub.endsWith(suffix);
+        } else {
+            subMatch = pSub.equalsIgnoreCase(tSub);
+        }
+
+        return typeMatch && subMatch;
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": true
+}
+
+
+
+

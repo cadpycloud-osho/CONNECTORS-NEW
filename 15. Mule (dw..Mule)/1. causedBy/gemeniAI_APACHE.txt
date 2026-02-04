@@ -1,0 +1,54 @@
+causedBy:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.http.base.HttpOperationFailedException;
+
+public class SecurityErrorHandlerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // 1. Equivalent to <on-error-continue type="SECURITY">
+        // We catch a base security exception or a generic HTTP failure
+        onException(javax.security.auth.login.LoginException.class, 
+                    HttpOperationFailedException.class)
+            .handled(true) // 'true' behaves like on-error-continue (swallows error, continues flow)
+            .choice()
+                // 2. Equivalent to causedBy(error, 'HTTP:UNAUTHORIZED')
+                .when(exceptionCause().isInstanceOf(HttpOperationFailedException.class))
+                    .process(exchange -> {
+                        HttpOperationFailedException cause = 
+                            exchange.getProperty(Exchange.EXCEPTION_CAUGHT, HttpOperationFailedException.class);
+                        
+                        if (cause.getStatusCode() == 401) {
+                            // Logic for HTTP:UNAUTHORIZED
+                            log.info("Handling Unauthorized access...");
+                        } else if (cause.getStatusCode() == 403) {
+                            // Logic for HTTP:FORBIDDEN
+                            log.info("Handling Forbidden access...");
+                        }
+                    })
+                .otherwise()
+                    // General security error handling
+                    .log("Handling general security error")
+            .end();
+
+        from("direct:secureService")
+            .routeId("Secure-Service-Route")
+            .to("http://secure-api.com/data")
+            .log("Request successful");
+    }
+}
+
+output:
+
+{
+  "isUnauthorized": true,
+  "isForbidden": false
+}
+
+
+

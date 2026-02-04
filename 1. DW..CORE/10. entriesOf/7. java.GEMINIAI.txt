@@ -1,0 +1,84 @@
+entriesOf:
+
+
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main { // <-- **Corrected: Added the opening curly brace here**
+    // --- Data Model classes to represent the intermediate parsed XML structure ---
+    // (A real XML parser would generate a similar structured object)
+    static class XmlNode {
+        String key;
+        Map<String, String> value; // Inner elements a, b
+        Map<String, String> attributes; // XML attributes
+
+        public XmlNode(String key, Map<String, String> value, Map<String, String> attributes) {
+            this.key = key;
+            this.value = value;
+            this.attributes = attributes;
+        }
+    }
+
+    // --- Core Logic: Simulating the DataWeave entriesOf function ---
+    // This function takes the parsed node and transforms it into the specific DW output format.
+    private static List<Map<String, Object>> entriesOf(XmlNode node) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        // Create the entry map required by the DW output structure
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("key", node.key);
+        entry.put("value", node.value);
+        entry.put("attributes", node.attributes);
+        
+        result.add(entry);
+        return result;
+    }
+
+    public static void main(String[] args) {
+        // DataWeave Source: var myVar = read('<xml attr="x"><a>true</a><b>1</b></xml>', 'application/xml')
+
+        // 1. Simulate the XML parsing and variable assignment (myVar)
+        // The root element is "xml".
+        // Attributes: attr="x".
+        // Inner Elements (Value): a="true", b="1".
+        
+        // Using Map.of is fine, but for full Java version compatibility, 
+        // we might use a builder pattern or standard HashMap initialization.
+        // Map.of is used here as it's cleaner for immutable maps.
+        Map<String, String> innerValueMap = Map.of("a", "true", "b", "1");
+        Map<String, String> attributesMap = Map.of("attr", "x");
+        
+        XmlNode parsedRootNode = new XmlNode("xml", innerValueMap, attributesMap);
+
+        // 2. Apply the DataWeave function: entriesOf(myVar)
+        List<Map<String, Object>> entries = entriesOf(parsedRootNode);
+        
+        // 3. Construct the final output object: { "entriesOf" : entries }
+        // We use a mutable HashMap to construct the final output.
+        Map<String, List<Map<String, Object>>> output = new HashMap<>();
+        output.put("entriesOf", entries);
+
+        // Print the result (similar to the DataWeave JSON output)
+        System.out.println("Output:");
+        System.out.println(output);
+    }
+}
+// <-- The closing curly brace for the class is now correctly here.
+
+output:
+
+
+{entriesOf: [{key: xml, value: {a: true, b: 1}, attributes: {attr: x}}]}
+
+
+
+
+
+
+

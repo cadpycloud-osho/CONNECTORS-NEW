@@ -1,0 +1,60 @@
+isPeriodType:
+
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Period; // The Java equivalent of DataWeave Period
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class PeriodCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isPeriodType(Type).
+     */
+    private boolean isPeriodType(Class<?> type) {
+        return Period.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/period-typecheck")
+    public Map<String, Boolean> checkPeriodTypes() {
+        
+        // DataWeave type APeriod is an alias for Period
+        Class<?> aPeriod = Period.class;
+        
+        // DataWeave type Period
+        Class<?> periodType = Period.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isPeriodType(aPeriod);
+        boolean b = isPeriodType(periodType);
+        boolean c = isPeriodType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

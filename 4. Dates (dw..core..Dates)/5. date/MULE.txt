@@ -1,0 +1,51 @@
+date:
+
+date(parts: DateFactory): Date
+
+date(parts: DateFactory): Date
+Creates a Date value from values specified for year, month, and day fields.
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+   newDate: date({year: 2012, month: 10, day: 11})
+}
+
+DataWeave
+Output
+{
+   "newDate": "2012-10-11"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

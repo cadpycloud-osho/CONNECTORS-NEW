@@ -1,0 +1,171 @@
+toNumber:
+
+example 1:
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String input = "0.005";
+        
+        // Equivalent to DataWeave 'a'
+        Number resultA = parseWithMultipleFormats(input);
+        
+        // Equivalent to DataWeave 'b'
+        String errorMessageB = parseSecondsOnly(input);
+        
+        System.out.println("Result: " + Map.of("a", resultA, "b", errorMessageB));
+    }
+    
+    private static Number parseWithMultipleFormats(String input) {
+        try {
+            return parseSeconds(input);
+        } catch (Exception e) {
+            return Double.parseDouble(input);
+        }
+    }
+    
+    private static Number parseSeconds(String input) {
+        throw new NumberFormatException("Invalid seconds format");
+    }
+    
+    private static String parseSecondsOnly(String input) {
+        try {
+            parseSeconds(input);
+            return null;
+        } catch (Exception e) {
+            return "Could not find a valid formatter for '" + input + "'";
+        }
+    }
+}
+
+
+
+
+output:
+
+Result: {a=0.005, b=Could not find a valid formatter for '0.005'}
+
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.time.Instant;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String isoDateTime = "2015-10-01T23:57:59Z";
+        
+        // Equivalent to DataWeave 'epoch'
+        Instant instant = Instant.parse(isoDateTime);
+        long epochSeconds = instant.getEpochSecond();
+        
+        // Equivalent to DataWeave 'millis'
+        long millis = instant.toEpochMilli();
+        
+        System.out.println("Result: " + Map.of(
+            "epoch", epochSeconds,
+            "millis", millis
+        ));
+    }
+}
+
+
+output:
+
+Result: {epoch=1443743879, millis=1443743879000}
+
+
+--------------------------------------------------------------
+
+
+example 3:
+
+
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        // Equivalent to DataWeave var myKey = keysOf({"123" : "myValue"})
+        Map<String, String> map = Map.of("123", "myValue");
+        String myKey = map.keySet().iterator().next();
+        
+        Map<String, Object> result = Map.of(
+            "default", parseDefault("1.0"),
+            "withFormat", parseWithFormat("0.005", ".00"),
+            "withLocal", parseWithLocale("1,25", "#.##", "ES"),
+            "withExtraPlaceholders", parseWithExtraPlaceholders("5.55", "####.####"),
+            "keyToNumber", parseKeyToNumber(myKey)
+        );
+        
+        System.out.println("Result: " + result);
+    }
+    
+    private static Number parseDefault(String input) {
+        return Double.parseDouble(input);
+    }
+    
+    private static Number parseWithFormat(String input, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        try {
+            return format.parse(input);
+        } catch (ParseException e) {
+            return Double.parseDouble(input);
+        }
+    }
+    
+    private static Number parseWithLocale(String input, String pattern, String locale) {
+        DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance(new Locale(locale));
+        format.applyPattern(pattern);
+        try {
+            return format.parse(input);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private static Number parseWithExtraPlaceholders(String input, String pattern) {
+        DecimalFormat format = new DecimalFormat(pattern);
+        try {
+            return format.parse(input);
+        } catch (ParseException e) {
+            return Double.parseDouble(input);
+        }
+    }
+    
+    private static Number parseKeyToNumber(String key) {
+        return Double.parseDouble(key);
+    }
+}
+
+
+output:
+
+Result: {default=1.0, withFormat=0.005, withLocal=1.25, withExtraPlaceholders=5.55, keyToNumber=123.0}
+
+
+--------------------------------------------------------------
+
+
+

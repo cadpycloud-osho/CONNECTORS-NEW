@@ -1,0 +1,35 @@
+sum:
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class SumExampleApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SumExampleApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3);
+        
+        // Java equivalent of DWL sum(): Using streams to sum the integers
+        int result = numbers.stream()
+                            .mapToInt(Integer::intValue)
+                            .sum();
+        
+        System.out.println("--- DWL sum Equivalent Output ---");
+        System.out.println(result); 
+    }
+}
+
+output:
+
+6

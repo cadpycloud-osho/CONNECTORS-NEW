@@ -1,0 +1,19 @@
+randomInt:
+
+input:
+
+from("direct:start")
+    .setBody(exchange -> {
+        int price = new java.util.Random().nextInt(1000);
+        return java.util.Collections.singletonMap("price", (double) price);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+{
+  "price": 442.0
+}
+
+

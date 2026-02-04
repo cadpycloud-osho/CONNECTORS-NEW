@@ -1,0 +1,45 @@
+baseTypeOf:
+
+baseTypeOf(t: Type): Type
+
+baseTypeOf(t: Type): Type
+Returns an the base type of the given type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = String {format: "YYYY-MM-dd"}
+output application/json
+---
+{
+   a: baseTypeOf(AType)
+}
+
+
+DataWeave
+Output
+{
+  "a": "String"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

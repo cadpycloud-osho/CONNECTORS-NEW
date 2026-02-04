@@ -1,0 +1,52 @@
+fromHex:
+
+
+input:
+
+import java.math.BigInteger;
+
+public class Main {
+    public static void main(String[] args) {
+        BigInteger a = fromHex("-1");
+        BigInteger b = fromHex("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000");
+        BigInteger c = fromHex("0");   // DataWeave fromHex(0) → "0"
+        BigInteger d = fromHex(null); // null passthrough
+        BigInteger e = fromHex("f");
+
+        System.out.println("{");
+        System.out.println("  \"a\": " + (a == null ? "null" : a.toString()) + ",");
+        System.out.println("  \"b\": " + (b == null ? "null" : b.toString()) + ",");
+        System.out.println("  \"c\": " + (c == null ? "null" : c.toString()) + ",");
+        System.out.println("  \"d\": " + (d == null ? "null" : d.toString()) + ",");
+        System.out.println("  \"e\": " + (e == null ? "null" : e.toString()));
+        System.out.println("}");
+    }
+
+    // DataWeave Numbers::fromHex equivalent
+    public static BigInteger fromHex(String hex) {
+        if (hex == null) {
+            return null;
+        }
+        if (hex instanceof String && ((String) hex).startsWith("-")) {
+            String positivePart = hex.substring(1);
+            return new BigInteger(positivePart, 16).negate();
+        } else {
+            return new BigInteger(hex, 16);
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a": -1,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 15
+}
+
+
+

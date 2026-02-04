@@ -1,0 +1,83 @@
+duration:
+
+
+input:
+
+package com.example.demo.controller;
+
+import com.example.demo.service.DurationService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class Main {
+
+    private final DurationService durationService;
+
+    public DurationController(DurationService durationService) {
+        this.durationService = durationService;
+    }
+
+    @GetMapping("/duration")
+    public Map<String, Object> getDurationData() {
+        return durationService.getDurationData();
+    }
+}
+
+DurationService.java:
+
+package com.example.demo.service;
+
+import org.springframework.stereotype.Service;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@Service
+public class DurationService {
+
+    public Map<String, Object> getDurationData() {
+        ZonedDateTime baseDateTime = ZonedDateTime.parse(
+                "2020-10-05T20:22:34.385Z",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("dayAfterDateTime", baseDateTime.plusDays(1).toString());
+        result.put("dayAndHourBeforeDateTime", baseDateTime.minusDays(1).minusHours(1).toString());
+        result.put("pointInTimeBefore", baseDateTime.minusDays(1).minusHours(1).minusMinutes(20).minusSeconds(10).toString());
+
+        Duration emptyDuration = Duration.ZERO;
+        result.put("emptyDuration", emptyDuration);
+
+        Duration constructDuration = Duration.ofDays(4).plusHours(11).plusMinutes(28);
+        result.put("constructDuration", constructDuration);
+
+        result.put("selectHoursFromDuration", constructDuration.toHoursPart());
+
+        Duration decimalAsPeriod = Duration.ofMillis((long)(30.5 * 1000));
+        result.put("decimalAsPeriod", decimalAsPeriod);
+
+        Duration addNegativeValue = Duration.ofMinutes(1).plus(Duration.ofSeconds(-1));
+        result.put("addNegativeValue", addNegativeValue.getSeconds());
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "dayAfterDateTime": "2020-10-06T20:22:34.385Z",
+  "dayAndHourBeforeDateTime": "2020-10-04T19:22:34.385Z",
+  "pointInTimeBefore": "2020-10-04T19:02:24.385Z",
+  "emptyDuration": "PT0S",
+  "constructDuration": "PT107H28M",
+  "selectHoursFromDuration": 11,
+  "decimalAsPeriod": "PT30.5S",
+  "addNegativeValue": 59
+}
+

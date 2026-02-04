@@ -1,0 +1,18 @@
+today:
+
+
+input:
+
+from("direct:today")
+    .process(exchange -> {
+        LocalDate today = LocalDate.now();
+        
+        exchange.getIn().setBody(today.format(DateTimeFormatter.ISO_LOCAL_DATE));
+    });
+
+
+
+
+output:
+
+"2026-01-21"

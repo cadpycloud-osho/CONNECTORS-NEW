@@ -1,0 +1,111 @@
+unzip:
+
+
+example 1:
+
+input:
+
+@GetMapping("/unzip1")
+public List<List<Object>> unzipExample1() {
+
+    List<List<Object>> zipped = List.of(
+        List.of(0, "a"),
+        List.of(1, "b"),
+        List.of(2, "c"),
+        List.of(3, "d")
+    );
+
+    List<Object> first = new ArrayList<>();
+    List<Object> second = new ArrayList<>();
+
+    for (List<Object> pair : zipped) {
+        first.add(pair.get(0));
+        second.add(pair.get(1));
+    }
+
+    return List.of(first, second);
+}
+
+
+output:
+
+[
+  [0, 1, 2, 3],
+  ["a", "b", "c", "d"]
+]
+
+------------------------------------------------------------------
+
+
+
+
+
+example 2:
+
+input:
+
+@GetMapping("/unzip2")
+public List<Integer> unzipExample2() {
+
+    List<List<Object>> zipped = List.of(
+        List.of(0, "a"),
+        List.of(1, "a", "foo"),
+        List.of(2),
+        List.of(3, "a")
+    );
+
+    List<Integer> first = new ArrayList<>();
+
+    for (List<Object> row : zipped) {
+        first.add((Integer) row.get(0)); // only first column like DW
+    }
+
+    return first;
+}
+
+
+output:
+
+[0, 1, 2, 3]
+
+------------------------------------------------------------------
+
+
+
+
+example 3:
+
+input:
+
+@GetMapping("/unzip3")
+public List<List<Object>> unzipExample3() {
+
+    List<List<Object>> zipped = List.of(
+        List.of(0, "a", "W"),
+        List.of(1, "b", "X"),
+        List.of(2, "c", "Y"),
+        List.of(3, "d", "Z")
+    );
+
+    List<Object> first = new ArrayList<>();
+    List<Object> second = new ArrayList<>();
+    List<Object> third = new ArrayList<>();
+
+    for (List<Object> row : zipped) {
+        first.add(row.get(0));
+        second.add(row.get(1));
+        third.add(row.get(2));
+    }
+
+    return List.of(first, second, third);
+}
+
+output:
+
+[
+  [0,1,2,3],
+  ["a","b","c","d"],
+  ["W","X","Y","Z"]
+]
+
+------------------------------------------------------------------

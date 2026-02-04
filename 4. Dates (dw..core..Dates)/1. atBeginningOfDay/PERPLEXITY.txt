@@ -1,0 +1,61 @@
+
+atBeginningOfDay:
+
+
+example 1:
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/zoned-at-beginning")
+    public Map<String, String> getZonedBeginningOfDay() {
+        ZonedDateTime input = ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        ZonedDateTime beginning = input.toLocalDate().atStartOfDay(input.getZone());
+        // Alternative: input.truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfDayDateTime", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfDayDateTime": "2020-10-06T00:00-03:00"
+}
+
+
+--------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/local-at-beginning")
+    public Map<String, String> getLocalBeginningOfDay() {
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        LocalDateTime beginning = input.toLocalDate().atStartOfDay();
+        // Alternative: input.with(LocalTime.MIDNIGHT);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfDayLocalDateTime", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfDayLocalDateTime": "2020-10-06T00:00"
+}

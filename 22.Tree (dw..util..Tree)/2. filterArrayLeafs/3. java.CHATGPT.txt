@@ -1,0 +1,69 @@
+filterArrayLeafs:
+
+
+
+
+input:
+
+
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Object> myArray = Arrays.asList(
+                1,
+                Map.of("name", Arrays.asList("", true), "test", 213),
+                "123",
+                null
+        );
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("a", filterArrayLeafs(myArray, (value, path) ->
+                !(value == null || value instanceof String)));
+        result.put("b", filterArrayLeafs(myArray, (value, path) ->
+                (value == null || Objects.equals(value, 1))));
+        result.put("c", filterArrayLeafs(Map.of("a", Arrays.asList(1,2)), (value, path) ->
+                (value == null || Objects.equals(value,1))));
+        result.put("d", filterArrayLeafs(myArray, (value, path) ->
+                !(path instanceof List)));
+
+        System.out.println(result);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object filterArrayLeafs(Object node, BiPredicate<Object, Object> predicate) {
+
+        if (node instanceof List<?> list) {
+            List<Object> filtered = list.stream()
+                    .map(item -> filterArrayLeafs(item, predicate))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            return filtered;
+        } else if (node instanceof Map<?, ?> map) {
+            Map<Object, Object> filteredMap = new HashMap<>();
+            map.forEach((k, v) -> {
+                Object filteredValue = filterArrayLeafs(v, predicate);
+                filteredMap.put(k, filteredValue);
+            });
+            return filteredMap;
+        } else if (predicate.test(node, null)) {
+            return node;
+        } else {
+            return null;
+        }
+    }
+}
+
+
+output:
+
+{a=[1, {name=[true], test=213}], 
+ b=[1, {name=[], test=213}, null], 
+ c={a=[1]}, 
+ d=[{name=[], test=213}]}
+
+

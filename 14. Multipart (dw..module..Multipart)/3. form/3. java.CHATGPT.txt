@@ -1,0 +1,145 @@
+form:
+
+
+example 1:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String boundary = "------=_Part_146_143704079";
+        StringBuilder sb = new StringBuilder();
+
+        // --- FILE PART (XML inline) ---
+        String xmlContent =
+                "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<orders>\n" +
+                "  <order>\n" +
+                "    <item>\n" +
+                "      <id>1001</id>\n" +
+                "      <qty>1</qty>\n" +
+                "      <price>$100</price>\n" +
+                "    </item>\n" +
+                "    <item>\n" +
+                "      <id>2001</id>\n" +
+                "      <qty>2</qty>\n" +
+                "      <price>$50</price>\n" +
+                "    </item>\n" +
+                "  </order>\n" +
+                "</orders>";
+
+        sb.append(boundary).append("\n");
+        sb.append("Content-Type: application/xml\n");
+        sb.append("Content-Disposition: form-data; name=\"file\"; filename=\"myorders.xml\"\n\n");
+        sb.append(xmlContent).append("\n");
+
+        // --- TEXT PART ---
+        sb.append(boundary).append("\n");
+        sb.append("Content-Type: text/plain\n");
+        sb.append("Content-Disposition: form-data; name=\"userName\"\n\n");
+        sb.append("Annie Point\n");
+
+        // --- JSON PART ---
+        sb.append(boundary).append("\n");
+        sb.append("Content-Type: application/json\n");
+        sb.append("Content-Disposition: form-data; name=\"myJson\"; filename=\"userInfo.json\"\n\n");
+        sb.append("{\n  \"user\": \"Annie Point\"\n}\n");
+
+        // --- CLOSING BOUNDARY ---
+        sb.append(boundary).append("--");
+
+        System.out.println(sb.toString());
+    }
+}
+
+
+
+output:
+
+------=_Part_146_143704079
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+------=_Part_146_143704079
+Content-Type: text/plain
+Content-Disposition: form-data; name="userName"
+
+Annie Point
+------=_Part_146_143704079
+Content-Type: application/json
+Content-Disposition: form-data; name="myJson"; filename="userInfo.json"
+
+{
+  "user": "Annie Point"
+}
+------=_Part_146_143704079--
+
+-----------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String boundary = "------=_Part_320_1528378161.1542639222352";
+        String firstPart = "content for my first part";
+        String secondPart = "content for my second part";
+
+        StringBuilder sb = new StringBuilder();
+
+        // part1
+        sb.append(boundary).append("\n");
+        sb.append("Content-Disposition: form-data; name=\"myFirstPart\"\n\n");
+        sb.append(firstPart).append("\n");
+
+        // part2
+        sb.append(boundary).append("\n");
+        sb.append("Content-Disposition: form-data; name=\"mySecondPart\"\n\n");
+        sb.append(secondPart).append("\n");
+
+        // closing boundary
+        sb.append(boundary).append("--");
+
+        System.out.println(sb.toString());
+    }
+}
+
+
+
+output:
+
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="myFirstPart"
+
+content for my first part
+------=_Part_320_1528378161.1542639222352
+Content-Disposition: form-data; name="mySecondPart"
+
+content for my second part
+------=_Part_320_1528378161.1542639222352--
+
+

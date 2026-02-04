@@ -1,0 +1,83 @@
+orElseTry:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.HashMap;
+import java.util.Map;
+
+public class OrElseTryRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:start")
+            .process(exchange -> {
+                Map<String, Object> user = new HashMap<>();
+                Map<String, Object> otherUser = new HashMap<>();
+                
+                Map<String, Object> finalResponse = new HashMap<>();
+                
+                // Logic for "a": attempt 1 then attempt 2, then fail
+                finalResponse.put("a", tryChain(
+                    () -> user.get("name").toString(),       // Attempt 1
+                    () -> otherUser.get("name").toString()  // Fallback (orElseTry)
+                ));
+
+                // Logic for "b": attempt 1 then fallback to a constant string
+                finalResponse.put("b", tryChain(
+                    () -> user.get("name").toString(),       // Attempt 1
+                    () -> "No User Name"                     // Fallback constant
+                ));
+
+                exchange.getMessage().setBody(finalResponse);
+            })
+            .marshal().json();
+    }
+
+    private Map<String, Object> tryChain(ThrowingSupplier... attempts) {
+        Exception lastError = null;
+        for (ThrowingSupplier attempt : attempts) {
+            try {
+                Object result = attempt.get();
+                if (result == null) throw new NullPointerException("KeyNotFound");
+                return Map.of("success", true, "result", result);
+            } catch (Exception e) {
+                lastError = e;
+            }
+        }
+        // If all attempts fail, return the error structure
+        return Map.of(
+            "success", false,
+            "error", Map.of(
+                "kind", lastError.getClass().getSimpleName(),
+                "message", "There is no key named 'name'",
+                "stack", "main (org::camel::processor::" + lastError.getStackTrace()[0].getLineNumber() + ")"
+            )
+        );
+    }
+
+    @FunctionalInterface
+    interface ThrowingSupplier {
+        Object get() throws Exception;
+    }
+}
+
+output:
+
+{
+  "a": {
+    "success": false,
+    "error": {
+      "kind": "NullPointerException",
+      "message": "There is no key named 'name'",
+      "stack": [ "main (org::camel::processor:24)" ]
+    }
+  },
+  "b": {
+    "success": true,
+    "result": "No User Name"
+  }
+}
+
+

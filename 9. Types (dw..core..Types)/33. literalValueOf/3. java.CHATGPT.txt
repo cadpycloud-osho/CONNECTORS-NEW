@@ -1,0 +1,32 @@
+literalValueOf:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static <T> T literalValueOf(T value) {
+        return value;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        String AType = "Mariano";
+
+        result.put("a", literalValueOf(AType));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=Mariano}
+
+

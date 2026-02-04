@@ -1,0 +1,48 @@
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:t="http://schemas.xmlsoap.org/ws/2005/02/trust" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl">
+	<wsp:ExactlyOne>
+	  <wsp:All>
+	    <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+	      <wsp:Policy>
+	        <sp:TransportToken>
+	          <wsp:Policy>
+	            <sp:HttpsToken RequireClientCertificate="false"/>
+	          </wsp:Policy>
+	        </sp:TransportToken>
+	        <sp:AlgorithmSuite>
+	          <wsp:Policy>
+	            <sp:Basic256/>
+	          </wsp:Policy>
+	        </sp:AlgorithmSuite>
+	        <sp:Layout>
+	          <wsp:Policy>
+	            <sp:Strict/>
+	          </wsp:Policy>
+	        </sp:Layout>
+	        <sp:IncludeTimestamp/>
+	      </wsp:Policy>
+	    </sp:TransportBinding>
+	    <sp:SignedSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+	      <wsp:Policy>
+	        <sp:IssuedToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+	          <sp:RequestSecurityTokenTemplate></sp:RequestSecurityTokenTemplate>
+	          <wsp:Policy>
+	            <sp:RequireInternalReference/>
+	          </wsp:Policy>
+	        </sp:IssuedToken>
+	        <mssp:RsaToken xmlns:mssp="http://schemas.microsoft.com/ws/2005/07/securitypolicy" sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never" wsp:Optional="true"/>
+	      </wsp:Policy>
+	    </sp:SignedSupportingTokens>
+	    <sp:Wss11 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+	      <wsp:Policy/>
+	    </sp:Wss11>
+	    <sp:Trust10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+	      <wsp:Policy>
+	        <sp:MustSupportIssuedTokens/>
+	        <sp:RequireClientEntropy/>
+	        <sp:RequireServerEntropy/>
+	      </wsp:Policy>
+	    </sp:Trust10>
+	    <wsaw:UsingAddressing/>
+	  </wsp:All>
+	</wsp:ExactlyOne>
+</wsp:Policy>

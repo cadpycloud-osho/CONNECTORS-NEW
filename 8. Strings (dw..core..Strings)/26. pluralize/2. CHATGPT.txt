@@ -1,0 +1,59 @@
+pluralize:
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String pluralize(String word) {
+        if (word == null || word.isEmpty()) return word;
+
+        String lower = word.toLowerCase();
+
+        // 1. Words ending with s, sh, ch, x, z → add "es"
+        if (lower.endsWith("s") || lower.endsWith("sh") ||
+            lower.endsWith("ch") || lower.endsWith("x") ||
+            lower.endsWith("z")) {
+            return word + "es";
+        }
+
+        // 2. Words ending with consonant + y → "y" → "ies"
+        if (lower.matches(".*[^aeiou]y$")) {
+            return word.substring(0, word.length() - 1) + "ies";
+        }
+
+        // 3. Default → add "s"
+        return word + "s";
+    }
+}
+
+Spring Boot Controller
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class PluralizeController {
+
+    @GetMapping("/pluralize")
+    public Map<String, String> pluralizeExample() {
+        return Map.of(
+            "pluralize", StringUtils.pluralize("box")
+        );
+    }
+}
+
+
+output:
+
+{
+  "pluralize": "boxes"
+}
+
+

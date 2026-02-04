@@ -1,0 +1,55 @@
+isAttributeType:
+
+
+input:
+
+public class IsAttributeTypeConverter {
+    public static boolean isAttributeType(List<Map<String, Object>> path) {
+        // Returns true if path contains ANY ATTRIBUTE_TYPE element
+        return path.stream().anyMatch(p -> "ATTRIBUTE_TYPE".equals(p.get("kind")));
+    }
+    
+    public static void main(String[] args) {
+        List<Map<String, Object>> pathA = Arrays.asList(
+            createPathElement("OBJECT_TYPE", "user", null),
+            createPathElement("ATTRIBUTE_TYPE", "name", null)
+        );
+        
+        List<Map<String, Object>> pathB = Arrays.asList(
+            createPathElement("OBJECT_TYPE", "user", null),
+            createPathElement("ARRAY_TYPE", "name", null)
+        );
+        
+        List<Map<String, Object>> pathC = Arrays.asList(
+            createPathElement("ATTRIBUTE_TYPE", "name", null)
+        );
+        
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isAttributeType(pathA));  // true - has ATTRIBUTE_TYPE
+        result.put("b", isAttributeType(pathB));  // false - no ATTRIBUTE_TYPE
+        result.put("c", isAttributeType(pathC));  // true - has ATTRIBUTE_TYPE
+        
+        System.out.println(result);
+    }
+    
+    private static Map<String, Object> createPathElement(String kind, Object selector, String namespace) {
+        Map<String, Object> element = new LinkedHashMap<>();
+        element.put("kind", kind);
+        element.put("selector", selector);
+        element.put("namespace", namespace);
+        return element;
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false,
+  "c": true
+}
+
+
+

@@ -1,0 +1,173 @@
+fromString:
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MimeJsonProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String mimeString = "application/json";
+        
+        try {
+            MimeType mimeType = new MimeType(mimeString);
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", true);
+            
+            Map<String, Object> mimeResult = new HashMap<>();
+            mimeResult.put("type", mimeType.getPrimaryType());
+            mimeResult.put("subtype", mimeType.getSubType());
+            mimeResult.put("parameters", new HashMap<String, String>());
+            
+            result.put("result", mimeResult);
+            exchange.getIn().setBody(result);
+        } catch (MimeTypeParseException e) {
+            // Won't happen for valid "application/json"
+        }
+    }
+}
+
+
+from("direct:mimeJson")
+    .process(new MimeJsonProcessor())
+    .log("${body}");
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "application",
+    "subtype": "json",
+    "parameters": {}
+  }
+}
+
+
+-----------------------------------------
+
+
+example 2:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MimeMultipartProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String mimeString = "multipart/form-data; boundary=the-boundary";
+        
+        try {
+            MimeType mimeType = new MimeType(mimeString);
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", true);
+            
+            Map<String, Object> mimeResult = new HashMap<>();
+            mimeResult.put("type", mimeType.getPrimaryType());
+            mimeResult.put("subtype", mimeType.getSubType());
+            
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("boundary", mimeType.getParameter("boundary"));
+            mimeResult.put("parameters", parameters);
+            
+            result.put("result", mimeResult);
+            exchange.getIn().setBody(result);
+        } catch (MimeTypeParseException e) {
+            // Won't happen for valid MIME type
+        }
+    }
+}
+
+from("direct:mimeMultipart")
+    .process(new MimeMultipartProcessor())
+    .log("${body}");
+
+
+output:
+
+{
+  "success": true,
+  "result": {
+    "type": "multipart",
+    "subtype": "form-data",
+    "parameters": {
+      "boundary": "the-boundary"
+    }
+  }
+}
+
+
+-----------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MimeInvalidProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String mimeString = "Invalid MIME type";
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            new MimeType(mimeString); // Will throw MimeTypeParseException
+            result.put("success", true); // Won't reach here
+        } catch (MimeTypeParseException e) {
+            result.put("success", false);
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Unable to find a sub type in `" + mimeString + "`.");
+            result.put("error", error);
+        }
+        
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:mimeInvalid")
+    .process(new MimeInvalidProcessor())
+    .log("${body}");
+
+
+output:
+
+
+{
+  "success": false,
+  "error": {
+    "message": "Unable to find a sub type in `Invalid MIME type`."
+  }
+}
+
+-----------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

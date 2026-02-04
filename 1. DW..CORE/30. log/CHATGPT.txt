@@ -1,0 +1,90 @@
+log:
+
+example 1:
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.logging.Logger;
+
+@RestController
+public class LogExample1Controller {
+
+    private static final Logger logger = Logger.getLogger(LogExample1Controller.class.getName());
+
+    @GetMapping("/log1")
+    public String logExample() {
+        logger.warning("Houston, we have a problem");
+        return "Houston, we have a problem";
+    }
+}
+
+
+
+output:
+
+Console Log Output:
+
+WARNING: Houston, we have a problem
+
+
+API Response:
+
+"Houston, we have a problem"
+
+
+_______________________________________________________________
+
+
+example 2:
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.logging.Logger;
+import java.util.Map;
+
+@RestController
+public class LogExample2Controller {
+
+    private static final Logger logger = Logger.getLogger(LogExample2Controller.class.getName());
+
+    @GetMapping("/log2")
+    public String logUserExample() {
+
+        Map<String, Object> user = Map.of(
+                "friend", Map.of("name", "Shoki"),
+                "id", 1,
+                "name", "Tomo"
+        );
+
+        logger.info("User - " + user.toString());
+
+        // Return the inner friend.name
+        return "Shoki";
+    }
+}
+
+
+
+output:
+
+
+Console Output:
+
+INFO: User - {friend={name=Shoki}, id=1, name=Tomo}
+
+
+API Response:
+
+"Shoki"
+
+

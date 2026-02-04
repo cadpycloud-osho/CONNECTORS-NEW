@@ -1,0 +1,146 @@
+minBy:
+
+EXAMPLE 1:
+
+INPUT:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+
+@RestController
+public class MinByController {
+
+    // Helper class to represent the input object structure
+    public static class DataObject {
+        public int a;
+        public DataObject(int a) { this.a = a; }
+        public int getA() { return a; }
+    }
+
+    /**
+     * DataWeave Source: [ { "a" : 1 }, { "a" : 2 }, { "a" : 3 } ] minBy (item) -> item.a
+     * Accessible at http://localhost:8080/minby/object-field
+     */
+    @GetMapping("/minby/object-field")
+    public DataObject minByObjectField() {
+        // 1. Input List
+        List<DataObject> dataList = Arrays.asList(
+            new DataObject(1),
+            new DataObject(2),
+            new DataObject(3)
+        );
+
+        // 2. Perform the minBy equivalent using Stream API and Comparator.comparing
+        // The criterion is item.a, so we compare based on the getA() method.
+        DataObject result = dataList.stream()
+            .min(Comparator.comparing(DataObject::getA))
+            .orElse(null); // Return null if the list is empty
+
+        return result;
+    }
+
+    // ... other methods will be added below ...
+}
+
+
+OUTPUT:
+
+{
+  "a": 1
+}
+
+----------------------------------------------------------------
+
+EXAMPLE 2:
+
+INPUT:
+
+// ... inside the MinByController class ...
+
+import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
+
+    /**
+     * DataWeave Source: minBy on DateTime, Date, Time, Boolean, and empty array.
+     * Accessible at http://localhost:8080/minby/complex
+     */
+    @GetMapping("/minby/complex")
+    public Map<String, Map<String, Object>> minByComplex() {
+        // DataWeave DateTime input strings
+        String dwDateTime1 = "2017-10-01T22:57:59-03:00";
+        String dwDateTime2 = "2018-10-01T23:57:59-03:00";
+
+        // Convert DW strings to Java ZonedDateTime for accurate comparison
+        ZonedDateTime myDateTime1 = ZonedDateTime.parse(dwDateTime1, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        ZonedDateTime myDateTime2 = ZonedDateTime.parse(dwDateTime2, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+        // --- 1. byDateTime: minBy ((item) -> item) ---
+        List<ZonedDateTime> dateTimeList = Arrays.asList(myDateTime1, myDateTime2);
+        // min() on ZonedDateTime uses its natural ordering (earliest date/time)
+        String minDateTime = dateTimeList.stream()
+            .min(Comparator.naturalOrder())
+            .map(ZonedDateTime::toString)
+            .orElse(null);
+
+        // --- 2. byDate: minBy ((item) -> item) ---
+        List<LocalDate> dateList = Arrays.asList(myDateTime1.toLocalDate(), myDateTime2.toLocalDate());
+        String minDate = dateList.stream()
+            .min(Comparator.naturalOrder())
+            .map(LocalDate::toString)
+            .orElse(null);
+
+        // --- 3. byTime: minBy ((item) -> item) ---
+        // DW Time preserves the offset, Java LocalTime discards it, but comparison finds the earlier time.
+        List<LocalTime> timeList = Arrays.asList(myDateTime1.toLocalTime(), myDateTime2.toLocalTime());
+        String minTime = timeList.stream()
+            .min(Comparator.naturalOrder())
+            // Need to manually append the offset to match DW output format, as LocalTime doesn't carry it
+            .map(t -> t.toString() + "-03:00") 
+            .orElse(null);
+
+        // --- 4. aBoolean: minBy $ ---
+        // Boolean natural ordering is False < True.
+        List<Boolean> booleanList = Arrays.asList(true, false, (0 > 1), (1 > 0)); // [true, false, false, true]
+        Boolean minBoolean = booleanList.stream()
+            .min(Comparator.naturalOrder())
+            .orElse(null);
+
+        // --- 5. emptyArray: [] minBy ((item) -> item) ---
+        List<Object> emptyList = new ArrayList<>();
+        // min() on an empty list returns Optional.empty, which we map to null
+        Object emptyArrayResult = emptyList.stream().min(Comparator.comparing(item -> item)).orElse(null);
+
+        // Construct the nested JSON output map
+        Map<String, Object> innerMap = new LinkedHashMap<>();
+        innerMap.put("byDateTime", minDateTime);
+        innerMap.put("byDate", minDate);
+        innerMap.put("byTime", minTime);
+        innerMap.put("aBoolean", minBoolean);
+        innerMap.put("emptyArray", emptyArrayResult);
+
+        return Collections.singletonMap("myMinBy", innerMap);
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "myMinBy": {
+    "byDateTime": "2017-10-01T22:57:59-03:00",
+    "byDate": "2017-10-01",
+    "byTime": "22:57:59-03:00",
+    "aBoolean": false,
+    "emptyArray": null
+  }
+}

@@ -1,0 +1,117 @@
+toDate:
+
+example 1:
+
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+public class DateCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceDate")
+            .process(exchange -> {
+                String input = "2023-28-03";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                // Formatters equivalent to [{format: "yyyy/MM/dd"}, {format: "yyyy-dd-MM", locale: "en_US"}]
+                List<DateTimeFormatter> formatters = List.of(
+                    DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+                    DateTimeFormatter.ofPattern("yyyy-dd-MM", Locale.US)
+                );
+
+                // logic for 'a'
+                response.put("a", tryParseDate(input, formatters));
+
+                // logic for 'b'
+                List<DateTimeFormatter> failingFormatters = List.of(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+                try {
+                    tryParseDate(input, failingFormatters);
+                } catch (Exception e) {
+                    response.put("b", e.getMessage());
+                }
+
+                exchange.getIn().setBody(response);
+            });
+    }
+
+    private LocalDate tryParseDate(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDate.parse(input, formatter);
+            } catch (Exception ignored) {}
+        }
+        throw new IllegalArgumentException("Could not find a valid formatter for '" + input + "'");
+    }
+}
+
+
+output:
+
+{
+  a: |2023-03-28| as Date {format: "yyyy-dd-MM", locale: "en_US"},
+  b: "Could not find a valid formatter for '2023-28-03'"
+}
+
+
+
+
+------------------------------------------------
+
+
+example 2:
+
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DateCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceDate")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Case A: Standard ISO-8601 (yyyy-MM-dd)
+                // Camel's TypeConverter handles this natively
+                String inputA = "2015-10-01";
+                results.put("a", exchange.getContext().getTypeConverter()
+                                         .convertTo(LocalDate.class, inputA));
+
+                // Case B: Custom Pattern (uuuu/MM/dd)
+                String inputB = "2003/10/01";
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+                results.put("b", LocalDate.parse(inputB, formatter));
+
+                exchange.getIn().setBody(results);
+            });
+    }
+}
+
+
+output:
+
+{
+  a: |2015-10-01|,
+  b: |2003-10-01| as Date {format: "uuuu/MM/dd"}
+}
+
+

@@ -1,0 +1,90 @@
+match:
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.regex.*;
+import java.util.*;
+
+public class RegexMatchRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:regexMatch")
+            .process(exchange -> {
+                String email = "me@mulesoft.com";
+                Pattern pattern = Pattern.compile("([a-z]*)@([a-z]*)\\.com");
+                Matcher matcher = pattern.matcher(email);
+                
+                List<String> matches = new ArrayList<>();
+                if (matcher.find()) {
+                    // Full match + capture groups (exactly matches DataWeave)
+                    matches.add(matcher.group(0)); // "me@mulesoft.com"
+                    matches.add(matcher.group(1)); // "me"  
+                    matches.add(matcher.group(2)); // "mulesoft"
+                }
+                
+                exchange.getIn().setBody(matches);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  "me@mulesoft.com",
+  "me",
+  "mulesoft"
+]
+
+
+--------------------------------------------------------
+
+example 2:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.regex.*;
+
+public class FlatMapRegexRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:flatMapRegex")
+            .process(exchange -> {
+                List<String> cidrs = Arrays.asList(
+                    "192.88.99.0/24",  // Ends with .0 → filtered out
+                    "192.168.0.0/16",  // Ends with .0 → filtered out  
+                    "192.175.48.0/24"  // Ends with .48 → matches
+                );
+                
+                List<String> result = new ArrayList<>();
+                Pattern pattern = Pattern.compile(".*\\.4");
+                
+                for (String cidr : cidrs) {
+                    if (pattern.matcher(cidr).find()) {
+                        result.add(cidr);
+                    }
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  "192.88.99.0/24", 
+  "192.175.48.0/24"
+]
+

@@ -1,0 +1,32 @@
+drop:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+
+        // Equivalent of DataWeave drop(users, 2)
+        List<String> result = users.stream()
+                                   .skip(2)
+                                   .collect(Collectors.toList());
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+
+[Julian]
+

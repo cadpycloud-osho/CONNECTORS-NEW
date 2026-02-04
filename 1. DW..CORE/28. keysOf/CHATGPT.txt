@@ -1,0 +1,136 @@
+keysOf:
+
+example 1:
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class KeysOfExample1Controller {
+
+    @GetMapping("/keysOf1")
+    public Map<String, List<String>> getKeysOfObject() {
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("a", true);
+        input.put("b", 1);
+
+        Map<String, List<String>> result = new HashMap<>();
+        result.put("keysOf", new ArrayList<>(input.keySet()));
+
+        return result;
+    }
+}
+
+
+
+
+output:
+
+{
+  "keysOf": [
+    "a",
+    "b"
+  ]
+}
+
+
+
+_____________________________________________________________________
+example 2:
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.*;
+
+@RestController
+public class KeysOfNamesOfExample2Controller {
+
+    @GetMapping("/keysOf2")
+    public Map<String, Object> processXMLKeysNames() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        try {
+            String xml = """
+                    <users xmlns="http://test.com">
+                        <user name="Mariano" lastName="Achaval"/>
+                        <user name="Stacey" lastName="Duke"/>
+                    </users>
+                    """;
+
+            Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+            Element root = doc.getDocumentElement();
+            NodeList users = root.getElementsByTagName("user");
+
+            List<Object> keysList = new ArrayList<>();
+            List<Object> namesList = new ArrayList<>();
+
+            // First: namespace of each element
+            keysList.add(root.getAttributeNode("xmlns") != null ? root.getAttribute("xmlns") : "http://test.com");
+            keysList.add(root.getAttributeNode("xmlns") != null ? root.getAttribute("xmlns") : "http://test.com");
+
+            namesList.add(null);
+            namesList.add(null);
+
+            // Second: children values treated as objects
+            for (int i = 0; i < users.getLength(); i++) {
+                Element user = (Element) users.item(i);
+
+                Map<String, String> userMap = new LinkedHashMap<>();
+                userMap.put("name", user.getAttribute("name"));
+                userMap.put("lastName", user.getAttribute("lastName"));
+
+                keysList.add(userMap);
+                namesList.add(null);
+            }
+
+            result.put("keysOfExample", keysList);
+            result.put("namesOfExample", namesList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "keysOfExample": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "namesOfExample": [
+    null,
+    null,
+    null,
+    null
+  ]
+}
+
+

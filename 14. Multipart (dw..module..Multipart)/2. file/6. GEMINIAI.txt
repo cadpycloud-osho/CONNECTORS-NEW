@@ -1,0 +1,280 @@
+file:
+
+A. Prerequisites: File Setup
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+example 1:
+
+
+input:
+
+B. Service Implementation
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
+import java.io.File;
+import java.nio.file.Paths;
+
+@Service
+public class FilePartService {
+
+    /**
+     * Builds a MultiValueMap containing a single file part read from the filesystem.
+     * @return MultiValueMap representing the multipart body.
+     */
+    public MultiValueMap<String, HttpEntity<?>> buildFileMultipartBody() {
+        // 1. Define File Path (relative to the project root/working directory)
+        // In a Spring Boot application, resources are typically accessed via the ClassLoader,
+        // but since the DW source uses a relative file path, we mimic that here.
+        File file = Paths.get("src", "main", "resources", "orders.xml").toFile();
+        
+        if (!file.exists()) {
+            throw new RuntimeException("File not found at: " + file.getAbsolutePath());
+        }
+
+        // 2. Prepare File Resource
+        FileSystemResource fileResource = new FileSystemResource(file);
+        
+        // 3. Define Headers (mimicking the DW output's Content-Disposition)
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.APPLICATION_XML);
+
+        // Content-Disposition: form-data; name="file"; filename="orders.xml"
+        // The file name in the header is automatically derived from the resource name, 
+        // but we explicitly set the 'name' parameter to "file"
+        fileHeaders.setContentDispositionFormData("file", fileResource.getFilename());
+        
+        // 4. Build the Body (using the file resource and the custom headers)
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // The key 'file' is used internally by the builder but the 'name' in the header 
+        // is controlled by the Content-Disposition header set above.
+        builder.part("file", fileResource)
+               .headers(h -> h.addAll(fileHeaders));
+
+        return builder.build();
+    }
+}
+
+output:
+// Logic to display the structure after calling buildFileMultipartBody():
+
+// MultiValueMap<String, HttpEntity<?>> multipartBody = service.buildFileMultipartBody();
+// HttpEntity<?> part = multipartBody.getFirst("file");
+
+{
+    "headers": {
+        "Content-Type": ["application/xml"],
+        "Content-Disposition": ["form-data; name=\"file\"; filename=\"orders.xml\""]
+    },
+    "content_type": "org.springframework.core.io.FileSystemResource",
+    // To match the exact DW output, we must read the file content as a String
+    "content": "<orders>\n  <order>\n    <item>...</item>\n  </order>\n</orders>" // Actual XML content
+}
+
+
+-------------------------------------------------------------------
+
+<orders>
+  <order>
+    <item>
+      <id>1001</id>
+      <qty>1</qty>
+      <price>$100</price>
+    </item>
+    <item>
+      <id>2001</id>
+      <qty>2</qty>
+      <price>$50</price>
+    </item>
+  </order>
+</orders>
+example 2:
+
+
+input:
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
+import java.io.File;
+import java.nio.file.Paths;
+
+@Service
+public class FileMultipartService {
+
+    private static final String FILE_PATH = "src/main/resources/orders.xml";
+
+    /**
+     * Builds a MultiValueMap for a multipart request containing a single XML file part.
+     * @return MultiValueMap representing the multipart body.
+     */
+    public MultiValueMap<String, HttpEntity<?>> buildFileMultipartBody() {
+        // 1. Locate the file
+        File file = Paths.get(FILE_PATH).toFile();
+        
+        if (!file.exists()) {
+            throw new RuntimeException("File not found at: " + file.getAbsolutePath());
+        }
+
+        // 2. Prepare File Resource and Headers
+        FileSystemResource fileResource = new FileSystemResource(file);
+        
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.APPLICATION_XML);
+
+        // Content-Disposition: form-data; name="file"; filename="myorders.xml"
+        // DW sets the filename to "myorders.xml" explicitly, overriding the source filename.
+        fileHeaders.setContentDispositionFormData("file", "myorders.xml"); 
+        
+        // 3. Build the Body
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // The key used in the builder ("file") matches the 'name' in the Content-Disposition header.
+        builder.part("file", fileResource)
+               .headers(h -> h.addAll(fileHeaders));
+
+        return builder.build();
+    }
+}
+
+output:
+
+Content-Type: multipart/form-data; boundary=...
+--<GENERATED_SPRING_BOUNDARY>
+Content-Type: application/xml
+Content-Disposition: form-data; name="file"; filename="myorders.xml"
+
+<?xml version='1.0' encoding='UTF-8'?>
+<orders>
+  <order>
+    <item>...</item>
+  </order>
+</orders>
+--<GENERATED_SPRING_BOUNDARY>--
+
+-------------------------------------------------------------------
+
+{
+    "clients": {
+        "client": [
+            {
+                "id": 1,
+                "name": "Mariano"
+            },
+            {
+                "id": 2,
+                "name": "Shoki"
+            }
+        ]
+    }
+}
+
+example 3:
+
+
+input:
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
+import java.io.File;
+import java.nio.file.Paths;
+
+@Service
+public class JsonFilePartService {
+
+    private static final String SOURCE_FILE_PATH = "src/main/resources/myClients.json";
+    private static final String PART_NAME = "myFile";
+    private static final String TARGET_FILENAME = "partMyClients.json";
+
+    /**
+     * Builds a MultiValueMap for a multipart request containing a single JSON file part.
+     * @return MultiValueMap representing the multipart body.
+     */
+    public MultiValueMap<String, HttpEntity<?>> buildFileMultipartBody() {
+        // 1. Locate the file
+        File file = Paths.get(SOURCE_FILE_PATH).toFile();
+        
+        if (!file.exists()) {
+            throw new RuntimeException("File not found at: " + file.getAbsolutePath());
+        }
+
+        // 2. Prepare File Resource and Headers
+        FileSystemResource fileResource = new FileSystemResource(file);
+        
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        // Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+        fileHeaders.setContentDispositionFormData(PART_NAME, TARGET_FILENAME); 
+        
+        // 3. Build the Body
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+        // The key in the builder matches the 'name' in the Content-Disposition header.
+        builder.part(PART_NAME, fileResource)
+               .headers(h -> h.addAll(fileHeaders));
+
+        return builder.build();
+    }
+}
+
+output:
+
+Content-Type: multipart/form-data; boundary=...
+--<GENERATED_SPRING_BOUNDARY>
+Content-Type: application/json
+Content-Disposition: form-data; name="myFile"; filename="partMyClients.json"
+
+{
+    "clients": {
+        "client": [
+            { "id": 1, "name": "Mariano" },
+            { "id": 2, "name": "Shoki" }
+        ]
+    }
+}
+--<GENERATED_SPRING_BOUNDARY>--
+
+-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,24 @@
+countCharactersBy:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "42 = 11 * 2 + 20";
+        long count = input.chars()
+                         .mapToObj(c -> (char) c)
+                         .filter(Character::isDigit)
+                         .count();
+        
+        System.out.println((int) count);
+    }
+}
+
+
+output:
+
+
+7
+

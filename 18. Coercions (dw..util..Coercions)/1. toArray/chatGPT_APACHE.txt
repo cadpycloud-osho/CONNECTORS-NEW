@@ -1,0 +1,39 @@
+toArray:
+
+
+input:
+
+import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ToArraySimulation {
+
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        // a -> empty string -> empty array
+        output.put("a", new ArrayList<>());
+
+        // b -> split string into chars
+        String str = "hola";
+        List<String> chars = new ArrayList<>();
+        for (char c : str.toCharArray()) {
+            chars.add(String.valueOf(c));
+        }
+        output.put("b", chars);
+
+        // Print as JSON
+        System.out.println(mapper.writeValueAsString(output));
+    }
+}
+
+
+output:
+
+{"a":[],"b":["h","o","l","a"]}
+
+
+
+

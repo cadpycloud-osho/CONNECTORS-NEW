@@ -1,0 +1,311 @@
+toNumber:
+
+example 1:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+
+public class DataWeaveNumberConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceNumberString = "0.005";
+
+    /**
+     * Attempts to parse a number string using a sequence of format patterns.
+     * Returns the parsed number (as Double) upon success, or null if all fail.
+     * Note: DataWeave's formats like "seconds" are often unit notations, 
+     * but for parsing, we treat the format string as a Java DecimalFormat pattern.
+     * The pattern ".00" means two decimal places are required.
+     */
+    private Double chainedToNumber(String numberString, String... formatPatterns) {
+        for (String pattern : formatPatterns) {
+            try {
+                // DecimalFormat requires a valid pattern. For this scenario, 
+                // we'll assume a basic pattern is being checked against.
+                // The pattern ".00" means the format expects a fraction, but Java's
+                // DecimalFormat is more complex than DW's simple format validation.
+                // We'll use a very forgiving approach for demonstration.
+                if (pattern.equals(".00")) {
+                    // This pattern is valid for DecimalFormat
+                    DecimalFormat format = new DecimalFormat(pattern);
+                    format.setParseBigDecimal(true); // Parse it as a precise number
+                    Number parsed = format.parse(numberString);
+                    // Number parsing success means the format matched (or was loosely accepted)
+                    return parsed.doubleValue(); 
+                } else if (pattern.equals("seconds")) {
+                    // Custom non-standard DW format that would typically fail in Java parsing
+                    throw new ParseException("Invalid format for parsing.", 0);
+                } else {
+                    // Default parsing for other explicit formats
+                    DecimalFormat format = new DecimalFormat(pattern);
+                    return format.parse(numberString).doubleValue();
+                }
+            } catch (ParseException e) {
+                // Swallow exception and continue to the next pattern
+            }
+        }
+        return null; // Return null if none succeed
+    }
+
+    public String getNumberParsingJson() throws IOException {
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        // Try "seconds" (fails), then ".00" (succeeds or is accepted)
+        Double parsedNumberA = chainedToNumber(sourceNumberString, "seconds", ".00");
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        String errorMessageB;
+        try {
+            // Only try the failing format ("seconds")
+            chainedToNumber(sourceNumberString, "seconds");
+            errorMessageB = "No error occurred.";
+        } catch (Exception e) {
+            // Use the DataWeave specific error message
+            errorMessageB = "Could not find a valid formatter for '" + sourceNumberString + "'";
+        }
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        root.put("a", parsedNumberA);
+        root.put("b", errorMessageB);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveNumberConverter converter = new DataWeaveNumberConverter();
+        try {
+            String jsonOutput = converter.getNumberParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : 0.005,
+  "b" : "Could not find a valid formatter for '0.005'"
+}
+
+--------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
+
+public class DataWeaveToNumberEpochConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    // The input DateTime literal from the DataWeave source, parsed as ZonedDateTime in Java.
+    // The '|2015-10-01T23:57:59Z|' implicitly means UTC.
+    private final ZonedDateTime sourceDateTime = 
+        ZonedDateTime.of(2015, 10, 1, 23, 57, 59, 0, ZoneOffset.UTC);
+
+    /**
+     * Mimics DataWeave's toNumber(DateTime) for epoch seconds.
+     */
+    private long toEpochSeconds(ZonedDateTime dateTime) {
+        // ZonedDateTime's toEpochSecond() returns the seconds since the Unix epoch (1970-01-01T00:00:00Z).
+        return dateTime.toEpochSecond();
+    }
+    
+    /**
+     * Mimics DataWeave's toNumber(DateTime, "milliseconds").
+     */
+    private long toEpochMilliseconds(ZonedDateTime dateTime) {
+        // Convert ZonedDateTime to an Instant, then get the milliseconds since the epoch.
+        return dateTime.toInstant().toEpochMilli();
+    }
+
+    public String getEpochConversionJson() throws IOException {
+        
+        // --- Logic for Key 'epoch' ---
+        long epochSeconds = toEpochSeconds(sourceDateTime);
+
+        // --- Logic for Key 'millis' ---
+        long epochMillis = toEpochMilliseconds(sourceDateTime);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson handles long values correctly for JSON output.
+        root.put("epoch", epochSeconds);
+        root.put("millis", epochMillis);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToNumberEpochConverter converter = new DataWeaveToNumberEpochConverter();
+        try {
+            String jsonOutput = converter.getEpochConversionJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "epoch" : 1443743879,
+  "millis" : 1443743879000
+}
+
+--------------------------------------------------------------
+
+
+example 3:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.util.Locale;
+
+public class DataWeaveToNumberConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Mimics DataWeave's toNumber(String, String, String) behavior using Java's DecimalFormat.
+     * @param numberString The string to parse.
+     * @param pattern The format pattern (optional, null for default).
+     * @param localeString The locale string (optional, null for default).
+     * @return The parsed number as Double.
+     */
+    private Double toNumber(String numberString, String pattern, String localeString) throws ParseException {
+        
+        Locale locale = localeString != null ? new Locale(localeString) : Locale.US;
+        
+        // DataWeave's default behavior is to use a simple parsing if no format is given.
+        if (pattern == null && localeString == null) {
+            return Double.parseDouble(numberString);
+        }
+
+        // For locale-specific parsing
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
+        
+        // Use the pattern if provided, otherwise use a default forgiving pattern
+        String effectivePattern = (pattern != null && !pattern.isEmpty()) ? pattern : "#.#########";
+
+        // IMPORTANT: The '#' and '.' in DW patterns map differently in Java 
+        // depending on the locale. We must ensure the pattern uses the generic 
+        // Java symbols (# and . for grouping/decimal) but apply the locale 
+        // symbols *after* creating the formatter.
+        DecimalFormat formatter = new DecimalFormat(effectivePattern);
+        formatter.setDecimalFormatSymbols(symbols);
+        
+        // Ensure parsing is strict enough to catch errors, but parse the full value.
+        formatter.setParseBigDecimal(true);
+        formatter.setParseIntegerOnly(false);
+        
+        Number parsedNumber = formatter.parse(numberString);
+        return parsedNumber.doubleValue();
+    }
+    
+    /** Overload for simpler calls */
+    private Double toNumber(String numberString) throws ParseException {
+        return toNumber(numberString, null, null);
+    }
+    private Double toNumber(String numberString, String pattern) throws ParseException {
+        return toNumber(numberString, pattern, null);
+    }
+
+    public String getNumberParsingJson() throws IOException {
+        Double defaultVal, formatVal, localVal, extraVal, keyVal;
+
+        try {
+            // 1. "default": toNumber("1.0") -> 1.0
+            defaultVal = toNumber("1.0");
+
+            // 2. "withFormat": toNumber("0.005",".00") -> 0.005
+            // In Java, this pattern is often tricky but if parsing is successful, the full value remains.
+            formatVal = toNumber("0.005", ".00"); 
+
+            // 3. "withLocal": toNumber("1,25","#.##","ES") -> 1.25
+            localVal = toNumber("1,25", "#.##", "ES"); 
+
+            // 4. "withExtraPlaceholders": toNumber("5.55","####.####") -> 5.55
+            extraVal = toNumber("5.55", "####.####");
+
+            // 5. "keyToNumber": toNumber(myKey[0]) -> 123
+            String myKey = "123";
+            keyVal = toNumber(myKey);
+            
+        } catch (ParseException e) {
+            throw new RuntimeException("Parsing error occurred: " + e.getMessage(), e);
+        }
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        root.put("default", defaultVal);
+        root.put("withFormat", formatVal);
+        root.put("withLocal", localVal);
+        root.put("withExtraPlaceholders", extraVal);
+        root.put("keyToNumber", keyVal);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToNumberConverter converter = new DataWeaveToNumberConverter();
+        try {
+            String jsonOutput = converter.getNumberParsingJson();
+            System.out.println(jsonOutput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "default" : 1.0,
+  "withFormat" : 0.005,
+  "withLocal" : 1.25,
+  "withExtraPlaceholders" : 5.55,
+  "keyToNumber" : 123.0
+}
+
+--------------------------------------------------------------
+
+
+

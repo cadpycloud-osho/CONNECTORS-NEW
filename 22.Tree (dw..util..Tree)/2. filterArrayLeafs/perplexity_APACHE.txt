@@ -1,0 +1,70 @@
+filterArrayLeafs:
+
+
+input:
+
+import java.util.*;
+import java.util.function.BiPredicate;
+
+public class FilterArrayLeafsProcessor {
+    private static final String NULL_TYPE = "Null";
+    private static final String STRING_TYPE = "String";
+    private static final String ARRAY_TYPE = "Array";
+    
+    public static Object filterArrayLeafs(Object input, BiPredicate<Object, String> criteria) {
+        if (input instanceof List) {
+            return filterArray((List<?>) input, criteria, "");
+        } else if (input instanceof Map) {
+            return filterObject((Map<?, ?>) input, criteria, "");
+        }
+        return input;
+    }
+    
+    private static List<Object> filterArray(List<?> array, BiPredicate<Object, String> criteria, String path) {
+        List<Object> result = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            Object value = array.get(i);
+            String newPath = path.isEmpty() ? String.valueOf(i) : path + "." + i;
+            
+            if (isLeaf(value)) {
+                if (criteria.test(value, newPath)) {
+                    result.add(value);
+                }
+            } else {
+                result.add(filterLeafsRecursive(value, criteria, newPath));
+            }
+        }
+        return result;
+    }
+    
+    private static Object filterObject(Map<?, ?> obj, BiPredicate<Object, String> criteria, String path) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        obj.forEach((key, value) -> {
+            String newPath = path.isEmpty() ? key.toString() : path + "." + key;
+            if (isLeaf(value)) {
+                if (criteria.test(value, newPath)) {
+                    result.put(key.toString(), value);
+                }
+            } else {
+                Object filtered = filterLeafsRecursive(value, criteria, newPath);
+                if (!isEmptyResult(filtered)) {
+                    result.put(key.toString(), filtered);
+                }
+            }
+        });
+        return result.isEmpty() ? null : result;
+    }
+}
+
+
+output:
+
+
+{
+  "a": [1, {name: [true], test: 213}],    // Non-strings
+  "b": [1, {name: [], test: 213}, null],  // 1 + nulls
+  "c": {"a": [1]},                        // Nested object filtering
+  "d": [{name: [], test: 213}]            // Skip array-position leaves
+}
+
+

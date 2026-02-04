@@ -1,0 +1,98 @@
+entriesOf:
+
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.*;
+
+@RestController
+public class EntriesOfController {
+
+    @GetMapping("/entries-of")
+    public Map<String, Object> getEntriesOf() {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String xml = """
+                    <xml attr="x">
+                        <a>true</a>
+                        <b>1</b>
+                    </xml>
+                    """;
+
+            Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+            Element root = doc.getDocumentElement();
+            String rootName = root.getNodeName();
+
+            // Extract attributes
+            Map<String, String> attributes = new HashMap<>();
+            NamedNodeMap attrs = root.getAttributes();
+            for (int i = 0; i < attrs.getLength(); i++) {
+                Node attrNode = attrs.item(i);
+                attributes.put(attrNode.getNodeName(), attrNode.getNodeValue());
+            }
+
+            // Extract child elements (a,b)
+            Map<String, String> values = new HashMap<>();
+            NodeList nodes = root.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node child = nodes.item(i);
+                if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    values.put(child.getNodeName(), child.getTextContent().trim());
+                }
+            }
+
+            // Create final JSON structure
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("key", rootName);
+            entry.put("value", values);
+            entry.put("attributes", attributes);
+
+            List<Object> entriesList = new ArrayList<>();
+            entriesList.add(entry);
+
+            response.put("entriesOf", entriesList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+
+
+
+_____________________________________________________________________
+
+
+entriesOf(obj: Null): Null
+Helper function that enables entriesOf to work with a null value.

@@ -1,0 +1,76 @@
+isNumeric:
+
+isNumeric(text: String): Boolean
+
+isNumeric(text: String): Boolean
+Checks if the text contains only Unicode digits.
+
+A decimal point is not a Unicode digit and returns false. Note that the method does not allow for a leading sign, either positive or negative.
+
+
+
+Source
+%dw 2.0
+import isNumeric from dw::core::Strings
+output application/json
+---
+{
+  "a": isNumeric(null),
+  "b": isNumeric(""),
+  "c": isNumeric("  "),
+  "d": isNumeric("123"),
+  "e": isNumeric("१२३"),
+  "f": isNumeric("12 3"),
+  "g": isNumeric("ab2c"),
+  "h": isNumeric("12-3"),
+  "i": isNumeric("12.3"),
+  "j": isNumeric("-123"),
+  "k": isNumeric("+123")
+}
+
+
+DataWeave
+Output
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

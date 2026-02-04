@@ -1,0 +1,52 @@
+hammingDistance:
+
+
+
+input:
+
+public class Main {
+
+    /**
+     * Static method to emulate DataWeave's hammingDistance(text1, text2) function.
+     */
+    public static int calculateHammingDistance(String s1, String s2) {
+        if (s1 == null || s2 == null || s1.length() != s2.length()) {
+            // As per definition, length must be equal.
+            // We can throw an IllegalArgumentException for unequal lengths.
+            throw new IllegalArgumentException("Cannot calculate Hamming distance for strings of unequal length.");
+        }
+
+        int distance = 0;
+        
+        // Iterate through the strings
+        for (int i = 0; i < s1.length(); i++) {
+            if (s1.charAt(i) != s2.charAt(i)) {
+                distance++;
+            }
+        }
+        return distance;
+    }
+
+    public static void main(String[] args) {
+        String s1 = "holu"; 
+        String s2 = "chau";
+        
+        try {
+            int distance = calculateHammingDistance(s1, s2);
+            
+            System.out.println("DataWeave");
+            System.out.println("Output");
+            
+            // Print the result to match the DataWeave output structure
+            System.out.println(distance);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}
+
+
+output:
+
+
+3

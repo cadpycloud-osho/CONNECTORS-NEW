@@ -1,0 +1,55 @@
+isRegexType:
+
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+public class RegexTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkRegex")
+            .process(exchange -> {
+                // Mapping the DataWeave source logic:
+                // a: The type definition ARegex
+                // b: The Regex keyword
+                // c: A different type (Boolean)
+                Object refA = Pattern.class;
+                Object refB = Pattern.compile("^[0-9]*$"); // A Pattern instance
+                Object refC = Boolean.TRUE;
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if it is the Pattern class or an instance of a Pattern
+                result.put("a", isRegexType(refA));
+                result.put("b", isRegexType(refB));
+                result.put("c", isRegexType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isRegexType(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the class reference (Pattern.class) or an actual Regex instance
+        return obj instanceof Pattern || obj.equals(Pattern.class);
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

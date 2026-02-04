@@ -1,0 +1,98 @@
+keyset:
+
+example 1:
+
+input:
+@GetMapping("/keyset1")
+public Map<String, Object> keySetExample1() {
+
+    Map<String, Object> sampleMap = new HashMap<>();
+    sampleMap.put("a", true);
+    sampleMap.put("b", 1);
+
+    return Map.of(
+        "keySet",
+        new ArrayList<>(sampleMap.keySet())
+    );
+}
+
+
+
+output:
+
+
+{
+  "keySet": ["a", "b"]
+}
+
+-----------------------------------------------------------
+example 2:
+
+@GetMapping("/keyset2")
+public Map<String, Object> keySetExample2() throws Exception {
+
+    String xml = """
+        <users xmlns="http://test.com">
+            <user name="Mariano" lastName="Achaval"/>
+            <user name="Stacey" lastName="Duke"/>
+        </users>
+        """;
+
+    // Parse XML
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    DocumentBuilder builder = dbf.newDocumentBuilder();
+    Document doc = builder.parse(new InputSource(new StringReader(xml)));
+    Element root = doc.getDocumentElement();
+
+    List<Object> keySet = new ArrayList<>();
+    List<Object> nameSet = new ArrayList<>();
+
+    // Namespace (twice to match DW behavior)
+    String namespace = root.getNamespaceURI();
+    keySet.add(namespace);
+    keySet.add(namespace);
+
+    // Extract children users
+    NodeList users = root.getElementsByTagNameNS(namespace, "user");
+
+    for (int i = 0; i < users.getLength(); i++) {
+        Element user = (Element) users.item(i);
+
+        Map<String, String> userMap = new HashMap<>();
+        userMap.put("name", user.getAttribute("name"));
+        userMap.put("lastName", user.getAttribute("lastName"));
+
+        keySet.add(userMap);
+        nameSet.add(null); // DW returns null
+        nameSet.add(null); // Because flatten duplicates per maps
+    }
+
+    return Map.of(
+        "keySet", keySet,
+        "nameSet", nameSet
+    );
+}
+
+
+
+output:
+
+
+
+{
+  "keySet": [
+    "http://test.com",
+    "http://test.com",
+    {
+      "name": "Mariano",
+      "lastName": "Achaval"
+    },
+    {
+      "name": "Stacey",
+      "lastName": "Duke"
+    }
+  ],
+  "nameSet": [null, null, null, null]
+}
+

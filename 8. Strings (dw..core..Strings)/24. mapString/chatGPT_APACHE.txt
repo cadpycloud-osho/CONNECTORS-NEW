@@ -1,0 +1,31 @@
+mapString:
+
+
+input:
+
+public class MapStringExample {
+
+    public static void main(String[] args) {
+
+        String input = "$234";
+        StringBuilder result = new StringBuilder();
+
+        for (char ch : input.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                result.append("~");
+            } else {
+                result.append(ch);
+            }
+        }
+
+        System.out.println("{ \"balance\": \"" + result + "\" }");
+    }
+}
+
+
+
+output:
+
+{ "balance": "$~~~" }
+
+

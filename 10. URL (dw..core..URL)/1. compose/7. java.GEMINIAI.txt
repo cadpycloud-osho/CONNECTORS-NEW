@@ -1,0 +1,62 @@
+compose:
+
+
+input:
+
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List; // <<< MISSING IMPORT ADDED
+import java.util.Map; // Existing Map import is fine, but List was needed.
+
+public class Main {
+
+    /**
+     * Conceptually mimics DataWeave's URL::compose by building a URI from components
+     * and relying on the URI constructor to handle path segment encoding.
+     * @param scheme The URI scheme (e.g., "http")
+     * @param authority The URI authority (e.g., "examplewebsite.com")
+     * @param segments The path segments to join and encode (e.g., "content folder", "page.html")
+     * @return The correctly encoded and composed URL string.
+     */
+    public static String composeUrl(String scheme, String authority, List<String> segments) throws URISyntaxException {
+        // 1. Join the path segments with '/'
+        // The path component must start with a '/' for absolute paths.
+        String path = "/" + String.join("/", segments);
+        
+        // 2. Use the multi-argument URI constructor. It correctly handles encoding 
+        //    for the path component (path), turning spaces into %20.
+        //    (The constructor takes scheme, authority, path, query, fragment)
+        URI uri = new URI(scheme, authority, path, null, null);
+
+        // 3. toASCIIString() provides the final, encoded URL.
+        return uri.toASCIIString();
+    }
+
+    public static void main(String[] args) {
+        String urlPath = "content folder";
+        String encodedURL = null;
+
+        try {
+            // Mimics the DataWeave expression: compose(...)
+            List<String> segments = List.of(urlPath, "page.html"); // List.of requires the List import
+            
+            encodedURL = composeUrl("http", "examplewebsite.com", segments);
+            
+        } catch (URISyntaxException e) {
+            encodedURL = "Error: " + e.getMessage();
+        }
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"encodedURL\": \"" + encodedURL + "\"");
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "encodedURL": "http://examplewebsite.com/content%20folder/page.html"
+}
+

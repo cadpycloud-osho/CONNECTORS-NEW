@@ -1,0 +1,100 @@
+keysOf:
+
+exapmle 1:
+input:
+
+
+// KeysOfMapApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.*;
+
+@SpringBootApplication
+public class KeysOfMapApp {
+    public static void main(String[] args) {
+        SpringApplication.run(KeysOfMapApp.class, args);
+
+        Map<String, Object> mapExample = Map.of("a", true, "b", 1);
+        List<String> keysOfResult = new ArrayList<>(mapExample.keySet());
+        
+        Map<String, List<String>> result = Map.of("keysOf", keysOfResult);
+        System.out.println(result); 
+    }
+}
+
+output:
+
+
+{keysOf=[a, b]}
+
+_____________________________________________________________________
+example 2:
+
+input:
+
+// KeysOfXmlApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import java.util.*;
+
+@SpringBootApplication
+public class KeysOfXmlApp {
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(KeysOfXmlApp.class, args);
+
+        String xml = "<users xmlns=\"http://test.com\">\n" +
+                     "  <user name=\"Mariano\" lastName=\"Achaval\"/>\n" +
+                     "  <user name=\"Stacey\" lastName=\"Duke\"/>\n" +
+                     "</users>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+        
+        Element users = doc.getDocumentElement();
+        NodeList usersList = users.getElementsByTagNameNS("http://test.com", "user");
+
+        // keysOfExample: namespace URIs + attribute maps
+        List<Object> keysOfExample = new ArrayList<>();
+        for (int i = 0; i < usersList.getLength(); i++) {
+            keysOfExample.add("http://test.com");  // $.#
+        }
+        for (int i = 0; i < usersList.getLength(); i++) {
+            Element user = (Element) usersList.item(i);
+            keysOfExample.add(Map.of("name", user.getAttribute("name"), 
+                                   "lastName", user.getAttribute("lastName")));  // $.@
+        }
+
+        // namesOfExample: all nulls as in DataWeave
+        List<Object> namesOfExample = Arrays.asList(null, null, null, null);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("keysOfExample", keysOfExample);
+        result.put("namesOfExample", namesOfExample);
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+{
+  "keysOfExample": [
+    "http://test.com",
+    "http://test.com", 
+    {"name": "Mariano", "lastName": "Achaval"},
+    {"name": "Stacey", "lastName": "Duke"}
+  ],
+  "namesOfExample": [null, null, null, null]
+}
+
+
+
+

@@ -1,0 +1,63 @@
+readLinesWith:
+
+
+input:
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        // Equivalent to DataWeave read(..., "application/octet-stream")
+        String input =
+                "Line 1\n" +
+                "Line 2\n" +
+                "Line 3\n" +
+                "Line 4\n" +
+                "Line 5\n";
+
+        byte[] content = input.getBytes(StandardCharsets.UTF_8);
+
+        // Equivalent to readLinesWith "UTF-8"
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader =
+                     new BufferedReader(
+                             new InputStreamReader(
+                                     new ByteArrayInputStream(content),
+                                     StandardCharsets.UTF_8))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+
+        // Equivalent to typeOf(content)
+        String showType = "Binary";
+
+        // Output
+        System.out.println("{");
+        System.out.println("  \"lines\": " + lines + ",");
+        System.out.println("  \"showType\": \"" + showType + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "lines": [Line 1, Line 2, Line 3, Line 4, Line 5],
+  "showType": "Binary"
+}
+
+
+
+

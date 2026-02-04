@@ -1,0 +1,48 @@
+tan:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the tan function.
+     * @return A map containing the results of the tangent calculations.
+     */
+    @GetMapping("/calculateTan")
+    public Map<String, Double> calculateTan() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        // Helper function for tan (direct map to Java's Math.tan)
+        double tan(double x) {
+            // Math.tan takes an angle in radians and returns its tangent.
+            return Math.tan(x);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("tan0", tan(0));
+        output.put("tan13", tan(0.13));
+        output.put("tan-1", tan(-1));
+
+        return output;
+    }
+}
+
+output:
+
+{
+  "tan0": 0.0,
+  "tan13": 0.13073731800446006,
+  "tan-1": -1.5574077246549023
+}
+

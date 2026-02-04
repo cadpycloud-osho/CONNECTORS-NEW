@@ -1,0 +1,34 @@
+cos:
+
+
+input:
+
+import java.util.*;
+
+public class CosExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        output.put("cos0", Math.cos(0.0));
+        output.put("cos13", Math.cos(0.13));
+        output.put("cos-1", Math.cos(-1.0));
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+
+{
+  "cos0": 1.0,
+  "cos13": 0.9915618937147881,
+  "cos-1": 0.5403023058681398
+}
+
+
+

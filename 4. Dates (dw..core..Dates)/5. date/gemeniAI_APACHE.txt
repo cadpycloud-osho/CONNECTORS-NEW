@@ -1,0 +1,44 @@
+date:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ConstructDateRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:constructDate")
+            .routeId("Construct-Date-Route")
+            .process(exchange -> {
+                // 1. Logic: date({year: 2012, month: 10, day: 11})
+                // Java's LocalDate.of takes (year, month, dayOfMonth)
+                LocalDate newDate = LocalDate.of(2012, 10, 11);
+
+                // 2. Format to ISO-8601 string (yyyy-MM-dd)
+                String result = newDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                // 3. Construct the Map for JSON output
+                Map<String, String> response = new HashMap<>();
+                response.put("newDate", result);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Final JSON Output: ${body}");
+    }
+}
+
+
+output:
+
+{
+   "newDate": "2012-10-11"
+}

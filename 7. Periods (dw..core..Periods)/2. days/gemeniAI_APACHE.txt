@@ -1,0 +1,68 @@
+days:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.Instant;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DaysArithmeticRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculateDays")
+            .routeId("Days-Arithmetic-Route")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+                Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+                Instant midnight = Instant.parse("2020-10-05T00:00:00.000Z");
+
+                // 1. Whole Days
+                results.put("tomorrow", base.plus(Duration.ofDays(1)).toString());
+                results.put("yesterday", base.minus(Duration.ofDays(1)).toString());
+
+                // 2. Decimal Days (Fractional conversion)
+                results.put("decimalDaysPlusQuarter", midnight.plus(toDuration(0.25)).toString());
+                results.put("decimalDaysPlusHalf", midnight.plus(toDuration(0.5)).toString());
+                results.put("decimalDaysPlusThreeQuarters", midnight.plus(toDuration(0.75)).toString());
+
+                // 3. Period Representation
+                results.put("decimalInputAsPeriod", toDuration(4.555).toString());
+                results.put("fourDayPeriod", "P4D"); // Standard Period format
+                results.put("negativeValue", "P-1D");
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Date Arithmetic Result: ${body}");
+    }
+
+    /**
+     * Converts decimal days to a Java Duration to mimic DW days()
+     * Formula: days * 24 * 60 * 60 * 1000 (milliseconds)
+     */
+    private Duration toDuration(double days) {
+        long millis = Math.round(days * 24 * 60 * 60 * 1000);
+        return Duration.ofMillis(millis);
+    }
+}
+
+output:
+
+
+{
+   "tomorrow": "2020-10-06T20:22:34.385Z",
+   "yesterday": "2020-10-04T20:22:34.385Z",
+   "decimalDaysPlusQuarter": "2020-10-05T06:00:00Z",
+   "decimalDaysPlusHalf": "2020-10-05T12:00:00Z",
+   "decimalDaysPlusThreeQuarters": "2020-10-05T18:00:00Z",
+   "decimalInputAsPeriod": "PT109H19M12S",
+   "fourDayPeriod": "P4D",
+   "negativeValue": "P-1D"
+}
+
+

@@ -1,0 +1,25 @@
+intersectionItems:
+
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, List<String>> result = new HashMap<>();
+        
+        // Simulates intersectionItems(AType) where AType = {name: String} & {age: Number}
+        result.put("a", Arrays.asList("Object", "Object"));
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+{a=[Object, Object]}
+
+

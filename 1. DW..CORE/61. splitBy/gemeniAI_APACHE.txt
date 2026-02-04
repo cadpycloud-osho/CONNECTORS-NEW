@@ -1,0 +1,337 @@
+splitBy:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+
+public class CamelSplitByRegex {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String input = "192.88.99.0/24";
+                        
+                        // Java Regex: [./] 
+                        // We split by any character inside the brackets
+                        String[] segments = input.split("[./]");
+                        
+                        exchange.getIn().setBody(segments);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+["192", "88", "99", "0", "24"]
+
+
+-----------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelComplexSplit {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        Map<String, Object> splitters = new LinkedHashMap<>();
+
+                        // split1: . matches any char, so "-b-" is the delimiter
+                        splitters.put("split1", "a-b-c".split(".b."));
+
+                        // split2: \s matches whitespace
+                        splitters.put("split2", "hello world".split("\\s"));
+
+                        // split3: ^s matches 's' only if at start. No match here.
+                        splitters.put("split3", "no match".split("^s"));
+
+                        // split4: ^n.. matches 'no ' at the start. 
+                        // Results in ["", "match"] because 'no ' is at index 0.
+                        splitters.put("split4", "no match".split("^n.."));
+
+                        // split5: [0-9A-Z] matches any digit or uppercase letter
+                        splitters.put("split5", "a1b2c3d4A1B2C3D".split("[0-9A-Z]"));
+
+                        Map<String, Object> root = new LinkedHashMap<>();
+                        root.put("splitters", splitters);
+
+                        exchange.getIn().setBody(root);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a", "c"],
+    "split2": ["hello", "world"],
+    "split3": ["no match"],
+    "split4": ["", "match"],
+    "split5": ["a", "b", "c", "d"]
+  }
+}
+
+
+-----------------------------------------------------------
+
+example 3:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelSplitAndIndex {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    // Using Simple Language to split and get index 0
+                    // In Java split, we escape the dot: \\.
+                    .setBody(simple("${body.split('\\.')[0]}"))
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        // Sending the IP address string
+        context.createProducerTemplate().sendBody("direct:start", "192.88.99.0");
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+192
+
+
+-----------------------------------------------------------
+
+example 4:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class CamelBacktickSplit {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String input = "root.sources.data.`test.branch.BranchSource`.source.traits";
+                        
+                        // Java Regex requires double escaping for backslashes
+                        // Pattern: Split on dot if followed by even number of backticks
+                        String regex = "[.](?=(?:[^`]*`[^`]*`)*[^`]*$)";
+                        
+                        String[] result = input.split(regex);
+                        
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[
+  "root",
+  "sources",
+  "data",
+  "`test.branch.BranchSource`",
+  "source",
+  "traits"
+]
+
+
+-----------------------------------------------------------
+
+
+example 5:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class CamelLiteralSplit {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        String input = "192.88.99.0";
+                        
+                        // Java uses Regex for split. 
+                        // "." means "any character", so we use "\\." for a literal dot.
+                        String[] result = input.split("\\.");
+                        
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+["192", "88", "99", "0"]
+
+
+
+-----------------------------------------------------------
+
+
+example 6:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class CamelLiteralSplitters {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        Map<String, Object> splitters = new LinkedHashMap<>();
+
+                        // split1: Standard dash delimiter
+                        splitters.put("split1", "a-b-c".split("-"));
+
+                        // split2: Empty string delimiter (character-by-character)
+                        // Note: Java "hello world".split("") returns ["h","e","l","l","o"," ","w","o","r","l","d"]
+                        splitters.put("split2", "hello world".split(""));
+
+                        // split3: Comma delimiter
+                        splitters.put("split3", "first,middle,last".split(","));
+
+                        // split4: String delimiter that doesn't exist in the source
+                        splitters.put("split4", "no split".split("NO"));
+
+                        Map<String, Object> root = new LinkedHashMap<>();
+                        root.put("splitters", splitters);
+
+                        exchange.getIn().setBody(root);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+{
+  "splitters": {
+    "split1": ["a", "b", "c"],
+    "split2": ["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d"],
+    "split3": ["first", "middle", "last"],
+    "split4": ["no split"]
+  }
+}
+
+
+-----------------------------------------------------------
+
+
+
+
+
+
+

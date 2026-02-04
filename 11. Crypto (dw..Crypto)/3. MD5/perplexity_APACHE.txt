@@ -1,0 +1,42 @@
+MD5:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.security.MessageDigest;
+
+public class MD5Processor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        byte[] input = "asd".getBytes();
+        
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest(input);
+        
+        // Convert to lowercase hex string (matches DataWeave)
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : digest) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        
+        String result = "{ \"md5\": \"" + hexString.toString() + "\" }";
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:md5")
+    .process(new MD5Processor())
+    .log("${body}");
+
+
+output:
+
+{ "md5": "7815696ecbf1c96e6894b779456d330e" }
+
+

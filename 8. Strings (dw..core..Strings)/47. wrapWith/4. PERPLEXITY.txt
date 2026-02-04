@@ -1,0 +1,37 @@
+wrapWith:
+
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class WrapWithController {
+    
+    @GetMapping("/wrap-with")
+    public Map<String, Object> wrapWithExamples() {
+        return Map.of(
+            "a", wrapWith(null, "'"),
+            "b", wrapWith("", "'"),
+            "c", wrapWith("ab", "x"),
+            "d", wrapWith("'ab'", "'"),
+            "e", wrapWith("ab", "'")
+        );
+    }
+    
+    private String wrapWith(String input, char wrapper) {
+        if (input == null) return null;
+        return wrapper + input + wrapper;
+    }
+}
+
+output:
+
+
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}

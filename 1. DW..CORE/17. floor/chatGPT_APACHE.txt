@@ -1,0 +1,21 @@
+floor:
+
+input:
+
+from("direct:floorExample")
+.setBody(constant(List.of(1.5, 2.2, 3.0)))
+
+.split(body())
+    .convertBodyTo(Long.class)
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end();
+
+
+output:
+
+[1, 2, 3]
+
+
+

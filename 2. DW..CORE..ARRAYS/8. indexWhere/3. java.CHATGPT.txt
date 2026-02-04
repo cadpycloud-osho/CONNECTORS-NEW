@@ -1,0 +1,36 @@
+indexWhere:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<String> users = Arrays.asList("Mariano", "Leandro", "Julian");
+
+        int index = -1;
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).startsWith("Jul")) {
+                index = i;
+                break;
+            }
+        }
+
+        System.out.println(index);
+    }
+}
+
+
+
+
+output:
+
+2
+
+
+

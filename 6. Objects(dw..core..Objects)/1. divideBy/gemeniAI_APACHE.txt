@@ -1,0 +1,74 @@
+divideBy:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class DivideByObjectRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:divideObject")
+            .routeId("Divide-By-Object-Route")
+            .process(exchange -> {
+                // 1. Source Object (LinkedHashMap to preserve order)
+                // Note: Java Maps don't allow duplicate keys like DW objects do,
+                // so we use a list of entries if duplicates are required, 
+                // but here we follow the logical structure.
+                Map<String, Object> source = new LinkedHashMap<>();
+                source.put("a1", 1);    // Using unique suffixes as Java Map keys 
+                source.put("b1", true); // must be unique.
+                source.put("a2", 2);
+                source.put("b2", false);
+                source.put("c1", 3);
+
+                int chunkSize = 2;
+                
+                // 2. Logic: divideBy 2
+                List<Map<String, Object>> dividedList = new ArrayList<>();
+                Map<String, Object> currentChunk = new LinkedHashMap<>();
+                
+                int count = 0;
+                for (Map.Entry<String, Object> entry : source.entrySet()) {
+                    currentChunk.put(entry.getKey().replaceAll("\\d", ""), entry.getValue());
+                    count++;
+                    
+                    if (count == chunkSize) {
+                        dividedList.add(currentChunk);
+                        currentChunk = new LinkedHashMap<>();
+                        count = 0;
+                    }
+                }
+                
+                // Add the last remaining chunk
+                if (!currentChunk.isEmpty()) {
+                    dividedList.add(currentChunk);
+                }
+
+                // 3. Structure for JSON output
+                Map<String, Object> response = new HashMap<>();
+                response.put("divideBy", dividedList);
+
+                exchange.getIn().setBody(response);
+            })
+            // 4. Logic: output application/json
+            .marshal().json()
+            .log("Divided Object: ${body}");
+    }
+}
+
+
+output:
+
+{
+  "divideBy": [
+    { "a": 1, "b": true },
+    { "a": 2, "b": false },
+    { "c": 3 }
+  ]
+}
+
+

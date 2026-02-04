@@ -1,0 +1,137 @@
+distinctBy:
+
+
+example 1:
+
+input:
+from("direct:distinctArray")
+    .setBody(simple("[0,1,2,3,3,2,1,4]"))
+    .process(exchange -> {
+        List<Integer> list = Arrays.asList(0,1,2,3,3,2,1,4);
+        LinkedHashSet<Integer> unique = new LinkedHashSet<>(list);
+        exchange.getIn().setBody(unique);
+    })
+    .marshal().json();
+
+
+
+output:
+
+[0,1,2,3,4]
+
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:distinctAuthors")
+    .setBody(simple("{\"book\":{\"title\":\"XQuery Kick Start\",\"author\":[\"James McGovern\",\"Per Bothner\",\"Kurt Cagle\",\"James Linn\",\"Kurt Cagle\",\"Kurt Cagle\",\"Kurt Cagle\",\"Vaidyanathan Nagarajan\"],\"year\":\"2000\"}}"))
+    .unmarshal().json(JsonLibrary.Jackson)
+    .setBody(jsonpath("$.book.author"))
+    .process(exchange -> {
+        List<String> authors = exchange.getIn().getBody(List.class);
+        LinkedHashSet<String> unique = new LinkedHashSet<>(authors);
+        Map<String,Object> book = new LinkedHashMap<>();
+        book.put("title", "XQuery Kick Start");
+        book.put("year", "2000");
+        book.put("authors", new ArrayList<>(unique));
+        exchange.getIn().setBody(Map.of("book", book));
+    })
+    .marshal().json();
+
+
+output:
+
+{"book":{"title":"XQuery Kick Start","year":"2000","authors":["James McGovern","Per Bothner","Kurt Cagle","James Linn","Vaidyanathan Nagarajan"]}}
+
+
+
+-----------------------------------------------------------------
+
+example 3:
+
+input:
+{a : "b", a : "b", A : "b", a : "B"}
+from("direct:distinctObject")
+    .setBody(simple("{\"a\":\"b\",\"a\":\"b\",\"A\":\"b\",\"a\":\"B\"}"))
+    .unmarshal().json(JsonLibrary.Jackson)
+    .process(exchange -> {
+        ObjectNode obj = exchange.getIn().getBody(ObjectNode.class);
+        ObjectNode unique = new ObjectNode(JsonNodeFactory.instance);
+        obj.fieldNames().forEachRemaining(key -> {
+            if (!unique.has(key)) unique.set(key, obj.get(key));
+        });
+        exchange.getIn().setBody(unique);
+    })
+    .marshal().json();
+
+
+output:
+
+{"a":"b","A":"b"}
+
+
+-----------------------------------------------------------------
+
+example 4:
+
+input:
+
+from("direct:distinctXmlAuthors")
+    .setBody(simple("<?xml version='1.0'?><book><title>XQuery Kick Start</title><author>James Linn</author><author>Per Bothner</author><author>James McGovern</author><author>James McGovern</author><author>James McGovern</author></book>"))
+    .split(xpath("//author"))
+        .setHeader("author", xpath("text()"))
+    .end()
+    .aggregate(simple("${header.author}"), new MyDistinctAggregationStrategy())
+    .completionSize(1)
+    .setBody(xpath("string-join(//author/text(), ',')"))
+    .setBody(simple("{\"book\":{\"title\":\"XQuery Kick Start\",\"authors\":[${body}]}}"));
+
+
+
+public class MyDistinctAggregationStrategy implements AggregationStrategy {
+    private Set<String> seen = new LinkedHashSet<>();
+    @Override
+    public Exchange aggregate(Exchange old, Exchange newExchange) {
+        String author = newExchange.getIn().getHeader("author", String.class);
+        if (seen.add(author)) {
+            if (old == null) return newExchange;
+            old.getIn().getBody(List.class).add(author);
+            return old;
+        }
+        return old;
+    }
+}
+
+
+output:
+
+<book>
+  <title>XQuery Kick Start</title>
+  <authors>James Linn,Per Bothner,James McGovern</authors>
+</book>
+
+
+
+
+
+
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

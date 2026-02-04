@@ -1,0 +1,50 @@
+toLocalTimeOrNull:
+
+
+
+input:
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        result.put("a", toLocalTimeOrNull("23:57:59", new String[]{
+                "HH:mm:ss.n",
+                "HH:mm:ss"
+        }));
+
+        result.put("b", toLocalTimeOrNull("23:57:59", new String[]{
+                "HH:mm:ss.n"
+        }));
+
+        System.out.println(result);
+    }
+
+    private static String toLocalTimeOrNull(String value, String[] formats) {
+        for (String format : formats) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+                LocalTime lt = LocalTime.parse(value, formatter);
+                return lt.toString();
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        return null;
+    }
+}
+
+
+output:
+
+{a=23:57:59, b=null}
+
+
+

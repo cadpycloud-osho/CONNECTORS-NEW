@@ -1,0 +1,162 @@
+toDate:
+
+example 1:
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveDateCoercionConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceDateString = "2023-28-03";
+
+    /**
+     * Mimics DataWeave's chained toDate() with multiple formatters.
+     * @param dateString The date string to parse.
+     * @param formatters An array of formatters to try in order.
+     * @return The parsed LocalDate object or null if all fail.
+     */
+    private LocalDate chainedToDate(String dateString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return LocalDate.parse(dateString, formatter);
+            } catch (DateTimeParseException e) {
+                // Continue to the next formatter on failure
+            }
+        }
+        return null; // Return null if none succeed
+    }
+
+    public String getDateParsingJson() throws IOException {
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.US);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-dd-MM", Locale.US);
+        
+        LocalDate parsedDateA = chainedToDate(sourceDateString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        String errorMessageB;
+        try {
+            // Only try the failing formatter (formatter1)
+            LocalDate.parse(sourceDateString, formatter1);
+            errorMessageB = "No error occurred.";
+        } catch (DateTimeParseException e) {
+            // Capture the error message for the failure
+            errorMessageB = "Could not find a valid formatter for '" + sourceDateString + "'";
+            // DataWeave uses a generic message for the try/error block, so we hardcode the equivalent message.
+        }
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson will correctly serialize LocalDate as a standard ISO string (e.g., "2023-03-28")
+        if (parsedDateA != null) {
+             root.put("a", parsedDateA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        root.put("b", errorMessageB);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveDateCoercionConverter converter = new DataWeaveDateCoercionConverter();
+        try {
+            String jsonOutput = converter.getDateParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+
+{
+  "a" : "2023-03-28",
+  "b" : "Could not find a valid formatter for '2023-28-03'"
+}
+
+
+
+
+----------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class SimpleDateParsingConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getDateParsingJson() throws IOException {
+        
+        // --- Logic for Key 'a' ---
+        // DataWeave infers ISO 8601 (yyyy-MM-dd). In Java, LocalDate.parse() uses this by default.
+        String dateStringA = "2015-10-01";
+        LocalDate parsedDateA = LocalDate.parse(dateStringA); 
+
+        // --- Logic for Key 'b' ---
+        String dateStringB = "2003/10/01";
+        // Define the explicit format using Java's DateTimeFormatter
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate parsedDateB = LocalDate.parse(dateStringB, customFormatter);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson will serialize LocalDate as a standard ISO string ("yyyy-MM-dd")
+        root.put("a", parsedDateA.toString());
+        root.put("b", parsedDateB.toString());
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        SimpleDateParsingConverter converter = new SimpleDateParsingConverter();
+        try {
+            String jsonOutput = converter.getDateParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+
+{
+  "a" : "2015-10-01",
+  "b" : "2003-10-01"
+}
+
+
+
+
+
+
+

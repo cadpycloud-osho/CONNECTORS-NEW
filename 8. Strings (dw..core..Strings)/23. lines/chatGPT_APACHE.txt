@@ -1,0 +1,24 @@
+lines:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class LinesExample {
+
+    public static void main(String[] args) {
+        String input = "hello world\n\nhere   data-weave";
+
+        List<String> result = Arrays.asList(input.split("\\R", -1));
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+[hello world, , here   data-weave]
+

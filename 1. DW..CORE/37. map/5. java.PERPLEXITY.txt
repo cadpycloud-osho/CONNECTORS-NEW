@@ -1,0 +1,131 @@
+map:
+
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> input = Arrays.asList("jose", "pedro", "mateo");
+        StringBuilder result = new StringBuilder("[");
+        
+        for (int i = 0; i < input.size(); i++) {
+            if (i > 0) result.append(",");
+            result.append("{\"").append(i).append("\":\"").append(input.get(i)).append("\"}");
+        }
+        result.append("]");
+        
+        System.out.println(result.toString());
+    }
+}
+
+
+output:
+
+[{"0":"jose"},{"1":"pedro"},{"2":"mateo"}]
+
+-------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> input = Arrays.asList("a", "b", "c");
+        List<String> result = new ArrayList<>();
+        
+        for (int i = 0; i < input.size(); i++) {
+            result.add((i + 1) + "_" + input.get(i));
+        }
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+[1_a, 2_b, 3_c]
+
+
+-------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> input = Arrays.asList("joe", "pete", "matt");
+        StringBuilder result = new StringBuilder("[");
+        
+        for (int i = 0; i < input.size(); i++) {
+            if (i > 0) result.append(",");
+            result.append("{\"").append(i).append("\":\"").append(input.get(i)).append("\"}");
+        }
+        result.append("]");
+        
+        System.out.println(result.toString());
+    }
+}
+
+
+
+output:
+
+[{"0":"joe"},{"1":"pete"},{"2":"matt"}]
+
+-------------------------------------------------------------
+
+
+example 4:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        class Person {
+            int age;
+            String name;
+            Person(int age, String name) { this.age = age; this.name = name; }
+        }
+        
+        List<Person> input = Arrays.asList(
+            new Person(14, "Claire"),
+            new Person(56, "Max"),
+            new Person(89, "John")
+        );
+        
+        // CSV Header
+        System.out.println("age,name");
+        // CSV Rows
+        for (Person p : input) {
+            System.out.println(p.age + "," + p.name);
+        }
+    }
+}
+
+
+output:
+
+age,name
+14,Claire
+56,Max
+89,John
+
+-------------------------------------------------------------

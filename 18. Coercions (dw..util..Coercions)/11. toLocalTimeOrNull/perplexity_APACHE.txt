@@ -1,0 +1,60 @@
+toLocalTimeOrNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LocalTimeOrNullOptimizedRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    String inputTime = "23:57:59";
+                    
+                    // 'a': Multiple format fallback (HH:mm:ss.n or HH:mm:ss)
+                    result.put("a", parseLocalTimeOrNull(inputTime, 
+                        DateTimeFormatter.ofPattern("HH:mm:ss.SSS"),
+                        DateTimeFormatter.ofPattern("HH:mm:ss")));
+                    
+                    // 'b': Single format only (HH:mm:ss.n)
+                    result.put("b", parseLocalTimeOrNull(inputTime, 
+                        DateTimeFormatter.ofPattern("HH:mm:ss.SSS")));
+                    
+                    exchange.getIn().setBody(result);
+                }
+                
+                private String parseLocalTimeOrNull(String timeStr, DateTimeFormatter... formatters) {
+                    for (DateTimeFormatter formatter : formatters) {
+                        try {
+                            return LocalTime.parse(timeStr, formatter)
+                                .format(DateTimeFormatter.ISO_LOCAL_TIME);
+                        } catch (DateTimeParseException ignored) {}
+                    }
+                    return null;
+                }
+            });
+    }
+}
+
+
+
+output:
+
+{
+  "a": "23:57:59",
+  "b": null
+}
+
+

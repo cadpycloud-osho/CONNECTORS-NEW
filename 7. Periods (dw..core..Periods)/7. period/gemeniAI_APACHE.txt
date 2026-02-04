@@ -1,0 +1,63 @@
+period:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class PeriodArithmeticRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:calculatePeriods")
+            .routeId("Period-Arithmetic-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // 1. DateTime Subtraction: |2020-10-05T...| - period({days:1})
+                ZonedDateTime dateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+                results.put("dayBeforeDateTime", dateTime.minus(Period.ofDays(1)).toInstant().toString());
+
+                // 2. Date Addition: |2020-10-05| + period({days:1})
+                LocalDate date = LocalDate.parse("2020-10-05");
+                results.put("dayAfterDate", date.plus(Period.ofDays(1)).toString());
+
+                // 3. Complex Addition: {years:1, months:1, days:1}
+                Period ymd = Period.of(1, 1, 1);
+                results.put("yearMonthDayAfterDate", date.plus(ymd).toString());
+
+                // 4. Empty and Construct
+                results.put("emptyPeriod", Period.ZERO.toString()); // Results in "P0D"
+                
+                Period constructed = Period.of(4, 11, 28);
+                results.put("constructPeriod", constructed.toString());
+
+                // 5. Unit Selection: .months
+                // Accesses the 'months' component directly (11)
+                results.put("selectMonthsFromPeriod", constructed.getMonths());
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("Period Result: ${body}");
+    }
+}
+
+
+
+output:
+
+
+{
+   "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+   "dayAfterDate": "2020-10-06",
+   "yearMonthDayAfterDate": "2021-11-06",
+   "emptyPeriod": "P0D",
+   "constructPeriod": "P4Y11M28D",
+   "selectMonthsFromPeriod": 11
+}

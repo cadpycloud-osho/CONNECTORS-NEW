@@ -1,0 +1,46 @@
+rightPad:
+
+
+input:
+
+import java.util.*;
+
+public class RightPadConverter {
+    public static String rightPad(String input, int size) {
+        if (input == null) return null;
+        if (size <= input.length()) return input;
+        
+        int padsNeeded = size - input.length();
+        StringBuilder result = new StringBuilder(input);
+        for (int i = 0; i < padsNeeded; i++) {
+            result.append(" ");
+        }
+        return result.toString();
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", rightPad(null, 3));
+        result.put("b", rightPad("", 3));
+        result.put("c", rightPad("bat", 5));
+        result.put("d", rightPad("bat", 3));
+        result.put("e", rightPad("bat", -1));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}
+
+
+

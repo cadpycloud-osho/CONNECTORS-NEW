@@ -1,0 +1,53 @@
+isBinaryType:
+
+isBinaryType(t: Type): Boolean
+
+isBinaryType(t: Type): Boolean
+Returns true if the input is the Binary type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type ABinary = Binary
+output application/json
+---
+{
+   a: isBinaryType(ABinary),
+   b: isBinaryType(Binary),
+   c: isBinaryType(String),
+}
+
+
+DataWeave
+Output
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

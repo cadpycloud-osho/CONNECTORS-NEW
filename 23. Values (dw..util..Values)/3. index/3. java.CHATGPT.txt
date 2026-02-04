@@ -1,0 +1,47 @@
+index:
+
+
+index:
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Equivalent to DataWeave index(0)
+        ValueDescriptor descriptor = new ValueDescriptor("Array", null, 0);
+
+        System.out.println(descriptor);
+    }
+}
+
+// Separate class for ValueDescriptor
+class ValueDescriptor {
+    private String kind;
+    private String namespace;
+    private int selector;
+
+    public ValueDescriptor(String kind, String namespace, int selector) {
+        this.kind = kind;
+        this.namespace = namespace;
+        this.selector = selector;
+    }
+
+    @Override
+    public String toString() {
+        return "{\n" +
+               "  \"kind\": \"" + kind + "\",\n" +
+               "  \"namespace\": " + (namespace == null ? "null" : "\"" + namespace + "\"") + ",\n" +
+               "  \"selector\": " + selector + "\n" +
+               "}";
+    }
+}
+
+
+output:
+
+{
+  "kind": "Array",
+  "namespace": null,
+  "selector": 0
+}
+
+

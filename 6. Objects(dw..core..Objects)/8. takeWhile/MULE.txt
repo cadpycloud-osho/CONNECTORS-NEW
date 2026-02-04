@@ -1,0 +1,48 @@
+takeWhile:
+
+takeWhile<T>(obj: Object, condition: (value: Any, key: Key) -> Boolean): Object
+
+takeWhile<T>(obj: Object, condition: (value: Any, key: Key) -> Boolean): Object
+Selects key-value pairs from the object while the condition is met.
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Objects
+output application/json
+var obj = {
+  "a": 1,
+  "b": 2,
+  "c": 5,
+  "d": 1
+}
+---
+obj takeWhile ((value, key) ->  value < 3)
+
+
+DataWeave
+Output
+{
+  "a": 1,
+  "b": 2
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+index:
+
+input:
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class DataWeaveIndexProcessor {
+    public static Map<String, Object> index(int position) {
+        // DataWeave index(0) → Creates PathElement for array selection
+        return new LinkedHashMap<String, Object>() {{
+            put("kind", "Array");
+            put("namespace", null);
+            put("selector", position);  // selector: 0
+        }};
+    }
+    
+    public static void main(String[] args) {
+        System.out.println(index(0));
+    }
+}
+
+
+output:
+
+{
+   "kind": "Array",
+   "namespace": null,
+   "selector": 0
+}
+
+
+

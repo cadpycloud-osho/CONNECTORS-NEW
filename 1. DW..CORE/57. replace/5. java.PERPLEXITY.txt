@@ -1,0 +1,71 @@
+replace:
+
+
+
+example 1:
+
+input:
+
+
+import java.util.regex.Pattern;
+
+public class Main {
+    public static void main(String[] args) {
+        // "123-456-7890" replace /.*-/ with("")
+        String result1 = "123-456-7890".replaceAll(".*-", "");
+        
+        // "abc123def" replace /[b13e]/ with("-")
+        String result2 = "abc123def".replaceAll("[b13e]", "-");
+        
+        System.out.println("[" + result1 + ", \"" + result2 + "\"]");
+    }
+}
+
+
+
+output:
+
+[7890, "a-c-2-d-f"]
+
+------------------------------------------------------------------------
+
+
+
+example 2:
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        // "admin123" replace "123" with("ID")
+        String result = "admin123".replace("123", "ID");
+        
+        // Manual JSON output
+        System.out.println("{\"replace\":\"" + result + "\"}");
+    }
+}
+
+
+
+
+output:
+{"replace":"adminID"}
+
+
+------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

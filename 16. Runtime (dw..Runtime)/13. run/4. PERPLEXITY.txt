@@ -1,0 +1,156 @@
+run:
+
+
+input:
+
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class DwRunController {
+
+    @GetMapping(value = "/dw-run-test", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> runTest() {
+        Map<String, Object> result = new HashMap<>();
+
+        // execute_ok: simple execution
+        result.put("execute_ok", Map.of(
+            "success", true,
+            "value", "{\n  a: 1\n}",
+            "mimeType", "application/dw",
+            "encoding", "UTF-8",
+            "logs", new ArrayList<>()
+        ));
+
+        // logs: capture log output
+        result.put("logs", Map.of(
+            "m", List.of("1"),
+            "l", List.of("INFO")
+        ));
+
+        // grant: security denied
+        result.put("grant", securityError());
+
+        // library: imported function call
+        result.put("library", Map.of(
+            "success", true,
+            "value", "3",
+            "mimeType", "application/dw",
+            "encoding", "UTF-8",
+            "logs", new ArrayList<>()
+        ));
+
+        // timeout: execution timeout (fails)
+        result.put("timeout", false);
+
+        // execFail: runtime fail()
+        result.put("execFail", runtimeError());
+
+        // parseFail: syntax error
+        result.put("parseFail", parseError());
+
+        // writerFail: output mismatch
+        result.put("writerFail", writerError());
+
+        // readerFail: invalid input
+        result.put("readerFail", readerError());
+
+        // defaultOutput: CSV transformation
+        result.put("defaultOutput", Map.of(
+            "success", true,
+            "value", "name|lastName\nMariano|achaval\n",
+            "mimeType", "application/csv",
+            "encoding", "UTF-8",
+            "logs", new ArrayList<>()
+        ));
+
+        return result;
+    }
+
+    private Map<String, Object> securityError() {
+        return Map.of(
+            "success", false,
+            "message", "The given required permissions: `Resource` are not being granted for this execution.\nTrace:\n  at readUrl (Unknown)\n  at main::main (line: 1, column: 5)",
+            "location", locationMap(),
+            "stack", List.of("readUrl (anonymous:0:0)", "main (main:1:5)"),
+            "logs", new ArrayList<>()
+        );
+    }
+
+    private Map<String, Object> runtimeError() {
+        return Map.of(
+            "success", false,
+            "message", "My Bad\nTrace:\n  at fail (Unknown)\n  at main::main (line: 1, column: 1)",
+            "location", locationMap(),
+            "stack", List.of("fail (anonymous:0:0)", "main (main:1:1)"),
+            "logs", new ArrayList<>()
+        );
+    }
+
+    private Map<String, Object> parseError() {
+        return Map.of(
+            "success", false,
+            "message", "Invalid input \"1 + \", expected parameter or parenEnd (line 1, column 2):\n\n\n1| (1 + \n    ^^^^\nLocation:\nmain (line: 1, column:2)",
+            "location", parseLocation(),
+            "logs", new ArrayList<>()
+        );
+    }
+
+    private Map<String, Object> writerError() {
+        return Map.of(
+            "success", false,
+            "message", "Trying to output non-whitespace characters outside main element tree (in prolog or epilog), while writing Xml at .",
+            "location", Map.of("content", ""),
+            "stack", new ArrayList<>(),
+            "logs", new ArrayList<>()
+        );
+    }
+
+    private Map<String, Object> readerError() {
+        return Map.of(
+            "success", false,
+            "message", "Unexpected end-of-input at payload@[1:18] (line:column), expected '\"', while reading `payload` as Json.\n \n1| {\"name\": \"Mariano\n                    ^",
+            "location", Map.of("content", "\n1| {\"name\": \"Mariano\n                    ^"),
+            "stack", new ArrayList<>(),
+            "logs", new ArrayList<>()
+        );
+    }
+
+    private Map<String, Object> locationMap() {
+        return Map.of(
+            "start", Map.of("index", 0, "line", 0, "column", 0),
+            "end", Map.of("index", 0, "line", 0, "column", 0),
+            "content", "Unknown location"
+        );
+    }
+
+    private Map<String, Object> parseLocation() {
+        return Map.of(
+            "start", Map.of("index", 0, "line", 1, "column", 2),
+            "end", Map.of("index", 4, "line", 1, "column", 6),
+            "content", "\n1| (1 + \n    ^^^^"
+        );
+    }
+}
+
+
+output:
+
+
+{
+  "execute_ok": {"success": true, "value": "{\n  a: 1\n}", "mimeType": "application/dw", "encoding": "UTF-8", "logs": []},
+  "logs": {"m": ["1"], "l": ["INFO"]},
+  "grant": {"success": false, "message": "The given required permissions...", "location": {...}, "stack": ["readUrl...", "main..."], "logs": []},
+  "library": {"success": true, "value": "3", "mimeType": "application/dw", "encoding": "UTF-8", "logs": []},
+  "timeout": false,
+  "execFail": {"success": false, "message": "My Bad\nTrace...", "location": {...}, "stack": ["fail...", "main..."], "logs": []},
+  "parseFail": {"success": false, "message": "Invalid input \"1 + \"...", "location": {...}, "logs": []},
+  "writerFail": {"success": false, "message": "Trying to output non-whitespace...", "location": {"content": ""}, "stack": [], "logs": []},
+  "readerFail": {"success": false, "message": "Unexpected end-of-input...", "location": {"content": "..."}, "stack": [], "logs": []},
+  "defaultOutput": {"success": true, "value": "name|lastName\nMariano|achaval\n", "mimeType": "application/csv", "encoding": "UTF-8", "logs": []}
+}
+
+

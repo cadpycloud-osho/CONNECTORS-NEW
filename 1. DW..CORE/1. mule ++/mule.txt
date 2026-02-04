@@ -1,0 +1,83 @@
+++:
+
+
+The example concatenates an Array<Number> with an Array<String>. 
+
+%dw 2.0
+output application/json
+---
+{ "a" : [0, 1, true, "my string"] ++ [2, [3,4,5], {"a": 6}] }
+
+Output:
+
+{ "a": [0, 1, true, "my string", 2, [3, 4, 5], { "a": 6}] }
+
+
+-------------------------------------------------------
+++(date: Date, time: LocalTime): LocalDateTime
+%dw 2.0
+output application/json
+---
+{ "LocalDateTime" : (|2017-10-01| ++ |23:57:59|) }
+
+Output:
+
+{ "LocalDateTime": "2017-10-01T23:57:59" }
+
+------------------------------------------------------------
+
+
+%dw 2.0
+output application/json
+---
+{
+  "DateTime1" : (|23:57:59| as Time) ++ |2017-10-01|,
+  "DateTime2" : |23:57:59Z| ++ |2017-10-01|,
+  "DateTime3" : |2017-10-01| ++ |23:57:59+02:00|
+}
+
+Output
+
+{
+  "DateTime1": "2017-10-01T23:57:59Z",
+  "DateTime2": "2017-10-01T23:57:59Z",
+  "DateTime3": "2017-10-01T23:57:59+02:00"
+}
+--------------------------------------------------
+++(time: LocalTime, timezone: TimeZone): Time
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "Time" : (|23:57| ++ |-03:00|) }
+
+
+DataWeave
+Output
+{ "Time": "23:57:00-03:00" }
+
+
+--------------------------------------------------
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "Time" : (|-03:00| ++ |23:57|) }
+
+
+DataWeave
+Output
+{
+  "Time": "23:57:00-03:00"
+}
+
+
+
+
+
+
+

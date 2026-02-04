@@ -1,0 +1,110 @@
+toString:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import jakarta.activation.MimeType;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MimeToStringRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:mimeToString")
+            .routeId("Mime-Serialization-Route")
+            .process(exchange -> {
+                // 1. Define the input structure (replicating the DW var)
+                Map<String, Object> mimeMap = new LinkedHashMap<>();
+                mimeMap.put("type", "application");
+                mimeMap.put("subtype", "json");
+                mimeMap.put("parameters", new LinkedHashMap<String, String>());
+
+                // 2. Logic: Convert to String
+                // We construct the string: type/subtype
+                StringBuilder sb = new StringBuilder();
+                sb.append(mimeMap.get("type"))
+                  .append("/")
+                  .append(mimeMap.get("subtype"));
+
+                // 3. Handle parameters if they exist
+                Map<String, String> params = (Map<String, String>) mimeMap.get("parameters");
+                if (params != null && !params.isEmpty()) {
+                    params.forEach((k, v) -> sb.append("; ").append(k).append("=").append(v));
+                }
+
+                // 4. Set the literal string as the body
+                exchange.getIn().setBody(sb.toString());
+            })
+            // Since the output is a raw string, we don't necessarily need to marshal to JSON
+            // unless we want the quotes included in the final payload.
+            .log("Serialized MIME: ${body}");
+    }
+}
+
+
+output:
+
+application/json
+
+
+-----------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import jakarta.activation.MimeType;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class MimeToStringWithParamsRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:serializeMimeParams")
+            .routeId("Mime-Multipart-Serialization")
+            .process(exchange -> {
+                // 1. Input Data Structure
+                Map<String, String> params = new LinkedHashMap<>();
+                params.put("boundary", "my-boundary");
+
+                Map<String, Object> mimeMap = new LinkedHashMap<>();
+                mimeMap.put("type", "multipart");
+                mimeMap.put("subtype", "form-data");
+                mimeMap.put("parameters", params);
+
+                // 2. Logic: Replicate toString() using MimeType class
+                // Constructing the base "type/subtype"
+                MimeType mimeType = new MimeType(
+                    (String) mimeMap.get("type"), 
+                    (String) mimeMap.get("subtype")
+                );
+
+                // 3. Add parameters to the MimeType object
+                if (mimeMap.get("parameters") instanceof Map) {
+                    Map<String, String> pMap = (Map<String, String>) mimeMap.get("parameters");
+                    pMap.forEach(mimeType::setParameter);
+                }
+
+                // 4. Resulting string (e.g., "multipart/form-data; boundary=my-boundary")
+                exchange.getIn().setBody(mimeType.toString());
+            })
+            .log("Serialized Multipart MIME: ${body}");
+    }
+}
+
+
+output:
+
+multipart/form-data; boundary=my-boundary
+
+
+
+-----------------------------------------------

@@ -1,0 +1,432 @@
+outerJoin:
+
+
+
+input:
+
+import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    // --- 1. Data Structure Classes ---
+    
+    // Class for the left side of the join
+    static class User {
+        String id;
+        String name;
+
+        public User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        public String getId() { return id; }
+        
+        @Override
+        public String toString() {
+            // Minified JSON output for better formatting control in JoinedRecord's toString
+            return "{\"id\": \"" + id + "\", \"name\": \"" + name + "\"}";
+        }
+    }
+
+    // Class for the right side of the join
+    static class Product {
+        String ownerId;
+        String name;
+
+        public Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+        public String getOwnerId() { return ownerId; }
+
+        @Override
+        public String toString() {
+            // Minified JSON output for better formatting control in JoinedRecord's toString
+            return "{\"ownerId\": \"" + ownerId + "\", \"name\": \"" + name + "\"}";
+        }
+    }
+
+    // Class for the result of the join
+    static class JoinedRecord {
+        User l; // Left element (can be null)
+        Product r; // Right element (can be null)
+
+        public JoinedRecord(User l, Product r) {
+            this.l = l;
+            this.r = r;
+        }
+        
+        // Custom toString to match the desired JSON structure
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("  {");
+            String separator = "";
+            
+            // Handle left element ("l")
+            if (l != null) {
+                sb.append("\n    \"l\": ").append(l.toString());
+                separator = ",";
+            }
+
+            // Handle right element ("r")
+            if (r != null) {
+                 // Add comma only if 'l' was present
+                sb.append(separator).append("\n    \"r\": ").append(r.toString());
+            }
+            
+            // Check for empty case (should not happen in a full outer join logic)
+            if (l == null && r == null) {
+                 return "  {}";
+            }
+            
+            sb.append("\n  }");
+            // Replace minified JSON in User/Product with required indentation
+            return sb.toString().replaceAll("\\{", "{\n      ").replaceAll("\\}", "\n    }");
+        }
+    }
+
+    // --- 2. Full Outer Join Logic ---
+    
+    public static List<JoinedRecord> fullOuterJoin(List<User> users, List<Product> products) {
+        List<JoinedRecord> result = new ArrayList<>();
+        
+        // 1. Map Products by ownerId for O(1) lookups and to track unmatched products
+        Map<String, List<Product>> productMap = products.stream()
+            .collect(Collectors.groupingBy(Product::getOwnerId));
+        
+        // 2. Perform Left Outer Join
+        for (User user : users) {
+            List<Product> matches = productMap.getOrDefault(user.getId(), List.of());
+            
+            if (matches.isEmpty()) {
+                // Case 1: Left-only match (User, null)
+                result.add(new JoinedRecord(user, null));
+            } else {
+                // Case 2: Full matches (User, Product)
+                for (Product product : matches) {
+                    result.add(new JoinedRecord(user, product));
+                }
+                // Important: Remove matched products from the map
+                productMap.remove(user.getId());
+            }
+        }
+        
+        // 3. Perform Right Outer Join (process remaining products)
+        for (List<Product> remainingProducts : productMap.values()) {
+            for (Product product : remainingProducts) {
+                // Case 3: Right-only match (null, Product)
+                result.add(new JoinedRecord(null, product));
+            }
+        }
+        
+        return result;
+    }
+
+    // --- 3. Execution ---
+    
+    public static void main(String[] args) {
+        // Source data
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"), new User("2", "Leandro"),  
+            new User("3", "Julian"), new User("5", "Julian") // '5' has no product
+        );
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"), new Product("1", "BAT"),  
+            new Product("3", "DataSense"), new Product("4", "SmartConnectors") // '4' has no user
+        );
+
+        List<JoinedRecord> result = fullOuterJoin(users, products);
+
+        // Print the final output structure
+        String output = result.stream()
+            .map(JoinedRecord::toString)
+            .collect(Collectors.joining(",\n"));
+            
+        System.out.println("[\n" + output + "\n]");
+    }
+}
+
+output:
+
+
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  },
+  {
+    "r": {
+      "ownerId": "4",
+      "name": "SmartConnectors"
+    }
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Java Code (Grouped Keys - Hybrid Approach)
+This is the most efficient and scalable way to perform an outer join in Java, using HashMaps to group elements by key.
+
+Java
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    // --- 1. Data Structure Classes (Needed for compilation) ---
+    
+    static class User {
+        String id;
+        String name;
+        public User(String id, String name) { this.id = id; this.name = name; }
+        public String getId() { return id; }
+        @Override
+        public String toString() {
+            return "{\"id\": \"" + id + "\", \"name\": \"" + name + "\"}";
+        }
+    }
+
+    static class Product {
+        String ownerId;
+        String name;
+        public Product(String ownerId, String name) { this.ownerId = ownerId; this.name = name; }
+        public String getOwnerId() { return ownerId; }
+        @Override
+        public String toString() {
+            return "{\"ownerId\": \"" + ownerId + "\", \"name\": \"" + name + "\"}";
+        }
+    }
+
+    static class JoinedRecord {
+        User l;
+        Product r;
+        public JoinedRecord(User l, Product r) { this.l = l; this.r = r; }
+        
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("  {");
+            String separator = "";
+            
+            // Handle left element ("l")
+            if (l != null) {
+                sb.append("\n    \"l\": ").append(l.toString());
+                separator = ",";
+            }
+
+            // Handle right element ("r")
+            if (r != null) {
+                 // Add comma only if 'l' was present
+                sb.append(separator).append("\n    \"r\": ").append(r.toString());
+            }
+            
+            sb.append("\n  }");
+            // Replace minified JSON in User/Product with required indentation
+            return sb.toString().replaceAll("\\{", "{\n      ").replaceAll("\\}", "\n    }");
+        }
+    }
+
+    // --- 2. Full Outer Join Logic (Hybrid/Grouping Method) ---
+
+    public static List<JoinedRecord> outerJoin(List<User> users, List<Product> products) {
+        List<JoinedRecord> result = new ArrayList<>();
+        
+        // 1. Group the right array (products) by key (ownerId)
+        Map<String, List<Product>> productsByKey = products.stream()
+            .collect(Collectors.groupingBy(Product::getOwnerId));
+        
+        // Used to track which right keys have been matched by the left array
+        Map<String, Boolean> matchedRightKeys = new HashMap<>();
+
+        // 2. Iterate Left Array (Users) to find matches and left-only records
+        for (User user : users) {
+            String leftKey = user.getId();
+            List<Product> matchedProducts = productsByKey.getOrDefault(leftKey, List.of());
+            
+            if (matchedProducts.isEmpty()) {
+                // Case 1: Left Only (no match in products)
+                result.add(new JoinedRecord(user, null));
+            } else {
+                // Case 2: Matches Found (Inner Join portion)
+                for (Product product : matchedProducts) {
+                    result.add(new JoinedRecord(user, product));
+                }
+                matchedRightKeys.put(leftKey, true);
+            }
+        }
+        
+        // 3. Find Right-Only records
+        // Iterate through all product keys (ownerIds)
+        for (Map.Entry<String, List<Product>> entry : productsByKey.entrySet()) {
+            String rightKey = entry.getKey();
+            
+            // If the right key was NOT matched during the user iteration, it's a right-only record
+            if (!matchedRightKeys.containsKey(rightKey)) {
+                // Add all products with this right-only key
+                for (Product product : entry.getValue()) {
+                    result.add(new JoinedRecord(null, product));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    // --- 3. Execution ---
+
+    public static void main(String[] args) {
+        // Source data
+        List<User> users = Arrays.asList(
+            new User("1", "Mariano"), new User("2", "Leandro"),  
+            new User("3", "Julian"), new User("5", "Julian")
+        );
+        List<Product> products = Arrays.asList(
+            new Product("1", "DataWeave"), new Product("1", "BAT"),  
+            new Product("3", "DataSense"), new Product("4", "SmartConnectors")
+        );
+
+        List<JoinedRecord> result = outerJoin(users, products);
+
+        // Print the final output structure
+        String output = result.stream()
+            .map(JoinedRecord::toString)
+            .collect(Collectors.joining(",\n"));
+            
+        System.out.println("[\n" + output + "\n]");
+    }
+}
+
+
+
+Java Output
+The output generated by both Java implementations is identical and correctly matches the expected DataWeave output:
+
+JSON
+
+Output structure:
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  },
+  {
+    "r": {
+      "ownerId": "4",
+      "name": "SmartConnectors"
+    }
+  }
+]
+

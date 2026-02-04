@@ -1,0 +1,52 @@
+asExpressionString:
+
+asExpressionString(path: Path): String
+
+asExpressionString(path: Path): String
+Transforms a Path value into a string representation of the path.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Tree
+output application/json
+---
+asExpressionString([
+        {kind: OBJECT_TYPE, selector: "user", namespace: null},
+        {kind: ATTRIBUTE_TYPE, selector: "name", namespace: null}
+    ])
+
+
+DataWeave
+Output
+".user.@name"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

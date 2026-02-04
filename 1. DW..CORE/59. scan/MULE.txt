@@ -1,0 +1,63 @@
+scan:
+
+scan(text: String, matcher: Regex): Array<Array<String>>
+
+scan(text: String, matcher: Regex): Array<Array<String>>
+Returns an array with all of the matches found in an input string.
+
+Each match is returned as an array that contains the complete match followed by any capture groups in your regular expression (if present).
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+flatten("www.mulesoft.com" scan(/([w]*)\.([a-z]*)\.([a-z]*)/))
+
+DataWeave
+Output
+[ "www.mulesoft.com", "www", "mulesoft", "com" ]
+
+
+
+---------------------------------------------------------------
+
+Source
+%dw 2.0
+output application/json
+---
+"anypt@mulesoft.com,max@mulesoft.com" scan(/([a-z]*)@([a-z]*).com/)
+
+DataWeave
+Output
+[
+  [ "anypt@mulesoft.com", "anypt", "mulesoft" ],
+  [ "max@mulesoft.com", "max", "mulesoft" ]
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

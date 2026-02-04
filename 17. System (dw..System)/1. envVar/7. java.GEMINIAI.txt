@@ -1,0 +1,57 @@
+envVar:
+
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Reads environment variables and returns a Java Map matching the desired structure.
+     */
+    public Map<String, List<Map<String, String>>> getEnvironmentVariablesMap() {
+        // Get environment variables using standard Java
+        String realVarValue = System.getenv("SHELL");
+        String fakeVarValue = System.getenv("FAKE_ENV_VAR");
+
+        // Create the individual objects: {"real": value} and {"fake": value}
+        Map<String, String> realMap = new HashMap<>();
+        // Note: If realVarValue is null, putting it into a map will store it as null.
+        realMap.put("real", realVarValue);
+
+        Map<String, String> fakeMap = new HashMap<>();
+        fakeMap.put("fake", fakeVarValue);
+
+        // Create the "envVars" array (List in Java)
+        List<Map<String, String>> envVarsList = new ArrayList<>();
+        envVarsList.add(realMap);
+        envVarsList.add(fakeMap);
+
+        // Create the root object (Map in Java)
+        Map<String, List<Map<String, String>>> rootMap = new HashMap<>();
+        rootMap.put("envVars", envVarsList);
+
+        return rootMap;
+    }
+
+    public static void main(String[] args) {
+        // FIX: Change 'PureJavaEnvReader' to 'Main'
+        Main reader = new Main();
+        Map<String, List<Map<String, String>>> result = reader.getEnvironmentVariablesMap();
+        
+        // Print the Java structure (looks like the desired JSON when printed)
+        System.out.println(result);
+    }
+}
+
+output:
+
+{envVars=[{real=/bin/bash}, {fake=null}]}
+
+

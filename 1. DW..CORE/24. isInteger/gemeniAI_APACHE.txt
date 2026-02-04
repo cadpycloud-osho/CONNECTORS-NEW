@@ -1,0 +1,25 @@
+isInteger:
+
+
+input:
+
+from("direct:start")
+    .setBody(exchange -> {
+        def input = [1, 2.0, 2.2, "1"]
+        return input.collect { val ->
+            try {
+                // Attempt to see if it can be represented as an Integer 
+                // without losing precision
+                return val.toString().isInteger() || (val instanceof Number && val == val.toInteger())
+            } catch (Exception e) {
+                return false
+            }
+        }
+    })
+    .to("mock:result");
+
+
+output:
+
+
+[ true, true, false, true ]

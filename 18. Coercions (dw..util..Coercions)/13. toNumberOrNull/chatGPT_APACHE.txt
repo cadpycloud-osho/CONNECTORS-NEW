@@ -1,0 +1,50 @@
+toNumberOrNull:
+
+
+input:
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.*;
+
+public class ToNumberOrNullExample {
+
+    public static void main(String[] args) {
+
+        String input = "0.005";
+
+        List<String> formatsA = List.of("0.###", "0.00"); // DW "seconds" ≈ "0.###"
+        List<String> formatsB = List.of("0.###");          // DW "seconds"
+
+        Map<String, Double> output = new LinkedHashMap<>();
+        output.put("a", parseOrNull(input, formatsA));
+        output.put("b", parseOrNull(input, formatsB));
+
+        // Print results
+        output.forEach((k, v) -> System.out.println(k + ": " + v));
+    }
+
+    private static Double parseOrNull(String value, List<String> formats) {
+        for (String fmt : formats) {
+            try {
+                DecimalFormat df = new DecimalFormat(fmt);
+                df.setParseBigDecimal(true);
+                return df.parse(value).doubleValue();
+            } catch (ParseException e) {
+                // ignore and try next format
+            }
+        }
+        return null; // if no format succeeded
+    }
+}
+
+
+
+output:
+
+a: 0.005
+b: null
+
+
+
+

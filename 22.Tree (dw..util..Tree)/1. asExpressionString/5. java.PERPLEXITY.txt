@@ -1,0 +1,57 @@
+asExpressionString:
+
+
+
+input:
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        String result = asExpressionString();
+        System.out.println(result);
+    }
+    
+    /**
+     * DataWeave Tree.asExpressionString() equivalent:
+     * Converts tree path nodes to XPath-like expression string
+     */
+    public static String asExpressionString() {
+        List<TreeNode> path = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        return path.stream()
+            .map(Main::nodeToExpression)  // Fix: Use Main::nodeToExpression
+            .collect(Collectors.joining(""));
+    }
+    
+    private static String nodeToExpression(TreeNode node) {
+        return switch (node.kind) {
+            case "OBJECT_TYPE" -> "." + node.selector;
+            case "ATTRIBUTE_TYPE" -> ".@" + node.selector;
+            default -> "";
+        };
+    }
+    
+    public static class TreeNode {
+        final String kind;
+        final String selector;
+        final String namespace;
+        
+        TreeNode(String kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+    }
+}
+
+
+output:
+
+.user.@name
+
+
+

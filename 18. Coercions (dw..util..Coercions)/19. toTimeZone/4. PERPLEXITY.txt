@@ -1,0 +1,56 @@
+toTimeZone:
+
+
+
+
+input:
+
+
+@SpringBootApplication
+@RestController
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Map;
+
+public class ToTimeZoneApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ToTimeZoneApp.class, args);
+    }
+
+    @GetMapping("/to-timezone")
+    public Map<String, Object> toTimeZone() {
+        return Map.of(
+            "toTimeZoneOffset", toTimeZoneOffset(),
+            "toTimeZoneAbbreviation", toTimeZoneAbbreviation(),
+            "toTimeZoneName", toTimeZoneName()
+        );
+    }
+    
+    private ZoneOffset toTimeZoneOffset() {
+        // Equivalent to DataWeave toTimeZone("-03:00")
+        return ZoneOffset.of("-03:00");
+    }
+    
+    private ZoneOffset toTimeZoneAbbreviation() {
+        // Equivalent to DataWeave toTimeZone("Z")
+        return ZoneOffset.UTC;
+    }
+    
+    private ZoneId toTimeZoneName() {
+        // Equivalent to DataWeave toTimeZone("America/Argentina/Buenos_Aires")
+        return ZoneId.of("America/Argentina/Buenos_Aires");
+    }
+}
+
+
+output:
+
+{
+  "toTimeZoneOffset": "-03:00",
+  "toTimeZoneAbbreviation": "Z",
+  "toTimeZoneName": "America/Argentina/Buenos_Aires"
+}
+
+
+

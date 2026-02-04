@@ -1,0 +1,55 @@
+minutes:
+
+input:
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_INSTANT;
+        Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+
+        // nextMinute: +1 minute
+        Instant nextMinute = base.plus(Duration.ofMinutes(1));
+        
+        // previousMinute: -1 minute
+        Instant previousMinute = base.minus(Duration.ofMinutes(1));
+        
+        // decimalInputPeriod: 4.555 minutes = 4 min + 33.3 sec (custom formatting)
+        double decimalMinutes = 4.555;
+        long totalSeconds = Math.round(decimalMinutes * 60);
+        Duration decimalDuration = Duration.ofSeconds(totalSeconds);
+        String decimalStr = String.format("PT%dM%.1fS", 4, (decimalMinutes - 4) * 60);
+        
+        // wholeNumberInputPeriod: 4 minutes
+        Duration wholeDuration = Duration.ofMinutes(4);
+        
+        // addNegativeValue: minutes(-1) + minutes(2) = 1 minute = 60 seconds
+        Duration negativeSum = Duration.ofMinutes(-1).plus(Duration.ofMinutes(2));
+        long addNegativeSeconds = negativeSum.getSeconds();
+
+        // JSON output matching DataWeave exactly
+        System.out.println("{");
+        System.out.println("  \"nextMinute\": \"" + fmt.format(nextMinute) + "\",");
+        System.out.println("  \"previousMinute\": \"" + fmt.format(previousMinute) + "\",");
+        System.out.println("  \"decimalInputPeriod\": \"" + decimalStr + "\",");
+        System.out.println("  \"wholeNumberInputPeriod\": \"" + wholeDuration + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeSeconds);
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+{
+  "nextMinute": "2020-10-05T20:23:34.385Z",
+  "previousMinute": "2020-10-05T20:21:34.385Z",
+  "decimalInputPeriod": "PT4M33.3S",
+  "wholeNumberInputPeriod": "PT4M",
+  "addNegativeValue": 60
+}
+

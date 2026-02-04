@@ -1,0 +1,72 @@
+attr:
+
+
+input:
+
+public class AttributeRepresentation {
+    private String kind;
+    private String namespace;
+    private String selector;
+
+    // Constructor to mimic the DataWeave function call
+    public AttributeRepresentation(String namespace, String selector) {
+        this.kind = "Attribute";
+        this.namespace = namespace;
+        this.selector = selector;
+    }
+
+    // Getters (needed for Jackson serialization)
+    public String getKind() {
+        return kind;
+    }
+    public String getNamespace() {
+        return namespace;
+    }
+    public String getSelector() {
+        return selector;
+    }
+
+    // Setters are optional if the object is immutable
+}
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveController {
+
+    // The namespace defined in DataWeave
+    private static final String NAMESPACE_URI = "http://acme.com/foo";
+    private static final String ATTRIBUTE_NAME = "myAttr";
+
+    @GetMapping("/create-attribute")
+    public AttributeRepresentation createAttribute() {
+        // This instantiates the Java object, mimicking the DataWeave 'attr' function
+        return new AttributeRepresentation(NAMESPACE_URI, ATTRIBUTE_NAME);
+    }
+}
+
+
+output:
+
+{
+  "kind": "Attribute",
+  "namespace": "http://acme.com/foo",
+  "selector": "myAttr"
+}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DataWeaveController {
+
+    // The namespace defined in DataWeave
+    private static final String NAMESPACE_URI = "http://acme.com/foo";
+    private static final String ATTRIBUTE_NAME = "myAttr";
+
+    @GetMapping("/create-attribute")
+    public AttributeRepresentation createAttribute() {
+        // This instantiates the Java object, mimicking the DataWeave 'attr' function
+        return new AttributeRepresentation(NAMESPACE_URI, ATTRIBUTE_NAME);
+    }
+}

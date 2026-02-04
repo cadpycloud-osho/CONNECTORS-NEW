@@ -1,0 +1,54 @@
+isUnionType:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UnionTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkUnion")
+            .process(exchange -> {
+                // In Java, we represent a 'Union' via a Sealed interface
+                // that only allows StringWrapper or NumberWrapper.
+                Object refA = StringOrNumber.class; 
+                Object refB = Boolean.class;
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if the class is a Sealed type (Java's Union equivalent)
+                result.put("a", isUnionType(refA));
+                result.put("b", isUnionType(refB));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isUnionType(Object obj) {
+        if (!(obj instanceof Class)) return false;
+        Class<?> clazz = (Class<?>) obj;
+        
+        // isSealed() is the Java equivalent of a Union Type definition
+        return clazz.isSealed();
+    }
+
+    // Define the Union: String | Number
+    public sealed interface StringOrNumber permits StringWrapper, NumberWrapper {}
+    public final class StringWrapper implements StringOrNumber { String val; }
+    public final class NumberWrapper implements StringOrNumber { Number val; }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+

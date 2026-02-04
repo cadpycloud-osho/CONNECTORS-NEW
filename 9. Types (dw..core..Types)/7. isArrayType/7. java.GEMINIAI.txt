@@ -1,0 +1,53 @@
+isArrayType:
+
+
+input:
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    private static final String ARRAY_TYPE_PREFIX = "Array<";
+    
+    /**
+     * Pure Java method to mimic the DataWeave isArrayType() function.
+     */
+    public static boolean checkIsArrayType(String typeName) {
+        // Checks if the type name starts with the array indicator
+        return typeName.startsWith(ARRAY_TYPE_PREFIX);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Define the input types (mimicking the DW type aliases and built-in types)
+        final String AType = "Array<String>"; // Emulates type AType = Array<String>
+        final String Builtin_Boolean = "Boolean";
+
+        // 2. Perform the transformation
+        boolean resultA = checkIsArrayType(AType);
+        boolean resultB = checkIsArrayType(Builtin_Boolean);
+
+        // 3. Structure the final output map: { "a": resultA, "b": resultB }
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", resultA);
+        output.put("b", resultB);
+
+        // 4. Print the result to the console
+        System.out.println("DataWeave Output Emulation:");
+        // Simple print of the Map structure (looks like JSON key-value pairs)
+        System.out.println(output.toString().replace("=", ": "));
+    }
+}
+
+
+
+output:
+{a: true, b: false}
+
+
+
+
+
+
+

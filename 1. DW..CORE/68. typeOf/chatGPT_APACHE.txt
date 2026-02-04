@@ -1,0 +1,69 @@
+typeOf:
+
+
+example 1:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        java.util.List<Object> input = java.util.Arrays.asList("A b", java.util.Arrays.asList(1, 2), 34, true, java.util.Collections.singletonMap("a", 5));
+        java.util.List<String> types = new java.util.ArrayList<>();
+
+        for (Object item : input) {
+            if (item == null) {
+                types.add("Null");
+            } else if (item instanceof String) {
+                types.add("String");
+            } else if (item instanceof Number) {
+                types.add("Number");
+            } else if (item instanceof Boolean) {
+                types.add("Boolean");
+            } else if (item instanceof java.util.List) {
+                types.add("Array");
+            } else if (item instanceof java.util.Map) {
+                types.add("Object");
+            } else {
+                types.add(item.getClass().getSimpleName());
+            }
+        }
+
+        exchange.getIn().setBody(types);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+
+[ "String", "Array", "Number", "Boolean", "Object" ]
+
+
+-------------------------------------------------------
+
+example 2:
+
+input:
+
+Source
+%dw 2.0
+output application/json
+
+var x: String | Number = "clearly a string"
+var y: "because" = "because"
+---
+[typeOf(x), typeOf(y)]
+
+DataWeave
+Output
+["String", "String"]
+
+
+
+output:
+
+["String", "String"]
+
+
+
+-------------------------------------------------------

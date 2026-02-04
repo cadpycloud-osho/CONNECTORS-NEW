@@ -1,0 +1,32 @@
+substring:
+
+
+input:
+
+public class Main {
+
+    public static String substringDW(String input, int start, int length) {
+        if (input == null) return null;
+        if (start < 0) start = 0;
+        if (length <= 0) return "";
+
+        int endIndex = Math.min(start + length, input.length());
+        if (start >= input.length()) return "";
+
+        return input.substring(start, endIndex);
+    }
+
+    public static void main(String[] args) {
+        String text = "hello world!";
+        String result = substringDW(text, 1, 5);
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+ello
+

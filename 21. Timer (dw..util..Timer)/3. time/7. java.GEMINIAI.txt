@@ -1,0 +1,118 @@
+time:
+
+
+input:
+
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    // Helper function to simulate dw::Runtime::wait("My result", 100)
+    private static String myFunction() {
+        try {
+            // Simulate the 100ms wait
+            Thread.sleep(100);
+            return "My result";
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return "Error";
+        }
+    }
+
+    // Helper function to simulate sum([1,2,3,4])
+    private static int myFunction2() {
+        return List.of(1, 2, 3, 4).stream().mapToInt(Integer::intValue).sum();
+    }
+
+    /**
+     * Replicates dw::util::Timer::time(() -> expression)
+     */
+    private static Map<String, Object> time(Supplier<Object> supplier) {
+        // Use ISO_INSTANT formatter to match DataWeave's Z-suffix ISO 8601 format
+        String start = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
+        Object result = supplier.get();
+        String end = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
+
+        Map<String, Object> timerResult = new LinkedHashMap<>();
+        timerResult.put("start", start);
+        timerResult.put("result", result);
+        timerResult.put("end", end);
+        return timerResult;
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    @SuppressWarnings("unchecked")
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> toPrettyJson(v, indent + 1))
+                    .map(s -> s.contains("\n") ? s : next + s)
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Output Simulation ---");
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        
+        // Simulating the DataWeave calls:
+        output.put("testing", List.of(
+            // CORRECTED: Reference functions within Main class
+            time(Main::myFunction), 
+            time(Main::myFunction2)
+        ));
+
+        // Output the map using the pure Java JSON printer
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+output:
+
+{
+  "testing": [
+    {
+      "start": "2025-12-13T09:42:44.000Z",
+      "result": "My result",
+      "end": "2025-12-13T09:42:44.102Z"
+    },
+    {
+      "start": "2025-12-13T09:42:44.102Z",
+      "result": 10,
+      "end": "2025-12-13T09:42:44.102Z"
+    }
+  ]
+}
+
+
+

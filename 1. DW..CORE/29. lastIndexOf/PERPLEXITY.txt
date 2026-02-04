@@ -1,0 +1,92 @@
+lastIndexOf:
+
+example 1:
+
+input:
+
+
+// ListLastIndexOfApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.*;
+
+@SpringBootApplication
+public class ListLastIndexOfApp {
+    public static void main(String[] args) {
+        SpringApplication.run(ListLastIndexOfApp.class, args);
+
+        List<String> presentList = Arrays.asList("a", "b", "c", "d");
+        List<String> notPresentList = Arrays.asList("x", "w", "x");
+        List<String> multipleList = Arrays.asList("a", "b", "c", "c");
+
+        int present = lastIndexOf(presentList, "c");
+        int notPresent = lastIndexOf(notPresentList, "c");
+        int multiple = lastIndexOf(multipleList, "c");
+
+        Map<String, Integer> result = Map.of(
+            "present", present,
+            "notPresent", notPresent,
+            "presentMoreThanOnce", multiple
+        );
+        System.out.println(result);
+    }
+
+    private static int lastIndexOf(List<String> list, String target) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (list.get(i).equals(target)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+
+
+output:
+
+{present=2, notPresent=-1, presentMoreThanOnce=3}
+
+
+____________________________________________________________________
+
+
+example 2:
+
+input:
+
+
+// StringLastIndexOfApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Map;
+
+@SpringBootApplication
+public class StringLastIndexOfApp {
+    public static void main(String[] args) {
+        SpringApplication.run(StringLastIndexOfApp.class, args);
+
+        String presentStr = "abcd";
+        String notPresentStr = "xyz";
+        String multipleStr = "abcdc";
+
+        int present = presentStr.lastIndexOf("c");
+        int notPresent = notPresentStr.lastIndexOf("c");
+        int multiple = multipleStr.lastIndexOf("c");
+
+        Map<String, Integer> result = Map.of(
+            "present", present,
+            "notPresent", notPresent,
+            "presentMoreThanOnce", multiple
+        );
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{present=2, notPresent=-1, presentMoreThanOnce=4}

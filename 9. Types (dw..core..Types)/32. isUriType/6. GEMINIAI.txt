@@ -1,0 +1,61 @@
+isUriType:
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.net.URI; // The Java equivalent of DataWeave Uri
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isUriType(Type).
+     */
+    private boolean isUriType(Class<?> type) {
+        return URI.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/uri-typecheck")
+    public Map<String, Boolean> checkUriTypes() {
+        
+        // DataWeave type AUri is an alias for Uri
+        Class<?> aUri = URI.class;
+        
+        // DataWeave type Uri
+        Class<?> uriType = URI.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isUriType(aUri);
+        boolean b = isUriType(uriType);
+        boolean c = isUriType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

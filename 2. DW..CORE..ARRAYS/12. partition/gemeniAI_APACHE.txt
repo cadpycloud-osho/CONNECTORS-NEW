@@ -1,0 +1,70 @@
+partition:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class CamelPartitionExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: var arr = [0,1,2,3,4,5]
+                        List<Integer> arr = List.of(0, 1, 2, 3, 4, 5);
+                        
+                        // Java equivalent: Collectors.partitioningBy
+                        // (item) -> isEven(item) becomes n -> n % 2 == 0
+                        Map<Boolean, List<Integer>> partitioned = arr.stream()
+                                .collect(Collectors.partitioningBy(n -> n % 2 == 0));
+
+                        // Remap Boolean keys to "success" and "failure"
+                        Map<String, List<Integer>> result = Map.of(
+                            "success", partitioned.get(true),
+                            "failure", partitioned.get(false)
+                        );
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+
+from("direct:processData")
+    .split(body())
+        .choice()
+            .when(simple("${body} % 2 == 0"))
+                .to("activemq:queue:even_numbers")
+            .otherwise()
+                .to("activemq:queue:odd_numbers")
+        .end()
+    .end();
+
+
+
+output:
+
+
+{
+  "success": [0, 2, 4],
+  "failure": [1, 3, 5]
+}

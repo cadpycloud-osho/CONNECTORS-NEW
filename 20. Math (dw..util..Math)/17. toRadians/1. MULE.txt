@@ -1,0 +1,29 @@
+toRadians:
+
+toRadians(angdeg: Number): Number
+
+toRadians(angdeg: Number): Number
+Converts a given number of degrees in an angle to an approximately equivalent number of radians.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Math
+output application/json
+---
+{
+  "toRadians10":  toRadians(10),
+  "toRadians013": toRadians(0.13),
+  "toRadians-20": toRadians(-20)
+}
+
+
+DataWeave
+Output
+{
+   "toRadians10": 0.1745329251994329576922222222222222,
+   "toRadians013": 0.002268928027592628449998888888888889,
+   "toRadians-20": -0.3490658503988659153844444444444444
+ }

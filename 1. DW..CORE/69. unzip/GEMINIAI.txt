@@ -1,0 +1,149 @@
+unzip:
+
+
+example 1:
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class UnzipExample1 {
+
+    public static void main(String[] args) {
+        // Input: List of Lists (Object to handle mixed types)
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a"),
+            Arrays.asList(1, "b"),
+            Arrays.asList(2, "c"),
+            Arrays.asList(3, "d")
+        );
+
+        // Determine the maximum number of columns (elements per inner array). Here it's 2.
+        int numColumns = input.get(0).size(); 
+        
+        // Initialize the output list of lists (the transposed matrix)
+        List<List<Object>> output = new ArrayList<>();
+        for (int i = 0; i < numColumns; i++) {
+            output.add(new ArrayList<>());
+        }
+
+        // Iterate through each inner list and place elements at the correct index in the output
+        for (List<Object> row : input) {
+            for (int i = 0; i < numColumns; i++) {
+                output.get(i).add(row.get(i));
+            }
+        }
+        
+        System.out.println("--- DWL Example 1 Output (Standard Unzip) ---");
+        System.out.println(output);
+    }
+}
+output:
+
+[[0, 1, 2, 3], [a, b, c, d]]
+------------------------------------------------------------------
+
+
+
+
+
+example 2:
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class UnzipExample2 {
+
+    public static void main(String[] args) {
+        // Input: Inner arrays have varying lengths (2, 3, 1, 2)
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a"),
+            Arrays.asList(1, "a", "foo"),
+            Arrays.asList(2),
+            Arrays.asList(3, "a")
+        );
+        
+        // Check for inconsistent column size (the DWL quirk condition)
+        boolean inconsistentSize = false;
+        int size = input.get(0).size();
+        for (List<Object> row : input) {
+            if (row.size() != size) {
+                inconsistentSize = true;
+                break;
+            }
+        }
+
+        List<Object> output;
+        
+        if (inconsistentSize) {
+            // DWL Quirk: If sizes are inconsistent, it returns only the first column
+            output = new ArrayList<>();
+            for (List<Object> row : input) {
+                // We assume the first element always exists
+                output.add(row.get(0)); 
+            }
+        } else {
+            // Standard Unzip (not executed here, but good practice)
+            output = new ArrayList<>();
+        }
+
+        System.out.println("--- DWL Example 2 Output (Inconsistent Size Quirk) ---");
+        System.out.println(output);
+    }
+}
+output:
+
+[0, 1, 2, 3]
+------------------------------------------------------------------
+
+
+
+
+example 3:
+
+input:
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class UnzipExample3 {
+
+    public static void main(String[] args) {
+        // Input: List of Lists (Object to handle mixed types)
+        List<List<Object>> input = Arrays.asList(
+            Arrays.asList(0, "a", "W"),
+            Arrays.asList(1, "b", "X"),
+            Arrays.asList(2, "c", "Y"),
+            Arrays.asList(3, "d", "Z")
+        );
+
+        // Determine the number of columns (which is 3)
+        int numColumns = input.get(0).size(); 
+        
+        // Initialize the output list of lists (the transposed matrix)
+        List<List<Object>> output = new ArrayList<>();
+        for (int i = 0; i < numColumns; i++) {
+            output.add(new ArrayList<>());
+        }
+
+        // Iterate through each row and place elements at the correct index in the output list
+        for (List<Object> row : input) {
+            for (int i = 0; i < numColumns; i++) {
+                output.get(i).add(row.get(i));
+            }
+        }
+        
+        System.out.println("--- DWL Example 3 Output (3-Column Unzip) ---");
+        System.out.println(output);
+    }
+}
+
+output:
+
+[[0, 1, 2, 3], [a, b, c, d], [W, X, Y, Z]]
+------------------------------------------------------------------

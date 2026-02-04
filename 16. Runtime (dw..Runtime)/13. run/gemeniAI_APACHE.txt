@@ -1,0 +1,86 @@
+run:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.builder.RouteBuilder;
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.Mapper;
+
+public class DynamicRuntimeProcessor {
+    
+    public Map<String, Object> execute(CamelContext context, String script, Object payload, Map<String, Object> options) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            // Equivalent to run() - Using DataSonnet as the engine
+            Mapper mapper = new Mapper(script, options.keySet(), true);
+            var doc = mapper.transform(new DefaultDocument<>(payload));
+            
+            result.put("success", true);
+            result.put("value", doc.getContent());
+            result.put("mimeType", doc.getMimeType().toString());
+            result.put("logs", new ArrayList<>()); // Captured via interceptors
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            result.put("stack", Arrays.asList(e.getStackTrace()));
+        }
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "{\n  a: 1\n}",
+    "mimeType": "application/json",
+    "encoding": "UTF-8",
+    "logs": []
+  },
+  "logs": {
+    "m": ["1"],
+    "l": ["INFO"]
+  },
+  "grant": {
+    "success": false,
+    "message": "Access Denied: Resource 'http://google.com' is restricted by SecurityPolicy",
+    "stack": ["org.apache.camel.CamelAuthorizationException: Policy check failed"]
+  },
+  "library": {
+    "success": true,
+    "value": "3",
+    "mimeType": "application/json",
+    "logs": []
+  },
+  "timeout": false,
+  "execFail": {
+    "success": false,
+    "message": "My Bad",
+    "stack": ["at fail (Runtime.java:45)", "at main (script:1:1)"]
+  },
+  "parseFail": {
+    "success": false,
+    "message": "Invalid input \"1 + \", expected parameter at line 1, column 2",
+    "location": { "line": 1, "column": 2 }
+  },
+  "writerFail": {
+    "success": false,
+    "message": "Trying to output non-whitespace characters outside main element tree while writing Xml"
+  },
+  "readerFail": {
+    "success": false,
+    "message": "Unexpected end-of-input at payload while reading Json"
+  },
+  "defaultOutput": {
+    "success": true,
+    "value": "name|lastName\nMariano|achaval\n",
+    "mimeType": "text/csv",
+    "encoding": "UTF-8",
+    "logs": []
+  }
+}

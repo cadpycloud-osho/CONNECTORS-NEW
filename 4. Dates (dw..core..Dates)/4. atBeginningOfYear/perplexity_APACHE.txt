@@ -1,0 +1,88 @@
+atBeginningOfYear:
+
+example 1:
+
+
+input:
+
+from("direct:beginningOfYear")
+    .process(exchange -> {
+        ZonedDateTime input = ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        ZonedDateTime startOfYear = input.withDayOfYear(1).truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfYearDateTime", startOfYear.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "atBeginningOfYearDateTime": "2020-01-01T00:00:00-03:00"
+}
+
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+from("direct:beginningOfYearLocal")
+    .process(exchange -> {
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        LocalDateTime startOfYear = input.withDayOfYear(1).truncatedTo(ChronoUnit.DAYS);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfYearLocalDateTime", startOfYear.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+{
+  "atBeginningOfYearLocalDateTime": "2020-01-01T00:00:00"
+}
+
+
+
+---------------------------------------------------------
+
+example 3:
+
+
+input:
+from("direct:beginningOfYearDate")
+    .process(exchange -> {
+        LocalDate input = LocalDate.parse("2020-10-06");
+        LocalDate startOfYear = input.withDayOfYear(1);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfYearDate", startOfYear.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+{
+  "atBeginningOfYearDate": "2020-01-01"
+}
+
+
+
+---------------------------------------------------------
+
+
+
+
+
+
+
+

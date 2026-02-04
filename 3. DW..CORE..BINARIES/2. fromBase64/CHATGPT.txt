@@ -1,0 +1,23 @@
+fromBase64:
+
+
+INPUT:
+
+
+package com.example.demo.controller;
+
+import org.springframework.util.Base64Utils;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class Base64Controller {
+
+    @PostMapping(value = "/decode", produces = "application/octet-stream")
+    public byte[] decodeBase64(@RequestBody String payload) {
+        return Base64Utils.decodeFromString(payload);
+    }
+}
+
+
+
+

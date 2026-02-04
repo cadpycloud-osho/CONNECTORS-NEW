@@ -1,0 +1,29 @@
+lower:
+
+input:
+
+
+// LowerCaseApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Map;
+
+@SpringBootApplication
+public class LowerCaseApp {
+    public static void main(String[] args) {
+        SpringApplication.run(LowerCaseApp.class, args);
+
+        String lowerName = "MULESOFT".toLowerCase();
+        Map<String, String> result = Map.of("name", lowerName);
+        
+        System.out.println(result); // Output: {name=mulesoft}
+    }
+}
+
+
+output:
+
+{name=mulesoft}

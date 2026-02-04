@@ -1,0 +1,37 @@
+fromBinary:
+
+
+input:
+
+from("direct:fromBinary")
+.process(exchange -> {
+
+    // Input binary strings
+    String a = "-10";
+    String b = "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000";
+    String c = "0";
+    String d = null;
+    String e = "100";
+
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+
+    output.put("a", a != null ? new java.math.BigInteger(a, 2) : null);
+    output.put("b", b != null ? new java.math.BigInteger(b, 2) : null);
+    output.put("c", c != null ? new java.math.BigInteger(c, 2) : null);
+    output.put("d", d != null ? new java.math.BigInteger(d, 2) : null);
+    output.put("e", e != null ? new java.math.BigInteger(e, 2) : null);
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+{
+  "a": -2,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 4
+}
+

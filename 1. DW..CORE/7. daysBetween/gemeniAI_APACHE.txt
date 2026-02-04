@@ -1,0 +1,63 @@
+daysBetween:
+
+
+input:
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.format.DateTimeParseException;
+
+// Name this file 'DateCalculatorBean.java'
+public class DateCalculatorBean {
+
+    // The method can be called directly from Camel's Bean component
+    public long calculateDaysBetween(String startDateString, String endDateString) throws DateTimeParseException {
+        
+        // 1. Parse the strings into ZonedDateTime objects (handles the 'Z' and time zones like -03:00)
+        ZonedDateTime start = ZonedDateTime.parse(startDateString);
+        ZonedDateTime end = ZonedDateTime.parse(endDateString);
+
+        // 2. Calculate the difference in DAYS (ChronoUnit.DAYS)
+        // Note: The 'between' method calculates the duration between the two temporal objects 
+        // in terms of the specified unit, ensuring precision.
+        long days = ChronoUnit.DAYS.between(start, end);
+        
+        return days;
+    }
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://camel.apache.org/schema/spring 
+           http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <bean id="dateCalculator" class="com.example.DateCalculatorBean"/>
+
+    <camelContext id="date-calculation-context">
+        <route id="Days-Between-Route">
+            
+            <from uri="direct:startDaysBetween"/>
+
+            <to uri="bean:dateCalculator?method=calculateDaysBetween('2016-10-01T23:57:59-03:00', '2017-10-01T23:57:59-03:00')"/>
+
+            <transform>
+                <simple>{"days": ${body}}</simple>
+            </transform>
+
+            <to uri="log:result?showBody=true"/>
+            <to uri="mock:result"/>
+        </route>
+    </camelContext>
+
+</beans>
+
+output:
+
+{
+  "days": 365
+}
+

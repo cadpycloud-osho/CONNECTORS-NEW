@@ -1,0 +1,44 @@
+prependIfMissing:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static String prependIfMissing(String input, String prefix) {
+        if (input == null) return null;
+        if (prefix == null) prefix = "";
+
+        if (prefix.isEmpty()) return input;
+        if (input.isEmpty()) return prefix;
+
+        if (input.startsWith(prefix)) return input;
+
+        return prefix + input;
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", prependIfMissing(null, ""));
+        result.put("b", prependIfMissing("abc", ""));
+        result.put("c", prependIfMissing("", "xyz"));
+        result.put("d", prependIfMissing("abc", "xyz"));
+        result.put("e", prependIfMissing("xyzabc", "xyz"));
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{a=null, b=abc, c=xyz, d=xyzabc, e=xyzabc}
+
+

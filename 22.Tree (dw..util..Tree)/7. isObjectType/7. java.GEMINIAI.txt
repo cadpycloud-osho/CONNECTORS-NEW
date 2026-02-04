@@ -1,0 +1,112 @@
+isObjectType:
+
+
+
+input:
+
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    // Removed ObjectMapper dependency.
+
+    /**
+     * Replicates the logic of dw::util::Tree::isObjectType(path).
+     * @param path The list representing the DataWeave AST path nodes.
+     * @return true if the last node's kind is "OBJECT_TYPE", false otherwise.
+     */
+    @SuppressWarnings("unchecked")
+    public static boolean isObjectType(List<Map<String, Object>> path) {
+        if (path == null || path.isEmpty()) {
+            return false;
+        }
+
+        // Get the last node in the path list
+        Map<String, Object> lastNode = path.get(path.size() - 1);
+
+        // Check its 'kind' property
+        Object kind = lastNode.get("kind");
+        return "OBJECT_TYPE".equals(kind);
+    }
+
+    // ---------- Pretty JSON printer (pure Java) ----------
+    private static String toPrettyJson(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+        String next = "  ".repeat(indent + 1);
+
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\"" + obj + "\"";
+        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
+
+        if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            String body = map.entrySet().stream()
+                    .map(e -> next + "\"" + e.getKey() + "\": " +
+                            toPrettyJson(e.getValue(), indent + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "{\n" + body + "\n" + pad + "}";
+        }
+
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            String body = list.stream()
+                    .map(v -> {
+                        String jsonValue = toPrettyJson(v, indent + 1);
+                        return jsonValue.contains("\n") ? jsonValue : next + jsonValue;
+                    })
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + body + "\n" + pad + "]";
+        }
+
+        return obj.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Output Simulation ---");
+
+        // Helper for null values
+        Object nullObj = null;
+
+        // --- Input Structures (Using LinkedHashMap for null-safe construction) ---
+
+        // a: Last node is ATTRIBUTE_TYPE (Expected: FALSE)
+        Map<String, Object> nodeA1 = new LinkedHashMap<>();
+        nodeA1.put("kind", "OBJECT_TYPE"); nodeA1.put("selector", "user"); nodeA1.put("namespace", nullObj);
+        Map<String, Object> nodeA2 = new LinkedHashMap<>();
+        nodeA2.put("kind", "ATTRIBUTE_TYPE"); nodeA2.put("selector", "name"); nodeA2.put("namespace", nullObj);
+        List<Map<String, Object>> pathA = List.of(nodeA1, nodeA2);
+
+
+        // b: Last node is OBJECT_TYPE (Expected: TRUE)
+        Map<String, Object> nodeB1 = new LinkedHashMap<>();
+        nodeB1.put("kind", "OBJECT_TYPE"); nodeB1.put("selector", "user"); nodeB1.put("namespace", nullObj);
+        Map<String, Object> nodeB2 = new LinkedHashMap<>();
+        nodeB2.put("kind", "OBJECT_TYPE"); nodeB2.put("selector", "name"); nodeB2.put("namespace", nullObj);
+        List<Map<String, Object>> pathB = List.of(nodeB1, nodeB2);
+
+        // c: Last node is OBJECT_TYPE (Expected: TRUE)
+        Map<String, Object> nodeC = new LinkedHashMap<>();
+        nodeC.put("kind", "OBJECT_TYPE"); nodeC.put("selector", "user"); nodeC.put("namespace", nullObj);
+        List<Map<String, Object>> pathC = List.of(nodeC);
+
+        // --- Execution ---
+        Map<String, Boolean> output = new LinkedHashMap<>();
+        output.put("a", isObjectType(pathA));
+        output.put("b", isObjectType(pathB));
+        output.put("c", isObjectType(pathC));
+
+        // Output the map using the pure Java JSON printer
+        System.out.println(toPrettyJson(output, 0));
+    }
+}
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+

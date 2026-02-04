@@ -1,0 +1,21 @@
+remove:
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class StringRemoveController {
+    
+    @GetMapping("/remove")
+    public String removeState() {
+        String input = "lazyness purity state higher-order stateful";
+        return input.replaceAll("state", "");
+    }
+}
+
+
+output:
+
+
+"lazyness purity  higher-order ful"

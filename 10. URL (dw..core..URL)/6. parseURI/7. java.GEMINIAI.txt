@@ -1,0 +1,122 @@
+parseURI:
+
+
+
+input:
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Data structure to hold the parsed URI components, matching the DW output.
+     */
+    public record ParsedUriResult(
+        boolean isValid,
+        String raw,
+        String host,
+        String authority,
+        String fragment,
+        String path,
+        String scheme,
+        boolean isAbsolute,
+        boolean isOpaque
+    ) {}
+
+    /**
+     * Conceptually mimics DataWeave's URL::parseURI.
+     * Parses a URI string and extracts its components.
+     */
+    public static ParsedUriResult parseUri(String uriString) {
+        try {
+            URI uri = new URI(uriString);
+            
+            // Note: uri.getAuthority() and uri.getHost() can return null, but we return String fields.
+            // We use ternary operators to return null for fields that are null in the Java object.
+            return new ParsedUriResult(
+                true,
+                uri.toString(),
+                uri.getHost(),
+                uri.getAuthority(),
+                uri.getFragment(),
+                uri.getPath(),
+                uri.getScheme(),
+                uri.isAbsolute(),
+                uri.isOpaque()
+            );
+        } catch (URISyntaxException e) {
+            // If URI construction fails, it's not valid.
+            return new ParsedUriResult(
+                false,
+                uriString,
+                null, null, null, null, null, false, false
+            );
+        }
+    }
+
+    public static void main(String[] args) {
+        
+        // DataWeave input string
+        String inputUri = "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer";
+        
+        // --- Execution ---
+        
+        ParsedUriResult composition = parseUri(inputUri); 
+
+        // Output the result in JSON format (using a nested map for clean printing)
+        Map<String, Object> innerMap = new LinkedHashMap<>();
+        innerMap.put("isValid", composition.isValid());
+        innerMap.put("raw", composition.raw());
+        innerMap.put("host", composition.host());
+        innerMap.put("authority", composition.authority());
+        innerMap.put("fragment", composition.fragment());
+        innerMap.put("path", composition.path());
+        innerMap.put("scheme", composition.scheme());
+        innerMap.put("isAbsolute", composition.isAbsolute());
+        innerMap.put("isOpaque", composition.isOpaque());
+        
+        Map<String, Map<String, Object>> output = new LinkedHashMap<>();
+        output.put("composition", innerMap);
+
+        // Printing the result (assuming Jackson or similar serialization for the Map)
+        // Since we cannot run Jackson, we approximate the required JSON output:
+        
+        System.out.println("{");
+        System.out.println("  \"composition\": {");
+        System.out.println("    \"isValid\": " + composition.isValid() + ",");
+        System.out.println("    \"raw\": \"" + composition.raw() + "\",");
+        System.out.println("    \"host\": \"" + composition.host() + "\",");
+        System.out.println("    \"authority\": \"" + composition.authority() + "\",");
+        System.out.println("    \"fragment\": \"" + composition.fragment() + "\",");
+        System.out.println("    \"path\": \"" + composition.path() + "\",");
+        System.out.println("    \"scheme\": \"" + composition.scheme() + "\",");
+        System.out.println("    \"isAbsolute\": " + composition.isAbsolute() + ",");
+        System.out.println("    \"isOpaque\": " + composition.isOpaque());
+        System.out.println("  }");
+        System.out.println("}");
+    }
+}
+
+
+
+
+output:
+
+{
+  "composition": {
+    "isValid": true,
+    "raw": "https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#footer",
+    "host": "en.wikipedia.org",
+    "authority": "en.wikipedia.org",
+    "fragment": "footer",
+    "path": "/wiki/Uniform_Resource_Identifier",
+    "scheme": "https",
+    "isAbsolute": true,
+    "isOpaque": false
+  }
+}
+
+

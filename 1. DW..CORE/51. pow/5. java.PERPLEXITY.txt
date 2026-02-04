@@ -1,0 +1,43 @@
+pow:
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+        // pow equivalents using Math.pow()
+        double pow1 = Math.pow(2, 3);
+        double pow2 = Math.pow(3, 2);
+        double pow3 = Math.pow(7, 3);
+        
+        // Output array format
+        System.out.println("[" + (int)pow1 + ", " + (int)pow2 + ", " + (int)pow3 + "]");
+    }
+}
+
+
+
+output:
+
+[8, 9, 343]
+
+
+
+
+
+
+
+Alternative using integer exponentiation (more efficient for integers):
+
+java
+public class Main {
+    public static void main(String[] args) {
+        // Integer power using bit manipulation/recursion (faster than Math.pow for ints)
+        int pow1 = (int) Math.pow(2, 3);
+        int pow2 = (int) Math.pow(3, 2);
+        int pow3 = (int) Math.pow(7, 3);
+        
+        System.out.println("[" + pow1 + ", " + pow2 + ", " + pow3 + "]");
+    }
+}

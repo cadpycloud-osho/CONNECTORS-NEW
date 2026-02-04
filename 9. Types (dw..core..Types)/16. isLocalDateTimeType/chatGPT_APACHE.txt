@@ -1,0 +1,76 @@
+
+
+isLocalDateTimeType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+import java.time.LocalDateTime;
+
+public class CamelLocalDateTimeTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // Simulating DataWeave isLocalDateTimeType
+                        boolean a = isLocalDateTimeType(ALocalDateTime.class);
+                        boolean b = isLocalDateTimeType(LocalDateTime.class);
+                        boolean c = isLocalDateTimeType(String.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + ",\n" +
+                                "  \"c\": " + c + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate DataWeave LocalDateTime type check
+    private static boolean isLocalDateTimeType(Class<?> clazz) {
+        return clazz == LocalDateTime.class;
+    }
+
+    // type ALocalDateTime = LocalDateTime
+    static class ALocalDateTime extends LocalDateTime {
+        private ALocalDateTime() {
+            super(null, null, null, null);
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+

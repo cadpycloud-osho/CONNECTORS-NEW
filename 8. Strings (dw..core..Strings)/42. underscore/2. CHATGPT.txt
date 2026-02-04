@@ -1,0 +1,58 @@
+underscore:
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String underscore(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        // Convert camelCase → camel_case
+        String camelToUnderscore = input.replaceAll("([a-z])([A-Z])", "$1_$2");
+
+        // Replace hyphens & spaces → underscores
+        String normalized = camelToUnderscore
+                .replace("-", "_")
+                .replace(" ", "_");
+
+        return normalized.toLowerCase();
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class UnderscoreController {
+
+    @GetMapping("/underscore")
+    public Map<String, String> underscoreExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.underscore("customer"));
+        result.put("b", StringUtils.underscore("customer-first-name"));
+        result.put("c", StringUtils.underscore("customer NAME"));
+        result.put("d", StringUtils.underscore("customerName"));
+
+        return result;
+    }
+}
+
+ouput:
+
+
+{
+  "a": "customer",
+  "b": "customer_first_name",
+  "c": "customer_name",
+  "d": "customer_name"
+}
+

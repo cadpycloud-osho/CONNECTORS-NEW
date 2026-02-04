@@ -1,0 +1,40 @@
+with:
+
+with<V, U, R, X>(toBeReplaced: ((V, U) -> R) -> X, replacer: (V, U) -> R): X
+
+with<V, U, R, X>(toBeReplaced: ((V, U) -> R) -> X, replacer: (V, U) -> R): X
+Helper function that specifies a replacement element. This function is used with replace, update or mask to perform data substitutions.
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "ssn" : "987-65-4321" replace /[0-9]/ with("x") }
+
+DataWeave
+Output
+{ "ssn": "xxx-xx-xxxx" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,66 @@
+hashWith:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.security.MessageDigest;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MD2Controller {
+
+    @GetMapping("/md2")
+    public Map<String, String> computeMD2() {
+        String input = "hello";
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("md2", computeMD2Hex(input));
+        response.put("md2Base64", computeMD2Base64(input));
+        response.put("md2RawLength", "16 bytes");
+        
+        return response;
+    }
+
+    private String computeMD2Hex(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD2");
+            byte[] digest = md.digest(input.getBytes());
+            return bytesToHex(digest);
+        } catch (Exception e) {
+            throw new RuntimeException("MD2 computation failed", e);
+        }
+    }
+
+    private String computeMD2Base64(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD2");
+            byte[] digest = md.digest(input.getBytes());
+            return Base64.getEncoder().encodeToString(digest);
+        } catch (Exception e) {
+            throw new RuntimeException("MD2 computation failed", e);
+        }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+{
+  "md2": "9055d2350b0340e53d7f7d576c5b0044",
+  "md2Base64": "kV2lUwDANG31fX1WxLAA",
+  "md2RawLength": "16 bytes"
+}
+
+

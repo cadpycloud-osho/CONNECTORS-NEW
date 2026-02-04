@@ -1,0 +1,90 @@
+toLocalDateTimeOrNull:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveToLocalDateTimeOrNullConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceDateTimeString = "2003-10-01 23:57:59";
+
+    /**
+     * Mimics DataWeave's toLocalDateTimeOrNull() behavior with chained formatters.
+     * Returns the parsed LocalDateTime upon success, or null if all formatters fail.
+     */
+    private LocalDateTime toLocalDateTimeOrNull(String dateTimeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return LocalDateTime.parse(dateTimeString, formatter);
+            } catch (DateTimeParseException e) {
+                // DataWeave's behavior: swallow the exception and continue to the next formatter
+            }
+        }
+        // If the loop completes without a successful parse, return null
+        return null; 
+    }
+
+    public String getLocalDateTimeParsingJson() throws IOException {
+        // Define formatters
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss", Locale.US);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.US);
+        
+        // --- Logic for Key 'a' (Success after chain) ---
+        // Try formatter1 (fails), then formatter2 (succeeds)
+        LocalDateTime parsedDateA = toLocalDateTimeOrNull(sourceDateTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Failure) ---
+        // Only try formatter1 (fails), resulting in null
+        LocalDateTime parsedDateB = toLocalDateTimeOrNull(sourceDateTimeString, formatter1);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes LocalDateTime as a standard ISO string or null.
+        if (parsedDateA != null) {
+             root.put("a", parsedDateA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        if (parsedDateB != null) {
+             root.put("b", parsedDateB.toString());
+        } else {
+             root.putNull("b");
+        }
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToLocalDateTimeOrNullConverter converter = new DataWeaveToLocalDateTimeOrNullConverter();
+        try {
+            String jsonOutput = converter.getLocalDateTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a" : "2003-10-01T23:57:59",
+  "b" : null
+}
+

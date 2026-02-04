@@ -1,0 +1,83 @@
+isEmpty:
+
+
+example 1:
+
+
+input:
+
+from("direct:isEmptyArray")
+.setBody(simple(
+    "["
+  + " ${list:[]}.isEmpty(),"
+  + " ${list:[1]}.isEmpty()"
+  + "]"
+));
+
+
+output:
+
+[ true, false ]
+
+
+---------------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:isEmptyString")
+.setBody(simple(
+    "["
+  + " ${''.length()} == 0,"
+  + " ${'DataWeave'.length()} == 0"
+  + "]"
+));
+
+
+output:
+[ true, false ]
+
+
+
+---------------------------------------------------------
+
+example 3:
+
+
+input:
+
+from("direct:isEmptyObject")
+.setBody(simple(
+    "["
+  + " ${map:{}}.isEmpty(),"
+  + " ${map:{name:'DataWeave'}}.isEmpty()"
+  + "]"
+));
+
+
+output:
+
+[ true, false ]
+
+
+---------------------------------------------------------
+
+example 4:
+
+
+input:
+
+from("direct:isEmptyNull")
+.setBody(simple(
+    "{ \"nullValue\": ${null == null} }"
+));
+
+
+output:
+
+{ "nullValue": true }
+
+
+---------------------------------------------------------

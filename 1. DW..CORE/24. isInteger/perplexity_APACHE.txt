@@ -1,0 +1,57 @@
+isInteger:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+public class IsIntegerProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<Object> input = exchange.getIn().getBody(List.class);
+        List<Boolean> result = new ArrayList<>();
+        for (Object item : input) {
+            if (item instanceof Number) {
+                BigDecimal bd = new BigDecimal(item.toString());
+                result.add(bd.scale() == 0);
+            } else if (item instanceof String) {
+                try {
+                    BigDecimal bd = new BigDecimal((String) item);
+                    result.add(bd.scale() == 0);
+                } catch (NumberFormatException e) {
+                    result.add(false);
+                }
+            } else {
+                result.add(false);
+            }
+        }
+        exchange.getIn().setBody(result);
+    }
+}
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+public class DataWeaveToCamelRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .unmarshal().json(JsonLibrary.Jackson, List.class)
+            .process(new IsIntegerProcessor())
+            .marshal().json()
+            .to("mock:output");
+    }
+}
+
+[1, 2.0, 2.2, "1"]
+
+
+output:
+
+[true, true, false, true]
+
+

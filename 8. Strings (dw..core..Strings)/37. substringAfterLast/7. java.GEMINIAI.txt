@@ -1,0 +1,79 @@
+substringAfterLast:
+
+
+INPUT:
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = SubstringUtil.substringAfterLast(null, "'");
+        String b = SubstringUtil.substringAfterLast("", "-");
+        String c = SubstringUtil.substringAfterLast("abc", "b");
+        String d = SubstringUtil.substringAfterLast("abcba", "b");
+        String e = SubstringUtil.substringAfterLast("abc", "d");
+        String f = SubstringUtil.substringAfterLast("abc", "");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s,\n  \"c\": %s,\n  \"d\": %s,\n  \"e\": %s,\n  \"f\": %s\n}",
+            formatJsonString(a), 
+            formatJsonString(b), 
+            formatJsonString(c), 
+            formatJsonString(d), 
+            formatJsonString(e),
+            formatJsonString(f)
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class SubstringUtil {
+        public static String substringAfterLast(String str, String separator) {
+            if (str == null) {
+                return null;
+            }
+            if (separator == null || separator.isEmpty()) {
+                // DW Rule 'f'
+                return null;
+            }
+
+            int separatorIndex = str.lastIndexOf(separator);
+
+            if (separatorIndex == -1) {
+                // DW Rule 'b', 'e'
+                return "";
+            }
+
+            // DW Rule 'c', 'd'
+            return str.substring(separatorIndex + separator.length());
+        }
+    }
+
+    /**
+     * Helper to format the Java String result into a valid JSON string (with quotes)
+     * or the JSON literal 'null'.
+     */
+    private static String formatJsonString(String value) {
+        // If the Java String is null, return the JSON literal "null". Otherwise, quote the string value.
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+output:
+
+
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "a",
+  "e": "",
+  "f": null
+}
+

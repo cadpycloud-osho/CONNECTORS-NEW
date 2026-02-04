@@ -1,0 +1,77 @@
+isArrayType:
+
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class TreeController {
+
+    static class Node {
+        String kind;
+        Object selector;
+        String namespace;
+
+        Node(String kind, Object selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+    }
+
+    @GetMapping("/isArrayType")
+    public Map<String, Boolean> checkArrayType() {
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        // a
+        List<Node> pathA = Arrays.asList(
+                new Node("OBJECT_TYPE", "user", null),
+                new Node("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("a", isArrayType(pathA));
+
+        // b
+        List<Node> pathB = Arrays.asList(
+                new Node("OBJECT_TYPE", "user", null),
+                new Node("ARRAY_TYPE", 0, null)
+        );
+        result.put("b", isArrayType(pathB));
+
+        // c
+        List<Node> pathC = Collections.singletonList(
+                new Node("ARRAY_TYPE", 0, null)
+        );
+        result.put("c", isArrayType(pathC));
+
+        return result;
+    }
+
+    private boolean isArrayType(List<Node> path) {
+        for (Node node : path) {
+            if ("ARRAY_TYPE".equals(node.kind)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+
+
+

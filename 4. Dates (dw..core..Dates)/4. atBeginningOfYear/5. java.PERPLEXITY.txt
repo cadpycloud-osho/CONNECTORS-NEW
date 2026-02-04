@@ -1,0 +1,133 @@
+atBeginningOfYear:
+
+
+example 1:
+
+
+
+input:
+
+
+import java.time.OffsetDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351-03:00|
+        OffsetDateTime input = OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+        // atBeginningOfYear: first day of year at 00:00, keep offset
+        OffsetDateTime result = input
+                .withMonth(1)
+                .withDayOfMonth(1)
+                .with(LocalTime.MIDNIGHT)
+                .withNano(0);
+
+        String output = result.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfYearDateTime\": \"" + output + "\"");
+        System.out.println("}");
+        // -> 2020-01-01T00:00:00-03:00 (fractional seconds can be formatted if needed)
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfYearDateTime": "2020-01-01T00:00:00-03:00"
+}
+
+
+
+------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+
+input:
+
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06T18:23:20.351|
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+
+        // atBeginningOfYear: first day of year at 00:00
+        LocalDateTime result = input
+                .withMonth(1)
+                .withDayOfMonth(1)
+                .with(LocalTime.MIDNIGHT)
+                .withNano(0);
+
+        String output = result.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfYearLocalDateTime\": \"" + output + "\"");
+        System.out.println("}");
+        // -> 2020-01-01T00:00:00
+    }
+}
+
+
+
+output:
+
+{
+  "atBeginningOfYearLocalDateTime": "2020-01-01T00:00:00"
+}
+
+
+
+------------------------------------------------------------
+
+
+
+
+example 3:
+
+
+
+input:
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        // DataWeave: |2020-10-06|
+        LocalDate input = LocalDate.parse("2020-10-06");
+
+        // atBeginningOfYear: first day of year
+        LocalDate result = input.withMonth(1).withDayOfMonth(1);
+
+        String output = result.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+        System.out.println("{");
+        System.out.println("  \"atBeginningOfYearDate\": \"" + output + "\"");
+        System.out.println("}");
+        // -> 2020-01-01
+    }
+}
+
+
+
+output:
+
+
+{
+  "atBeginningOfYearDate": "2020-01-01"
+}
+
+
+------------------------------------------------------------

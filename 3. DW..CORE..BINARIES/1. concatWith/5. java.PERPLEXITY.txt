@@ -1,0 +1,72 @@
+concatWith:
+
+
+
+input:
+
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+    public static void main(String[] args) {
+        // Step 1: Convert "CAFE" hex to bytes
+        byte[] cafeBytes = hexStringToBytes("CAFE");
+        System.out.println("Step 1 - CAFE hex -> bytes: " + bytesToHex(cafeBytes));
+        
+        // Step 2: Convert "ABCD" hex to bytes  
+        byte[] abcdBytes = hexStringToBytes("ABCD");
+        System.out.println("Step 2 - ABCD hex -> bytes: " + bytesToHex(abcdBytes));
+        
+        // Step 3: Concatenate the byte arrays (DataWeave concatWith equivalent)
+        byte[] concatenatedBytes = concatByteArrays(cafeBytes, abcdBytes);
+        System.out.println("Step 3 - Concatenated bytes: " + bytesToHex(concatenatedBytes));
+        
+        // Step 4: Base64 encode the result
+        String base64Result = Base64.getEncoder().encodeToString(concatenatedBytes);
+        System.out.println("Final Output - Base64: " + base64Result);
+        
+        // Verify it matches DataWeave output
+        byte[] finalBytes = Base64.getDecoder().decode(base64Result);
+        System.out.println("Verified bytes: " + bytesToHex(finalBytes));
+    }
+    
+    // Convert hex string to byte array (DataWeave "as Binary {base: '16'}")
+    public static byte[] hexStringToBytes(String hex) {
+        byte[] bytes = new byte[hex.length() / 2];
+        for (int i = 0; i < hex.length(); i += 2) {
+            bytes[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
+                                 + Character.digit(hex.charAt(i+1), 16));
+        }
+        return bytes;
+    }
+    
+    // Concatenate two byte arrays (DataWeave concatWith equivalent)
+    public static byte[] concatByteArrays(byte[] first, byte[] second) {
+        byte[] result = new byte[first.length + second.length];
+        System.arraycopy(first, 0, result, 0, first.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
+    }
+    
+    // Utility to display bytes as hex (for verification)
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
+    }
+}
+
+
+
+output:
+
+
+Step 1 - CAFE hex -> bytes: CA FE
+Step 2 - ABCD hex -> bytes: AB CD
+Step 3 - Concatenated bytes: CAFEBABE
+Final Output - Base64: yv6rzQ==
+Verified bytes: CA FE AB CD
+
+

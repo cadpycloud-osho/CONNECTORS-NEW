@@ -1,0 +1,39 @@
+toBinary:
+
+
+
+input:
+
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, String> result = new HashMap<>();
+
+        result.put("UTF-16Ex", encode("DW", "UTF-16"));
+        result.put("utf16Ex", encode("DW", "utf16"));
+        result.put("UnicodeBigEx", encode("DW", "UnicodeBig"));
+        result.put("UTF-32Ex", encode("DW", "UTF-32"));
+        result.put("UTF_32Ex", encode("DW", "UTF_32"));
+
+        System.out.println(result);
+    }
+
+    private static String encode(String value, String charsetName) {
+        byte[] bytes = value.getBytes(Charset.forName(charsetName));
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+}
+
+
+output:
+
+{UTF-16Ex=/v8ARABX, utf16Ex=/v8ARABX, UnicodeBigEx=/v8ARABX, UTF-32Ex=AAAARAAAAFc=, UTF_32Ex=AAAARAAAAFc=}
+
+
+

@@ -1,0 +1,44 @@
+isEven:
+
+INPUT:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+public class IsEvenExample {
+
+    /**
+     * Custom utility method to replicate DataWeave's isEven behavior.
+     */
+    public static boolean isEven(int number) {
+        // A number is even if the remainder when divided by 2 is 0.
+        return number % 2 == 0;
+    }
+
+    public static Map<String, List<Boolean>> calculateEvenStatus() {
+        // DataWeave: isEven(0)
+        boolean result1 = isEven(0);
+        
+        // DataWeave: isEven(1)
+        boolean result2 = isEven(1);
+        
+        // DataWeave: isEven(1+1) -> isEven(2)
+        boolean result3 = isEven(1 + 1);
+        
+        // Return results as a Map (JSON object equivalent)
+        return Map.of("isEven", Arrays.asList(result1, result2, result3));
+    }
+
+    public static void main(String[] args) {
+        Map<String, List<Boolean>> output = calculateEvenStatus();
+        System.out.println("Input Logic: Custom isEven(n) -> n % 2 == 0");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+
+OUTPUT:
+
+{isEven=[true, false, true]}
+

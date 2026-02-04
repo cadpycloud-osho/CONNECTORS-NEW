@@ -1,0 +1,76 @@
+every:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.Map;
+
+public class CamelEveryExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // "ok" cases
+                        List<Boolean> ok = List.of(
+                            List.of(1, 1, 1).stream().allMatch(n -> n == 1),
+                            List.of(1).stream().allMatch(n -> n == 1)
+                        );
+
+                        // "err" cases (Short-circuiting)
+                        List<Boolean> err = List.of(
+                            List.of(1, 2, 3).stream().allMatch(n -> n % 2 != 0), // Stops at 2
+                            List.of(1, 1, 0).stream().allMatch(n -> n == 1),     // Stops at 0
+                            List.of(0, 1, 1, 0).stream().allMatch(n -> n == 1),  // Stops at 0
+                            List.of(1, 2, 3).stream().allMatch(n -> n == 1),     // Stops at 2
+                            // Empty array handling: Java allMatch returns true for empty, 
+                            // so we add a size check to match your DW output requirement.
+                            !List.of().isEmpty() && List.of().stream().allMatch(n -> true)
+                        );
+
+                        exchange.getIn().setBody(Map.of("results", List.of(
+                            Map.of("ok", ok),
+                            Map.of("err", err)
+                        )));
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+
+from("direct:validateOrder")
+    .choice()
+        .when(body().method("stream").allMatch(i -> i.isInStock()))
+            .to("direct:processOrder")
+        .otherwise()
+            .to("direct:backorder")
+    .end();
+
+
+
+output:
+
+
+{
+  "results": [
+    { "ok": [true, true] },
+    { "err": [false, false, false, false, false] }
+  ]
+}

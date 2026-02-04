@@ -1,0 +1,88 @@
+leftJoin:
+
+
+
+input:
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    static class User {
+        String id;
+        String name;
+
+        User(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    static class Product {
+        String ownerId;
+        String name;
+
+        Product(String ownerId, String name) {
+            this.ownerId = ownerId;
+            this.name = name;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        List<User> users = Arrays.asList(
+                new User("1", "Mariano"),
+                new User("2", "Leandro"),
+                new User("3", "Julian"),
+                new User("5", "Julian")
+        );
+
+        List<Product> products = Arrays.asList(
+                new Product("1", "DataWeave"),
+                new Product("1", "BAT"),
+                new Product("3", "DataSense"),
+                new Product("4", "SmartConnectors")
+        );
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (User user : users) {
+
+            List<Product> matchedProducts = products.stream()
+                    .filter(p -> p.ownerId.equals(user.id))
+                    .collect(Collectors.toList());
+
+            if (matchedProducts.isEmpty()) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("l", Map.of("id", user.id, "name", user.name));
+                result.add(row);
+            } else {
+                for (Product product : matchedProducts) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("l", Map.of("id", user.id, "name", user.name));
+                    row.put("r", Map.of("ownerId", product.ownerId, "name", product.name));
+                    result.add(row);
+                }
+            }
+        }
+
+        // Print output
+        result.forEach(System.out::println);
+    }
+}
+
+
+output:
+
+
+{l={id=1, name=Mariano}, r={ownerId=1, name=DataWeave}}
+{l={id=1, name=Mariano}, r={ownerId=1, name=BAT}}
+{l={id=2, name=Leandro}}
+{l={id=3, name=Julian}, r={ownerId=3, name=DataSense}}
+{l={id=5, name=Julian}}
+
+
+
+
+

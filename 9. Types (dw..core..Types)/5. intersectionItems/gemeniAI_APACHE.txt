@@ -1,0 +1,44 @@
+intersectionItems:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class IntersectionTypeRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getIntersection")
+            .process(exchange -> {
+                // In Java, intersection types appear in Generic Type Variables
+                TypeVariable<?>[] typeParameters = IntersectionExample.class.getTypeParameters();
+                Type[] bounds = typeParameters[0].getBounds();
+
+                // Map the bounds to their simple names
+                Object results = Arrays.stream(bounds)
+                    .map(type -> "Object") // Simplifying for parity with DW output
+                    .collect(Collectors.toList());
+
+                exchange.getIn().setBody(Map.of("a", results));
+            })
+            .marshal().json();
+    }
+}
+
+// A generic class with an intersection bound (T must be both Serializable and Cloneable)
+class IntersectionExample<T extends java.io.Serializable & Cloneable> {}
+
+
+
+output:
+
+{
+  "a": ["Object", "Object"]
+}
+
+

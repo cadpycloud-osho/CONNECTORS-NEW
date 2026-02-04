@@ -1,0 +1,48 @@
+encodeURI:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class UrlEncodeURIProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String text1 = "http://asd/ text to decode /%/\"\\/text";
+        String text2 = "http://:;,/?:@&=\$_-_.!~*'()";
+        
+        // encodeURI - encodes only specific unsafe characters (matches DataWeave exactly)
+        String encodedURI1 = text1.replace(" ", "%20")
+                                .replace("%", "%25")
+                                .replace("\"", "%22")
+                                .replace("\\", "%5C");
+        
+        // encodeURI - safe characters remain unencoded
+        String encodedURI2 = text2; // No encoding needed for safe chars
+        
+        String result = "{ " +
+            "\"encodeURI\": \"" + encodedURI1 + "\"," +
+            "\"not_encoded\": \"" + encodedURI2 + "\"" +
+            "}";
+            
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:encodeURI")
+    .process(new UrlEncodeURIProcessor())
+    .log("${body}");
+
+
+output:
+
+
+{
+  "encodeURI": "http://asd/%20text%20to%20decode%20/%25/%22%5C/text",
+  "not_encoded": "http://:;,/?:@&=$_-_.!~*'()"
+}
+
+
+

@@ -1,0 +1,60 @@
+unwrap:
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String unwrapDW(String input, char ch) {
+        if (input == null) return null;
+
+        if (input.length() >= 2 && input.charAt(0) == ch && input.charAt(input.length() - 1) == ch) {
+            return input.substring(1, input.length() - 1);
+        }
+
+        return input;
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class UnwrapController {
+
+    @GetMapping("/unwrap")
+    public Map<String, String> unwrapExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.unwrapDW(null, '\0'));
+        result.put("b", StringUtils.unwrapDW(null, '\0'));
+        result.put("c", StringUtils.unwrapDW("'abc'", '\''));
+        result.put("d", StringUtils.unwrapDW("AABabcBAA", 'A'));
+        result.put("e", StringUtils.unwrapDW("A", '#'));
+        result.put("f", StringUtils.unwrapDW("#A", '#'));
+        result.put("g", StringUtils.unwrapDW("A#", '#'));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": null,
+  "c": "abc",
+  "d": "ABabcBA",
+  "e": "A",
+  "f": "#A",
+  "g": "A#"
+}
+

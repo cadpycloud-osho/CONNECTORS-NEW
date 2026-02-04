@@ -1,0 +1,30 @@
+first:
+
+input:
+
+import java.util.*;
+
+public class FirstConverter {
+    public static String first(String input, int n) {
+        if (input == null) return null;
+        if (n <= 0) return "";
+        return input.substring(0, Math.min(n, input.length()));
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("first", first("hello world!", 5));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{"first": "hello"}
+
+
+
+

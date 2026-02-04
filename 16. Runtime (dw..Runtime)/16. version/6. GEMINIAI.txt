@@ -1,0 +1,36 @@
+version:
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+public class VersionService implements CommandLineRunner {
+
+    // Simulates the version retrieved from the DW Runtime metadata
+    private static final String DATAWEAVE_VERSION = "2.5";
+
+    /**
+     * Replicates the DataWeave version() function.
+     * @return The DataWeave version string.
+     */
+    public String getRuntimeVersion() {
+        return DATAWEAVE_VERSION;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("--- Spring Boot Version Simulation ---");
+        // We replicate the DW output structure: a single JSON string
+        System.out.println(getRuntimeVersion()); 
+    }
+}
+
+output:
+
+
+2.5

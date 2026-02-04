@@ -1,0 +1,42 @@
+isWhitespace:
+
+input:
+
+
+import java.util.*;
+
+public class IsWhitespaceConverter {
+    public static boolean isWhitespace(String input) {
+        if (input == null) return false;
+        
+        return !input.isEmpty() && input.chars()
+                   .allMatch(Character::isWhitespace);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isWhitespace(null));
+        result.put("b", isWhitespace(""));
+        result.put("c", isWhitespace("  "));
+        result.put("d", isWhitespace("abc"));
+        result.put("e", isWhitespace("ab2c"));
+        result.put("f", isWhitespace("ab-c"));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+
+
+

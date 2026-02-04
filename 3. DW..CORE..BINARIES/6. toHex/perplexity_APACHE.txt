@@ -1,0 +1,25 @@
+toHex:
+
+
+input:
+
+from("direct:binaryToHex")
+    .process(exchange -> {
+        String input = "Mule";
+        byte[] binary = input.getBytes(StandardCharsets.UTF_8);
+        String hex = javax.xml.bind.DatatypeConverter.printHexBinary(binary);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("binaryToHex", hex);
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+
+{
+  "binaryToHex": "4D756C65"
+}
+
+

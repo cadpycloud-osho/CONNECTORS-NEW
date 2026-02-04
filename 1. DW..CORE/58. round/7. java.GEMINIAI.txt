@@ -1,0 +1,34 @@
+round:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        // --- 1. Define the operations ---
+        
+        // Operation 1: round(1.2) -> 1
+        long result1 = Math.round(1.2); 
+
+        // Operation 2: round(4.6) -> 5
+        long result2 = Math.round(4.6); 
+
+        // Operation 3: round(3.5) -> 4 (rounds half up)
+        long result3 = Math.round(3.5); 
+
+        // --- 2. Assemble the final JSON array ---
+        
+        // Manually format the result into the required JSON array string.
+        String outputJson = String.format("[ %d, %d, %d ]", result1, result2, result3);
+        
+        // 3. Output the result
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+[ 1, 5, 4 ]
+

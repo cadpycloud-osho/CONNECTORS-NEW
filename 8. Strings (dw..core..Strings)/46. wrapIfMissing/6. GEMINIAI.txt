@@ -1,0 +1,46 @@
+wrapIfMissing:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class WrapIfMissingController {
+
+    @GetMapping("/wrap-conversion")
+    public Map<String, String> convertDataWeaveWrapIfMissing() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String a = StringWrapUtil.wrapIfMissing(null, "'");
+        String b = StringWrapUtil.wrapIfMissing("", "'");
+        String c = StringWrapUtil.wrapIfMissing("ab", "x");
+        String d = StringWrapUtil.wrapIfMissing("'ab'", "'");
+        String e = StringWrapUtil.wrapIfMissing("/", "/");
+        String f = StringWrapUtil.wrapIfMissing("a/b/c", "/");
+        String g = StringWrapUtil.wrapIfMissing("/a/b/c", "/");
+        String h = StringWrapUtil.wrapIfMissing("a/b/c/", "/");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot/Jackson will serialize to the required JSON, 
+        // handling the null value for 'a' correctly.
+        return Map.of(
+            "a", a,
+            "b", b,
+            "c", c,
+            "d", d,
+            "e", e,
+            "f", f,
+            "g", g,
+            "h", h
+        );
+    }
+}
+
+output:
+
+
+

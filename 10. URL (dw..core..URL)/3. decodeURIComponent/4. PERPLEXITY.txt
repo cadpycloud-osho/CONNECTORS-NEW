@@ -1,0 +1,46 @@
+decodeURIComponent:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriUtils;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class DecodeUriComponentController {
+
+    @GetMapping("/decode-uri-component")
+    public Map<String, Object> decodeUriComponent() {
+        Map<String, Object> inner = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+        
+        // decodeURIComponent("%20PATH/%20TO%20/DECODE%20")
+        inner.put("decodeURIComponent", UriUtils.decode("%20PATH/%20TO%20/DECODE%20", "UTF-8"));
+        
+        // decodeURIComponent("%3B%2C%2F%3F%3A%40%26%3D")
+        inner.put("decodeURIComponent", UriUtils.decode("%3B%2C%2F%3F%3A%40%26%3D", "UTF-8"));
+        
+        // decodeURIComponent("%2D%5F%2E%21%7E%2A%27%28%29%24")
+        inner.put("decodeURIComponent", UriUtils.decode("%2D%5F%2E%21%7E%2A%27%28%29%24", "UTF-8"));
+        
+        result.put("decodeURIComponent", inner);
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "decodeURIComponent": {
+    "decodeURIComponent": " PATH/ TO /DECODE ",
+    "decodeURIComponent": ";,/?:@&=",
+    "decodeURIComponent": "-_.!~*'()$"
+  }
+}
+
+
+

@@ -1,0 +1,50 @@
+objectFields:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    // Same Name, Attribute, Field classes as above (omitted for brevity)
+
+    public static void main(String[] args) {
+        Map<String, List<Field>> result = new HashMap<>();
+
+        // Identical field population as Spring Boot version
+        List<Field> aFields = Arrays.asList(
+            new Field(new Name("_", null), new ArrayList<>(), true, false, "String")
+        );
+        result.put("a", aFields);
+
+        List<Attribute> bAttrs = Arrays.asList(
+            new Attribute(new Name("foo", "http://acme.com"), "String", true)
+        );
+        List<Field> bFields = Arrays.asList(
+            new Field(new Name("name", "http://acme.com"), bAttrs, true, false, "Object")
+        );
+        result.put("b", bFields);
+
+        result.put("c", new ArrayList<>());
+
+        List<Attribute> nameAttrs = Arrays.asList(
+            new Attribute(new Name("foo", null), "String", false),
+            new Attribute(new Name("l", null), "Number", true)
+        );
+        List<Field> dFields = Arrays.asList(
+            new Field(new Name("name", null), nameAttrs, false, false, "String"),
+            new Field(new Name("lastName", null), new ArrayList<>(), true, true, "Number")
+        );
+        result.put("d", dFields);
+
+        System.out.println(result); // Produces equivalent structure
+    }
+}
+
+
+
+output:
+
+
+

@@ -1,0 +1,98 @@
+isAttributeType:
+
+
+
+input:
+
+package com.example.service;
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+@Service
+public class TreeUtilService {
+
+    /**
+     * Replicates the logic of dw::util::Tree::isAttributeType(path).
+     * Checks the kind of the last AST node in the path list.
+     * @param path The list representing the DataWeave AST path nodes.
+     * @return true if the last node's kind is "ATTRIBUTE_TYPE", false otherwise.
+     */
+    @SuppressWarnings("unchecked")
+    public boolean isAttributeType(List<Map<String, Object>> path) {
+        if (path == null || path.isEmpty()) {
+            return false;
+        }
+
+        // Get the last node in the path list
+        Map<String, Object> lastNode = path.get(path.size() - 1);
+
+        // Check its 'kind' property
+        return "ATTRIBUTE_TYPE".equals(lastNode.get("kind"));
+    }
+
+    /**
+     * Executes the DataWeave simulation and returns the results.
+     */
+    public Map<String, Boolean> runIsAttributeTypeSimulation() {
+        // --- Input Structures ---
+
+        // a: Last node is ATTRIBUTE_TYPE (Expected: true)
+        List<Map<String, Object>> pathA = List.of(
+            Map.of("kind", "OBJECT_TYPE", "selector", "user", "namespace", (Object) null),
+            Map.of("kind", "ATTRIBUTE_TYPE", "selector", "name", "namespace", (Object) null)
+        );
+
+        // b: Last node is ARRAY_TYPE (Expected: false)
+        List<Map<String, Object>> pathB = List.of(
+            Map.of("kind", "OBJECT_TYPE", "selector", "user", "namespace", (Object) null),
+            Map.of("kind", "ARRAY_TYPE", "selector", "name", "namespace", (Object) null)
+        );
+
+        // c: Last node is ATTRIBUTE_TYPE (Expected: true)
+        List<Map<String, Object>> pathC = List.of(
+            Map.of("kind", "ATTRIBUTE_TYPE", "selector", "name", "namespace", (Object) null)
+        );
+
+        // --- Execution ---
+        Map<String, Boolean> output = new LinkedHashMap<>();
+        output.put("a", isAttributeType(pathA));
+        output.put("b", isAttributeType(pathB));
+        output.put("c", isAttributeType(pathC));
+
+        return output;
+    }
+}
+
+package com.example.controller;
+
+import com.example.service.TreeUtilService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class TreeController {
+
+    private final TreeUtilService treeUtilService;
+
+    public TreeController(TreeUtilService treeUtilService) {
+        this.treeUtilService = treeUtilService;
+    }
+
+    @GetMapping("/isAttributeType")
+    public Map<String, Boolean> getIsAttributeTypeResults() {
+        return treeUtilService.runIsAttributeTypeSimulation();
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": false,
+  "c": true
+}
+

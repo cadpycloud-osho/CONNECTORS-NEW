@@ -1,0 +1,71 @@
+underscore:
+
+
+input:
+
+import java.util.regex.Pattern;
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = StringCaseUtil.underscore("customer");
+        String b = StringCaseUtil.underscore("customer-first-name");
+        String c = StringCaseUtil.underscore("customer NAME");
+        String d = StringCaseUtil.underscore("customerName");
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": \"%s\",\n  \"b\": \"%s\",\n  \"c\": \"%s\",\n  \"d\": \"%s\"\n}",
+            a, b, c, d
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class StringCaseUtil {
+        public static String underscore(String str) {
+            if (str == null || str.isEmpty()) {
+                return str;
+            }
+
+            // 1. Replace all hyphens/spaces with an underscore.
+            String temp = str.replaceAll("[- ]", "_");
+            
+            // 2. Insert an underscore before any uppercase letter that is NOT preceded by an underscore.
+            // Using a simple loop for maximum Java version compatibility and clarity, 
+            // though regex is often faster.
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for (char c : temp.toCharArray()) {
+                if (Character.isUpperCase(c)) {
+                    // Check if it's the start of the string or preceded by an underscore
+                    if (!first && (sb.length() == 0 || sb.charAt(sb.length() - 1) != '_')) {
+                        sb.append('_');
+                    }
+                }
+                sb.append(c);
+                first = false;
+            }
+            temp = sb.toString();
+
+            // 3. Convert the entire result to lowercase.
+            return temp.toLowerCase();
+        }
+    }
+}
+
+
+
+ouput:
+
+{
+  "a": "customer",
+  "b": "customer_first_name",
+  "c": "customer_name",
+  "d": "customer_name"
+}
+

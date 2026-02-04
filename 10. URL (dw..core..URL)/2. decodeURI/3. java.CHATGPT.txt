@@ -1,0 +1,32 @@
+decodeURI:
+
+
+
+input:
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new HashMap<>();
+
+        String encodedUrl = "http://asd/%20text%20to%20decode%20/text";
+        String decodedUrl = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8);
+
+        result.put("decodeURI", decodedUrl);
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{decodeURI=http://asd/ text to decode /text}
+
+

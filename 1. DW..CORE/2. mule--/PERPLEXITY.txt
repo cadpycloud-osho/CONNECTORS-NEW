@@ -1,0 +1,134 @@
+--<S>(source: Array<S>, toRemove: Array<Any>): Array<S>
+
+INPUT:
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class DataWeaveController {
+    @GetMapping("/dataweave-array-difference")
+    public Map<String, List<Integer>> getArrayDifference() {
+        List<Integer> array1 = Arrays.asList(0, 1, 1, 2);
+        List<Integer> array2 = Arrays.asList(1, 2);
+        
+        List<Integer> result = array1.stream()
+            .filter(item -> !array2.contains(item))
+            .collect(Collectors.toList());
+            
+        return Map.of("a", result);
+    }
+}
+
+
+OUTPUT:
+
+{
+  "a": [0]
+}
+
+
+-------------------------------------------------------------------------
+--(source: Object, keys: Array<String>)
+
+INPUT:
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class DataWeaveController {
+    @GetMapping("/dataweave-object-difference")
+    public Map<String, String> getObjectDifference() {
+        Map<String, String> original = Map.of(
+            "yes", "no", 
+            "good", "bad", 
+            "old", "new"
+        );
+        
+        List<String> keysToRemove = List.of("yes", "old");
+        
+        Map<String, String> result = original.entrySet().stream()
+            .filter(entry -> !keysToRemove.contains(entry.getKey()))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, 
+                Map.Entry::getValue
+            ));
+            
+        return result;
+    }
+}
+
+
+OUTPUT:
+
+
+{
+  "good": "bad"
+}
+
+
+-------------------------------------------------------------
+--(source: Object, keys: Array<String>)
+Removes specified key-value pairs from an object.
+INPUT:
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+@RestController
+class DataWeaveController {
+    @GetMapping("/dataweave-key-removal")
+    public Map<String, String> getKeyRemoval() {
+        Map<String, String> original = Map.of(
+            "hello", "world", 
+            "name", "DW"
+        );
+        
+        // Remove "hello" key (equivalent to ["hello" as Key])
+        return Map.of("name", original.get("name"));
+    }
+}
+
+OUTPUT:
+
+{
+  "name": "DW"
+}

@@ -1,0 +1,43 @@
+acos:
+
+input:
+
+
+import java.util.*;
+import static java.lang.Math.*;
+
+public class AcosConverter {
+    public static Double safeAcos(double value) {
+        if (value < -1.0 || value > 1.0) {
+            return null;
+        }
+        return acos(value);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        result.put("acos0", safeAcos(0));
+        result.put("acos13", safeAcos(0.13));
+        result.put("acos-1", safeAcos(-1));
+        result.put("acos1", safeAcos(1));
+        result.put("acos1.1", safeAcos(1.1));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+
+{
+   "acos0": 1.5707963267948966,
+   "acos13": 1.440427347091751,
+   "acos-1": 3.141592653589793,
+   "acos1": 0.0,
+   "acos1.1": null
+}
+
+
+

@@ -1,0 +1,66 @@
+to:
+
+to(from: Number, to: Number): Range
+
+to(from: Number, to: Number): Range
+Returns a range with the specified boundaries.
+
+The upper boundary is inclusive.
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "myRange": 1 to 10 }
+
+
+DataWeave
+Output
+{ "myRange": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+
+
+---------------------------------------------------------------
+
+
+Source
+%dw 2.0
+var myVar = "Hello World!"
+output application/json
+---
+{
+  indices2to6 : myVar[2 to 6],
+  indicesFromEnd : myVar[6 to -1],
+  reversal : myVar[11 to -0]
+}
+
+
+DataWeave
+Output
+{
+  "indices2to6": "llo W",
+  "indicesFromEnd": "World!",
+  "reversal": "!dlroW olleH"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

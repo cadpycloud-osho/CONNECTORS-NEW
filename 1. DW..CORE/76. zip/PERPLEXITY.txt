@@ -1,0 +1,184 @@
+zip:
+
+
+example 1:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+@RestController
+public class ZipExample1Controller {
+
+    @GetMapping("/zip1")
+    public List<List<Object>> zip1() {
+        List<Integer> list1 = Arrays.asList(0, 1);
+        List<String> list2 = Arrays.asList("a", "b");
+
+        List<List<Object>> result = new ArrayList<>();
+        int size = Math.min(list1.size(), list2.size());
+        for (int i = 0; i < size; i++) {
+            result.add(Arrays.asList(list1.get(i), list2.get(i)));
+        }
+        return result;
+    }
+}
+
+
+output:
+
+[[0,"a"],[1,"b"]]
+
+------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class ZipExample2Controller {
+
+    @GetMapping("/zip2")
+    public Map<String, List<List<Object>>> zip2() {
+        List<Integer> base = Arrays.asList(0, 1, 2, 3);
+
+        Map<String, List<List<Object>>> result = new LinkedHashMap<>();
+        result.put("a", zip(base, Arrays.asList("a", "b", "c", "d")));
+        result.put("b", zip(base, Arrays.asList("a")));
+        result.put("c", zip(base, Arrays.asList("a", "b")));
+        result.put("d", zip(Arrays.asList(0, 1, 2), Arrays.asList("a", "b", "c", "d")));
+        return result;
+    }
+
+    private List<List<Object>> zip(List<Integer> ints, List<String> strs) {
+        int size = Math.min(ints.size(), strs.size());
+        List<List<Object>> res = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            res.add(Arrays.asList(ints.get(i), strs.get(i)));
+        }
+        return res;
+    }
+}
+
+
+output:
+
+{
+  "a": [[0,"a"],[1,"b"],[2,"c"],[3,"d"]],
+  "b": [[0,"a"]],
+  "c": [[0,"a"],[1,"b"]],
+  "d": [[0,"a"],[1,"b"],[2,"c"]]
+}
+
+------------------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+
+@RestController
+public class ZipExample3Controller {
+
+    @GetMapping("/zip3")
+    public List<List<Object>> zip3() {
+        List<String> list1 = Arrays.asList("a", "b");
+        List<Integer> list2 = Arrays.asList(1, 2, 3);
+        List<String> list3 = Arrays.asList("aa", "bb");
+        List<List<Object>> list4 = Arrays.asList(
+                Arrays.asList("A", "B", "C"),
+                Arrays.asList(11, 12),
+                Arrays.asList("aA", "bB")
+        );
+
+        // list1 zip list2 -> [ ["a",1], ["b",2] ]
+        List<List<Object>> zip12 = zip(list1, list2);
+
+        // (list1 zip list2) zip list3 -> [ [ ["a",1], "aa" ], [ ["b",2], "bb" ] ]
+        List<List<Object>> zip123 = zipNested(zip12, list3);
+
+        // ((...) zip list4) -> final result
+        return zipNested(zip123, list4);
+    }
+
+    private List<List<Object>> zip(List<String> l1, List<Integer> l2) {
+        int size = Math.min(l1.size(), l2.size());
+        List<List<Object>> res = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            res.add(Arrays.asList(l1.get(i), l2.get(i)));
+        }
+        return res;
+    }
+
+    private <T> List<List<Object>> zipNested(List<?> left, List<T> right) {
+        int size = Math.min(left.size(), right.size());
+        List<List<Object>> res = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            res.add(Arrays.asList(left.get(i), right.get(i)));
+        }
+        return res;
+    }
+}
+
+
+output:
+
+[
+  [
+    [["a",1],"aa"],
+    ["A","B","C"]
+  ],
+  [
+    [["b",2],"bb"],
+    [11,12]
+  ]
+]
+
+------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

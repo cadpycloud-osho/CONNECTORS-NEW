@@ -1,0 +1,44 @@
+isStringType:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class StringTypeController {
+
+    private boolean isStringType(Object value) {
+        return value instanceof String;
+    }
+
+    @GetMapping("/string-type-check")
+    public Map<String, Boolean> checkStringTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        String aString = "test";     // AString alias
+        String stringType = "hello"; // String
+        Boolean boolValue = true;    // Boolean
+        
+        result.put("a", isStringType(aString));
+        result.put("b", isStringType(stringType));
+        result.put("c", isStringType(boolValue));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

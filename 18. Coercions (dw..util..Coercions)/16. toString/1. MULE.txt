@@ -1,0 +1,162 @@
+toString:
+
+toString(number: Number, format: String | Null = null, locale: String | Null = null, roundMode: RoundingMode | Null = null): String
+
+toString(number: Number, format: String | Null = null, locale: String | Null = null, roundMode: RoundingMode | Null = null): String
+A variant of toString that transforms a Number value (whole or decimal) into a String value and accepts a format, locale, and rounding mode value.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+    a: toString(1.0),
+    b: toString(0.005,".00"),
+    c: toString(0.035,"#.##","ES"),
+    d: toString(0.005,"#.##","ES","HALF_EVEN"),
+    e: toString(0.035,"#.00",null,"HALF_EVEN"),
+    f: toString(1.1234,"\$.## 'in my account'")
+}
+
+DataWeave
+Output
+{
+  "a": "1",
+  "b": ".01",
+  "c": "0,04",
+  "d": "0",
+  "e": ".04",
+  "f": "$1.12 in my account"
+}
+
+
+--------------------------------------------------------------
+
+
+toString(date: Date | DateTime | LocalDateTime | LocalTime | Time, format: String | Null = null, locale: String | Null = null): String
+A variant of toString that transforms a Date, DateTime, LocalTime, LocalDateTime, or Time value into a String value.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+   aDate: toString(|2003-10-01|, "uuuu/MM/dd"),
+   aDateTime: toString(|2018-09-17T22:13:00-03:00|),
+   aLocalTime: toString(|23:57:59|, "HH-mm-ss"),
+   aLocalDateTime : toString(|2015-10-01T23:57:59|),
+   aLocalDateTimeFormatted: toString(|2003-10-01T23:57:59|, "uuuu-MM-dd HH:mm:ss a"),
+   aLocalDateTimeFormattedAndLocalizedSpain: toString(|2003-01-01T23:57:59|, "eeee, dd MMMM, uuuu HH:mm:ss a", "ES"),
+   aTime: typeOf(|22:10:18Z|),
+   aTimeZone: toString(|-03:00|)
+}
+
+DataWeave
+Output
+{
+  "aDate": "2003/10/01",
+  "aDateTime": "2018-09-17T22:13:00-03:00",
+  "aLocalTime": "23-57-59",
+  "aLocalDateTime": "2015-10-01T23:57:59",
+  "aLocalDateTimeFormatted": "2003-10-01 23:57:59 PM",
+  "aLocalDateTimeFormattedAndLocalizedSpain": "miércoles, 01 enero, 2003 23:57:59 p. m.",
+  "aTime": "Time",
+  "aTimeZone": "-03:00"
+}
+
+
+
+--------------------------------------------------------------
+
+
+toString(binary: Binary, encoding: String): String
+A variant of toString that transforms a Binary value into a String value with the specified encoding.
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+var binaryData= "DW Test" as Binary {encoding: "UTF-32"}
+output application/json
+---
+{
+  a: toString(binaryData, "UTF-32"),
+}
+
+
+DataWeave
+Output
+{
+  "a": "DW Test"
+}
+
+
+--------------------------------------------------------------
+
+
+toString(data: TimeZone | Uri | Boolean | Period | Regex | Key): String
+A variant of toString that transforms a TimeZone, Uri, Boolean, Period, Regex, or Key value into a string.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+  transformTimeZone: toString(|Z|),
+  transformBoolean: toString(true),
+  transformPeriod: toString(|P1D|),
+  transformRegex: toString(/a-Z/),
+  transformPeriod: toString(|PT8M10S|),
+  transformUri: toString("https://docs.mulesoft.com/" as Uri)
+}  ++
+{ transformKey : toString((keysOf({ "aKeyToString" : "aValue"})[0])) }
+
+
+DataWeave
+Output
+{
+  "transformTimeZone": "Z",
+  "transformBoolean": "true",
+  "transformPeriod": "P1D",
+  "transformRegex": "a-Z",
+  "transformPeriod": "PT8M10S",
+  "transformUri": "https://docs.mulesoft.com/",
+  "transformKey": "aKeyToString"
+}
+
+
+
+--------------------------------------------------------------
+
+
+
+toString(arr: Array<String>): String
+A variant of toString that joins an Array of characters into a single String value.
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/json
+---
+{
+  a: toString([]),
+  b: toString(["h", "o", "l", "a"])
+}
+
+
+DataWeave
+Output
+{
+  "a": "",
+  "b": "hola"
+}

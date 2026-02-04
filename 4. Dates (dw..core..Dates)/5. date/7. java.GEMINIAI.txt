@@ -1,0 +1,66 @@
+date:
+
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Constructs a LocalDate from explicit year, month, and day components.
+     * This mimics the DataWeave 'date({year: X, month: Y, day: Z})' function.
+     * @param year The year component.
+     * @param month The month component (1-12).
+     * @param day The day component (1-31).
+     * @return The resulting date string in ISO 8601 format (YYYY-MM-DD).
+     */
+    public static String createNewDate(int year, int month, int day) {
+        // 1. Construct the date object (DW: date({...}))
+        // LocalDate.of() is the direct Java equivalent
+        LocalDate newDate = LocalDate.of(year, month, day);
+        
+        // 2. Format the date to the standard ISO output (DW output format)
+        // DateTimeFormatter.ISO_LOCAL_DATE produces the "YYYY-MM-DD" format
+        return newDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // Input values from the DW source
+        int year = 2012;
+        int month = 10;
+        int day = 11;
+        
+        // Calculate the new date string
+        String newDateString = createNewDate(year, month, day);
+        
+        // 3. Format the final JSON output
+        String jsonOutput = String.format("{\n  \"newDate\": \"%s\"\n}", newDateString);
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("Input Components: " + year + "-" + month + "-" + day);
+        System.out.println("ISO Date String:  " + newDateString);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+
+{
+  "newDate": "2012-10-11"
+}

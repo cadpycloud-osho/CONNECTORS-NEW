@@ -1,0 +1,51 @@
+someCharacter:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class CharacterCheckController {
+
+    @GetMapping("/some-upper-case")
+    public Map<String, Boolean> checkSomeUpperCase() {
+        
+        String inputString = "someCharacter";
+        
+        // --- Core DataWeave Logic ---
+        boolean result = checkAnyCharacterMatches(inputString);
+        // ----------------------------
+        
+        // Return a Map, which Spring Boot automatically converts to the required JSON
+        return Map.of(
+            "result", result
+        );
+    }
+    
+    /**
+     * Implements the logic of the DataWeave 'someCharacter isUpperCase($)' expression.
+     * Checks if at least one character in the string is uppercase.
+     */
+    private boolean checkAnyCharacterMatches(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        
+        // Use Java Streams to iterate over characters and check the condition, 
+        // stopping on the first match (anyMatch).
+        return str.chars()
+                  .anyMatch(c -> Character.isUpperCase(c));
+    }
+}
+
+output:
+
+{
+  "result": true
+}
+
+
+

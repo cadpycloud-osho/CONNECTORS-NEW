@@ -1,0 +1,37 @@
+with:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        String input = "987-65-4321";
+        
+        // --- 1. Define the operation ---
+        // DataWeave Regex: /[0-9]/
+        // Java Regex: "\\d" (shorthand for [0-9])
+        String regex = "\\d";
+        String replacement = "x";
+
+        // Java: String.replaceAll()
+        String result = input.replaceAll(regex, replacement); // Result: "xxx-xx-xxxx"
+
+        // --- 2. Assemble the final JSON object using standard String formatting ---
+        // This replaces the complex Jackson logic to avoid compilation errors
+        String outputJson = String.format("{\n  \"ssn\" : \"%s\"\n}", result);
+        
+        // 3. Output the result
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+
+
+{
+  "ssn" : "xxx-xx-xxxx"
+}
+

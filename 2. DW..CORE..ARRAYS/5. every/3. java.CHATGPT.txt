@@ -1,0 +1,74 @@
+every:
+
+
+input:
+
+
+import java.util.*;
+import java.util.function.Predicate;
+
+public class Main {
+
+    // DataWeave-like every() implementation
+    static <T> boolean every(List<T> list, Predicate<T> predicate) {
+        if (list.isEmpty()) {
+            return false; // DataWeave behavior
+        }
+        for (T item : list) {
+            if (!predicate.test(item)) {
+                return false; // short-circuit
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        List<Integer> arr0 = new ArrayList<>();
+
+        // OK cases
+        List<Boolean> ok = Arrays.asList(
+                every(Arrays.asList(1, 1, 1), n -> n == 1),
+                every(Arrays.asList(1), n -> n == 1)
+        );
+
+        // ERR cases
+        List<Boolean> err = Arrays.asList(
+                every(Arrays.asList(1, 2, 3), n -> {
+                    System.out.println("should stop at 2 == " + n);
+                    return n % 2 == 1;
+                }),
+                every(Arrays.asList(1, 1, 0), n -> n == 1),
+                every(Arrays.asList(0, 1, 1, 0), n -> {
+                    System.out.println("should stop at 0 == " + n);
+                    return n == 1;
+                }),
+                every(Arrays.asList(1, 2, 3), n -> n == 1),
+                every(arr0, n -> true)
+        );
+
+        Map<String, Object> result1 = new LinkedHashMap<>();
+        result1.put("ok", ok);
+
+        Map<String, Object> result2 = new LinkedHashMap<>();
+        result2.put("err", err);
+
+        List<Map<String, Object>> results = Arrays.asList(result1, result2);
+
+        System.out.println("{ \"results\": " + results + " }");
+    }
+}
+
+
+
+
+output:
+
+should stop at 2 == 1
+should stop at 2 == 2
+should stop at 0 == 0
+{ "results": [{ok=[true, true]}, {err=[false, false, false, false, false]}] }
+
+
+
+

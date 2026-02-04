@@ -1,0 +1,42 @@
+lookup:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class FlowLookupRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // --- Flow 1 (The Source) ---
+        from("jetty:http://0.0.0.0:8081/source")
+            .routeId("flow1")
+            .process(exchange -> {
+                // Prepare the input map (replicating {test: 'hello '})
+                java.util.Map<String, Object> input = new java.util.HashMap<>();
+                input.put("test", "hello ");
+                
+                // We send the input to flow2 and get the response back
+                // This is the direct equivalent of Mule::lookup
+                Object result = exchange.getContext().createProducerTemplate()
+                                    .requestBody("direct:flow2", input);
+                
+                // Set the result as the final JSON payload
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+
+        // --- Flow 2 (The Target) ---
+        from("direct:flow2")
+            .routeId("flow2")
+            // Logic: payload.test ++ "world"
+            .setBody(simple("${body[test]}world"))
+            .log("Logger: ${body}");
+    }
+}
+
+output:
+
+"hello world"
+

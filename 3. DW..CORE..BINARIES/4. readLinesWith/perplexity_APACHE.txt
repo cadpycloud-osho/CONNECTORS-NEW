@@ -1,0 +1,35 @@
+readLinesWith:
+
+
+
+input:
+
+from("direct:readLines")
+    .process(exchange -> {
+        String input = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n";
+        byte[] content = input.getBytes(StandardCharsets.UTF_8);
+        
+        // Simulate read("...", "application/octet-stream") → Binary
+        List<String> lines = new BufferedReader(
+            new InputStreamReader(new ByteArrayInputStream(content), StandardCharsets.UTF_8)
+        ).lines().collect(Collectors.toList());
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("lines", lines);
+        result.put("showType", "Binary");  // typeOf(Binary) equivalent
+        
+        exchange.getIn().setBody(result);
+    });
+
+
+output:
+
+
+{
+  "lines": [ "Line 1", "Line 2", "Line 3", "Line 4", "Line 5" ],
+  "showType": "Binary"
+}
+
+
+
+

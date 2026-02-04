@@ -1,0 +1,44 @@
+isBinaryType:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BinaryTypeCheckRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:checkBinaryType")
+            .process(exchange -> {
+                Map<String, Boolean> results = new LinkedHashMap<>();
+
+                // Equivalent to 'type ABinary = Binary'
+                Class<?> aBinary = byte[].class; 
+                Class<?> stringType = String.class;
+
+                results.put("a", isBinaryType(aBinary));
+                results.put("b", isBinaryType(byte[].class));
+                results.put("c", isBinaryType(stringType));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+
+    private boolean isBinaryType(Class<?> clazz) {
+        // In Java/Camel, binary is primarily byte arrays or InputStreams
+        return clazz != null && (clazz.isArray() && clazz.getComponentType() == byte.class);
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

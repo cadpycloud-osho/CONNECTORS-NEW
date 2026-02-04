@@ -1,0 +1,34 @@
+random:
+
+
+input:
+
+import java.util.Random;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Create random number generator
+        Random random = new Random();
+
+        // Generate a random price between 0 and 1000
+        double price = random.nextDouble() * 1000;
+
+        // Print JSON-style output
+        System.out.println("{ \"price\": " + price + " }");
+    }
+}
+
+
+
+output:
+
+
+{ "price": 342.5768234951285 }
+
+
+
+
+Another possible run could give:
+
+{ "price": 65.02770292248383 }

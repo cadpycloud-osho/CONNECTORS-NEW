@@ -1,0 +1,63 @@
+days:
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        Instant baseInstant = Instant.parse("2020-10-05T20:22:34.385Z");
+        Instant midnightBase = Instant.parse("2020-10-05T00:00:00.000Z");
+
+        // Equivalent operations
+        Instant tomorrow = baseInstant.plus(Duration.ofDays(1));
+        Instant yesterday = baseInstant.minus(Duration.ofDays(1));
+
+        // Decimal Day calculations -> convert decimal days into hours
+        Instant decimalDaysPlusQuarter = midnightBase.plus(Duration.ofHours((long) (0.25 * 24))); // 6 hours
+        Instant decimalDaysPlusHalf = midnightBase.plus(Duration.ofHours((long) (0.5 * 24)));     // 12 hours
+        Instant decimalDaysPlusThreeQuarters = midnightBase.plus(Duration.ofHours((long) (0.75 * 24))); // 18 hours
+
+        // Period / Duration
+        Duration decimalInputAsPeriod = Duration.ofSeconds((long) (4.555 * 24 * 60 * 60)); // Convert days → seconds
+        Period fourDayPeriod = Period.ofDays(4);
+        Period negativeValue = Period.ofDays(-1);
+
+        // Output JSON-like format
+        System.out.println("{");
+        System.out.println("  \"tomorrow\": \"" + formatter.format(tomorrow) + "\",");
+        System.out.println("  \"yesterday\": \"" + formatter.format(yesterday) + "\",");
+        System.out.println("  \"decimalDaysPlusQuarter\": \"" + formatter.format(decimalDaysPlusQuarter) + "\",");
+        System.out.println("  \"decimalDaysPlusHalf\": \"" + formatter.format(decimalDaysPlusHalf) + "\",");
+        System.out.println("  \"decimalDaysPlusThreeQuarters\": \"" + formatter.format(decimalDaysPlusThreeQuarters) + "\",");
+        System.out.println("  \"decimalInputAsPeriod\": \"" + decimalInputAsPeriod.toString() + "\",");
+        System.out.println("  \"fourDayPeriod\": \"" + fourDayPeriod.toString() + "\",");
+        System.out.println("  \"negativeValue\": \"" + negativeValue.toString() + "\"");
+        System.out.println("}");
+    }
+}
+
+
+
+output:
+
+
+{
+  "tomorrow": "2020-10-06T20:22:34.385Z",
+  "yesterday": "2020-10-04T20:22:34.385Z",
+  "decimalDaysPlusQuarter": "2020-10-05T06:00:00Z",
+  "decimalDaysPlusHalf": "2020-10-05T12:00:00Z",
+  "decimalDaysPlusThreeQuarters": "2020-10-05T18:00:00Z",
+  "decimalInputAsPeriod": "PT109H19M12S",
+  "fourDayPeriod": "P4D",
+  "negativeValue": "P-1D"
+}
+
+
+
+

@@ -1,0 +1,39 @@
+substringBeforeLast:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("{");
+        System.out.println("  \"a\": " + substringBeforeLast(null, "'") + ",");
+        System.out.println("  \"b\": \"" + substringBeforeLast("", "-") + "\",");
+        System.out.println("  \"c\": \"" + substringBeforeLast("abc", "b") + "\",");
+        System.out.println("  \"d\": \"" + substringBeforeLast("abcba", "b") + "\",");
+        System.out.println("  \"e\": \"" + substringBeforeLast("abc", "d") + "\",");
+        System.out.println("  \"f\": \"" + substringBeforeLast("abc", "") + "\"");
+        System.out.println("}");
+    }
+    
+    private static String substringBeforeLast(String input, String delimiter) {
+        if (input == null) return null;
+        if (delimiter == null || delimiter.isEmpty()) return input;
+        
+        int index = input.lastIndexOf(delimiter);
+        return index == -1 ? "" : input.substring(0, index);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "abc",
+  "e": "",
+  "f": "ab"
+}
+
+

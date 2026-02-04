@@ -1,0 +1,55 @@
+dropWhile:
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CamelDropWhileExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: var arr = [0,1,3,2,1]
+                        List<Integer> arr = List.of(0, 1, 3, 2, 1);
+                        
+                        // Java 9+ equivalent of dropWhile $ < 3
+                        List<Integer> result = arr.stream()
+                                .dropWhile(n -> n < 3)
+                                .collect(Collectors.toList());
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+from("direct:stream")
+    .transform(body().method("stream")) // Convert List to Stream
+    .process(e -> {
+        List<Integer> body = (List<Integer>) e.getIn().getBody();
+        e.getIn().setBody(body.stream().dropWhile(n -> n < 3).toList());
+    })
+    .to("mock:result");
+
+
+output:
+
+[3, 2, 1]
+

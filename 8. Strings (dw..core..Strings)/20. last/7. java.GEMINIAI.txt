@@ -1,0 +1,35 @@
+last:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Source inputs from the DataWeave example
+        String inputString = "hello world!"; 
+        int length = 6;
+        
+        // Calculate the starting index
+        int actualLength = inputString.length();
+        int effectiveLength = Math.min(actualLength, length);
+        int beginIndex = actualLength - effectiveLength;
+        
+        // Java's substring(beginIndex) extracts the last characters
+        String result = inputString.substring(beginIndex);
+        
+        System.out.println("DataWeave");
+        System.out.println("Output");
+        
+        // Print the result in a string format
+        System.out.println("\"" + result + "\"");
+    }
+}
+
+output:
+
+
+"world!"
+
+

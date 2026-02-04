@@ -1,0 +1,31 @@
+sum:
+
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+
+@RestController
+public class SumController {
+
+    @GetMapping("/sum")
+    public Integer getSum() {
+        return Arrays.asList(1, 2, 3)
+                     .stream()
+                     .mapToInt(Integer::intValue)
+                     .sum();
+    }
+}
+
+
+
+output:
+
+
+6
+
+

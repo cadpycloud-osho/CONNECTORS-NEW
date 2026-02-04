@@ -1,0 +1,74 @@
+
+toArray:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DwToArrayTest {
+
+    // Simulate dw::util::Coercions::toArray(String) -> Array<String>
+    static List<String> toArray(String text) {
+        if (text == null || text.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return text.chars()
+                   .mapToObj(c -> String.valueOf((char) c))
+                   .collect(ArrayList::new, List::add, List::addAll);
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToArrayRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToArrayRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Simulate DataWeave: { a: toArray(""), b: toArray("hola") }
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", toArray(""));
+                        result.put("b", toArray("hola"));
+
+                        // Simulate output application/json indent=false (compact JSON)
+                        ObjectMapper compactMapper = new ObjectMapper();
+                        compactMapper.configure(compactMapper.Feature.INDENT_OUTPUT, false);
+                        String output = compactMapper.writeValueAsString(result);
+                        
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+output:
+
+
+Output:
+{"a":[],"b":["h","o","l","a"]}
+
+
+

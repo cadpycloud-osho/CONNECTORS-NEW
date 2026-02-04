@@ -1,0 +1,50 @@
+appendIfMissing:
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class AppendIfMissingController {
+
+    @GetMapping("/append")
+    public Map<String, Object> appendValues() {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("a", appendIfMissing(null, ""));
+        response.put("b", appendIfMissing("abc", ""));
+        response.put("c", appendIfMissing("", "xyz"));
+        response.put("d", appendIfMissing("abc", "xyz"));
+        response.put("e", appendIfMissing("abcxyz", "xyz"));
+
+        return response;
+    }
+
+    private String appendIfMissing(String input, String suffix) {
+        if (input == null) return null;
+        if (suffix == null || suffix.isEmpty()) return input;
+        if (input.endsWith(suffix)) return input;
+        return input + suffix;
+    }
+}
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+

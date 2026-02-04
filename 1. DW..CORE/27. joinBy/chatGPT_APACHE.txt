@@ -1,0 +1,20 @@
+joinBy:
+
+
+input:
+
+from("direct:joinByHyphen")
+.setBody(constant(List.of("a", "b", "c")))
+.setBody(simple(
+    "{ \"hyphenate\": \"${join(body, '-')}\" }"
+));
+
+
+
+output:
+
+{
+  "hyphenate": "a-b-c"
+}
+
+

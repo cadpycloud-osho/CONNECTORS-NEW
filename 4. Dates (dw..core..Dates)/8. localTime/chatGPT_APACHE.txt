@@ -1,0 +1,28 @@
+localTime:
+
+
+input:
+
+from("direct:createLocalTime")
+.process(exchange -> {
+
+    // Create a LocalTime with specific hour, minute, second
+    java.time.LocalTime newLocalTime = java.time.LocalTime.of(12, 30, 40);
+
+    // Prepare JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("newLocalTime", newLocalTime.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+
+
+{
+  "newLocalTime": "12:30:40"
+}
+
+

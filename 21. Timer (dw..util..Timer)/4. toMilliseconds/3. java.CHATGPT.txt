@@ -1,0 +1,29 @@
+toMilliseconds:
+
+
+
+input:
+
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Instant instant = Instant.parse("2018-07-23T22:03:04.829Z");
+
+        Map<String, Long> result = new HashMap<>();
+        result.put("toMilliseconds", instant.toEpochMilli());
+
+        System.out.println(result);
+    }
+}
+
+output:
+
+{toMilliseconds=1532383384829}
+
+

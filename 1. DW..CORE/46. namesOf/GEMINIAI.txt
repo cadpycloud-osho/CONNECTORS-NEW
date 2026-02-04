@@ -1,0 +1,79 @@
+namesOf:
+
+input:
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class MapKeyExtractor {
+
+    public static void main(String[] args) {
+        // 1. Define the input map (equivalent to DataWeave's { "a" : true, "b" : 1})
+        Map<String, Object> inputMap = new HashMap<>();
+        inputMap.put("a", true);
+        inputMap.put("b", 1);
+        
+        // 2. The core transformation logic (equivalent to DataWeave's namesOf function)
+        // Get the set of keys
+        List<String> namesOf = inputMap.keySet()
+                                       .stream()
+                                       .collect(Collectors.toList());
+
+        // 3. Structure the output as a Map (equivalent to DataWeave's { "namesOf" : ... })
+        Map<String, Object> output = new HashMap<>();
+        output.put("namesOf", namesOf);
+
+        // Print the final result (which would typically be converted to JSON by Spring Boot)
+        System.out.println(output);
+    }
+}
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController:
+public class KeyExtractorController {
+
+    // Define the structure of the response object to match the desired JSON output
+    public static class KeyResponse {
+        private List<String> namesOf;
+
+        public KeyResponse(List<String> namesOf) {
+            this.namesOf = namesOf;
+        }
+        
+        // Getters and Setters for Jackson serialization
+        public List<String> getNamesOf() { return namesOf; }
+        public void setNamesOf(List<String> namesOf) { this.namesOf = namesOf; }
+    }
+
+    // Endpoint to process the map and return the keys
+    @PostMapping("/extract-keys")
+    public KeyResponse extractKeys(@RequestBody Map<String, Object> inputMap) {
+        
+        // Use the keySet() method to get the map keys
+        List<String> namesOfKeys = inputMap.keySet()
+                                           .stream()
+                                           .sorted() // Optional: Sorts the keys for predictable output
+                                           .collect(Collectors.toList());
+
+        // Return the structured response
+        return new KeyResponse(namesOfKeys);
+    }
+}
+
+
+output:
+
+
+{namesOf=[a, b]}

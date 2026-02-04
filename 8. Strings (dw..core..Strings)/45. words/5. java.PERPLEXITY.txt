@@ -1,0 +1,25 @@
+words:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "hello world\nhere\t\t\tdata-weave";
+        List<String> result = Arrays.stream(input.split("\\s+"))
+                                   .filter(s -> !s.isEmpty())
+                                   .collect(Collectors.toList());
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[hello, world, here, data-weave]
+
+

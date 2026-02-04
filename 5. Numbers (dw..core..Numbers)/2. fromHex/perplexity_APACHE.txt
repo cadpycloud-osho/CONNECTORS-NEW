@@ -1,0 +1,35 @@
+fromHex:
+
+
+input:
+
+from("direct:fromHex")
+    .process(exchange -> {
+        Map<String, Object> result = new HashMap<>();
+        
+        result.put("a", new BigInteger("-1", 16).intValue());  // -1
+        result.put("b", new BigInteger("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000", 16));
+        result.put("c", new BigInteger("0", 16).intValue());    // 0
+        result.put("d", null);
+        result.put("e", new BigInteger("f", 16).intValue());   // 15
+        
+        exchange.getIn().setBody(result);
+    });
+
+
+
+output:
+
+{
+  "a": -1,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 15
+}
+
+
+
+
+
+

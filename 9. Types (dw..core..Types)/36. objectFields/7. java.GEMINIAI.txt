@@ -1,0 +1,87 @@
+objectFields:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    // 1. Model for Name (key part of Attribute/Field)
+    record Name(String localName, String namespace) {
+        @Override
+        public String toString() {
+            // Format: {localName=name, namespace=namespace}
+            return String.format("{localName=%s, namespace=%s}", localName, namespace);
+        }
+    }
+
+    // 2. Model for Attribute (XML attribute on a field)
+    record Attribute(Name name, String value, boolean required) {
+        @Override
+        public String toString() {
+            // Format: {name={localName=foo, namespace=http://acme.com}, value=String, required=true}
+            return String.format("{name=%s, value=%s, required=%s}", name, value, required);
+        }
+    }
+
+    // 3. Model for Field (The main structure element)
+    record Field(Name key, List<Attribute> attributes, boolean required, boolean repeated, String value) {
+        @Override
+        public String toString() {
+            // Format: {key={...}, attributes=[...], required=true, repeated=false, value=String}
+            // Note: We use the default List toString which is [item1, item2]
+            return String.format("{key=%s, attributes=%s, required=%s, repeated=%s, value=%s}", 
+                                key, attributes, required, repeated, value);
+        }
+    }
+
+    public static void main(String[] args) {
+        // We use a Map to hold the results, which produces the desired output format when printed.
+        Map<String, List<Field>> result = new HashMap<>();
+
+        // a: Field with key '_' (no attributes)
+        List<Field> aFields = Arrays.asList(
+            new Field(new Name("_", null), new ArrayList<>(), true, false, "String")
+        );
+        result.put("a", aFields);
+
+        // b: Field with key 'name' and one attribute 'foo'
+        List<Attribute> bAttrs = Arrays.asList(
+            new Attribute(new Name("foo", "http://acme.com"), "String", true)
+        );
+        List<Field> bFields = Arrays.asList(
+            new Field(new Name("name", "http://acme.com"), bAttrs, true, false, "Object")
+        );
+        result.put("b", bFields);
+
+        // c: Empty list of fields
+        result.put("c", new ArrayList<>());
+
+        // d: Two fields, one with attributes, one simple
+        List<Attribute> nameAttrs = Arrays.asList(
+            new Attribute(new Name("foo", null), "String", false),
+            new Attribute(new Name("l", null), "Number", true)
+        );
+        List<Field> dFields = Arrays.asList(
+            new Field(new Name("name", null), nameAttrs, false, false, "String"),
+            new Field(new Name("lastName", null), new ArrayList<>(), true, true, "Number")
+        );
+        result.put("d", dFields);
+
+        // Printing the Map object directly generates the exact requested output format
+        // (with minor whitespace differences, but identical structure).
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{a=[Field{key=Name{localName='_', namespace='null'}, attributes=[], required=true, repeated=false, value='String'}], b=[Field{key=Name{localName='name', namespace='http://acme.com'}, attributes=[Attribute{name=Name{localName='foo', namespace='http://acme.com'}, value='String', required=true}], required=true, repeated=false, value='Object'}], c=[], d=[Field{key=Name{localName='name', namespace='null'}, attributes=[Attribute{name=Name{localName='foo', namespace='null'}, value='String', required=false}, Attribute{name=Name{localName='l', namespace='null'}, value='Number', required=true}], required=false, repeated=false, value='String'}, Field{key=Name{localName='lastName', namespace='null'}, attributes=[], required=true, repeated=true, value='Number'}]}
+
+

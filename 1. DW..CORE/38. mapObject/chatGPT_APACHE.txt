@@ -1,0 +1,106 @@
+mapObject:
+
+example 1:
+
+input:
+
+from("direct:mapObjectExample")
+.setBody(constant(Map.of(
+    "a", "b",
+    "c", "d"
+)))
+
+.split(simple("${body.entrySet()}"))
+    .setBody(simple(
+        "\"${exchangeProperty.CamelSplitIndex}\": { " +
+        "\"${body.value}\": \"${body.key}\"" +
+        " }"
+    ))
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end()
+
+.setBody(simple("{ ${body} }"));
+
+
+output:
+
+{
+  "0": { "b": "a" },
+  "1": { "d": "c" }
+}
+
+
+-----------------------------------------------------------------
+
+example 2:
+
+input:
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+    <basic>9.99</basic>
+    <premium>53</premium>
+    <vip>398.99</vip>
+</prices>
+
+from("direct:pricesIncrease")
+.setBody(constant(
+    "<prices>" +
+    "<basic>9.99</basic>" +
+    "<premium>53</premium>" +
+    "<vip>398.99</vip>" +
+    "</prices>"
+))
+
+.split(xpath("/prices/*"))
+    .setBody(simple(
+        "<${in.header.CamelXPathNodeName}>"
+      + "${number:${body} + 5:##.00}"
+      + "</${in.header.CamelXPathNodeName}>"
+    ))
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end()
+
+.setBody(simple(
+    "<?xml version='1.0' encoding='UTF-8'?>"
+  + "<prices>${body}</prices>"
+));
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+  <basic>14.99</basic>
+  <premium>58.00</premium>
+  <vip>403.99</vip>
+</prices>
+
+
+-----------------------------------------------------------------
+
+example 3:
+
+input:
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+from("direct:emptyPrices")
+.setBody(constant(
+    "<?xml version='1.0' encoding='UTF-8'?>" +
+    "<prices></prices>"
+));
+
+
+output:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+
+
+-----------------------------------------------------------------

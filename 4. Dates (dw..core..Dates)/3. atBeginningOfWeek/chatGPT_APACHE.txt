@@ -1,0 +1,109 @@
+atBeginningOfWeek:
+
+
+example 1:
+
+input:
+
+from("direct:atBeginningOfWeekDateTime")
+.process(exchange -> {
+
+    // Input DateTime with offset (equivalent to DW DateTime)
+    java.time.OffsetDateTime input =
+            java.time.OffsetDateTime.parse("2020-10-06T18:23:20.351-03:00");
+
+    // Move to beginning of week (Sunday)
+    java.time.OffsetDateTime result =
+            input.with(java.time.DayOfWeek.SUNDAY)
+                 .toLocalDate()
+                 .atStartOfDay()
+                 .atOffset(input.getOffset());
+
+    // Build JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("atBeginningOfWeekDateTime", result.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDateTime": "2020-10-04T00:00-03:00"
+}
+
+
+
+-------------------------------------------------------
+
+
+example 2:
+
+input:
+
+
+Source
+%dw 2.0
+import * from dw::core::Dates
+output application/json
+---
+{
+  atBeginningOfWeekLocalDateTime: atBeginningOfWeek(|2020-10-06T18:23:20.351|)
+}
+DataWeave
+Output
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00:00"
+}
+
+
+
+output:
+
+
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00:00"
+}
+
+
+-------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:atBeginningOfWeekDate")
+.process(exchange -> {
+
+    // Input Date (YYYY-MM-DD)
+    java.time.LocalDate input =
+            java.time.LocalDate.parse("2020-10-06");
+
+    // Beginning of week (Sunday)
+    java.time.LocalDate result =
+            input.with(java.time.DayOfWeek.SUNDAY);
+
+    // JSON-style output
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+    output.put("atBeginningOfWeekDate", result.toString());
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+
+output:
+
+{
+  "atBeginningOfWeekDate": "2020-10-04"
+}
+
+
+
+-------------------------------------------------------
+
+

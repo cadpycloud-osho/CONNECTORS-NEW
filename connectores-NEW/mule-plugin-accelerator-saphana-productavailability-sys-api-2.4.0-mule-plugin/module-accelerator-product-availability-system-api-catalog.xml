@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogs xmlns="http://www.mulesoft.org/schema/mule/types" >
+
+            
+            <catalog name="get-pings-response-type" format="application/json">
+        <schema format="application/json+schema" location="./get-pings-response-data-schema.json" />
+    </catalog>
+        
+                    
+            <catalog name="get-product-availabilities-response-type" format="application/json">
+        <schema format="application/json+schema" location="./get-product-availabilities-response-data-schema.json" />
+    </catalog>
+        
+                        <catalog name="create-product-availability-request-type" format="application/json">
+        <schema format="application/json+schema" location="./create-product-availability-request-data-schema.json" />
+    </catalog>
+        
+            <catalog name="create-product-availability-response-type" format="application/json">
+        <schema format="application/json+schema" location="./create-product-availability-response-data-schema.json" />
+    </catalog>
+        
+            
+    
+    <catalog name="request-streaming-mode-enum" format="application/json">
+        <schema format="application/json+schema" location="./request-streaming-mode-enum.json" />
+    </catalog>
+
+    <catalog name="java" format="application/java">
+            <schema format="application/classloader"/>
+    </catalog>
+
+</catalogs>

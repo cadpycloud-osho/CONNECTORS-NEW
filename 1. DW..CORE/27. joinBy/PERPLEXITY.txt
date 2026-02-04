@@ -1,0 +1,36 @@
+joinBy:
+
+
+input:
+
+// JoinByHyphenApp.java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class JoinByHyphenApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(JoinByHyphenApp.class, args);
+
+        List<String> items = Arrays.asList("a", "b", "c");
+        String hyphenated = String.join("-", items);
+        
+        Map<String, String> result = Map.of("hyphenate", hyphenated);
+        System.out.println(result); // Output: {hyphenate=a-b-c}
+    }
+}
+
+
+output:
+
+
+{hyphenate=a-b-c}
+

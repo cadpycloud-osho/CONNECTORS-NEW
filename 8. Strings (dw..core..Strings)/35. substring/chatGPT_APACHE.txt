@@ -1,0 +1,36 @@
+substring:
+
+input:
+
+public class SubstringExample {
+
+    public static void main(String[] args) {
+        String text = "hello world!";
+
+        // DataWeave substring(text, 1, 5) → Java substring(startIndex, endIndex)
+        String result = substring(text, 1, 5);
+        System.out.println(result);
+    }
+
+    public static String substring(String value, int start, int end) {
+        if (value == null) {
+            return null;
+        }
+        // Ensure indices are within bounds
+        start = Math.max(0, start);
+        end = Math.min(value.length(), end);
+        if (start > end) {
+            return "";
+        }
+        return value.substring(start, end);
+    }
+}
+
+
+
+output:
+
+
+ello
+
+

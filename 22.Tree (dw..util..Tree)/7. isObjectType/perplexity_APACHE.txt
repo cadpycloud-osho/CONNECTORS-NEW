@@ -1,0 +1,57 @@
+
+
+isObjectType:
+
+
+input:
+
+public class IsObjectTypeConverter {
+    public static boolean isObjectType(List<Map<String, Object>> path) {
+        // Returns true if LAST PathElement is OBJECT_TYPE
+        if (path.isEmpty()) return false;
+        Map<String, Object> last = path.get(path.size() - 1);
+        return "OBJECT_TYPE".equals(last.get("kind"));
+    }
+    
+    public static void main(String[] args) {
+        List<Map<String, Object>> pathA = Arrays.asList(
+            createPathElement("OBJECT_TYPE", "user", null),
+            createPathElement("ATTRIBUTE_TYPE", "name", null)
+        );
+        
+        List<Map<String, Object>> pathB = Arrays.asList(
+            createPathElement("OBJECT_TYPE", "user", null),
+            createPathElement("OBJECT_TYPE", "name", null)
+        );
+        
+        List<Map<String, Object>> pathC = Arrays.asList(
+            createPathElement("OBJECT_TYPE", "user", null)
+        );
+        
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isObjectType(pathA));  // false - ends with ATTRIBUTE_TYPE
+        result.put("b", isObjectType(pathB));  // true  - ends with OBJECT_TYPE
+        result.put("c", isObjectType(pathC));  // true  - ends with OBJECT_TYPE
+        
+        System.out.println(result);
+    }
+    
+    private static Map<String, Object> createPathElement(String kind, Object selector, String namespace) {
+        Map<String, Object> element = new LinkedHashMap<>();
+        element.put("kind", kind);
+        element.put("selector", selector);
+        element.put("namespace", namespace);
+        return element;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true
+}
+
+

@@ -1,0 +1,145 @@
+find:
+
+
+examples 1:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: ["Bond", "James", "Bond"] find "Bond"
+        List<String> sourceList = Arrays.asList("Bond", "James", "Bond");
+        String valueToFind = "Bond";
+        
+        List<Integer> foundIndices = new ArrayList<>();
+
+        // Core Logic: Iterate and manually track the index (i)
+        for (int i = 0; i < sourceList.size(); i++) {
+            if (valueToFind.equals(sourceList.get(i))) {
+                foundIndices.add(i);
+            }
+        }
+
+        System.out.println("Output:");
+        System.out.println(foundIndices);
+    }
+}
+
+
+output:
+[0,2]
+
+------------------------------------------------------------------------
+
+
+examples 2:
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: "I heart DataWeave" find /\w*ea\w*(\b)/
+        String sourceString = "I heart DataWeave";
+
+        // Define the Regex Pattern: \w*ea\w*\b
+        String regex = "\\w*ea\\w*\\b"; 
+        
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(sourceString);
+
+        // List to hold the [start, end] index pairs
+        List<List<Integer>> foundRanges = new ArrayList<>();
+
+        // Core Logic: Use Matcher.find() to loop through all matches
+        while (matcher.find()) {
+            // matcher.start() is the inclusive start index (0-based)
+            // matcher.end() is the exclusive end index (0-based)
+            foundRanges.add(Arrays.asList(matcher.start(), matcher.end()));
+        }
+
+        System.out.println("Output:");
+        System.out.println(foundRanges);
+    }
+}
+
+output:
+[[2, 7], [8, 17]]
+
+------------------------------------------------------------------------
+
+
+examples 3:
+
+
+input:
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Source: "aabccdbce" find "a"
+        String sourceString = "aabccdbce";
+        String substring = "a";
+        
+        List<Integer> foundIndices = new ArrayList<>();
+        int startIndex = 0; 
+        
+        // Core Logic: Loop using String.indexOf(substring, fromIndex)
+        while (true) {
+            // Find the index of the substring starting from startIndex
+            int index = sourceString.indexOf(substring, startIndex);
+            
+            if (index == -1) {
+                break; // Not found
+            }
+            
+            foundIndices.add(index);
+            
+            // Advance the starting index past the current match to find the next occurrence
+            startIndex = index + substring.length();
+        }
+
+        System.out.println("Output:");
+        System.out.println(foundIndices);
+    }
+}
+
+output:
+
+[0, 1]
+------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

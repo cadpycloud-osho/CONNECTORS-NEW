@@ -1,0 +1,42 @@
+hashWith:
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.security.MessageDigest;
+
+public class MD2Processor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        byte[] input = "hello".getBytes();
+        
+        // Note: MD2 may require BouncyCastle provider in modern Java
+        MessageDigest md = MessageDigest.getInstance("MD2");
+        byte[] digest = md.digest(input);
+        
+        // Convert to Unicode escape string (matches DataWeave binary output format)
+        StringBuilder unicodeString = new StringBuilder("\"");
+        for (byte b : digest) {
+            unicodeString.append(String.format("\\u%04x", b & 0xFFFF));
+        }
+        unicodeString.append("\"");
+        
+        String result = "{ \"md2\": " + unicodeString.toString() + " }";
+        exchange.getIn().setBody(result);
+    }
+}
+
+from("direct:md2")
+    .process(new MD2Processor())
+    .log("${body}");
+
+
+output:
+
+
+
+{ "md2": "\ufffd\u0004ls\ufffd\u00031\ufffdh\ufffd}8\u0004\ufffd\u0006U" }
+
+

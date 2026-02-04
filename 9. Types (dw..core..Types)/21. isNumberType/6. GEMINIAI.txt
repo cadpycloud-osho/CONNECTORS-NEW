@@ -1,0 +1,59 @@
+isNumberType:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.lang.Number;
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NumberCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isNumberType(Type).
+     */
+    private boolean isNumberType(Class<?> type) {
+        return Number.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/number-typecheck")
+    public Map<String, Boolean> checkNumberTypes() {
+        
+        // DataWeave type ANumber is an alias for Number
+        Class<?> aNumber = Number.class;
+        
+        // DataWeave type Number
+        Class<?> numberType = Number.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+
+        // Perform the type checks
+        boolean a = isNumberType(aNumber);
+        boolean b = isNumberType(numberType);
+        boolean c = isNumberType(stringType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

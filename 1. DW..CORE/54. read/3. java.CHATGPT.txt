@@ -1,0 +1,111 @@
+read:
+
+
+example 1:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Input JSON string
+        String jsonInput = "{ \"hello\" : \"world\" }";
+
+        // Extract value manually (simple JSON case)
+        String value = jsonInput
+                .replace("{", "")
+                .replace("}", "")
+                .replace("\"", "")
+                .split(":")[1]
+                .trim();
+
+        // Print XML output
+        System.out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        System.out.println("<hello>" + value + "</hello>");
+    }
+}
+
+
+output:
+<?xml version="1.0" encoding="UTF-8"?>
+<hello>world</hello>
+
+
+---------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String csvData = "Some, Body";
+        
+        // Parse CSV manually (header: false -> column_0, column_1, ...)
+        String[] columns = csvData.split(",");
+        
+        // Manual JSON output
+        System.out.println("{");
+        for (int i = 0; i < columns.length; i++) {
+            System.out.print("  \"column_" + i + "\" : \"" + columns[i].trim() + "\"");
+            if (i < columns.length - 1) {
+                System.out.println(",");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.println("}");
+    }
+}
+
+output:
+
+{
+  "column_0" : "Some",
+  "column_1" : " Body"
+}
+
+---------------------------------------------------------------
+
+
+
+
+
+example 3:
+
+
+input:
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Input XML
+        String xmlInput = "<prices><basic>9.99</basic></prices>";
+
+        // Extract value between <basic> and </basic>
+        String value = xmlInput
+                .replaceAll(".*<basic>", "")
+                .replaceAll("</basic>.*", "");
+
+        // Print required XML output
+        System.out.println("<XML>");
+        System.out.println("  <basic>" + value + "</basic>");
+        System.out.println("</XML>");
+    }
+}
+
+
+output:
+
+<XML>
+  <basic>9.99</basic>
+</XML>
+
+---------------------------------------------------------------

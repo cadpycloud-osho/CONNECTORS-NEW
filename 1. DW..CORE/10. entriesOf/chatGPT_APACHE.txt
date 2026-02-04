@@ -1,0 +1,50 @@
+entriesOf:
+
+
+
+input:
+
+from("direct:entriesOfXml")
+.setBody(constant("<xml attr=\"x\"><a>true</a><b>1</b></xml>"))
+
+.setProperty("rootName", xpath("name(/*)", String.class))
+.setProperty("attr", xpath("/*/@attr", String.class))
+.setProperty("aVal", xpath("/*/a/text()", String.class))
+.setProperty("bVal", xpath("/*/b/text()", String.class))
+
+.setBody(simple("""
+{
+  "entriesOf": [
+    {
+      "key": "${exchangeProperty.rootName}",
+      "value": {
+        "a": "${exchangeProperty.aVal}",
+        "b": "${exchangeProperty.bVal}"
+      },
+      "attributes": {
+        "attr": "${exchangeProperty.attr}"
+      }
+    }
+  ]
+}
+"""));
+
+
+output:
+
+{
+  "entriesOf": [
+    {
+      "key": "xml",
+      "value": {
+        "a": "true",
+        "b": "1"
+      },
+      "attributes": {
+        "attr": "x"
+      }
+    }
+  ]
+}
+
+

@@ -1,0 +1,142 @@
+divideBy:
+
+
+
+input:
+
+
+package com.example.dataweaveconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+// =========================================================================
+// 1. SPRING BOOT APPLICATION MAIN CLASS
+// =========================================================================
+@SpringBootApplication
+public class DataweaveConverterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveConverterApplication.class, args);
+    }
+
+    // Record to represent a single key-value pair in the object definition order
+    // This is necessary because standard Java Maps do not maintain order or allow duplicate keys.
+    public record KeyValuePair(String key, Object value) {}
+
+    // DTO for the final output JSON structure
+    public record DataWeaveOutput(
+        List<Map<String, Object>> divideBy
+    ) {}
+
+    // =========================================================================
+    // 2. REST CONTROLLER
+    // =========================================================================
+    @RestController
+    @RequestMapping("/convert")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+
+        @Autowired
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/divideBy")
+        public DataWeaveOutput runDataWeaveLogic() {
+            // Source: { "a": 1, "b" : true, "a" : 2, "b" : false, "c" : 3} divideBy 2
+            
+            // Manually represent the object's 5 properties in the exact order
+            List<KeyValuePair> sourceFields = List.of(
+                new KeyValuePair("a", 1),
+                new KeyValuePair("b", true),
+                new KeyValuePair("a", 2),
+                new KeyValuePair("b", false),
+                new KeyValuePair("c", 3)
+            );
+
+            int divisor = 2; // The 'divideBy 2' operation
+
+            List<Map<String, Object>> result = dataWeaveService.divideObjectFields(sourceFields, divisor);
+
+            return new DataWeaveOutput(result);
+        }
+    }
+
+    // =========================================================================
+    // 3. SERVICE LAYER (LOGIC IMPLEMENTATION)
+    // =========================================================================
+    @Service
+    public static class DataWeaveService {
+
+        /**
+         * Mimics the DataWeave Object divideBy N operation, which splits an object's
+         * fields (in order) into chunks of size up to N.
+         *
+         * @param sourceFields The ordered list of key-value pairs representing the object.
+         * @param chunkSize The divisor N, which determines the maximum size of each resulting object.
+         * @return A list of Maps, where each map contains a chunk of the original fields.
+         */
+        public List<Map<String, Object>> divideObjectFields(List<KeyValuePair> sourceFields, int chunkSize) {
+            if (chunkSize <= 0) {
+                // Handle edge case, though divisor is fixed at 2
+                throw new IllegalArgumentException("Chunk size (divisor) must be positive.");
+            }
+
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            int totalFields = sourceFields.size();
+
+            // Loop through the fields, incrementing by the chunk size (2)
+            for (int i = 0; i < totalFields; i += chunkSize) {
+                // Use LinkedHashMap to maintain order, though standard HashMap would work for simple output
+                Map<String, Object> currentChunk = new LinkedHashMap<>();
+
+                // Calculate the end index for the current chunk
+                int endIndex = Math.min(i + chunkSize, totalFields);
+
+                // Populate the chunk map
+                for (int j = i; j < endIndex; j++) {
+                    KeyValuePair pair = sourceFields.get(j);
+                    
+                    // The result objects use the key/value pairs from the original object.
+                    // Note: Java Maps cannot have duplicate keys, but this structure accurately
+                    // represents the grouping of the *original* fields.
+                    currentChunk.put(pair.key(), pair.value());
+                }
+
+                resultList.add(currentChunk);
+            }
+
+            return resultList;
+        }
+    }
+}
+
+ouput:
+
+{
+  "divideBy": [
+    {
+      "a": 1,
+      "b": true
+    },
+    {
+      "a": 2,
+      "b": false
+    },
+    {
+      "c": 3
+    }
+  ]
+}

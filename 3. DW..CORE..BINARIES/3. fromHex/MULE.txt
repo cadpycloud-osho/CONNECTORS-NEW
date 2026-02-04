@@ -1,0 +1,20 @@
+fromHex:
+
+fromHex(hexString: String): Binary
+
+fromHex(hexString: String): Binary
+Transforms a hexadecimal string into a binary.
+
+
+Source
+%dw 2.0
+import * from dw::core::Binaries
+output application/dw
+---
+{ "hexToBinary": fromHex("4D756C65") }
+
+DataWeave
+Output
+{
+   hexToBinary: "TXVsZQ==" as Binary {base: "64"}
+}

@@ -1,0 +1,39 @@
+prop:
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+public class SystemPropertyService implements CommandLineRunner {
+
+    private static final String PROPERTY_KEY = "user.timezone";
+
+    /**
+     * Replicates the DataWeave prop("user.timezone") function.
+     * @return A map containing the retrieved system property value.
+     */
+    public Map<String, String> getSystemTimezoneProperty() {
+        // Equivalent to: prop("user.timezone")
+        String timezoneValue = System.getProperty(PROPERTY_KEY);
+
+        // Map to the DW output structure: { props: "..." }
+        return Map.of("props", timezoneValue);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("--- Spring Boot System Property Simulation ---");
+        System.out.println(getSystemTimezoneProperty());
+    }
+}
+
+output:
+
+{props=Asia/Kolkata} 
+// Output will vary based on the host system's 'user.timezone' setting (e.g., America/Los_Angeles, UTC, etc.)
+

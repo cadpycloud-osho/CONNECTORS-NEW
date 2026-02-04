@@ -1,0 +1,65 @@
+isNamespaceType:
+
+
+
+
+
+input:
+
+import javax.xml.namespace.QName;
+import java.lang.String;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Conceptually mirrors DataWeave's isNamespaceType(Type).
+     * Checks if the provided type is QName or a subclass/implementation.
+     * QName is used here as a proxy for the XML Namespace concept.
+     */
+    public static boolean isNamespaceType(Class<?> type) {
+        return QName.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+        
+        // 1. Mimics the Type alias 'ANamespace' (which is Namespace)
+        Class<?> aNamespaceClass = QName.class;
+
+        // 2. Mimics the type 'Namespace'
+        Class<?> namespaceClass = QName.class;
+
+        // 3. Mimics the type 'String'
+        Class<?> stringClass = String.class;
+        
+        // --- Execution ---
+        
+        // a: isNamespaceType(ANamespace)
+        boolean a = isNamespaceType(aNamespaceClass); 
+
+        // b: isNamespaceType(Namespace)
+        boolean b = isNamespaceType(namespaceClass); 
+        
+        // c: isNamespaceType(String)
+        boolean c = isNamespaceType(stringClass); 
+
+        // Output the result in JSON format
+        System.out.println("{");
+        System.out.println("  \"a\": " + a + ",");
+        System.out.println("  \"b\": " + b + ",");
+        System.out.println("  \"c\": " + c);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

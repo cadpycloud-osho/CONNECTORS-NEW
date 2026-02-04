@@ -1,0 +1,61 @@
+fail:
+
+
+input:
+
+import java.util.Collections;
+import java.util.List;
+
+// 1. Custom Exception (equivalent to the specific Mule error)
+class DataEmptyException extends RuntimeException {
+    public DataEmptyException(String message) {
+        super(message);
+    }
+}
+
+// Renamed the public class from DataValidator to Main 
+// to match the expected file name (Main.java).
+public class Main {
+
+    public List<?> processData(List<?> result) {
+        // --- Replicates the DataWeave Logic ---
+        // if(sizeOf(result) <= 0) fail('Data was empty') else result
+        
+        if (result == null || result.isEmpty()) {
+            System.out.println("Validation failed. Throwing exception...");
+            // Throws a runtime exception, equivalent to dw::Runtime::fail()
+            throw new DataEmptyException("Data was empty");
+        }
+        
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        // Now creating an instance of the Main class
+        Main validator = new Main();
+        List<String> emptyData = Collections.emptyList();
+        
+        System.out.println("--- Pure Java Data Validation Simulation ---");
+        
+        try {
+            validator.processData(emptyData);
+            // This line will not be reached because processData throws an exception
+            // System.out.println("Validation successful.");
+            
+        } catch (DataEmptyException e) {
+            // Catching the specific exception (equivalent to an Mule On Error Continue/Propagate)
+            System.err.println("Caught DataEmptyException (Mule Fail equivalent):");
+            System.err.println("Message: \"" + e.getMessage() + "\"");
+            
+        } catch (Exception e) {
+            // Catching other unexpected exceptions
+            System.err.println("Caught unexpected error: " + e.getMessage());
+        }
+    }
+}
+output:
+
+--- Pure Java Data Validation Simulation ---
+Validation failed. Throwing exception...
+Caught DataEmptyException (Mule Fail equivalent):
+Message: "Data was empty"

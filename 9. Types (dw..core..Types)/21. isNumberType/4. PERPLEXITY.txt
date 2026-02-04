@@ -1,0 +1,43 @@
+isNumberType:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class NumberTypeController {
+
+    private boolean isNumberType(Object value) {
+        return value instanceof Number;
+    }
+
+    @GetMapping("/number-type-check")
+    public Map<String, Boolean> checkNumberTypes() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        Number aNumber = 123;    // ANumber alias
+        Number numberType = 456.78;  // Number
+        String str = "test";     // String
+        
+        result.put("a", isNumberType(aNumber));
+        result.put("b", isNumberType(numberType));
+        result.put("c", isNumberType(str));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

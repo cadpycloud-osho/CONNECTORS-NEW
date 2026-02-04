@@ -1,0 +1,20 @@
+upper:
+
+input:
+from("direct:start")
+    .process(exchange -> {
+        String input = "mulesoft";
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+        result.put("name", input.toUpperCase());
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+
+output:
+
+
+{ "name": "MULESOFT" }
+
+

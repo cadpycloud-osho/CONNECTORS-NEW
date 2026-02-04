@@ -1,0 +1,73 @@
+firstWith:
+
+
+input:
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@SpringBootApplication
+public class FirstWithDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(FirstWithDemoApplication.class, args);
+    }
+}
+
+class User {
+    public String name;
+    public String lastName;
+    
+    public User(String name, String lastName) {
+        this.name = name;
+        this.lastName = lastName;
+    }
+}
+
+@RestController
+class FirstWithController {
+    
+    private <T> T firstWith(List<T> list, java.util.function.BiPredicate<T, Integer> predicate) {
+        for (int i = 0; i < list.size(); i++) {
+            if (predicate.test(list.get(i), i)) {
+                return list.get(i);
+            }
+        }
+        return null;
+    }
+    
+    @GetMapping("/firstWith")
+    public Map<String, Object> firstWithExample() {
+        List<User> users = Arrays.asList(
+            new User("Mariano", "Achaval"),
+            new User("Ana", "Felisatti"),
+            new User("Mariano", "de Sousa")
+        );
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        // First Mariano
+        result.put("a", firstWith(users, (user, index) -> user.name.equals("Mariano")));
+        
+        // Peter (not found)
+        result.put("b", firstWith(users, (user, index) -> user.name.equals("Peter")));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+
+

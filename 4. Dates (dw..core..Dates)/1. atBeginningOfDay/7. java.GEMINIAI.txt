@@ -1,0 +1,99 @@
+atBeginningOfDay:
+
+example 1:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a ZonedDateTime to the start of its day, preserving the time zone.
+     * This mimics the DataWeave 'atBeginningOfDay(DateTime)' function.
+     * @param dateTimeString The input date-time string with offset.
+     * @return The resulting date-time string at midnight.
+     */
+    public static String calculateBeginningOfDayZoned(String dateTimeString) {
+        // 1. Parse the input string into a ZonedDateTime object
+        // The ISO_OFFSET_DATE_TIME formatter handles the offset (-03:00)
+        ZonedDateTime originalZdt = ZonedDateTime.parse(dateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        // 2. Adjust the time component to the start of the day (midnight)
+        // ZonedDateTime.toLocalDate().atStartOfDay(originalZdt.getZone())
+        // or using ZonedDateTime.truncatedTo(ChronoUnit.DAYS) which is concise
+        ZonedDateTime beginningOfDayZdt = originalZdt.toLocalDate().atStartOfDay(originalZdt.getZone());
+        
+        // 3. Format the result back to the desired output string format
+        // We use ISO_OFFSET_DATE_TIME for output to match DW's default DateTime format
+        return beginningOfDayZdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351-03:00";
+        String output = calculateBeginningOfDayZoned(input);
+        
+        System.out.println("--- Scenario 1: ZonedDateTime (with Offset) ---");
+        System.out.println("Input (DW: DateTime):   " + input);
+        System.out.println("Java Output:            " + output);
+    }
+}
+
+output:
+
+--- Scenario 1: ZonedDateTime (with Offset) ---
+Input (DW: DateTime):   2020-10-06T18:23:20.351-03:00
+Java Output:            2020-10-06T00:00:00-03:00
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Converts a LocalDateTime to the start of its day (midnight).
+     * This mimics the DataWeave 'atBeginningOfDay(LocalDateTime)' function.
+     * @param dateTimeString The input local date-time string.
+     * @return The resulting local date-time string at midnight.
+     */
+    public static String calculateBeginningOfDayLocal(String dateTimeString) {
+        // 1. Parse the input string into a LocalDateTime object
+        LocalDateTime originalLdt = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        // 2. Adjust the time component to the start of the day (midnight)
+        // LocalDateTime.toLocalDate().atStartOfDay() is the standard way, or use with()
+        LocalDateTime beginningOfDayLdt = originalLdt.with(LocalTime.MIN);
+        
+        // 3. Format the result back to the desired output string format
+        // We use ISO_LOCAL_DATE_TIME for output to match DW's default LocalDateTime format
+        return beginningOfDayLdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    public static void main(String[] args) {
+        String input = "2020-10-06T18:23:20.351";
+        String output = calculateBeginningOfDayLocal(input);
+        
+        System.out.println("\n--- Scenario 2: LocalDateTime (without Offset) ---");
+        System.out.println("Input (DW: LocalDateTime): " + input);
+        System.out.println("Java Output:               " + output);
+    }
+}
+
+output:
+
+--- Scenario 2: LocalDateTime (without Offset) ---
+Input (DW: LocalDateTime): 2020-10-06T18:23:20.351
+Java Output:               2020-10-06T00:00:00
+

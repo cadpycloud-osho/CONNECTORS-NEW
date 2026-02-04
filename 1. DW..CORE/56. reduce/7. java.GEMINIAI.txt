@@ -1,0 +1,487 @@
+reduce:
+
+
+example 1:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> list = Arrays.asList(2, 3);
+        
+        // Java Stream reduce with no initial value: 
+        // accumulator (acc = $$) starts at 2 (the first element).
+        // item ($) starts at 3 (the second element).
+        Optional<Integer> resultOptional = list.stream().reduce((acc, item) -> acc + item);
+        
+        // If the list is not empty, it returns the result.
+        Integer result = resultOptional.orElse(null);
+        
+        System.out.println(result);
+    }
+}
+
+output:
+
+5
+
+-------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+
+input:
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Map;
+import java.util.LinkedHashMap; // Used to maintain key order
+
+public class Main {
+
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        int i = 0;
+        int size = map.size();
+        
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            
+            sb.append("  \"").append(key).append("\" : ");
+            
+            // Format value: Strings need quotes, null is unquoted, Numbers are unquoted
+            if (value instanceof String) {
+                sb.append("\"").append(value).append("\"");
+            } else if (value == null) {
+                sb.append("null");
+            } else {
+                sb.append(value);
+            }
+            
+            if (i < size - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+            i++;
+        }
+        
+        sb.append("}");
+        return sb.toString();
+    }
+    
+    public static void main(String[] args) {
+        // Inputs
+        List<String> myNumsStr = Arrays.asList("1", "2", "3", "4");
+        List<Integer> myNumsInt = Arrays.asList(1, 2, 3, 4);
+        List<String> myEmptyList = Collections.emptyList();
+        
+        // 1. "sum" : myNums reduce ($$ + $)
+        // Sums the elements: 1 + 2 + 3 + 4 = 10
+        Optional<Integer> sumOptional = myNumsInt.stream().reduce(Integer::sum);
+        
+        // 2. "concat" : myNums reduce ($$ ++ $)
+        // Concatenates the elements: "1234"
+        String concatResult = myNumsStr.stream().reduce((acc, item) -> acc + item).orElse(null);
+
+        // 3. "emptyList" : myEmptyList reduce ($$ ++ $)
+        // For an empty list reduction without an initial value, Java returns Optional.empty(), 
+        // which corresponds to null in DataWeave output.
+        Optional<String> emptyOptional = myEmptyList.stream().reduce((acc, item) -> acc + item);
+        
+        // --- Assemble Output using standard Map ---
+        Map<String, Object> output = new LinkedHashMap<>();
+        
+        // Optional.orElse(null) ensures null for empty list case
+        output.put("sum", sumOptional.orElse(null));
+        output.put("concat", concatResult);
+        output.put("emptyList", emptyOptional.orElse(null));
+        
+        // 4. Output the result
+        System.out.println(formatMapAsPrettyJson(output));
+    }
+}
+output:
+
+{
+  "sum" : 10,
+  "concat" : "1234",
+  "emptyList" : null
+}
+
+-------------------------------------------------------------
+
+
+
+example 3:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap; // Used to maintain key order
+
+public class Main {
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        int i = 0;
+        int size = map.size();
+        
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            
+            sb.append("  \"").append(key).append("\" : ");
+            
+            // Format value: Strings need quotes, Numbers do not
+            if (value instanceof String) {
+                sb.append("\"").append(value).append("\"");
+            } else {
+                sb.append(value);
+            }
+            
+            if (i < size - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+            i++;
+        }
+        
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Inputs
+        List<String> chars = Arrays.asList("a", "b", "c", "d");
+        List<Integer> nums = Arrays.asList(0, 1, 2, 3, 4, 5);
+        List<Integer> factors = Arrays.asList(2, 3, 3);
+        List<Integer> factorsAcc = Arrays.asList(2, 2, 3);
+
+        // 1. "concat" : chars reduce ((item, acc = "z") -> acc ++ item)
+        // Accumulator starts at "z"
+        String concatResult = chars.stream().reduce("z", (acc, item) -> acc + item); // "z" + "a" + "b" + "c" + "d" = "zabcd"
+        
+        // 2. "sum": nums reduce ((item, acc = 3) -> acc + item)
+        // Accumulator starts at 3
+        int sumResult = nums.stream().reduce(3, Integer::sum); // 3 + (0 + 1 + 2 + 3 + 4 + 5) = 18
+        
+        // 3. "multiply" : factors reduce ((item, acc) -> acc * item) (No initial value)
+        // Java's reduce without initial value returns Optional.orElse(1) handles the empty list case gracefully.
+        int multiplyResult = factors.stream().reduce((acc, item) -> acc * item).orElse(1); // 2 * 3 * 3 = 18
+        
+        // 4. "multiplyAcc" : factorsAcc reduce ((item, acc = 3) -> acc * item) (Initial value of 3)
+        // Accumulator starts at 3
+        int multiplyAccResult = factorsAcc.stream().reduce(3, (acc, item) -> acc * item); // 3 * 2 * 2 * 3 = 36
+
+        // --- Assemble Output using standard Map ---
+        Map<String, Object> output = new LinkedHashMap<>();
+        
+        output.put("concat", concatResult);
+        output.put("sum", sumResult);
+        output.put("multiply", multiplyResult);
+        output.put("multiplyAcc", multiplyAccResult);
+        
+        // 5. Output the result
+        System.out.println(formatMapAsPrettyJson(output));
+    }
+}
+
+output:
+
+{
+  "concat" : "zabcd",
+  "sum" : 18,
+  "multiply" : 18,
+  "multiplyAcc" : 36
+}
+
+-------------------------------------------------------------
+
+
+
+example 4:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+class LetterObj {
+    public String letter;
+    public LetterObj(String letter) { this.letter = letter; }
+    // Getters needed for reflective JSON serialization (if used), but kept for structure
+    public String getLetter() { return letter; }
+    
+    // Override toString to simplify manual JSON output for POJO fields
+    @Override
+    public String toString() {
+        return "{\n    \"letter\" : \"" + this.letter + "\"\n  }";
+    }
+}
+
+public class Main {
+    
+    // Helper to manually format simple Java Map to JSON String
+    private static String formatOutput(Map<String, Object> output) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Keys must be processed in order to match the required output
+        List<String> orderedKeys = Arrays.asList(
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+            "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y"
+        );
+        
+        for (int i = 0; i < orderedKeys.size(); i++) {
+            String key = orderedKeys.get(i);
+            Object value = output.get(key);
+            String valueString;
+
+            if (value instanceof String) {
+                valueString = "\"" + value + "\"";
+            } else if (value instanceof LetterObj) {
+                // Use the custom toString for POJO formatting
+                valueString = ((LetterObj) value).toString().replace("\n", "\n  "); 
+            } else if (value instanceof List) {
+                // Format list [0, 1, 2, 3, 4]
+                valueString = ((List<?>) value).stream()
+                               .map(Object::toString)
+                               .collect(Collectors.joining(", ", "[ ", " ]"));
+            } else if (value == null) {
+                valueString = "null";
+            } else {
+                valueString = value.toString();
+            }
+
+            sb.append("  \"").append(key).append("\" : ").append(valueString);
+            
+            if (i < orderedKeys.size() - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+        }
+        
+        sb.append("}");
+        return sb.toString();
+    }
+    
+    public static void main(String[] args) {
+        // Define DataWeave variables
+        List<Integer> a = Arrays.asList(0, 1, 2, 3, 4, 5);
+        List<String> b = Arrays.asList("a", "b", "c", "d", "e");
+        List<LetterObj> c = Arrays.asList(new LetterObj("a"), new LetterObj("b"), new LetterObj("c"));
+        List<Boolean> d = Arrays.asList(true, false, false, true, true);
+        
+        // --- Reductions ---
+
+        // a: [0, 1, 2, 3, 4, 5] reduce $$ (Returns the first element)
+        Integer resultA = a.stream().reduce((acc, item) -> acc).orElse(null); // 0
+
+        // b: ["a", "b", "c", "d", "e"] reduce $$ (Returns the first element)
+        String resultB = b.stream().reduce((acc, item) -> acc).orElse(null); // "a"
+        
+        // c: [{ "letter": "a" }, ...] reduce ((item, acc = "z") -> acc ++ item.letter)
+        // FIX: Must explicitly define the reduction function to accept String accumulator and LetterObj item.
+        String resultC = c.stream().reduce("z", (String acc, LetterObj item) -> acc + item.letter, (acc1, acc2) -> acc1 + acc2); // "zabc"
+
+        // d: [{ letter: "a" }, ...] reduce $$ (Returns the first element)
+        LetterObj resultD = c.stream().reduce((acc, item) -> acc).orElse(null); // {letter: "a"}
+
+        // e/f: [true, false, ...] reduce ($$ and $) / ((item, acc) -> acc and item)
+        Boolean resultEF = d.stream().reduce(Boolean::logicalAnd).orElse(true); // false
+
+        // g: [true, false, ...] reduce ((item, acc = false) -> acc and item)
+        Boolean resultG = d.stream().reduce(false, Boolean::logicalAnd); // false
+
+        // h: [true, false, ...] reduce $$ (Returns the first element)
+        Boolean resultH = d.stream().reduce((acc, item) -> acc).orElse(null); // true
+
+        // i/j: myVar.a reduce ($$ + $) / ((item, acc) -> acc + item)
+        Integer resultIJ = a.stream().reduce(Integer::sum).orElse(0); // 15
+
+        // k: myVar.a reduce ((item, acc = 3) -> acc + item)
+        Integer resultK = a.stream().reduce(3, Integer::sum); // 18
+
+        // l: myVar.a reduce $$
+        Integer resultL = a.stream().reduce((acc, item) -> acc).orElse(null); // 0
+
+        // m/n: myVar.b reduce ($$ ++ $) / ((item, acc) -> acc ++ item)
+        String resultMN = b.stream().reduce(String::concat).orElse(null); // "abcde"
+
+        // o: myVar.b reduce ((item, acc = "z") -> acc ++ item)
+        String resultO = b.stream().reduce("z", String::concat); // "zabcde"
+
+        // p: myVar.b reduce $$
+        String resultP = b.stream().reduce((acc, item) -> acc).orElse(null); // "a"
+
+        // q: myVar.c reduce ((item, acc = "z") -> acc ++ item.letter)
+        // FIX: Same reduction fix as resultC
+        String resultQ = c.stream().reduce("z", (String acc, LetterObj item) -> acc + item.letter, (acc1, acc2) -> acc1 + acc2); // "zabc"
+
+        // r: myVar.c reduce $$
+        LetterObj resultR = c.stream().reduce((acc, item) -> acc).orElse(null); // {letter: "a"}
+
+        // s/t: myVar.d reduce ($$ and $) / ((item, acc) -> acc and item)
+        Boolean resultST = d.stream().reduce(Boolean::logicalAnd).orElse(true); // false
+
+        // u: myVar.d reduce ((item, acc = false) -> acc and item)
+        Boolean resultU = d.stream().reduce(false, Boolean::logicalAnd); // false
+
+        // v: myVar.d reduce $$
+        Boolean resultV = d.stream().reduce((acc, item) -> acc).orElse(null); // true
+
+        // w: ([0, 1, 2, 3, 4] reduce ((item, acc = {}) -> acc ++ { a: item })) pluck $
+        // Pluck $ extracts the values: [0, 1, 2, 3, 4]
+        List<Integer> listW = Arrays.asList(0, 1, 2, 3, 4);
+        List<Integer> resultW = listW; 
+
+        // x: [] reduce $$ (Returns null for empty list without initial accumulator)
+        String resultX = Arrays.<String>asList().stream().reduce((acc, item) -> acc).orElse(null); // null
+
+        // y: [] reduce ((item,acc = 0) -> acc + item)
+        // FIX: Explicitly cast empty list stream to ensure reduction type is Integer
+        Integer resultY = Arrays.<Integer>asList().stream().reduce(0, Integer::sum); // 0
+
+        // --- Assemble Output using standard Map ---
+        Map<String, Object> output = new LinkedHashMap<>(); // Use LinkedHashMap for ordered keys
+        
+        output.put("a", resultA); output.put("b", resultB); output.put("c", resultC);
+        output.put("d", resultD); output.put("e", resultEF); output.put("f", resultEF);
+        output.put("g", resultG); output.put("h", resultH); output.put("i", resultIJ);
+        output.put("j", resultIJ); output.put("k", resultK); output.put("l", resultL);
+        output.put("m", resultMN); output.put("n", resultMN); output.put("o", resultO);
+        output.put("p", resultP); output.put("q", resultQ);
+        output.put("r", resultR); output.put("s", resultST); output.put("t", resultST);
+        output.put("u", resultU); output.put("v", resultV);
+        output.put("w", resultW); 
+        output.put("x", resultX); output.put("y", resultY);
+        
+        System.out.println(formatOutput(output));
+    }
+}
+
+output:
+
+{
+  "a" : 0,
+  "b" : "a",
+  "c" : "zabc",
+  "d" : {
+    "letter" : "a"
+  },
+  "e" : false,
+  "f" : false,
+  "g" : false,
+  "h" : true,
+  "i" : 15,
+  "j" : 15,
+  "k" : 18,
+  "l" : 0,
+  "m" : "abcde",
+  "n" : "abcde",
+  "o" : "zabcde",
+  "p" : "a",
+  "q" : "zabc",
+  "r" : {
+    "letter" : "a"
+  },
+  "s" : false,
+  "t" : false,
+  "u" : false,
+  "v" : true,
+  "w" : [ 0, 1, 2, 3, 4 ],
+  "x" : null,
+  "y" : 0
+}
+
+-------------------------------------------------------------
+
+
+
+example 5:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        String inputString = "hello world";
+        
+        // 1. Convert String to a stream of characters (Strings in this case)
+        // inputString.split("") results in a List of single-character Strings: 
+        // ["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d"]
+        List<String> charList = Arrays.asList(inputString.split(""));
+
+        // 2. Reduce with acc = "" and prepend the item (item + acc)
+        // This is the functional way to reverse a sequence.
+        String reversedString = charList.stream().reduce("", (acc, item) -> item + acc);
+        // reversedString is "dlrow olleh"
+        
+        // 3. Output the result
+        // Manual JSON string serialization: enclosing the resulting string in quotes.
+        String outputJson = "\"" + reversedString + "\"";
+        
+        System.out.println(outputJson);
+    }
+}
+output:
+
+
+"dlrow olleh"
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

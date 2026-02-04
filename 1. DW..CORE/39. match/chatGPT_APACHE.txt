@@ -1,0 +1,52 @@
+match:
+
+example 1:
+
+
+input:
+
+from("direct:regexMatch")
+.setBody(simple(
+    "${'me@mulesoft.com'.regexReplaceAll('([a-z]*)@([a-z]*)\\\\.com', '[$0,$1,$2]')}"
+));
+
+
+
+output:
+[
+  "me@mulesoft.com",
+  "me",
+  "mulesoft"
+]
+
+
+
+--------------------------------------------------------
+
+example 2:
+
+
+input:
+
+from("direct:flatMapMatch")
+.setBody(constant(List.of(
+    "192.88.99.0/24",
+    "192.168.0.0/16",
+    "192.175.48.0/24"
+)))
+
+.split(body())
+    .filter(simple("${body} regex '.*\\/24$'"))
+        .aggregate(constant(true),
+            new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+output:
+
+[
+  "192.88.99.0/24",
+  "192.175.48.0/24"
+]
+

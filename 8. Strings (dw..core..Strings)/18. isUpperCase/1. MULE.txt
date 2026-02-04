@@ -1,0 +1,67 @@
+isUpperCase:
+
+isUpperCase(text: String): Boolean
+
+isUpperCase(text: String): Boolean
+Checks if the text contains only uppercase characters.
+
+
+
+Source
+%dw 2.0
+import isUpperCase from dw::core::Strings
+output application/json
+---
+{
+  "a": isUpperCase(null),
+  "b": isUpperCase(""),
+  "c": isUpperCase("  "),
+  "d": isUpperCase("ABC"),
+  "e": isUpperCase("aBC"),
+  "f": isUpperCase("A C"),
+  "g": isUpperCase("A1C"),
+  "h": isUpperCase("A/C")
+}
+
+
+
+DataWeave
+Output
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,36 @@
+takeWhile:
+
+input:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@RestController
+public class TakeWhileController {
+
+    @GetMapping("/takeWhile")
+    public List<Integer> takeWhileExample() {
+
+        List<Integer> arr = Arrays.asList(0, 1, 2, 1);
+        List<Integer> result = new ArrayList<>();
+
+        for (Integer value : arr) {
+            if (value <= 1) {
+                result.add(value);
+            } else {
+                break; // Stop once condition fails (just like DataWeave)
+            }
+        }
+
+        return result;
+    }
+}
+
+
+output:
+
+
+[0, 1]

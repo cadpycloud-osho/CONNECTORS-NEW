@@ -1,0 +1,38 @@
+wait:
+
+input:
+
+
+import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class WaitSimulation {
+
+    public static void main(String[] args) throws Exception {
+
+        // Create the object
+        Map<String, Object> output = new HashMap<>();
+        output.put("user", 1);
+
+        // Wait for 2000 milliseconds (2 seconds)
+        Thread.sleep(2000);
+
+        // Convert to JSON string
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonOutput = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(output);
+
+        // Print
+        System.out.println(jsonOutput);
+    }
+}
+
+
+output:
+
+{
+  "user" : 1
+}
+
+
+
+

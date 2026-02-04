@@ -1,0 +1,56 @@
+isNumberType:
+
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class NumberTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkNumber")
+            .process(exchange -> {
+                // Equivalent references to the DataWeave source
+                Object refA = Number.class;   // type ANumber
+                Object refB = Integer.valueOf(10); // A Number instance
+                Object refC = "10";           // A String literal
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Verify if the object is a Number type or class
+                result.put("a", isNumberType(refA));
+                result.put("b", isNumberType(refB));
+                result.put("c", isNumberType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isNumberType(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the Number class reference
+        if (obj instanceof Class) {
+            return Number.class.isAssignableFrom((Class<?>) obj);
+        }
+        
+        // Check if it's an instance of a Number (Integer, Double, etc.)
+        return obj instanceof Number;
+    }
+}
+
+
+output:
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+

@@ -1,0 +1,44 @@
+fromHex:
+
+
+input:
+
+from("direct:fromHex")
+.process(exchange -> {
+
+    // Input hex strings
+    String a = "-1";
+    String b = "3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000";
+    String c = "0";
+    String d = null;
+    String e = "f";
+
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+
+    // Convert hex strings to decimal
+    output.put("a", a != null ? new java.math.BigInteger(a, 16) : null);
+    output.put("b", b != null ? new java.math.BigInteger(b, 16) : null);
+    output.put("c", c != null ? new java.math.BigInteger(c, 16) : null);
+    output.put("d", d != null ? new java.math.BigInteger(d, 16) : null);
+    output.put("e", e != null ? new java.math.BigInteger(e, 16) : null);
+
+    exchange.getIn().setBody(output);
+});
+
+
+
+output:
+
+
+{
+  "a": -1,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 15
+}
+
+
+
+
+

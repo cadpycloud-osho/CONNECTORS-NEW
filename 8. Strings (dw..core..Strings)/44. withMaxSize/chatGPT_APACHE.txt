@@ -1,0 +1,47 @@
+withMaxSize:
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class WithMaxSizeExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", withMaxSize("123", 10));
+        result.put("b", withMaxSize("123", 3));
+        result.put("c", withMaxSize("123", 2));
+        result.put("d", withMaxSize("123", 0));
+        result.put("e", withMaxSize(null, 23));
+
+        System.out.println(result);
+    }
+
+    public static String withMaxSize(String value, int maxSize) {
+        if (value == null) {
+            return null;
+        }
+        // In DW, if maxSize <= 0, it returns the original string
+        if (maxSize <= 0) {
+            return value;
+        }
+        return value.length() <= maxSize ? value : value.substring(0, maxSize);
+    }
+}
+
+
+
+
+output:
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}
+
+
+

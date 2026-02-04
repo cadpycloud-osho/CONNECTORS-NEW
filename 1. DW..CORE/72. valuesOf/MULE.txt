@@ -1,0 +1,30 @@
+valuesOf:
+
+valuesOf<K, V>(obj: { (K)?: V }): Array<V>
+
+valuesOf<K, V>(obj: { (K)?: V }): Array<V>
+Returns an array of the values from key-value pairs in an object.
+
+
+
+
+
+Source
+%dw 2.0
+output application/json
+---
+{ "valuesOf" : valuesOf({a: true, b: 1}) }
+
+
+DataWeave
+Output
+{ "valuesOf" : [true,1] }
+
+
+
+
+
+
+
+
+

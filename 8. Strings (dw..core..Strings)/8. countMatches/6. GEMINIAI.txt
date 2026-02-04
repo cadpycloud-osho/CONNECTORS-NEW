@@ -1,0 +1,112 @@
+countMatches:
+
+
+example 1:
+
+
+
+input: 
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+
+@RestController
+public class StringMatchController {
+
+    /**
+     * Custom method to emulate DataWeave's countMatches(String, String).
+     * Counts non-overlapping occurrences of 'pattern' in 'text'.
+     */
+    private int countStringMatches(String text, String pattern) {
+        if (text == null || pattern == null || pattern.isEmpty()) {
+            return 0;
+        }
+
+        int count = 0;
+        int lastIndex = 0;
+        
+        // Find the index of the first occurrence starting from 'lastIndex'
+        while ((lastIndex = text.indexOf(pattern, lastIndex)) != -1) {
+            count++;
+            
+            // Move the search index past the found pattern to ensure non-overlapping counts
+            lastIndex += pattern.length();
+        }
+        return count;
+    }
+
+    @GetMapping("/count-string-matches")
+    public Map<String, Integer> getStringMatchCount() {
+        String input = "hello worlo!";
+        String pattern = "lo";
+        
+        int matchCount = countStringMatches(input, pattern);
+        
+        return Collections.singletonMap("countMatchesString", matchCount);
+    }
+}
+
+output:
+
+{
+  "countMatchesString": 2
+}
+
+-------------------------------------------------------------------
+
+
+example 2:
+
+
+
+input: 
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Collections;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@RestController
+public class RegexMatchController {
+
+    /**
+     * Custom method to emulate DataWeave's countMatches(String, Regex).
+     * Counts non-overlapping occurrences of the 'regex' in 'text'.
+     */
+    private int countRegexMatches(String text, String regex) {
+        if (text == null || regex == null) {
+            return 0;
+        }
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
+        int count = 0;
+
+        // The find() method automatically finds the next non-overlapping match
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
+    }
+
+    @GetMapping("/count-regex-matches")
+    public Map<String, Integer> getRegexMatchCount() {
+        String input = "hello, ciao!";
+        // The regex /[aeiou]/ in DataWeave is just "[aeiou]" in Java String syntax
+        String regex = "[aeiou]"; 
+        
+        int matchCount = countRegexMatches(input, regex);
+        
+        return Collections.singletonMap("countMatchesRegex", matchCount);
+    }
+}
+
+output:
+
+{
+  "countMatchesRegex": 5
+}

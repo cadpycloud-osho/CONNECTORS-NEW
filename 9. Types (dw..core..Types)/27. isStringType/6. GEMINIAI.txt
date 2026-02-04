@@ -1,0 +1,60 @@
+isStringType:
+
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.lang.String; // The Java equivalent of DataWeave String
+import java.lang.Boolean;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class StringCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isStringType(Type).
+     */
+    private boolean isStringType(Class<?> type) {
+        return String.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/string-typecheck")
+    public Map<String, Boolean> checkStringTypes() {
+        
+        // DataWeave type AString is an alias for String
+        Class<?> aString = String.class;
+        
+        // DataWeave type String
+        Class<?> stringType = String.class;
+        
+        // DataWeave type Boolean
+        Class<?> booleanType = Boolean.class;
+
+        // Perform the type checks
+        boolean a = isStringType(aString);
+        boolean b = isStringType(stringType);
+        boolean c = isStringType(booleanType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

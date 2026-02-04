@@ -1,0 +1,43 @@
+substringAfter:
+
+
+input:
+
+import java.util.*;
+
+public class SubstringAfterConverter {
+    public static String substringAfter(String text, String separator) {
+        if (text == null) return null;
+        if (separator == null || separator.isEmpty()) return text;
+        
+        int pos = text.indexOf(separator);
+        if (pos == -1) return "";
+        return text.substring(pos + separator.length());
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringAfter(null, "'"));
+        result.put("b", substringAfter("", "-"));
+        result.put("c", substringAfter("abc", "b"));
+        result.put("d", substringAfter("abcba", "b"));
+        result.put("e", substringAfter("abc", "d"));
+        result.put("f", substringAfter("abc", ""));
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "cba",
+  "e": "",
+  "f": "abc"
+}
+
+

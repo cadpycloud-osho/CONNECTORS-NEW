@@ -1,0 +1,71 @@
+isArrayType:
+
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = executeIsArrayTypeTests();
+        System.out.println(result);
+    }
+    
+    public static Map<String, Boolean> executeIsArrayTypeTests() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // a: [OBJECT_TYPE(user), ATTRIBUTE_TYPE(name)] → false
+        List<TreeNode> pathA = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ATTRIBUTE_TYPE", "name", null)
+        );
+        result.put("a", isArrayType(pathA));
+        
+        // b: [OBJECT_TYPE(user), ARRAY_TYPE(0)] → true
+        List<TreeNode> pathB = Arrays.asList(
+            new TreeNode("OBJECT_TYPE", "user", null),
+            new TreeNode("ARRAY_TYPE", "0", null)
+        );
+        result.put("b", isArrayType(pathB));
+        
+        // c: [ARRAY_TYPE(0)] → true
+        List<TreeNode> pathC = Arrays.asList(
+            new TreeNode("ARRAY_TYPE", "0", null)
+        );
+        result.put("c", isArrayType(pathC));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave Tree.isArrayType() equivalent:
+     * Returns true if path contains ARRAY_TYPE node
+     */
+    public static boolean isArrayType(List<TreeNode> path) {
+        return path.stream().anyMatch(node -> "ARRAY_TYPE".equals(node.kind));
+    }
+    
+    public static class TreeNode {
+        final String kind;
+        final String selector;
+        final String namespace;
+        
+        TreeNode(String kind, String selector, String namespace) {
+            this.kind = kind;
+            this.selector = selector;
+            this.namespace = namespace;
+        }
+    }
+}
+
+
+
+output:
+
+{a=false, b=true, c=true}
+
+
+
+

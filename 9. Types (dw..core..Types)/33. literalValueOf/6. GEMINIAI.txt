@@ -1,0 +1,49 @@
+
+literalValueOf:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class LiteralValueController {
+
+    // Define the literal value that the DataWeave type AType refers to.
+    private static final String ATYPE_VALUE = "Mariano";
+
+    /**
+     * Helper method to conceptually mimic literalValueOf(AType).
+     */
+    private String literalValueOf(String typeValue) {
+        // Returns the constant value defined by the "type"
+        return typeValue;
+    }
+
+    @GetMapping("/literal-value")
+    public Map<String, String> getLiteralValue() {
+        
+        // 1. AType refers to the literal value "Mariano"
+        String aType = ATYPE_VALUE;
+        
+        // Perform the value extraction
+        String a = literalValueOf(aType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, String> output = new HashMap<>();
+        output.put("a", a);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": "Mariano"
+}

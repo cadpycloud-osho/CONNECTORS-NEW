@@ -1,0 +1,57 @@
+isRegexType:
+
+
+input:
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.regex.Pattern; // The Java equivalent of DataWeave Regex
+import java.lang.Boolean;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class RegexCheckController {
+
+    /**
+     * Helper method for conceptual equivalence to isRegexType(Type).
+     */
+    private boolean isRegexType(Class<?> type) {
+        return Pattern.class.isAssignableFrom(type);
+    }
+
+    @GetMapping("/regex-typecheck")
+    public Map<String, Boolean> checkRegexTypes() {
+        
+        // DataWeave type ARegex is an alias for Regex
+        Class<?> aRegex = Pattern.class;
+        
+        // DataWeave type Regex
+        Class<?> regexType = Pattern.class;
+        
+        // DataWeave type Boolean
+        Class<?> booleanType = Boolean.class;
+
+        // Perform the type checks
+        boolean a = isRegexType(aRegex);
+        boolean b = isRegexType(regexType);
+        boolean c = isRegexType(booleanType);
+
+        // Map the results to match the desired JSON structure
+        Map<String, Boolean> output = new HashMap<>();
+        output.put("a", a);
+        output.put("b", b);
+        output.put("c", c);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}

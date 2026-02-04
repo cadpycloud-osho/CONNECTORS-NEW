@@ -1,0 +1,43 @@
+log10:
+
+
+input:
+
+
+import java.util.*;
+
+public class Log10Example {
+
+    public static void main(String[] args) {
+
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        output.put("log1010", safeLog10(10.0));
+        output.put("log1013", safeLog10(0.13));
+        output.put("log10-20", safeLog10(-20.0)); // invalid, convert to null
+
+        System.out.println(output);
+    }
+
+    private static Double safeLog10(double value) {
+        if (value <= 0) {
+            return null; // DataWeave returns null for negative or zero
+        }
+        return Math.log10(value);
+    }
+}
+
+
+
+
+output:
+
+{
+   "log1010": 1.0,
+   "log1013": -0.8860566476931632,
+   "log10-20": null
+}
+
+
+
+

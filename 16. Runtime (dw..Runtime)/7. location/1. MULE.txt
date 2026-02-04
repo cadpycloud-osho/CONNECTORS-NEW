@@ -1,0 +1,37 @@
+location:
+
+location(value: Any): Location
+
+location(value: Any): Location
+Returns the location of a given value, or null if the location can’t be traced back to a DataWeave file.
+
+
+
+Source
+%dw 2.0
+import location from dw::Runtime
+output application/json
+---
+location(sqrt)
+
+DataWeave
+Output
+{
+  "uri": "/dw/Core.dwl",
+  "nameIdentifier": "dw::Core",
+  "startLine": 5797,
+  "startColumn": 36,
+  "endLine": 5797,
+  "endColumn": 77
+}
+
+
+
+
+
+
+
+
+
+
+

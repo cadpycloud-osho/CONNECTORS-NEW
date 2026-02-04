@@ -1,0 +1,85 @@
+outerJoin:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class CamelOuterJoinExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        List<Map<String, String>> users = List.of(
+                            Map.of("id", "1", "name", "Mariano"),
+                            Map.of("id", "2", "name", "Leandro"),
+                            Map.of("id", "3", "name", "Julian"),
+                            Map.of("id", "5", "name", "Julian")
+                        );
+
+                        List<Map<String, String>> products = List.of(
+                            Map.of("ownerId", "1", "name", "DataWeave"),
+                            Map.of("ownerId", "1", "name", "BAT"),
+                            Map.of("ownerId", "3", "name", "DataSense"),
+                            Map.of("ownerId", "4", "name", "SmartConnectors")
+                        );
+
+                        // Track which products were matched
+                        Set<Map<String, String>> matchedProducts = new HashSet<>();
+                        
+                        // 1. Perform Left Join Logic
+                        List<Map<String, Object>> result = users.stream()
+                            .flatMap(user -> {
+                                List<Map<String, String>> matches = products.stream()
+                                    .filter(p -> user.get("id").equals(p.get("ownerId")))
+                                    .collect(Collectors.toList());
+
+                                if (matches.isEmpty()) {
+                                    return Stream.of(Map.of("l", user));
+                                }
+
+                                matchedProducts.addAll(matches);
+                                return matches.stream().map(p -> Map.of("l", user, "r", p));
+                            })
+                            .collect(Collectors.toCollection(ArrayList::new));
+
+                        // 2. Add orphaned products (Right Join part)
+                        products.stream()
+                            .filter(p -> !matchedProducts.contains(p))
+                            .forEach(p -> result.add(Map.of("r", p)));
+
+                        exchange.getIn().setBody(result);
+                    })
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+output:
+
+[
+  {"l": {"id": "1", "name": "Mariano"}, "r": {"ownerId": "1", "name": "DataWeave"}},
+  {"l": {"id": "1", "name": "Mariano"}, "r": {"ownerId": "1", "name": "BAT"}},
+  {"l": {"id": "2", "name": "Leandro"}},
+  {"l": {"id": "3", "name": "Julian"}, "r": {"ownerId": "3", "name": "DataSense"}},
+  {"l": {"id": "5", "name": "Julian"}},
+  {"r": {"ownerId": "4", "name": "SmartConnectors"}}
+]
+

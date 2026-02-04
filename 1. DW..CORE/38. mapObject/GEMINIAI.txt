@@ -1,0 +1,227 @@
+mapObject:
+
+example 1:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+@RestController
+public class MapObjectController {
+
+    /**
+     * DataWeave Source: {"a":"b","c":"d"} mapObject (value,key,index) -> { (index) : { (value):key} }
+     * Accessible at http://localhost:8080/map-object/json-transform
+     */
+    @GetMapping("/map-object/json-transform")
+    public Map<String, Map<String, String>> transformJsonMap() {
+        // 1. Input Map (DataWeave Object)
+        Map<String, String> inputMap = new LinkedHashMap<>();
+        inputMap.put("a", "b");
+        inputMap.put("c", "d");
+
+        // Use AtomicInteger to safely track the index during stream iteration
+        AtomicInteger indexCounter = new AtomicInteger(0);
+
+        // 2. Perform the mapObject equivalent using streams
+        return inputMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                // Key Mapper: Use the current index as the new key
+                entry -> String.valueOf(indexCounter.getAndIncrement()),
+                // Value Mapper: Create the nested object: { (value): key }
+                entry -> {
+                    Map<String, String> nestedMap = new LinkedHashMap<>();
+                    nestedMap.put(entry.getValue(), entry.getKey());
+                    return nestedMap;
+                },
+                // Merge Function (not used here), Supplier (for LinkedHashMap)
+                (a, b) -> a, // Should not happen with unique keys
+                LinkedHashMap::new
+            ));
+    }
+}
+
+output:
+
+{
+  "0": {
+    "b": "a"
+  },
+  "1": {
+    "d": "c"
+  }
+}
+____________________________________________________________________
+
+example 2:
+
+POJO (Plain Old Java Object)
+
+input:
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+@XmlRootElement(name = "prices")
+public class Prices {
+    
+    // Using a Map to flexibly hold the price elements (basic, premium, vip)
+    private Map<String, String> priceMap = new LinkedHashMap<>();
+
+    // JAXB requires accessors. This is simplified, as JAXB usually maps fields directly.
+    // For simplicity in a single example, we'll expose methods to access the internal map.
+
+    // A real JAXB solution would need a more complex adapter for a Map to XML elements.
+    // For this demonstration, we'll manually handle the map conversion in the controller.
+    
+    // For Spring's XML conversion, we can rely on ObjectMapper/Jackson XML which uses the getters/setters.
+    public Map<String, String> getPrices() {
+        return priceMap;
+    }
+
+    public void setBasic(String basic) {
+        priceMap.put("basic", basic);
+    }
+    
+    public void setPremium(String premium) {
+        priceMap.put("premium", premium);
+    }
+    
+    public void setVip(String vip) {
+        priceMap.put("vip", vip);
+    }
+
+    // Custom getters needed for XML output mapping if using JacksonXml
+    @XmlElement(name = "basic")
+    public String getBasic() {
+        return priceMap.get("basic");
+    }
+
+    @XmlElement(name = "premium")
+    public String getPremium() {
+        return priceMap.get("premium");
+    }
+
+    @XmlElement(name = "vip")
+    public String getVip() {
+        return priceMap.get("vip");
+    }
+    
+    // A simplified constructor for the demo
+    public Prices() {}
+}
+
+
+CONTROLLEER METHOD
+
+// ... inside the MapObjectController class ...
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.MediaType;
+import java.text.DecimalFormat;
+import java.util.AbstractMap;
+import java.util.Optional;
+
+    /**
+     * DataWeave Source: payload.prices mapObject (value, key) -> { (key): (value + 5) as Number {format: "##.00"} }
+     * Accessible via POST to http://localhost:8080/map-object/xml-transform
+     *
+     * NOTE: Since Spring's default XML mappers (Jackson/JAXB) struggle with flexible maps,
+     * this example processes a simple Map input and produces a final Map that is converted to XML.
+     * We will process the price strings as doubles for calculation.
+     */
+    @PostMapping(value = "/map-object/xml-transform", 
+                 consumes = MediaType.APPLICATION_XML_VALUE,
+                 produces = MediaType.APPLICATION_XML_VALUE)
+    public Map<String, String> transformXmlPrices(@RequestBody Map<String, Map<String, String>> xmlInput) {
+        
+        // 1. Get the inner "prices" map (equivalent to payload.prices)
+        Map<String, String> inputPrices = Optional.ofNullable(xmlInput)
+                                                  .map(m -> m.get("prices"))
+                                                  .orElse(new LinkedHashMap<>());
+        
+        // Setup Decimal Format for "##.00" equivalent
+        DecimalFormat df = new DecimalFormat("0.00");
+        
+        // 2. Perform the mapObject equivalent
+        Map<String, String> transformedPrices = inputPrices.entrySet().stream()
+            .map(entry -> {
+                String key = entry.getKey();
+                // Attempt to parse the value and handle potential NumberFormatException
+                try {
+                    double value = Double.parseDouble(entry.getValue());
+                    // Transformation: (value + 5)
+                    double newValue = value + 5;
+                    // Formatting: as Number {format: "##.00"}
+                    String formattedValue = df.format(newValue);
+                    
+                    return new AbstractMap.SimpleEntry<>(key, formattedValue);
+                } catch (NumberFormatException e) {
+                    // Return original value if it can't be parsed (Error handling equivalent)
+                    return new AbstractMap.SimpleEntry<>(key, entry.getValue());
+                }
+            })
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (a, b) -> a, 
+                LinkedHashMap::new
+            ));
+            
+        // Spring will serialize this Map into an XML root element, which mimics the DW output structure
+        return transformedPrices;
+    }
+}
+
+
+
+output:
+
+Scenario A: XML Input with Data
+Request:
+
+POST http://localhost:8080/map-object/xml-transform
+Content-Type: application/xml
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+    <basic>9.99</basic>
+    <premium>53</premium>
+    <vip>398.99</vip>
+</prices>
+Output:
+
+XML
+
+<LinkedHashMap>
+    <basic>14.99</basic>
+    <premium>58.00</premium>
+    <vip>403.99</vip>
+</LinkedHashMap>
+
+
+
+Scenario B: Empty XML Input
+Request:
+
+POST http://localhost:8080/map-object/xml-transform
+Content-Type: application/xml
+
+<?xml version='1.0' encoding='UTF-8'?>
+<prices>
+</prices>
+Output:
+
+XML
+
+<LinkedHashMap/>
+
+

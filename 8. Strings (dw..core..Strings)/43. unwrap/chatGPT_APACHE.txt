@@ -1,0 +1,88 @@
+unwrap:
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UnwrapExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", unwrap(null, ""));
+        result.put("b", unwrap(null, "\0"));
+        result.put("c", unwrap("'abc'", "'"));
+        result.put("d", unwrap("AABabcBAA", "A"));
+        result.put("e", unwrap("A", "#"));
+        result.put("f", unwrap("#A", "#"));
+        result.put("g", unwrap("A#", "#"));
+
+        System.out.println(result);
+    }
+
+    public static String unwrap(String value, String charToRemove) {
+        if (value == null) {
+            return null;
+        }
+        if (charToRemove == null || charToRemove.isEmpty()) {
+            return value;
+        }
+
+        int start = 0;
+        int end = value.length();
+
+        if (value.startsWith(charToRemove)) {
+            start = 1;
+        }
+        if (value.endsWith(charToRemove) && end > start) {
+            end -= 1;
+        }
+        return value.substring(start, end);
+    }
+}
+
+
+
+output:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class UnwrapExample {
+
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", unwrap(null, ""));
+        result.put("b", unwrap(null, "\0"));
+        result.put("c", unwrap("'abc'", "'"));
+        result.put("d", unwrap("AABabcBAA", "A"));
+        result.put("e", unwrap("A", "#"));
+        result.put("f", unwrap("#A", "#"));
+        result.put("g", unwrap("A#", "#"));
+
+        System.out.println(result);
+    }
+
+    public static String unwrap(String value, String charToRemove) {
+        if (value == null) {
+            return null;
+        }
+        if (charToRemove == null || charToRemove.isEmpty()) {
+            return value;
+        }
+
+        int start = 0;
+        int end = value.length();
+
+        if (value.startsWith(charToRemove)) {
+            start = 1;
+        }
+        if (value.endsWith(charToRemove) && end > start) {
+            end -= 1;
+        }
+        return value.substring(start, end);
+    }
+}
+
+

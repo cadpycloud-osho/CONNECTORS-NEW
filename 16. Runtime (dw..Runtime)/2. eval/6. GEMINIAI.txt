@@ -1,0 +1,133 @@
+eval:
+
+<dependency>
+    <groupId>org.mule.weave</groupId>
+    <artifactId>runtime-core</artifactId>
+    <version>X.Y.Z</version> </dependency>
+input:
+
+import org.mule.weave.v2.runtime.logging.SystemLogger;
+import org.mule.weave.v2.runtime.logging.WeaveLogger;
+import org.mule.weave.v2.runtime.security.DataWeaveSecurityManager;
+
+import java.util.Optional;
+
+// 1. Custom Logger Implementation (Replicates customLogger test)
+public class CustomWeaveLogger implements WeaveLogger {
+    private final WeaveLogger defaultLogger = new SystemLogger();
+
+    @Override
+    public void log(String level, String message, Optional<Map<String, Object>> context) {
+        // The custom logger logic: logs the level and message combined
+        defaultLogger.log(level, String.format("%s %s", level, message), context);
+    }
+    // Implement other required methods (logMessage, logException, etc.) by delegating to defaultLogger
+    // ...
+}
+
+// 2. Security Manager Implementation (Replicates grant test)
+public class DenyAllSecurityManager implements DataWeaveSecurityManager {
+    @Override
+    public boolean grant(String permission, Object args) {
+        return false; // Explicitly deny all permissions
+    }
+}
+
+
+import org.mule.weave.v2.runtime.WeaveRuntime;
+import org.mule.weave.v2.runtime.WeaveRuntimeService;
+import org.mule.weave.v2.runtime.utils.ResourceResolver;
+import org.mule.weave.v2.runtime.utils.SystemResourceResolver;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+@Service
+public class RuntimeFunctionService {
+
+    // --- Data Definition (Replicates DW variable definition) ---
+    private static final Map<String, Object> JSON_VALUE = Map.of(
+        "value", "{\"name\": \"Mariano\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8),
+        "encoding", "UTF-8",
+        "properties", Map.of(),
+        "mimeType", "application/json"
+    );
+
+    private final WeaveRuntime runtime;
+
+    public RuntimeFunctionService() {
+        // Initialize the Weave Runtime
+        this.runtime = WeaveRuntimeService.service().createRuntime(
+            ResourceResolver.empty(), new SystemLogger(), Optional.empty()
+        );
+    }
+
+    public Map<String, Object> executeAllTests() throws Exception {
+        Map<String, Object> results = new HashMap<>();
+        
+        // Prepare resources (the DW files)
+        Map<String, String> resources = new HashMap<>();
+        resources.put("main.dwl", "{a: 1}");
+        resources.put("/Utils.dwl", "fun sum(a,b) = a +b");
+
+        // 1. execute_ok (Simple run)
+        // Replicating dw::Runtime::run("main.dwl", {"main.dwl": "{a: 1}"}, {"payload": jsonValue })
+        results.put("execute_ok", runtime.execute("main.dwl", resources, Map.of("payload", JSON_VALUE)));
+
+        // 2. library (Eval with library import)
+        // Replicating eval("main.dwl", {"main.dwl": "Utils::sum(1,2)", "/Utils.dwl": Utils }, ...)
+        resources.put("main.dwl", "Utils::sum(1,2)");
+        results.put("library", runtime.evaluate("main.dwl", resources, Map.of("payload", JSON_VALUE)));
+        
+        // 3. grant (Eval with custom Security Manager)
+        // Replicating eval("main.dwl", ..., { securityManager: (grant, args) -> false })
+        resources.put("main.dwl", "{a: readUrl(`http://google.com`)}");
+        results.put("grant", runtime.evaluate(
+            "main.dwl", resources, Map.of("payload", JSON_VALUE), 
+            Optional.of(new DenyAllSecurityManager()), Optional.empty()
+        ));
+        
+        // 4. timeout (Eval with timeout)
+        // Replicating eval("main.dwl", ..., {timeOut: 2}).success (This requires careful SDK integration)
+        // In the SDK, timeouts are often handled via ExecutionContext/Thread control, 
+        // which is highly implementation-dependent. We simulate the intent:
+        resources.put("main.dwl", "(1 to 1000000000000) map $ + 1");
+        try {
+            runtime.evaluate("main.dwl", resources, Map.of("payload", JSON_VALUE), Optional.empty(), Optional.of(Duration.ofSeconds(2)));
+            results.put("timeout", false); // Should have timed out
+        } catch (Exception e) {
+            results.put("timeout", e.getMessage().contains("timed out")); // True if timeout occurred
+        }
+
+
+        // ... Additional tests would follow the same pattern ...
+        
+        return results;
+    }
+}
+output:
+
+
+{
+  "execute_ok": {
+    "success": true,
+    "value": "{\n  a: 1\n}",
+    "mimeType": "application/dw",
+    // ...
+  },
+  "library": {
+    "success": true,
+    "value": 3,
+    // ...
+  },
+  "grant": {
+    "success": false,
+    "message": "The given required permissions: `Resource` are not being granted...",
+    // ...
+  },
+  "timeout": true
+  // ...
+}

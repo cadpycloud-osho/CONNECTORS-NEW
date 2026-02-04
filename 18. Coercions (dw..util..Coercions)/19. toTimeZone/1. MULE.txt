@@ -1,0 +1,53 @@
+toTimeZone:
+
+toTimeZone(str: String): TimeZone
+
+toTimeZone(str: String): TimeZone
+Transform a String value into a TimeZone value.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+   toTimeZoneOffset: toTimeZone("-03:00"),
+   toTimeZoneAbbreviation: toTimeZone("Z"),
+   toTimeZoneName: toTimeZone("America/Argentina/Buenos_Aires")
+}
+
+
+DataWeave
+Output
+{
+  toTimeZoneOffset: |-03:00|,
+  toTimeZoneAbbreviation: |Z|,
+  toTimeZoneName: |America/Argentina/Buenos_Aires|
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

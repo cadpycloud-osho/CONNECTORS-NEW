@@ -1,0 +1,110 @@
+toString:
+
+
+example 1:
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.Map;
+import java.util.HashMap;
+
+public class MimeToStringProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        Map<String, Object> mimeType = new HashMap<>();
+        mimeType.put("type", "application");
+        mimeType.put("subtype", "json");
+        mimeType.put("parameters", new HashMap<>());
+        
+        String mimeString = toString(mimeType);
+        exchange.getIn().setBody("\"" + mimeString + "\"");
+    }
+    
+    private String toString(Map<String, Object> mimeType) {
+        String type = (String) mimeType.get("type");
+        String subtype = (String) mimeType.get("subtype");
+        @SuppressWarnings("unchecked")
+        Map<String, String> parameters = (Map<String, String>) mimeType.get("parameters");
+        
+        StringBuilder result = new StringBuilder();
+        result.append(type).append("/").append(subtype);
+        
+        if (!parameters.isEmpty()) {
+            for (Map.Entry<String, String> param : parameters.entrySet()) {
+                result.append("; ").append(param.getKey()).append("=").append(param.getValue());
+            }
+        }
+        
+        return result.toString();
+    }
+}
+
+from("direct:mimeToString")
+    .process(new MimeToStringProcessor())
+    .log("${body}");
+
+
+output:
+
+"application/json"
+
+
+
+-----------------------------------------------
+
+example 2:
+
+input:
+
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MimeToStringMultipartProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        Map<String, Object> mimeType = new HashMap<>();
+        mimeType.put("type", "multipart");
+        mimeType.put("subtype", "form-data");
+        
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("boundary", "my-boundary");
+        mimeType.put("parameters", parameters);
+        
+        String mimeString = toString(mimeType);
+        exchange.getIn().setBody("\"" + mimeString + "\"");
+    }
+    
+    private String toString(Map<String, Object> mimeType) {
+        String type = (String) mimeType.get("type");
+        String subtype = (String) mimeType.get("subtype");
+        @SuppressWarnings("unchecked")
+        Map<String, String> parameters = (Map<String, String>) mimeType.get("parameters");
+        
+        StringBuilder result = new StringBuilder();
+        result.append(type).append("/").append(subtype);
+        
+        // Append parameters
+        for (Map.Entry<String, String> param : parameters.entrySet()) {
+            result.append(";").append(param.getKey()).append("=").append(param.getValue());
+        }
+        
+        return result.toString();
+    }
+}
+
+from("direct:mimeToStringMultipart")
+    .process(new MimeToStringMultipartProcessor())
+    .log("${body}");
+
+output:
+
+"multipart/form-data;boundary=my-boundary"
+
+
+
+-----------------------------------------------

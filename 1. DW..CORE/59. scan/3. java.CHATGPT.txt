@@ -1,0 +1,94 @@
+scan:
+
+
+example 1:
+
+
+input:
+
+
+import java.util.*;
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String input = "www.mulesoft.com";
+        String regex = "([w]*)\\.([a-z]*)\\.([a-z]*)";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        List<String> result = new ArrayList<>();
+
+        while (matcher.find()) {
+            // Full match
+            result.add(matcher.group(0));
+
+            // Captured groups
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                result.add(matcher.group(i));
+            }
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[www.mulesoft.com, www, mulesoft, com]
+
+
+----------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String input = "anypt@mulesoft.com,max@mulesoft.com";
+        String regex = "([a-z]*)@([a-z]*).com";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        List<List<String>> result = new ArrayList<>();
+
+        while (matcher.find()) {
+            List<String> match = new ArrayList<>();
+
+            // Full match
+            match.add(matcher.group(0));
+
+            // Captured groups
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                match.add(matcher.group(i));
+            }
+
+            result.add(match);
+        }
+
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+[
+  [anypt@mulesoft.com, anypt, mulesoft],
+  [max@mulesoft.com, max, mulesoft]
+]
+
+
+----------------------------------------------------------

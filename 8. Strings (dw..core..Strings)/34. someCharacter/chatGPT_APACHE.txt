@@ -1,0 +1,38 @@
+someCharacter:
+
+
+
+input:
+
+public class SomeCharacterExample {
+
+    public static void main(String[] args) {
+        String input = "someCharacter";
+
+        boolean result = someCharacterIsUpperCase(input);
+        System.out.println(result);
+    }
+
+    // Checks if **any character** in the string is uppercase
+    public static boolean someCharacterIsUpperCase(String value) {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+
+        for (char ch : value.toCharArray()) {
+            if (Character.isUpperCase(ch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+
+
+output:
+
+true
+
+

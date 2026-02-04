@@ -1,0 +1,210 @@
+mapLeafValues:
+
+example 1:
+input:
+
+
+@SpringBootApplication
+public class DataWeaveTreeMapLeafValuesApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTreeMapLeafValuesApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/tree")
+@RequiredArgsConstructor
+class TreeController {
+    
+    private final TreeService treeService;
+    
+    @GetMapping("/mapLeafValues")
+    public Map<String, Object> mapLeafValues() {
+        return treeService.executeMapLeafValuesTest();
+    }
+}
+
+@Service
+class TreeService {
+    
+    public Map<String, Object> executeMapLeafValuesTest() {
+        Map<String, Object> input = Map.of(
+            "user", Arrays.asList(
+                Map.of(
+                    "name", "mariano",
+                    "lastName", "achaval"
+                )
+            ),
+            "group", "data-weave"
+        );
+        
+        return mapLeafValues(input, (value, path) -> {
+            if (value instanceof String s) {
+                return s.toUpperCase();
+            }
+            return value;
+        });
+    }
+    
+    /**
+     * DataWeave Tree.mapLeafValues() equivalent:
+     * Recursively maps leaf values while preserving structure
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> mapLeafValues(Object input, BiFunction<Object, String, Object> mapper) {
+        if (input instanceof Map) {
+            Map<String, Object> result = new HashMap<>();
+            ((Map<String, Object>) input).forEach((key, value) -> {
+                result.put(key, mapLeafValues(value, mapper));
+            });
+            return result;
+        } else if (input instanceof List) {
+            List<Object> result = new ArrayList<>();
+            ((List<Object>) input).forEach(value -> {
+                result.add(mapLeafValues(value, mapper));
+            });
+            return result;
+        } else {
+            // Leaf node - apply mapper
+            return (Map<String, Object>) mapper.apply(input, "");
+        }
+    }
+}
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+
+output:
+
+{
+  "user": [
+    {
+      "name": "MARIANO",
+      "lastName": "ACHAVAL"
+    }
+  ],
+  "group": "DATA-WEAVE"
+}
+
+
+
+-----------------------------------------------------------------
+
+example 2:
+
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveTreeMapLeafValuesPathApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveTreeMapLeafValuesPathApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/tree")
+@RequiredArgsConstructor
+class TreeController {
+    
+    private final TreeService treeService;
+    
+    @GetMapping("/mapLeafValuesPath")
+    public Map<String, Object> mapLeafValuesPath() {
+        return treeService.executeMapLeafValuesPathTest();
+    }
+}
+
+@Service
+class TreeService {
+    
+    public Map<String, Object> executeMapLeafValuesPathTest() {
+        Map<String, Object> input = Map.of(
+            "name", "Mariano",
+            "test", Arrays.asList(1, 2, 3)
+        );
+        
+        return mapLeafValues(input, this::pathBasedMapper);
+    }
+    
+    /**
+     * DataWeave path type logic equivalent:
+     * if(isObjectType(path)) "***"
+     * else if(isArrayType(path)) "In an array"
+     * else "Is an attribute"
+     */
+    private String pathBasedMapper(Object value, String path) {
+        if (isObjectType(path)) {
+            return "***";
+        } else if (isArrayType(path)) {
+            return "In an array";
+        } else {
+            return "Is an attribute";
+        }
+    }
+    
+    private boolean isObjectType(String path) {
+        // Object type: root level or object property (no array indicators)
+        return path == null || path.isEmpty() || !path.contains("[");
+    }
+    
+    private boolean isArrayType(String path) {
+        // Array type: contains array index notation [n]
+        return path != null && path.contains("[");
+    }
+    
+    /**
+     * DataWeave Tree.mapLeafValues() equivalent with path tracking
+     */
+    @SuppressWarnings("unchecked")
+    private Object mapLeafValues(Object input, BiFunction<Object, String, Object> mapper) {
+        return mapLeafValues(input, mapper, "");
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Object mapLeafValues(Object input, BiFunction<Object, String, Object> mapper, String path) {
+        if (input instanceof Map) {
+            Map<String, Object> result = new HashMap<>();
+            ((Map<String, Object>) input).forEach((key, value) -> {
+                String newPath = path.isEmpty() ? key : path + "." + key;
+                result.put(key, mapLeafValues(value, mapper, newPath));
+            });
+            return result.isEmpty() ? null : result;
+        } else if (input instanceof List) {
+            List<Object> result = new ArrayList<>();
+            for (int i = 0; i < ((List<?>) input).size(); i++) {
+                String newPath = path + "[" + i + "]";
+                result.add(mapLeafValues(((List<?>) input).get(i), mapper, newPath));
+            }
+            return result;
+        } else {
+            // Leaf node - apply mapper with current path
+            return mapper.apply(input, path);
+        }
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+{
+  "name": "***",
+  "test": [
+    "In an array",
+    "In an array",
+    "In an array"
+  ]
+}
+
+

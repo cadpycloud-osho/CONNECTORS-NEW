@@ -1,0 +1,60 @@
+appendIfMissing:
+
+
+input:
+
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        
+        // a: appendIfMissing(null, "") -> null
+        result.put("a", appendIfMissing(null, ""));
+        
+        // b: appendIfMissing("abc", "") -> "abc"
+        result.put("b", appendIfMissing("abc", ""));
+        
+        // c: appendIfMissing("", "xyz") -> "xyz"
+        result.put("c", appendIfMissing("", "xyz"));
+        
+        // d: appendIfMissing("abc", "xyz") -> "abcxyz"
+        result.put("d", appendIfMissing("abc", "xyz"));
+        
+        // e: appendIfMissing("abcxyz", "xyz") -> "abcxyz"
+        result.put("e", appendIfMissing("abcxyz", "xyz"));
+        
+        // JSON output matching DataWeave exactly
+        System.out.println("{");
+        result.forEach((key, value) -> {
+            if (value == null) {
+                System.out.println("  \"" + key + "\": null,");
+            } else {
+                System.out.println("  \"" + key + "\": \"" + value + "\",");
+            }
+        });
+        System.out.println("}");
+    }
+    
+    private static String appendIfMissing(String input, String suffix) {
+        if (input == null) return null;
+        if (suffix == null || suffix.isEmpty()) return input;
+        if (input.endsWith(suffix)) return input;
+        return input + suffix;
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+
+

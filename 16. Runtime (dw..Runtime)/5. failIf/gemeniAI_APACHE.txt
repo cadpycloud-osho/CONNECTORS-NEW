@@ -1,0 +1,37 @@
+failIf:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class FailIfRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        // Global formatting for the error output to match your source
+        onException(org.apache.camel.support.processor.PredicateValidationException.class)
+            .handled(true)
+            .log("ERROR ${date:now:yyyy-MM-dd HH:mm:ss,SSS} ...\n**********************************\nMessage : \"Failed\"");
+
+        from("direct:start")
+            // Equivalent to 'failIf (isEmpty(result))'
+            // In Camel, the body is our 'result'
+            .validate(body().isNotNull())
+            .validate(simple("${body.size} > 0")) 
+            
+            // If validation passes, return the success JSON
+            .setBody(constant("{\"result\": \"SUCCESS\"}"))
+            .setHeader("Content-Type", constant("application/json"));
+    }
+}
+
+
+output:
+
+
+ERROR 2026-01-26 11:56:39,988 ...
+**********************************
+Message                : "Failed"
+
+

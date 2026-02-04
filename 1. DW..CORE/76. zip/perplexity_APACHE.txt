@@ -1,0 +1,112 @@
+zip:
+
+example 1:
+
+
+input:
+
+from("direct:zip1")
+    .process(exchange -> {
+        List<Integer> left = Arrays.asList(0, 1);
+        List<String> right = Arrays.asList("a", "b");
+        List<List<Object>> result = IntStream.range(0, Math.min(left.size(), right.size()))
+            .mapToObj(i -> Arrays.asList(left.get(i), right.get(i)))
+            .collect(Collectors.toList());
+        exchange.getIn().setBody(result);
+    })
+
+
+
+output:
+
+[[0,"a"], [1,"b"]]
+
+
+
+-----------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+
+from("direct:zipMultiple")
+    .process(exchange -> {
+        Map<String, List<List<Object>>> result = new HashMap<>();
+        
+        // a: equal length
+        result.put("a", zipArrays(Arrays.asList(0,1,2,3), Arrays.asList("a","b","c","d")));
+        
+        // b: left longer
+        result.put("b", zipArrays(Arrays.asList(0,1,2,3), Arrays.asList("a")));
+        
+        // c: right shorter  
+        result.put("c", zipArrays(Arrays.asList(0,1,2,3), Arrays.asList("a","b")));
+        
+        // d: right longer
+        result.put("d", zipArrays(Arrays.asList(0,1,2), Arrays.asList("a","b","c","d")));
+        
+        exchange.getIn().setBody(result);
+    })
+
+
+output:
+
+
+{
+  "a": [[0,"a"],[1,"b"],[2,"c"],[3,"d"]],
+  "b": [[0,"a"]],
+  "c": [[0,"a"],[1,"b"]],
+  "d": [[0,"a"],[1,"b"],[2,"c"]]
+}
+
+-----------------------------------------------------
+
+
+
+example 3:
+
+
+input:
+
+from("direct:zipNested")
+    .process(exchange -> {
+        List<String> list1 = Arrays.asList("a", "b");
+        List<Integer> list2 = Arrays.asList(1, 2, 3);
+        List<String> list3 = Arrays.asList("aa", "bb");
+        List<List<?>> list4 = Arrays.asList(
+            Arrays.asList("A", "B", "C"),
+            Arrays.asList(11, 12)
+        );
+        
+        // Nested zipping matching DataWeave associativity
+        List<List<?>> intermediate1 = zipArrays(list1, list2);
+        List<List<?>> intermediate2 = zipArrays(intermediate1, list3);
+        List<List<?>> result = zipArrays(intermediate2, list4);
+        
+        exchange.getIn().setBody(result);
+    })
+
+
+
+output:
+
+[
+  [ [["a",1],"aa"], ["A","B","C"] ],
+  [ [["b",2],"bb"], [11,12] ]
+]
+
+
+
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+

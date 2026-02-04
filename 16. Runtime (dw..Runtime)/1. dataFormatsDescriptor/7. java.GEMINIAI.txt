@@ -1,0 +1,94 @@
+dataFormatsDescriptor:
+
+
+
+
+input:
+
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    /**
+     * Manually defines a descriptor list of common data formats, mimicking the structure 
+     * and content of the DataWeave function's output.
+     */
+    public static List<Map<String, Object>> dataFormatsDescriptor() {
+        return List.of(
+            // --- JSON Descriptor ---
+            Map.of(
+                "id", "json",
+                "binary", false,
+                "defaultEncoding", "UTF-8",
+                "extensions", List.of(".json"),
+                "defaultMimeType", "application/json",
+                "acceptedMimeTypes", List.of("application/json"),
+                "readerProperties", List.of(
+                    Map.of(
+                        "name", "streaming", "optional", true, 
+                        "defaultValue", false, "description", "Used for streaming input."
+                    )
+                ),
+                "writerProperties", List.of(
+                    Map.of(
+                        "name", "skipNullOn", "optional", true, 
+                        "defaultValue", "None", "description", "Skips null values."
+                    )
+                )
+            ),
+            // --- XML Descriptor ---
+            Map.of(
+                "id", "xml",
+                "binary", false,
+                "extensions", List.of(".xml"),
+                "defaultMimeType", "application/xml",
+                "acceptedMimeTypes", List.of("application/xml"),
+                "readerProperties", List.of(
+                    Map.of(
+                        "name", "supportDtd", "optional", true, 
+                        "defaultValue", true, "description", "Whether DTD handling is enabled."
+                    )
+                ),
+                "writerProperties", List.of(
+                    Map.of(
+                        "name", "indent", "optional", true, 
+                        "defaultValue", true, "description", "Indicates whether to indent the code."
+                    )
+                )
+            )
+            // ... more formats like CSV, DW, YAML, etc. would be added here
+        );
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Pure Java Data Formats Descriptor Simulation ---");
+        System.out.println(dataFormatsDescriptor());
+    }
+}
+
+output:
+
+--- Pure Java Data Formats Descriptor Simulation ---
+[
+  {
+    id=json, 
+    binary=false, 
+    defaultEncoding=UTF-8, 
+    extensions=[.json], 
+    defaultMimeType=application/json, 
+    acceptedMimeTypes=[application/json], 
+    readerProperties=[{name=streaming, optional=true, defaultValue=false, description=Used for streaming input.}],
+    writerProperties=[{name=skipNullOn, optional=true, defaultValue=None, description=Skips null values.}]
+  }, 
+  {
+    id=xml, 
+    binary=false, 
+    extensions=[.xml], 
+    defaultMimeType=application/xml, 
+    acceptedMimeTypes=[application/xml], 
+    readerProperties=[{name=supportDtd, optional=true, defaultValue=true, description=Whether DTD handling is enabled.}], 
+    writerProperties=[{name=indent, optional=true, defaultValue=true, description=Indicates whether to indent the code.}]
+  }
+]
+

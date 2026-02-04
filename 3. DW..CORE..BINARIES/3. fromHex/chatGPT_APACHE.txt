@@ -1,0 +1,41 @@
+fromHex:
+
+input:
+
+from("direct:hexToBinary")
+.process(exchange -> {
+
+    // Hex input
+    String hex = "4D756C65";
+
+    // Convert HEX → byte[]
+    int len = hex.length();
+    byte[] bytes = new byte[len / 2];
+    for (int i = 0; i < len; i += 2) {
+        bytes[i / 2] = (byte) (
+            (Character.digit(hex.charAt(i), 16) << 4)
+            + Character.digit(hex.charAt(i + 1), 16)
+        );
+    }
+
+    // Encode to Base64 (to match DataWeave Binary output)
+    String base64 = java.util.Base64.getEncoder().encodeToString(bytes);
+
+    // Final output
+    exchange.getIn().setBody(
+        java.util.Map.of("hexToBinary", base64)
+    );
+});
+
+
+
+
+output:
+
+{
+  "hexToBinary": "TXVsZQ=="
+}
+
+
+
+

@@ -1,0 +1,47 @@
+toArray:
+
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, List<String>> result = new HashMap<>();
+
+        result.put("a", toArray(""));
+        result.put("b", toArray("hola"));
+
+        System.out.println(result);
+    }
+
+    // Equivalent of DataWeave toArray()
+    private static List<String> toArray(String value) {
+        List<String> list = new ArrayList<>();
+
+        if (value == null || value.isEmpty()) {
+            return list;
+        }
+
+        for (char c : value.toCharArray()) {
+            list.add(String.valueOf(c));
+        }
+        return list;
+    }
+}
+
+
+
+output:
+
+
+{a=[], b=[h, o, l, a]}
+
+
+

@@ -1,0 +1,30 @@
+singularize:
+
+
+input:
+@RestController
+@RequestMapping("/api")
+public class SingularizeController {
+    
+    @GetMapping("/singularize")
+    public Map<String, String> singularizeWord() {
+        return Map.of("singularize", singularize("boxes"));
+    }
+    
+    private String singularize(String word) {
+        if (word.endsWith("es") && word.endsWith("xes")) {
+            return word.substring(0, word.length() - 2);
+        }
+        // Add more rules for other plural forms as needed
+        return word;
+    }
+}
+
+
+output:
+
+{
+  "singularize": "box"
+}
+
+

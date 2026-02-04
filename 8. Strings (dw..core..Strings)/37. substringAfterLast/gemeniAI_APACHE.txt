@@ -1,0 +1,48 @@
+substringAfterLast:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.commons.lang3.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class SubstringAfterLastRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from("direct:getLastSuffix")
+            .process(exchange -> {
+                Map<String, String> results = new LinkedHashMap<>();
+
+                // Apache Commons Lang provides nearly identical behavior
+                results.put("a", StringUtils.substringAfterLast(null, "'"));
+                results.put("b", StringUtils.substringAfterLast("", "-"));
+                results.put("c", StringUtils.substringAfterLast("abc", "b"));
+                results.put("d", StringUtils.substringAfterLast("abcba", "b"));
+                results.put("e", StringUtils.substringAfterLast("abc", "d"));
+                
+                // Specific edge case handling for an empty separator
+                String fInput = "abc";
+                String fSep = "";
+                results.put("f", fSep.isEmpty() ? null : StringUtils.substringAfterLast(fInput, fSep));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json();
+    }
+}
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "a",
+  "e": "",
+  "f": null
+}
+
+

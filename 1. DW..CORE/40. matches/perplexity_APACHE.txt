@@ -1,0 +1,36 @@
+matches:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.regex.*;
+import java.util.*;
+
+public class MatchesRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:matches")
+            .process(exchange -> {
+                String input = "admin123";
+                
+                // Pattern 1: /a.*\d+/ - starts with 'a', any chars, ends with digit
+                boolean match1 = Pattern.compile("a.*\\d+").matcher(input).matches();
+                
+                // Pattern 2: /^b.+/ - must start with 'b'
+                boolean match2 = Pattern.compile("^b.+").matcher(input).matches();
+                
+                List<Boolean> result = Arrays.asList(match1, match2);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+output:
+
+[ true, false ]
+
+
+

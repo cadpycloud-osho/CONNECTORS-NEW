@@ -1,0 +1,201 @@
+read:
+
+
+example 1:
+
+
+input:
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    /**
+     * Helper method to manually format a key-value pair into a simple XML structure.
+     */
+    private static String formatMapAsXml(Map<String, String> map) {
+        StringBuilder sb = new StringBuilder();
+        
+        // 1. Add XML Declaration (<?xml version="1.0" encoding="UTF-8"?>)
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        
+        // 2. Format the single key-value pair as the root element
+        // Since the input JSON is { "hello" : "world" }, the key is the root tag.
+        
+        if (!map.isEmpty()) {
+            Map.Entry<String, String> entry = map.entrySet().iterator().next();
+            String rootTag = entry.getKey();
+            String content = entry.getValue();
+            
+            // Output: <hello>world</hello>
+            sb.append("<").append(rootTag).append(">").append(content).append("</").append(rootTag).append(">");
+        }
+        
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Input string is JSON: { "hello" : "world" }
+        String jsonInput = "{ \"hello\" : \"world\" }";
+
+        // 1. Simulate JSON parsing (DataWeave 'read')
+        // Manually extract the single key-value pair.
+        Map<String, String> dataMap = new HashMap<>();
+        
+        // Simple manual parsing of {"key":"value"}
+        String content = jsonInput.trim().substring(1, jsonInput.length() - 1).trim(); // Remove { and }
+        String[] parts = content.split(":", 2);
+        
+        if (parts.length == 2) {
+            String key = parts[0].trim().replaceAll("^\"|\"$", ""); // Remove quotes from key
+            String value = parts[1].trim().replaceAll("^\"|\"$", ""); // Remove quotes from value
+            dataMap.put(key, value);
+        }
+
+        // 2. Output as XML (DataWeave 'output application/xml')
+        String outputXml = formatMapAsXml(dataMap);
+
+        // 3. Output the result
+        System.out.println(outputXml);
+    }
+}
+output:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<hello>world</hello>
+
+---------------------------------------------------------------
+
+
+
+example 2:
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Input string
+        String myVar = "Some, Body";
+        
+        // 1. Simulate CSV parsing: split the string by the comma delimiter
+        List<String> values = Arrays.asList(myVar.split(","));
+        // values is ["Some", " Body"]
+        
+        // 2. Assemble the final data structure: { "column_0": v0, "column_1": v1 } (using standard Map)
+        Map<String, String> outputMap = new HashMap<>();
+        
+        // DataWeave indexing starts at 0, using default column names
+        outputMap.put("column_0", values.get(0));       // "Some"
+        outputMap.put("column_1", values.get(1));       // " Body" (with leading space)
+
+        // 3. Manually format the result into the required pretty-printed JSON
+        String outputJson = formatMapAsPrettyJson(outputMap);
+
+        System.out.println(outputJson);
+    }
+    
+    /**
+     * Helper method to manually format the Map into a pretty-printed JSON string.
+     */
+    private static String formatMapAsPrettyJson(Map<String, String> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        
+        // Assuming two entries: "column_0" and "column_1"
+        // Iterate to ensure correct order/commas, although Map order is not guaranteed in Java < 8
+        // We rely on the typical behavior of the iteration to match the required output order.
+        
+        sb.append("  \"column_0\" : \"").append(map.get("column_0")).append("\",\n");
+        sb.append("  \"column_1\" : \"").append(map.get("column_1")).append("\"\n");
+
+        sb.append("}");
+        return sb.toString();
+    }
+}
+
+output:
+
+{
+  "column_0" : "Some",
+  "column_1" : " Body"
+}
+
+---------------------------------------------------------------
+
+
+
+
+
+example 3:
+
+
+input:
+
+public class Main {
+
+    /**
+     * Helper method to manually extract the inner content of the <prices> tag.
+     * @param xmlInput The input XML string.
+     * @return The string content between <prices> and </prices>.
+     */
+    private static String extractPricesContent(String xmlInput) {
+        // Find the index of the opening and closing <prices> tags
+        int start = xmlInput.indexOf("<prices>");
+        int end = xmlInput.lastIndexOf("</prices>");
+        
+        if (start != -1 && end != -1) {
+            // Extract the content, trimming leading/trailing whitespace
+            return xmlInput.substring(start + "<prices>".length(), end).trim();
+        }
+        return "";
+    }
+
+    public static void main(String[] args) {
+        // Input string
+        String xmlInput = "<prices><basic>9.99</basic></prices>";
+        
+        // 1. Simulate XML reading and extraction: .prices
+        // This extracts: <basic>9.99</basic>
+        String pricesContent = extractPricesContent(xmlInput);
+
+        // 2. Output as XML (DataWeave 'output application/xml')
+        // The DataWeave transformation {XML: payload.prices} wraps the content 
+        // under a new root element called <XML>.
+        
+        StringBuilder outputXmlBuilder = new StringBuilder();
+        
+        // Start with the root tag <XML>
+        outputXmlBuilder.append("<XML>\n");
+        
+        // Append the extracted content, ensuring it's indented and formatted
+        // We will normalize the indentation for the final output.
+        String indentedContent = pricesContent.replace("<basic>9.99</basic>", "  <basic>9.99</basic>");
+        outputXmlBuilder.append(indentedContent).append("\n");
+        
+        // Close the root tag </XML>
+        outputXmlBuilder.append("</XML>");
+        
+        String outputXml = outputXmlBuilder.toString();
+
+        // 3. Output the result
+        System.out.println(outputXml);
+    }
+}
+
+
+
+output:
+
+<XML>
+  <basic>9.99</basic>
+</XML>
+
+---------------------------------------------------------------

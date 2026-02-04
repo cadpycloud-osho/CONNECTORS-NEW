@@ -1,0 +1,52 @@
+toBase64:
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import java.security.MessageDigest;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+
+@SpringBootApplication
+public class GravatarDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(GravatarDemoApplication.class, args);
+    }
+}
+
+@RestController
+class GravatarController {
+    
+    private String md5Hex(String input) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest(input.getBytes(StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+    
+    @GetMapping("/gravatar")
+    public String gravatarBase64() throws Exception {
+        String email = "achaval@gmail.com";
+        String emailChecksum = md5Hex(email.toLowerCase().trim());
+        String gravatarUrl = "https://www.gravatar.com/avatar/" + emailChecksum;
+        
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<byte[]> response = restTemplate.getForEntity(gravatarUrl, byte[].class);
+        byte[] imageBytes = response.getBody();
+        
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
+}
+
+
+OUTPUT:
+
+"/9j/4AAQSkZJRgABAQEAYABgAAD//gAPh..."

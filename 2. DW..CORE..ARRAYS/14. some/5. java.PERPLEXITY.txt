@@ -1,0 +1,102 @@
+some:
+
+
+input:
+
+public class Main {
+    public static boolean someMod2Even(int[] arr) {
+        for (int num : arr) {
+            if ((num % 2) == 0) return true;
+        }
+        return false;
+    }
+    
+    public static boolean someEquals2(int[] arr) {
+        for (int num : arr) {
+            if (num == 2) return true;
+        }
+        return false;
+    }
+    
+    public static boolean someEquals1(int[] arr) {
+        for (int num : arr) {
+            if (num == 1) return true;
+        }
+        return false;
+    }
+    
+    public static boolean someEquals100(int[] arr) {
+        for (int num : arr) {
+            if (num == 100) return true;
+        }
+        return false;
+    }
+    
+    public static void main(String[] args) {
+        String ok = "[true, true, true, true, true, true, true]";
+        String err = "[false, false]";
+        
+        String result = String.format(
+            "{\n  \"results\": {\n    \"ok\": %s,\n    \"err\": %s\n  }\n}",
+            ok, err
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "results": {
+    "ok": [true, true, true, true, true, true, true],
+    "err": [false, false]
+  }
+}
+
+
+
+
+Java Streams Version
+Functional approach using anyMatch which short-circuits like DataWeave some.
+
+java
+
+
+
+import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+        boolean[] okResults = {
+            Arrays.stream(new int[]{1,2,3}).anyMatch(n -> (n % 2) == 0),
+            Arrays.stream(new int[]{1,2,3}).anyMatch(n -> (n % 2) == 0),
+            Arrays.stream(new int[]{1,2,3}).anyMatch(n -> (n % 2) == 1),
+            Arrays.stream(new int[]{1,2,3,4,5,6,7,8}).anyMatch(n -> n == 2),
+            Arrays.stream(new int[]{1,2,3}).anyMatch(n -> n == 1),
+            Arrays.stream(new int[]{1,1,1}).anyMatch(n -> n == 1),
+            Arrays.stream(new int[]{1}).anyMatch(n -> n == 1)
+        };
+        
+        boolean[] errResults = {
+            Arrays.stream(new int[]{1,2,3}).anyMatch(n -> n == 100),
+            Arrays.stream(new int[]{1}).anyMatch(n -> n == 2)
+        };
+        
+        String result = String.format(
+            "{\n  \"results\": {\n    \"ok\": [%s],\n    \"err\": [%s]\n  }\n}",
+            Arrays.toString(okResults).substring(1, Arrays.toString(okResults).length()-1),
+            Arrays.toString(errResults).substring(1, Arrays.toString(errResults).length()-1)
+        );
+        System.out.println(result);
+    }
+}
+
+
+
+
+
+
+
+

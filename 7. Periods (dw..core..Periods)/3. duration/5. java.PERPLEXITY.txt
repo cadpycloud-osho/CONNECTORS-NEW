@@ -1,0 +1,81 @@
+duration:
+
+
+input:
+
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_INSTANT;
+
+        Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+
+        // dayAfterDateTime: +1 day
+        Instant dayAfter = base.plus(Duration.ofDays(1));
+
+        // dayAndHourBeforeDateTime: -1 day -1 hour
+        Instant dayHourBefore = base.minus(Duration.ofDays(1)).minus(Duration.ofHours(1));
+
+        // pointInTimeBefore: -1 day -1 hour -20 min -10 sec
+        Instant pointBefore = base.minus(Duration.ofDays(1))
+                                   .minus(Duration.ofHours(1))
+                                   .minus(Duration.ofMinutes(20))
+                                   .minus(Duration.ofSeconds(10));
+
+        // emptyDuration
+        Duration emptyDuration = Duration.ZERO;
+
+        // constructDuration: 4 days + 11 hours + 28 minutes -> Duration
+        Duration constructDuration = Duration.ofDays(4)
+                                            .plusHours(11)
+                                            .plusMinutes(28);
+
+        // selectHoursFromDuration: extract the hours part within the day portion (11)
+        // Java 9+ provides toHoursPart; use fallback for older versions
+        int selectHours;
+        try {
+            selectHours = constructDuration.toHoursPart();
+        } catch (NoSuchMethodError e) {
+            // fallback: compute hours remainder after days
+            long totalHours = constructDuration.toHours();
+            selectHours = (int)(totalHours % 24);
+        }
+
+        // decimalAsPeriod: 30.5 seconds -> Duration supports nanoseconds
+        Duration decimalDuration = Duration.ofSeconds(30).plusNanos((long)(0.5 * 1_000_000_000L));
+
+        // addNegativeValue: 1 minute + (-1 second) => 59 seconds (as integer seconds)
+        Duration addNegative = Duration.ofMinutes(1).plusSeconds(-1);
+
+        // Print JSON-style output
+        System.out.println("{");
+        System.out.println("  \"dayAfterDateTime\": \"" + fmt.format(dayAfter) + "\",");
+        System.out.println("  \"dayAndHourBeforeDateTime\": \"" + fmt.format(dayHourBefore) + "\",");
+        System.out.println("  \"pointInTimeBefore\": \"" + fmt.format(pointBefore) + "\",");
+        System.out.println("  \"emptyDuration\": \"" + emptyDuration.toString() + "\",");
+        System.out.println("  \"constructDuration\": \"" + constructDuration.toString() + "\",");
+        System.out.println("  \"selectHoursFromDuration\": " + selectHours + ",");
+        System.out.println("  \"decimalAsPeriod\": \"" + decimalDuration.toString() + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegative.getSeconds());
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+"dayAfterDateTime": "2020-10-06T20:22:34.385Z",
+"dayAndHourBeforeDateTime": "2020-10-04T19:22:34.385Z",
+"pointInTimeBefore": "2020-10-04T19:02:24.385Z",
+"emptyDuration": "PT0S",
+"constructDuration": "PT107H28M",
+"selectHoursFromDuration": 11,
+"decimalAsPeriod": "PT30.5S",
+"addNegativeValue": 59
+}

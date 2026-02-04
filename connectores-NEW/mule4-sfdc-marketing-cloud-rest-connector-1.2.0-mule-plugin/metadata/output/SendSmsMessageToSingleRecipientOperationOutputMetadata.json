@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/schema",
+  "definitions": {
+    "schema": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "errorcode",
+        "requestId",
+        "responses"
+      ],
+      "properties": {
+        "errorcode": {
+          "type": "number"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "responses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/response"
+          }
+        }
+      }
+    },
+    "response": {
+      "additionalProperties": true,
+      "type": "object",
+      "required": [
+        "messageKey"
+      ],
+      "properties": {
+        "messageKey": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

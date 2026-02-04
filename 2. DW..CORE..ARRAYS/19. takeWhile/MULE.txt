@@ -1,0 +1,24 @@
+takeWhile:
+
+takeWhile<T>(array: Array<T>, condition: (item: T) -> Boolean): Array<T>
+
+takeWhile<T>(array: Array<T>, condition: (item: T) -> Boolean): Array<T>
+Selects elements from the array while the condition is met but stops the selection process when it reaches an element that fails to satisfy the condition.
+
+To select all elements that meet the condition, use the filter function.
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var arr = [0,1,2,1]
+---
+arr takeWhile $ <= 1
+
+DataWeave
+Output
+[
+  0,
+  1
+]

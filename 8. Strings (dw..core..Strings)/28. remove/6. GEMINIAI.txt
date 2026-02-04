@@ -1,0 +1,36 @@
+remove:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class RemoveController {
+
+    @GetMapping("/remove-conversion")
+    public Map<String, String> convertDataWeaveRemove() {
+        
+        String inputString = "lazyness purity state higher-order stateful";
+        String substringToRemove = "state";
+        
+        // --- Core DataWeave Logic ---
+        // String.replace() or String.replaceAll() in Java performs the same function:
+        // replacing all literal occurrences of the target string.
+        String transformedString = inputString.replaceAll(substringToRemove, "");
+        // ----------------------------
+        
+        // Return a Map, which Spring Boot automatically converts to the required JSON
+        return Map.of(
+            "result", transformedString
+        );
+    }
+}
+
+output:
+
+{
+  "result": "lazyness purity  higher-order ful"
+}

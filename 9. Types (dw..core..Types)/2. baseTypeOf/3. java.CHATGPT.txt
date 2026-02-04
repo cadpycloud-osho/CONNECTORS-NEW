@@ -1,0 +1,42 @@
+baseTypeOf:
+
+
+
+input:
+
+public class Main {
+
+    static class AType {
+        private final Class<?> baseType = String.class;
+        private final String format = "YYYY-MM-dd";
+
+        public Class<?> getBaseType() {
+            return baseType;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+    }
+
+    public static String baseTypeOf(Class<?> clazz) {
+        return clazz.getSimpleName();
+    }
+
+    public static void main(String[] args) {
+        AType aType = new AType();
+
+        String result = baseTypeOf(aType.getBaseType());
+
+        System.out.println("{ \"a\": \"" + result + "\" }");
+    }
+}
+
+
+
+output:
+
+{ "a": "String" }
+
+
+

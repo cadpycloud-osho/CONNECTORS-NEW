@@ -1,0 +1,55 @@
+toDateOrNull:
+
+toDateOrNull(str: String, formatters: Array<Formatter>): Date | Null
+
+toDateOrNull(str: String, formatters: Array<Formatter>): Date | Null
+Transforms a String value into a Date value using the first Formatter that matches with the given value to transform.
+
+If none of the Formatter matches with the given value, the function returns a null value.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+  a: toDateOrNull("2023-28-03", [{format: "yyyy/MM/dd"}, {format: "yyyy-dd-MM", locale: "en_US"}]),
+  b: toDateOrNull("2023-28-03", [{format: "yyyy/MM/dd"}])
+}
+
+
+
+
+DataWeave
+Output
+{
+  a: |2023-03-28| as Date {format: "yyyy-dd-MM", locale: "en_US"},
+  b: null
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

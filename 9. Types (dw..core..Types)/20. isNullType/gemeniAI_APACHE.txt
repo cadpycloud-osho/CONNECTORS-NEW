@@ -1,0 +1,53 @@
+isNullType:
+
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class NullTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkNullType")
+            .process(exchange -> {
+                // In Java, there is no 'Null' class like String.class, 
+                // so we represent the "Null Type" using a null value.
+                Object refA = null; 
+                Object refB = null;
+                Object refC = "Not Null";
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: isNullType check
+                result.put("a", isNullType(refA));
+                result.put("b", isNullType(refB));
+                result.put("c", isNullType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isNullType(Object obj) {
+        // Returns true if the object reference is null
+        return obj == null;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+
+
+

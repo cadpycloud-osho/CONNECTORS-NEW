@@ -1,0 +1,54 @@
+toRegex:
+
+toRegex(str: String): Regex
+
+toRegex(str: String): Regex
+Transforms a String value into a Regex value.
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+  toRegexEx1: toRegex("a-Z"),
+  toRegexEx2: toRegex("0-9+")
+}
+
+
+
+DataWeave
+Output
+{
+  toRegexEx1: /a-Z/,
+  toRegexEx2: /0-9+/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

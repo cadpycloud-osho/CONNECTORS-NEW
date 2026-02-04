@@ -1,0 +1,168 @@
+toLocalDateTime:
+
+
+
+example 1:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveLocalDateTimeConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceDateTimeString = "2003-10-01 23:57:59";
+
+    /**
+     * Mimics DataWeave's chained toLocalDateTime() with multiple formatters.
+     * Tries each formatter. Returns the parsed LocalDateTime upon success, or null if all fail.
+     */
+    private LocalDateTime chainedToLocalDateTime(String dateTimeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return LocalDateTime.parse(dateTimeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Swallow exception and continue to the next formatter
+            }
+        }
+        return null; // Return null if none succeed
+    }
+
+    public String getLocalDateTimeParsingJson() throws IOException {
+        
+        // Define formatters
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss", Locale.US);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.US);
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        // Try formatter1 (fails), then formatter2 (succeeds)
+        LocalDateTime parsedDateA = chainedToLocalDateTime(sourceDateTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        String errorMessageB;
+        try {
+            // Only try the failing formatter (formatter1)
+            LocalDateTime.parse(sourceDateTimeString, formatter1);
+            errorMessageB = "No error occurred.";
+        } catch (DateTimeParseException e) {
+            // Capture the DataWeave specific error message
+            errorMessageB = "Could not find a valid formatter for '" + sourceDateTimeString + "'";
+        }
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes LocalDateTime using the ISO 8601 local format (e.g., "2003-10-01T23:57:59")
+        if (parsedDateA != null) {
+             root.put("a", parsedDateA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        root.put("b", errorMessageB);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveLocalDateTimeConverter converter = new DataWeaveLocalDateTimeConverter();
+        try {
+            String jsonOutput = converter.getLocalDateTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "2003-10-01T23:57:59",
+  "b" : "Could not find a valid formatter for '2003-10-01 23:57:59'"
+}
+
+------------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class DataWeaveLocalTimeParsingConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getLocalDateTimeParsingJson() throws IOException {
+        
+        // --- Logic for Key 'a' (ISO 8601 Parsing) ---
+        String dateTimeStringA = "2015-10-01T23:57:59";
+        // Java's LocalDateTime.parse() recognizes ISO 8601 local formats by default.
+        LocalDateTime parsedDateA = LocalDateTime.parse(dateTimeStringA); 
+
+        // --- Logic for Key 'b' (Custom Format Parsing) ---
+        String dateTimeStringB = "2003-10-01 23:57:59";
+        // Define the explicit format using Java's DateTimeFormatter
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.US);
+        LocalDateTime parsedDateB = LocalDateTime.parse(dateTimeStringB, customFormatter);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes LocalDateTime using the standard ISO 8601 local string format (e.g., "2015-10-01T23:57:59")
+        root.put("a", parsedDateA.toString());
+        root.put("b", parsedDateB.toString());
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveLocalTimeParsingConverter converter = new DataWeaveLocalTimeParsingConverter();
+        try {
+            String jsonOutput = converter.getLocalDateTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+
+{
+  "a" : "2015-10-01T23:57:59",
+  "b" : "2003-10-01T23:57:59"
+}
+
+
+
+
+
+
+
+
+
+
+
+

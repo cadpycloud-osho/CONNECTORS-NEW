@@ -1,0 +1,32 @@
+fromRadixNumber:
+
+input:
+
+from("direct:fromRadixNumber")
+.process(exchange -> {
+
+    // Input strings and their radix
+    String aStr = "10"; // binary
+    int aRadix = 2;
+
+    String bStr = "FF"; // hexadecimal
+    int bRadix = 16;
+
+    java.util.Map<String, Object> output = new java.util.HashMap<>();
+
+    // Convert string to number using radix
+    output.put("a", aStr != null ? Integer.parseInt(aStr, aRadix) : null);
+    output.put("b", bStr != null ? Integer.parseInt(bStr, bRadix) : null);
+
+    exchange.getIn().setBody(output);
+});
+
+
+output:
+
+{
+  "a": 2,
+  "b": 255
+}
+
+

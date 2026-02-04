@@ -1,0 +1,65 @@
+isWhitespace:
+
+isWhitespace(text: String): Boolean
+
+isWhitespace(text: String): Boolean
+Checks if the text contains only whitespace.
+
+
+Source
+%dw 2.0
+import isWhitespace from dw::core::Strings
+output application/json
+---
+{
+  "a": isWhitespace(null),
+  "b": isWhitespace(""),
+  "c": isWhitespace("  "),
+  "d": isWhitespace("abc"),
+  "e": isWhitespace("ab2c"),
+  "f": isWhitespace("ab-c")
+}
+
+
+
+DataWeave
+Output
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

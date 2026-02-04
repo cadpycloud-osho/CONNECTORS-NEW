@@ -1,0 +1,36 @@
+currentMilliseconds:
+
+
+
+input:
+
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        Map<String, Long> result = getCurrentMilliseconds();
+        System.out.println(result);
+    }
+    
+    /**
+     * DataWeave Timer.currentMilliseconds() equivalent:
+     * Returns current time in milliseconds since Unix epoch (January 1, 1970 00:00:00 GMT)
+     */
+    public static Map<String, Long> getCurrentMilliseconds() {
+        return Map.of("currentMilliseconds", currentMilliseconds());
+    }
+    
+    public static long currentMilliseconds() {
+        return System.currentTimeMillis();
+    }
+}
+
+
+
+output:
+
+{currentMilliseconds=1734066423000}
+
+
+

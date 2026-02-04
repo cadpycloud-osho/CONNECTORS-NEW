@@ -1,0 +1,122 @@
+everyEntry:
+
+
+
+input:
+
+package com.example.dataweaveconverter;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Predicate;
+
+@SpringBootApplication
+public class DataweaveEveryEntryApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DataweaveEveryEntryApplication.class, args);
+    }
+
+    // =========================================================================
+    // 1. DTO (Data Transfer Object)
+    // =========================================================================
+
+    // DTO for the final output JSON structure
+    public record DataWeaveOutput(
+        boolean a,
+        boolean b,
+        boolean c,
+        boolean d,
+        boolean e,
+        boolean f
+    ) {}
+
+    // =========================================================================
+    // 2. REST CONTROLLER
+    // =========================================================================
+    @RestController
+    @RequestMapping("/convert")
+    public static class DataWeaveController {
+
+        private final DataWeaveService dataWeaveService;
+
+        @Autowired
+        public DataWeaveController(DataWeaveService dataWeaveService) {
+            this.dataWeaveService = dataWeaveService;
+        }
+
+        @GetMapping("/everyEntry")
+        public DataWeaveOutput runDataWeaveLogic() {
+            // Source data for the everyEntry operation
+            Map<String, Object> mapB = Map.of("a", "", "b", "123");
+            Map<String, Object> mapC_D = Map.of("a", "", "b", 123);
+            Map<String, Object> mapE = Map.of("a", "");
+
+            return new DataWeaveOutput(
+                // a: {} everyEntry (value is String) -> true (vacuously true)
+                dataWeaveService.everyEntry(Collections.emptyMap(), entry -> entry.getValue() instanceof String),
+
+                // b: {a: "", b: "123"} everyEntry (value is String) -> true
+                dataWeaveService.everyEntry(mapB, entry -> entry.getValue() instanceof String),
+
+                // c: {a: "", b: 123} everyEntry (value is String) -> false (123 is not a String)
+                dataWeaveService.everyEntry(mapC_D, entry -> entry.getValue() instanceof String),
+
+                // d: {a: "", b: 123} everyEntry (key == "a") -> false (key "b" fails the test)
+                dataWeaveService.everyEntry(mapC_D, entry -> entry.getKey().equals("a")),
+
+                // e: {a: ""} everyEntry (key == "a") -> true
+                dataWeaveService.everyEntry(mapE, entry -> entry.getKey().equals("a")),
+
+                // f: null everyEntry (...) -> true (vacuously true in DW)
+                dataWeaveService.everyEntry(null, entry -> entry.getKey().equals("a"))
+            );
+        }
+    }
+
+    // =========================================================================
+    // 3. SERVICE LAYER (LOGIC IMPLEMENTATION)
+    // =========================================================================
+    @Service
+    public static class DataWeaveService {
+
+        /**
+         * Mimics the DataWeave dw::core::Objects::everyEntry function.
+         * Checks if the predicate is true for ALL entries in the map.
+         *
+         * @param inputMap The map (DataWeave Object) to iterate over.
+         * @param condition The predicate (lambda) to check for each entry (key and value).
+         * @return true if the condition is true for all entries, or if the input is null/empty.
+         */
+        public boolean everyEntry(Map<String, Object> inputMap, Predicate<Map.Entry<String, Object>> condition) {
+            // Replicate DW's behavior for null or empty object: returns true
+            if (inputMap == null || inputMap.isEmpty()) {
+                return true;
+            }
+
+            // Use the Java Stream allMatch operation, the direct equivalent of everyEntry
+            return inputMap.entrySet().stream().allMatch(condition);
+        }
+    }
+}
+
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false,
+  "d": false,
+  "e": true,
+  "f": true
+}

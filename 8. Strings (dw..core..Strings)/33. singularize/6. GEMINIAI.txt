@@ -1,0 +1,32 @@
+singularize:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class SingularizeController {
+
+    @GetMapping("/singularize-conversion")
+    public Map<String, String> convertDataWeaveSingularize() {
+        
+        // --- Core DataWeave Logic Mapping ---
+        String singularizedWord = SingularizeUtil.singularize("boxes");
+        // ------------------------------------
+        
+        // Return a Map, which Spring Boot automatically converts to the required JSON
+        return Map.of(
+            "singularize", singularizedWord
+        );
+    }
+}
+
+output:
+
+{
+  "singularize": "box"
+}
+

@@ -1,0 +1,48 @@
+cos:
+
+
+
+input:
+
+package com.example.datamapper.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class MathController {
+
+    /**
+     * Simulates the DataWeave logic for the cos function.
+     * @return A map containing the results of the cosine calculations.
+     */
+    @GetMapping("/calculateCos")
+    public Map<String, Double> calculateCos() {
+        // Use LinkedHashMap to maintain key insertion order.
+        Map<String, Double> output = new LinkedHashMap<>();
+
+        // Helper function for cos (direct map to Java's Math.cos)
+        double cos(double x) {
+            // Math.cos takes an angle in radians and returns its cosine.
+            return Math.cos(x);
+        }
+
+        // Simulating the DataWeave calls:
+        output.put("cos0", cos(0));
+        output.put("cos13", cos(0.13));
+        output.put("cos-1", cos(-1));
+
+        return output;
+    }
+}
+
+
+output:
+
+{
+  "cos0": 1.0,
+  "cos13": 0.9915618937147881,
+  "cos-1": 0.5403023058681398
+}

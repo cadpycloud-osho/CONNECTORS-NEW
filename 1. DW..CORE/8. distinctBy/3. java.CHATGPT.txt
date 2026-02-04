@@ -1,0 +1,158 @@
+distinctBy:
+
+example 1:
+
+input:
+
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.*;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        String xml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+              + "<root>"
+              + "  <order><items>155</items></order>"
+              + "  <order><items>30</items></order>"
+              + "  <order><items>15</items></order>"
+              + "  <order><items>5</items></order>"
+              + "  <order><items>4</items><items>7</items></order>"
+              + "  <order><items>1</items><items>3</items></order>"
+              + "  <order></order>"
+              + "</root>";
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        Document document = builder.parse(
+                new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+
+        NodeList itemsList = document.getElementsByTagName("items");
+
+        boolean containsRequestedItem = false;
+
+        for (int i = 0; i < itemsList.getLength(); i++) {
+            String value = itemsList.item(i).getTextContent();
+            if ("3".equals(value)) {
+                containsRequestedItem = true;
+                break;
+            }
+        }
+
+        System.out.println("{ \"ContainsRequestedItem\": " + containsRequestedItem + " }");
+    }
+}
+
+
+
+output:
+
+{ "ContainsRequestedItem": true }
+
+
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import java.io.ByteArrayInputStream;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        String xml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<root><mystring>some string</mystring></root>";
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document =
+            builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        // Read value
+        String myString =
+            document.getElementsByTagName("mystring").item(0).getTextContent();
+
+        // Logic (DataWeave contains equivalent)
+        boolean containsRequestedItem = myString.contains("me");
+
+        // Output
+        System.out.println("{ \"ContainsRequestedItem\": " + containsRequestedItem + " }");
+    }
+}
+
+
+
+
+output:
+
+{ "ContainsString": true }
+
+
+
+---------------------------------------------------------------
+
+
+
+
+example 3:
+
+input:
+
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import java.io.ByteArrayInputStream;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        String xml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<root><mystring>some string</mystring></root>";
+
+        // Parse XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document =
+            builder.parse(new ByteArrayInputStream(xml.getBytes()));
+
+        // Read value
+        String myString =
+            document.getElementsByTagName("mystring").item(0).getTextContent();
+
+        // contains logic
+        boolean containsRequestedItem = myString.contains("me");
+
+        // Output
+        System.out.println("{ \"ContainsRequestedItem\": " + containsRequestedItem + " }");
+    }
+}
+
+
+output:
+
+
+{ "ContainsString": true }
+
+
+
+---------------------------------------------------------------
+

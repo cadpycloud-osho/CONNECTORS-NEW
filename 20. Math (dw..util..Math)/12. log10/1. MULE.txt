@@ -1,0 +1,59 @@
+log10:
+
+log10(a: Number): Number | NaN
+
+log10(a: Number): Number | NaN
+Returns the logarithm base 10 of a number.
+
+
+Source
+%dw 2.0
+import * from dw::util::Math
+output application/json
+---
+{
+  "log1010": log10(10),
+  "log1013": log10(0.13),
+  "log10-20": log10(-20)
+}
+
+
+DataWeave
+Output
+{
+   "log1010": 1.0,
+   "log1013": -0.8860566476931632,
+   "log10-20": null
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

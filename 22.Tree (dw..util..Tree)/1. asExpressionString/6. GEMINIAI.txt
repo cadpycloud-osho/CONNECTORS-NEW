@@ -1,0 +1,103 @@
+asExpressionString:
+
+
+
+input:
+
+package com.example.service;
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class TreeConverterService {
+
+    /**
+     * Replicates the logic of dw::util::Tree::asExpressionString() by manually
+     * converting the DataWeave AST structure (List of Maps) into the expression string.
+     * * @param treeStructure The list representing the DataWeave AST nodes.
+     * @return The constructed DataWeave expression string.
+     */
+    public String asExpressionString(List<Map<String, Object>> treeStructure) {
+        StringBuilder expression = new StringBuilder();
+        
+        for (Map<String, Object> node : treeStructure) {
+            String kind = (String) node.get("kind");
+            String selector = (String) node.get("selector");
+            
+            switch (kind) {
+                case "OBJECT_TYPE":
+                    // Represents navigation into an object key: .key
+                    // If it's the first element, we assume it starts with a dot/selector, otherwise it follows the previous selector.
+                    if (expression.length() == 0) {
+                        expression.append(".");
+                    }
+                    expression.append(selector);
+                    break;
+                case "ATTRIBUTE_TYPE":
+                    // Represents navigation into an XML attribute key: .@key
+                    // Since the previous element was "user", this appends the attribute selector.
+                    expression.append(".@").append(selector);
+                    break;
+                // Add other kind types (ARRAY_TYPE, etc.) as necessary for full coverage
+                default:
+                    // Fallback or error handling for unsupported kinds
+                    expression.append("/* unsupported kind: ").append(kind).append(" */");
+                    break;
+            }
+        }
+        
+        // The DataWeave output is quoted, representing a string literal.
+        return "\"" + expression.toString() + "\"";
+    }
+}
+
+
+
+package com.example.controller;
+
+import com.example.service.TreeConverterService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+@RestController
+public class TreeController {
+
+    private final TreeConverterService treeConverterService;
+
+    public TreeController(TreeConverterService treeConverterService) {
+        this.treeConverterService = treeConverterService;
+    }
+
+    @GetMapping("/expressionString")
+    public Map<String, String> getExpressionString() {
+        // Input DataWeave AST structure
+        List<Map<String, Object>> inputAst = List.of(
+            Map.of("kind", "OBJECT_TYPE", "selector", "user", "namespace", null),
+            Map.of("kind", "ATTRIBUTE_TYPE", "selector", "name", "namespace", null)
+        );
+
+        String result = treeConverterService.asExpressionString(inputAst);
+
+        // Structure the output as a JSON object
+        Map<String, String> output = new LinkedHashMap<>();
+        output.put("expression", result); // Using "expression" as a key for clarity
+
+        return output;
+    }
+}
+
+
+
+
+output:
+
+{
+  "expression": ".user.@name"
+}
+
+

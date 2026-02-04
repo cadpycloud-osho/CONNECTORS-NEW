@@ -1,0 +1,104 @@
+typeOf:
+
+
+
+example 1:
+
+
+input:
+
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> result = Arrays.asList(
+            getType("A b"),    // String
+            getType(Arrays.asList(1, 2)), // Array
+            getType(34),       // Number
+            getType(true),     // Boolean
+            getType(new HashMap<String, Integer>() {{ put("a", 5); }}) // Object
+        );
+        
+        System.out.println(result);
+    }
+    
+    private static String getType(Object obj) {
+        if (obj instanceof String) return "String";
+        if (obj instanceof List) return "Array";
+        if (obj instanceof Number) return "Number";
+        if (obj instanceof Boolean) return "Boolean";
+        if (obj instanceof Map) return "Object";
+        return "Unknown";
+    }
+}
+
+
+output:
+
+
+[String, Array, Number, Boolean, Object]
+
+
+------------------------------------------------
+
+
+
+
+
+example 2:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // var x: String | Number = "clearly a string"
+        Object x = "clearly a string";  // Assigned String value
+        
+        // var y: "because" = "because" (literal type)
+        String y = "because";
+        
+        List<String> result = Arrays.asList(
+            getType(x),  // String
+            getType(y)   // String
+        );
+        
+        System.out.println(result);
+    }
+    
+    private static String getType(Object obj) {
+        if (obj instanceof String) return "String";
+        if (obj instanceof List) return "Array";
+        if (obj instanceof Number) return "Number";
+        if (obj instanceof Boolean) return "Boolean";
+        if (obj instanceof Map) return "Object";
+        return "Unknown";
+    }
+}
+
+
+
+output:
+
+[String, String]
+
+
+
+------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,44 @@
+concatWith:
+
+
+INPUT:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.Base64Utils;
+import org.apache.commons.codec.binary.Hex;
+import java.util.Arrays;
+
+@SpringBootApplication
+public class BinaryConcatDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BinaryConcatDemoApplication.class, args);
+    }
+}
+
+@RestController
+class BinaryConcatController {
+    
+    @GetMapping("/binaryConcat")
+    public String binaryConcatExample() {
+        // "CAFE" hex to bytes: CA=202, FE=254
+        byte[] cafeBytes = Hex.decodeHex("CAFE".toCharArray());
+        // "ABCD" hex to bytes: AB=171, CD=205
+        byte[] abcdBytes = Hex.decodeHex("ABCD".toCharArray());
+        
+        // Concatenate byte arrays
+        byte[] concatBytes = Arrays.copyOf(cafeBytes, cafeBytes.length + abcdBytes.length);
+        System.arraycopy(abcdBytes, 0, concatBytes, cafeBytes.length, abcdBytes.length);
+        
+        // Encode to base64
+        return Base64Utils.encodeToString(concatBytes);
+    }
+}
+
+
+OUTPUT:
+
+"yv6rzQ=="
+

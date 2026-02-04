@@ -1,0 +1,58 @@
+toTimeOrNull:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+public class TimeOrNullRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceTimeOrNull")
+            .process(exchange -> {
+                String input = "13:44:12.283-08:00";
+
+                // Pattern list A: Includes a fallback that matches nanoseconds
+                List<DateTimeFormatter> listA = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.SSSxxx"), // Milliseconds
+                    DateTimeFormatter.ofPattern("HH:mm:ss.nxxx")    // Nanoseconds
+                );
+
+                // Pattern list B: Only includes millisecond precision, which fails
+                List<DateTimeFormatter> listB = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.SSSxxx")
+                );
+
+                exchange.getIn().setBody(Map.of(
+                    "a", parseTimeOrNull(input, listA),
+                    "b", parseTimeOrNull(input, listB)
+                ));
+            });
+    }
+
+    private OffsetTime parseTimeOrNull(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return OffsetTime.parse(input, formatter);
+            } catch (Exception ignored) {
+                // Continue to the next formatter
+            }
+        }
+        return null; // Equivalent to toTimeOrNull returning null
+    }
+}
+
+output:
+
+{
+  a: |13:44:12.000000283-08:00| as Time {format: "HH:mm:ss.nxxx"},
+  b: null
+}
+
+
+

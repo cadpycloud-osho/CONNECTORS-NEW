@@ -1,0 +1,177 @@
+mapObject:
+
+example 1:
+
+
+input:
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Simulate input: {"a":"b", "c":"d"}
+        Map<String, String> input = new HashMap<>();
+        input.put("a", "b");
+        input.put("c", "d");
+        
+        StringBuilder result = new StringBuilder("{");
+        int index = 0;
+        
+        for (Map.Entry<String, String> entry : input.entrySet()) {
+            if (index > 0) result.append(",");
+            String key = entry.getKey();
+            String value = entry.getValue();
+            result.append("\"").append(index).append("\":{\"").append(value).append("\":\"").append(key).append("\"}");
+            index++;
+        }
+        result.append("}");
+        
+        System.out.println(result.toString());
+    }
+}
+
+
+output:
+
+{"0":{"b":"a"},"1":{"d":"c"}}
+
+
+---------------------------------------------------------------
+
+
+
+example 2:
+
+<dependency>
+    <groupId>javax.xml.parsers</groupId>
+    <artifactId>xml-apis</artifactId>
+    <version>2.0.2</version>
+</dependency>
+
+input:
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Create input XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.newDocument();
+        Element root = doc.createElement("prices");
+        doc.appendChild(root);
+        
+        Element basic = doc.createElement("basic");
+        basic.setTextContent("9.99");
+        root.appendChild(basic);
+        
+        Element premium = doc.createElement("premium");
+        premium.setTextContent("53");
+        root.appendChild(premium);
+        
+        Element vip = doc.createElement("vip");
+        vip.setTextContent("398.99");
+        root.appendChild(vip);
+        
+        // Transform prices (+5) and format
+        NodeList priceNodes = root.getChildNodes();
+        for (int i = 0; i < priceNodes.getLength(); i++) {
+            Node node = priceNodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                double value = Double.parseDouble(node.getTextContent()) + 5;
+                node.setTextContent(String.format("%.2f", value));
+            }
+        }
+        
+        // Output XML
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.transform(new DOMSource(doc), new StreamResult(System.out));
+    }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<prices>
+   <basic>14.99</basic>
+   <premium>58.00</premium>
+   <vip>403.99</vip>
+</prices>
+
+
+---------------------------------------------------------------
+
+
+
+example 3:
+<dependency>
+    <groupId>javax.xml.parsers</groupId>
+    <artifactId>xml-apis</artifactId>
+    <version>2.0.2</version>
+</dependency>
+
+
+input:
+
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Create empty input XML
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.newDocument();
+        Element root = doc.createElement("prices");
+        doc.appendChild(root);
+        
+        // Output unchanged (identity transformation)
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.transform(new DOMSource(doc), new StreamResult(System.out));
+    }
+}
+
+
+output:
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<prices/>
+
+
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

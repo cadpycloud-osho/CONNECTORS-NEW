@@ -1,0 +1,51 @@
+concatWith:
+
+
+INPUT:
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Base64;
+
+@RestController
+public class BinaryController {
+
+    @GetMapping("/binaryConcat")
+    public String concatBinaryHex() {
+        // Input Hex Strings like DataWeave
+        String hex1 = "CAFE";
+        String hex2 = "ABCD";
+
+        // Convert Hex → Byte[]
+        byte[] bytes1 = hexStringToByteArray(hex1);
+        byte[] bytes2 = hexStringToByteArray(hex2);
+
+        // Concat Bytes
+        byte[] combined = new byte[bytes1.length + bytes2.length];
+        System.arraycopy(bytes1, 0, combined, 0, bytes1.length);
+        System.arraycopy(bytes2, 0, combined, bytes1.length, bytes2.length);
+
+        // Convert Bytes → Base64 (same as DataWeave output)
+        return Base64.getEncoder().encodeToString(combined);
+    }
+
+    // Helper Method: Convert Hex String to Byte Array
+    private byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) 
+                ((Character.digit(s.charAt(i), 16) << 4)
+                + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+}
+
+
+OUTPUT:
+
+"yv6rzQ=="
+

@@ -1,0 +1,30 @@
+prop:
+
+
+input:
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Simulating Mule property: user.timezone
+        System.setProperty("user.timezone", "America/Los_Angeles");
+
+        String timezone = System.getProperty("user.timezone");
+
+        Map<String, Object> output = new LinkedHashMap<>();
+        output.put("props", timezone);
+
+        System.out.println(output);
+    }
+}
+
+
+
+output:
+
+{
+  "props": "America/Los_Angeles"
+}
+

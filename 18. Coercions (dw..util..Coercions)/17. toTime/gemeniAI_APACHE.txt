@@ -1,0 +1,113 @@
+toTime:
+
+
+example 1:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class TimeCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceTime")
+            .process(exchange -> {
+                String input = "13:44:12.283-08:00";
+                Map<String, Object> response = new LinkedHashMap<>();
+
+                // Formatters equivalent to the DW patterns
+                // 'x' in Java handles ISO-8601 offsets (e.g., -08:00)
+                List<DateTimeFormatter> listA = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.SSSx"), // Attempt Millis
+                    DateTimeFormatter.ofPattern("HH:mm:ss.nxxx")  // Attempt Nanos
+                );
+
+                // Scenario A: Success via fallback
+                response.put("a", parseTimeOrError(input, listA));
+
+                // Scenario B: Failure (Only using one formatter that might not fit)
+                List<DateTimeFormatter> listB = List.of(
+                    DateTimeFormatter.ofPattern("HH:mm:ss.SSSx")
+                );
+                try {
+                    parseTimeOrError(input, listB);
+                } catch (Exception e) {
+                    response.put("b", e.getMessage());
+                }
+
+                exchange.getIn().setBody(response);
+            });
+    }
+
+    private OffsetTime parseTimeOrError(String input, List<DateTimeFormatter> formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return OffsetTime.parse(input, formatter);
+            } catch (Exception ignored) {}
+        }
+        throw new IllegalArgumentException("Could not find a valid formatter for '" + input + "'");
+    }
+}
+
+output:
+
+{
+  a: |13:44:12.000000283-08:00| as Time {format: "HH:mm:ss.nxxx"},
+  b: "Could not find a valid formatter for '13:44:12.283-08:00'"
+}
+
+
+---------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class TimeCoercionRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:coerceTime")
+            .process(exchange -> {
+                Map<String, OffsetTime> results = new LinkedHashMap<>();
+
+                // Case a: Default ISO-8601 parsing (Z for UTC)
+                // DataWeave: toTime("23:57:59Z")
+                results.put("a", OffsetTime.parse("23:57:59Z"));
+
+                // Case b: Custom pattern with nanos and offset
+                // DataWeave: toTime("13:44:12.283-08:00","HH:mm:ss.nxxx")
+                // Note: 'n' in Java patterns handles nanoseconds
+                DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.nxxx");
+                results.put("b", OffsetTime.parse("13:44:12.283-08:00", customFormatter));
+
+                exchange.getIn().setBody(results);
+            });
+    }
+}
+
+output:
+
+{
+  a: |23:57:59Z|,
+  b: |13:44:12.000000283-08:00| as Time {format: "HH:mm:ss.nxxx"}
+}
+
+
+---------------------------------------------------------
+

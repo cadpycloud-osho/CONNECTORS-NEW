@@ -1,0 +1,36 @@
+ceil(number: Number): Number
+
+
+input:
+
+<route id="DataWeaveCeilTransformation">
+    <from uri="direct:startCeil"/>
+    
+    <transform>
+        <groovy>
+            // Get the message body (the List of numbers)
+            def sourceList = request.body
+            
+            // Iterate over the list and apply the Math.ceil() function 
+            // to each element using Groovy's 'collect' method.
+            def resultList = sourceList.collect { 
+                // Math.ceil returns a Double, so we cast it to an Integer 
+                // if we want a clean whole number output like DataWeave.
+                Math.ceil(it).intValue() 
+            }
+            
+            // The resulting List is returned as the new body
+            return resultList
+        </groovy>
+    </transform>
+    
+    <marshal>
+        <json library="Jackson"/>
+    </marshal>
+    <to uri="mock:ceilOutput"/>
+</route>
+
+output:
+
+[ 2, 3, 3 ]
+

@@ -1,0 +1,207 @@
+update:
+
+example 1:
+
+input:
+// POJO: SimpleUser (has a 'name' field)
+
+@Service
+public class Ex1Service {
+    public SimpleUser updateName() {
+        // Source: {name: "Mariano"}
+        // Logic: {name: "Mariano"} update "name" with "Data Weave"
+        
+        // DataWeave creates a new object; Java mimics this:
+        return new SimpleUser("Data Weave");
+    }
+}
+
+output:
+
+ // Output: { "name": "Data Weave" }
+
+---------------------------------------------------------------
+
+
+example 2:
+
+input:
+
+// Implementation is identical to Ex 1, as the target structure and result are the same.
+@Service
+public class Ex2Service {
+    public SimpleUser updateName() {
+        return new SimpleUser("Data Weave");
+    }
+}
+
+output:
+
+  // Output: { "name": "Data Weave" }
+
+---------------------------------------------------------------
+
+
+example 3:
+
+input:
+
+// POJO: N/A (using List<Integer>)
+
+@Service
+public class Ex3Service {
+    public List<Integer> updateIndex() {
+        List<Integer> source = Arrays.asList(1, 2, 3);
+        
+        // 1. Create mutable copy (DataWeave creates a new array)
+        List<Integer> updated = new ArrayList<>(source); 
+        
+        // 2. Update the element at index 1 (the value 2) to 5
+        updated.set(1, 5); 
+        return updated;
+    }
+}
+
+output:
+
+ // Output: [1, 5, 3]
+
+---------------------------------------------------------------
+
+
+
+example 4:
+
+input:
+
+// POJO: Hero (has 'role' and 'name' fields)
+
+@Service
+public class Ex4Service {
+    public List<Hero> updateRole() {
+        List<Hero> source = Arrays.asList(
+            new Hero("a", "spiderman"), new Hero("b", "batman")
+        );
+        
+        // Use streams to map (iterate and transform)
+        return source.stream()
+            .map(hero -> {
+                // Create a new Hero instance with the updated role
+                Hero updated = new Hero();
+                updated.setName(hero.getName());
+                updated.setRole("Super Hero"); 
+                return updated;
+            })
+            .collect(Collectors.toList());
+    }
+}
+
+output:
+
+ /* Output: 
+    [
+      {"role": "Super Hero", "name": "spiderman"},
+      {"role": "Super Hero", "name": "batman"}
+    ]*/
+
+---------------------------------------------------------------
+
+
+
+example 5:
+
+input:
+
+// Implementation is identical to Ex 3, as index(1) resolves to the array index 1.
+@Service
+public class Ex5Service {
+    public List<Integer> updateIndex() {
+        List<Integer> source = Arrays.asList(1, 2, 3);
+        List<Integer> updated = new ArrayList<>(source);
+        updated.set(1, 5);
+        return updated;
+    }
+}
+
+output:
+
+ // Output: [1, 5, 3]
+
+---------------------------------------------------------------
+
+
+
+
+example 6:
+
+input:
+
+// POJOs: NestedObject, NestedUser
+
+@Service
+public class Ex6Service {
+    public NestedObject updateNested() {
+        NestedObject source = new NestedObject(new NestedUser("Mariano"));
+        
+        // 1. New innermost object (name is updated)
+        NestedUser updatedUser = new NestedUser("Data Weave");
+        
+        // 2. New top-level object pointing to the new inner object
+        NestedObject updated = new NestedObject();
+        updated.setUser(updatedUser);
+        return updated;
+    }
+}
+
+output:
+
+// Output: { "user": { "name": "Data Weave" }
+
+---------------------------------------------------------------
+
+
+
+example 7:
+
+input:
+
+// POJOs: XmlUsers, XmlUser
+
+@Service
+public class Ex7Service {
+    public XmlUsers updateLanguage() {
+        // Source Data: List of XmlUsers (Phoebe: French, Joey: English)
+        List<XmlUser> sourceUsers = Arrays.asList(
+            new XmlUser("Phoebe", "French"), new XmlUser("Joey", "English")
+        );
+        
+        List<XmlUser> updatedUsers = sourceUsers.stream()
+            .map(user -> {
+                // Create a mutable copy/new instance
+                XmlUser updated = new XmlUser(user.getName(), user.getLanguage());
+                
+                // Conditional Update Logic (if ($ == "English") "Gibberish" else $)
+                if ("English".equals(updated.getLanguage())) {
+                    updated.setLanguage("Gibberish");
+                }
+                return updated;
+            })
+            .collect(Collectors.toList());
+        
+        return new XmlUsers(updatedUsers);
+    }
+}
+
+output:
+
+/* Output: 
+    <users>
+      <user><language>French</language></user>
+      <user><language>Gibberish</language></user>
+    </users> */
+
+---------------------------------------------------------------
+
+
+
+

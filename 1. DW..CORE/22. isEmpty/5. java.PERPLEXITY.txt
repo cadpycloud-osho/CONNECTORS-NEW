@@ -1,0 +1,130 @@
+isEmpty:
+
+
+
+EXAMPLE 1:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static boolean isEmpty(List<?> list) {
+        return list.isEmpty();
+    }
+    
+    public static void main(String[] args) {
+        List<Boolean> result = Arrays.asList(
+            isEmpty(Arrays.asList()),
+            isEmpty(Arrays.asList(1))
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false]
+
+----------------------------------------------------------------
+
+
+
+EXAMPLE 2:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+
+public class IsEmptyString {
+    public static void main(String[] args) {
+        List<Boolean> result = Arrays.asList(
+            isEmpty(""),
+            isEmpty("DataWeave")
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false]
+
+----------------------------------------------------------------
+
+EXAMPLE 3:
+
+
+
+input:
+
+import java.util.*;
+
+public class MAin {
+    public static void main(String[] args) {
+        List<Boolean> result = Arrays.asList(
+            isEmpty(new HashMap<>()),
+            isEmpty(Map.of("name", "DataWeave"))
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+[true, false]
+
+----------------------------------------------------------------
+
+
+EXAMPLE 4:
+
+
+
+input:
+
+
+import java.util.Map;
+
+public class Main {
+    public static boolean isEmpty(Object obj) {
+        return obj == null;
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = Map.of(
+            "nullValue", isEmpty(null)
+        );
+        
+        System.out.println(result);
+    }
+}
+
+
+
+
+output:
+
+{nullValue=true}
+
+----------------------------------------------------------------
+
+
+
+
+
+
+
+

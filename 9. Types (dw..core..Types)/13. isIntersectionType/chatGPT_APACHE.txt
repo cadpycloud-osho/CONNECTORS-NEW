@@ -1,0 +1,72 @@
+isIntersectionType:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class CamelIntersectionTypeCheck {
+
+    public static void main(String[] args) throws Exception {
+
+        DefaultCamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+
+                from("direct:start")
+                    .process(exchange -> {
+
+                        // Simulating DataWeave isIntersectionType
+                        boolean a = isIntersectionType(IntersectionType.class);
+                        boolean b = isIntersectionType(Boolean.class);
+
+                        String jsonOutput =
+                                "{\n" +
+                                "  \"a\": " + a + ",\n" +
+                                "  \"b\": " + b + "\n" +
+                                "}";
+
+                        exchange.getMessage().setBody(jsonOutput);
+                    })
+                    .to("log:output");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(2000);
+        context.stop();
+    }
+
+    // Helper method to simulate intersection type detection
+    private static boolean isIntersectionType(Class<?> clazz) {
+        return clazz.isInterface() && clazz.getInterfaces().length > 1;
+    }
+
+    // Simulating {name: String} & {age: Number}
+    interface HasName {
+        String getName();
+    }
+
+    interface HasAge {
+        Number getAge();
+    }
+
+    interface IntersectionType extends HasName, HasAge {
+    }
+}
+
+
+
+output:
+
+{
+  "a": true,
+  "b": false
+}
+
+
+

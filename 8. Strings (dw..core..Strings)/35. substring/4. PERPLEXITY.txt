@@ -1,0 +1,22 @@
+substring:
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class SubstringController {
+    
+    @GetMapping("/substring")
+    public String getSubstring() {
+        String text = "hello world!";
+        return text.substring(1, 5);
+    }
+}
+
+
+output:
+
+
+"ello"
+

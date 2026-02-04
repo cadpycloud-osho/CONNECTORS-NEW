@@ -1,0 +1,89 @@
+find:
+
+
+example 1:
+
+input:
+
+from("direct:findBondArray")
+.setBody(constant(List.of("Bond", "James", "Bond")))
+.setProperty("search", constant("Bond"))
+
+.split(body())
+    .setProperty("idx", simple("${exchangeProperty.CamelSplitIndex}"))
+    .filter(simple("${body} == ${exchangeProperty.search}"))
+        .setBody(simple("${exchangeProperty.idx}"))
+        .aggregate(constant(true),
+            new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+
+output:
+
+[0,2]
+
+
+-----------------------------------------------------
+
+example 2:
+
+input:
+
+from("direct:findRegex")
+.setBody(constant("I heart DataWeave"))
+
+.split(simple("${body}"))
+    .setProperty("idx", simple("${exchangeProperty.CamelSplitIndex}"))
+    .aggregate(constant(true),
+        new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end()
+
+.process(e -> {
+    String s = "I heart DataWeave";
+    List<List<Integer>> result = new ArrayList<>();
+
+    Matcher m = Pattern.compile("\\w*ea\\w*(\\b)").matcher(s);
+    while (m.find()) {
+        result.add(List.of(m.start(), m.end()));
+    }
+    e.getMessage().setBody(result);
+});
+
+
+
+output:
+
+[[2,7],[8,17]]
+
+
+-----------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:findChar")
+.setBody(constant("aabccdbce"))
+
+.split(simple("${body}"))
+    .setProperty("idx", simple("${exchangeProperty.CamelSplitIndex}"))
+    .filter(simple("${body} == 'a'"))
+        .setBody(simple("${exchangeProperty.idx}"))
+        .aggregate(constant(true),
+            new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+
+output:
+[0,1]
+
+
+
+-----------------------------------------------------
+
+

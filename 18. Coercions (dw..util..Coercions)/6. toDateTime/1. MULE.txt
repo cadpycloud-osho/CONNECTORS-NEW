@@ -1,0 +1,92 @@
+toDateTime:
+
+toDateTime(str: String, formatters: Array<Formatter>): DateTime
+
+toDateTime(str: String, formatters: Array<Formatter>): DateTime
+Transforms a String value into a DateTime value using the first Formatter that matches with the given value to transform.
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+import * from dw::Runtime
+output application/dw
+---
+{
+  a: toDateTime("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}, {format: "uuuu-MM-dd HH:mm:ssz"}]),
+  b: try(() -> toDateTime("2003-10-01 23:57:59Z", [{format: "uuuu/MM/dd HH:mm:ssz"}])).error.message
+}
+
+
+DataWeave
+Output
+{
+  a: |2003-10-01T23:57:59Z| as DateTime {format: "uuuu-MM-dd HH:mm:ssz"},
+  b: "Could not find a valid formatter for '2003-10-01 23:57:59Z'"
+}
+
+
+--------------------------------------------------------------------
+
+toDateTime(number: Number, unit: MillisOrSecs | Null = null): DateTime
+Transforms a Number value into a DateTime value using milliseconds or seconds as the unit.
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+    fromEpoch: toDateTime(1443743879),
+    fromMillis: toDateTime(1443743879000, "milliseconds")
+}
+
+
+DataWeave
+Output
+{
+  fromEpoch: |2015-10-01T23:57:59Z|,
+  fromMillis: |2015-10-01T23:57:59Z| as DateTime {unit: "milliseconds"}
+}
+
+
+------------------------------------------------------------------
+
+toDateTime(str: String, format: String | Null = null, locale: String | Null = null): DateTime
+Transforms a String value into a DateTime value and accepts a format and locale.
+
+
+
+
+Source
+%dw 2.0
+import * from dw::util::Coercions
+output application/dw
+---
+{
+   a: toDateTime("2015-10-01T23:57:59Z"),
+   b: toDateTime("2003-10-01 23:57:59Z","uuuu-MM-dd HH:mm:ssz")
+}
+
+
+DataWeave
+Output
+{
+  a: |2015-10-01T23:57:59Z|,
+  b: |2003-10-01T23:57:59Z| as DateTime {format: "uuuu-MM-dd HH:mm:ssz"}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

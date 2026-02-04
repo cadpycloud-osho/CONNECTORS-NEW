@@ -1,0 +1,87 @@
+onNull:
+
+
+
+input:
+
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.Map;
+import java.util.HashMap;
+
+public class Main { // Class name changed to Main for generic execution compatibility
+
+    // Mimics the 'reduce' operation on a list.
+    public static <T> Optional<T> dwReduce(List<T> list, BinaryOperator<T> accumulator) {
+        // DataWeave 2.0 behavior for reduce(empty_array) is null/Optional.empty().
+        if (list == null || list.isEmpty()) {
+            return Optional.empty(); 
+        }
+        return list.stream().reduce(accumulator);
+    }
+
+    // Mimics the 'then' operator, which only executes if the input is non-null.
+    public static <T, R> R dwThen(T input, Function<T, R> function) {
+        if (input == null) {
+            return null; // If input is null, 'then' is skipped, returning null.
+        }
+        return function.apply(input);
+    }
+
+    public static void main(String[] args) {
+        
+        // --- 1. Define the initial input (which we set to null to trigger 'onNull') ---
+        List<String> inputPayload = null;
+        
+        // --- 2. DataWeave Transformation Pipeline ---
+        
+        // Step A: The first 'onNull: []' provides a default value for the list.
+        List<String> listAfterOnNull = (inputPayload == null) 
+                                        ? Collections.emptyList() 
+                                        : inputPayload;
+        
+        // Step B: reduce ((item, accumulator) -> item ++ accumulator)
+        // Since listAfterOnNull is empty, dwReduce returns Optional.empty(), which is null when retrieved.
+        Optional<String> reduceResultOptional = dwReduce(
+            listAfterOnNull, 
+            (item, accumulator) -> item + accumulator // String concatenation
+        );
+        String reduceResult = reduceResultOptional.orElse(null); // reduceResult is null
+
+        // Step C: then ((result) -> sizeOf(result))
+        // Since reduceResult is null, dwThen returns null.
+        Integer sizeResult = dwThen(
+            reduceResult, 
+            result -> result.length() // sizeOf(String) is length() in Java
+        );
+        // sizeResult is null
+
+        // Step D: onNull "Empty Text"
+        // This catches the null result from the chained operations.
+        String finalResult = (sizeResult == null) 
+                                ? "Empty Text" 
+                                : String.valueOf(sizeResult);
+
+        // --- 3. Assemble the final structure (Map for JSON) ---
+        Map<String, String> outputMap = new HashMap<>();
+        outputMap.put("onNull", finalResult); 
+
+        // 4. Manually format the result to match the required JSON output (pretty printed)
+        String outputJson = String.format("{\n  \"onNull\" : \"%s\"\n}", outputMap.get("onNull"));
+        
+        System.out.println(outputJson);
+    }
+}
+
+
+output:
+
+
+
+{
+  "onNull" : "Empty Text"
+}

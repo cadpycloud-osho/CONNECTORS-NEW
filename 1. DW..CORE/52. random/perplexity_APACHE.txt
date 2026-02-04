@@ -1,0 +1,30 @@
+random:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class RandomRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:random")
+            .process(exchange -> {
+                Map<String, Double> result = new HashMap<>();
+                result.put("price", Math.random() * 1000);
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+{ "price": 847.3928471092834 }
+
+
+
+

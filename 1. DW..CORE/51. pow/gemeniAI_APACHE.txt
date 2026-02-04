@@ -1,0 +1,52 @@
+pow:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.Arrays;
+import java.util.List;
+
+public class CamelPowExample {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from("direct:start")
+                    .process(exchange -> {
+                        // DataWeave: (2 pow 3)
+                        long val1 = (long) Math.pow(2, 3);
+                        
+                        // DataWeave: (3 pow 2)
+                        long val2 = (long) Math.pow(3, 2);
+                        
+                        // DataWeave: (7 pow 3)
+                        long val3 = (long) Math.pow(7, 3);
+
+                        // Create the list [ 8, 9, 343 ]
+                        List<Long> result = Arrays.asList(val1, val2, val3);
+                        exchange.getIn().setBody(result);
+                    })
+                    // Convert the List to JSON
+                    .marshal().json(JsonLibrary.Jackson)
+                    .to("stream:out");
+            }
+        });
+
+        context.start();
+        context.createProducerTemplate().sendBody("direct:start", null);
+        Thread.sleep(1000);
+        context.stop();
+    }
+}
+
+
+output:
+
+[ 8, 9, 343 ]
+

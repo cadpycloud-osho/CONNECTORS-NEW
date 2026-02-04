@@ -1,0 +1,69 @@
+time:
+
+
+input:
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("testing", List.of(
+                time(Main::myFunction),
+                time(Main::myFunction2)
+        ));
+
+        System.out.println(response);
+    }
+
+    static String myFunction() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {}
+        return "My result";
+    }
+
+    static Integer myFunction2() {
+        return List.of(1, 2, 3, 4)
+                   .stream()
+                   .mapToInt(Integer::intValue)
+                   .sum();
+    }
+
+    static Map<String, Object> time(Supplier<?> supplier) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        Instant start = Instant.now();
+        Object value = supplier.get();
+        Instant end = Instant.now();
+
+        result.put("start", start.toString());
+        result.put("result", value);
+        result.put("end", end.toString());
+
+        return result;
+    }
+
+    @FunctionalInterface
+    interface Supplier<T> {
+        T get();
+    }
+}
+
+output:
+
+{testing=[
+ {start=2018-10-05T19:23:01.490Z, result=My result, end=2018-10-05T19:23:01.591Z},
+ {start=2018-10-05T19:23:01.591Z, result=10, end=2018-10-05T19:23:01.591Z}
+]}
+
+
+
+

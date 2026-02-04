@@ -1,0 +1,39 @@
+toPeriod:
+
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class PeriodApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(PeriodApp.class, args);
+    }
+
+    @GetMapping("/to-period")
+    public Map<String, Object> toPeriod() {
+        // Equivalent to DataWeave toPeriod("P1D")
+        Period period1 = Period.parse("P1D");
+        
+        // Equivalent to DataWeave toPeriod("PT1H1M")
+        Duration duration2 = Duration.parse("PT1H1M");
+        
+        return Map.of(
+            "toPeriodEx1", period1,
+            "toPeriodEx2", duration2
+        );
+    }
+}
+
+
+output:
+
+
+
+{
+  "toPeriodEx1": "P1D",
+  "toPeriodEx2": "PT1H1M"
+}
+

@@ -1,0 +1,55 @@
+isRegexType:
+
+
+input:
+
+
+package com.example.demo.util;
+
+import java.util.regex.Pattern;
+
+public class TypeUtils {
+
+    public static boolean isRegexType(Class<?> type) {
+        return Pattern.class.isAssignableFrom(type);
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+@RestController
+public class RegexTypeController {
+
+    @GetMapping("/isRegexType")
+    public Map<String, Boolean> checkRegexTypes() {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        // Equivalent to "type ARegex = Regex"
+        Class<?> ARegex = Pattern.class;
+
+        result.put("a", TypeUtils.isRegexType(ARegex));
+        result.put("b", TypeUtils.isRegexType(Pattern.class));
+        result.put("c", TypeUtils.isRegexType(Boolean.class));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

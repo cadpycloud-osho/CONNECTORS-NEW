@@ -1,0 +1,49 @@
+asin:
+
+
+
+input:
+
+
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class AsinController {
+
+    @GetMapping("/asin")
+    public Map<String, Double> asinValues() {
+
+        Map<String, Double> result = new HashMap<>();
+
+        result.put("asin0", asinDW(0));
+        result.put("asin13", asinDW(0.13));
+        result.put("asin-1", asinDW(-1));
+        result.put("asin1.1", asinDW(1.1));
+
+        return result;
+    }
+
+    // DataWeave-compatible asin
+    private Double asinDW(double value) {
+        double r = Math.asin(value);
+        return Double.isNaN(r) ? null : r;
+    }
+}
+
+
+output:
+
+{
+  "asin0": 0.0,
+  "asin13": 0.1303689797031455,
+  "asin-1": -1.5707963267948966,
+  "asin1.1": null
+}
+
+

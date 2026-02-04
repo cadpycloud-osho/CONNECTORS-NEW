@@ -1,0 +1,174 @@
+filter:
+
+
+example 1:
+
+input:
+
+from("direct:filter1")
+.setBody(constant(List.of(9,2,3,4,5)))
+.split(body())
+    .filter(simple("${body} > 2"))
+        .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+output:
+[9,3,4,5]
+
+
+-----------------------------------------------------------
+
+
+example 2:
+
+input:
+
+from("direct:filter2")
+.setBody(constant(List.of(
+    Map.of("name","Mariano","age",37),
+    Map.of("name","Shoki","age",30),
+    Map.of("name","Tomo","age",25),
+    Map.of("name","Ana","age",29)
+)))
+.split(body())
+    .filter(simple("${body[age]} >= 30"))
+        .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+output:
+[
+  {"name":"Mariano","age":37},
+  {"name":"Shoki","age":30}
+]
+
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:filter3")
+.setBody(constant(List.of(9,2,3,4,5)))
+.split(body()).streaming()
+    .setProperty("index", simple("${exchangeProperty.CamelSplitIndex}"))
+    .filter(simple("${exchangeProperty.index} > 1 && ${body} < 5"))
+        .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+output:
+
+
+[3,4]
+
+
+-----------------------------------------------------------
+
+
+example 4:
+
+input:
+
+from("direct:filter4")
+.setBody(constant(List.of(
+    Map.of("user", Map.of("name","123","lastName","Smith"), "error","That name doesn't exists"),
+    Map.of("user", Map.of("name","John","lastName","Johnson"), "error", null)
+)))
+.split(body())
+    .filter(simple("${body[error]} == null"))
+        .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+
+output:
+
+[
+  {
+    "user":{"name":"John","lastName":"Johnson"},
+    "error":null
+  }
+]
+
+
+
+-----------------------------------------------------------
+
+
+example 5:
+
+input:
+
+from("direct:filter5")
+.setBody(simple("${body[profile][base][phone]}"))
+.split(body())
+    .filter(simple("${body[activeInd]} == 'Y' && ${body[primaryInd]} == 'Y'"))
+    .setBody(simple("${body[number]}"))
+    .aggregate(constant(true), new org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy())
+    .completionTimeout(100)
+.end()
+.setBody(simple("""
+{
+ "id":"${exchangeProperty.Id}",
+ "markCode":"${exchangeProperty.marketCode}",
+ "languageCode":"${exchangeProperty.languageCode}",
+ "username":"${exchangeProperty.username}",
+ "phoneNumber": ${body}
+}
+"""));
+
+
+output:
+
+{
+  "id":"1184001100000000517",
+  "markCode":"US",
+  "languageCode":"en-US",
+  "username":"TheMule",
+  "phoneNumber":["230678123","154896523"]
+}
+
+-----------------------------------------------------------
+
+
+example 6:
+
+input:
+
+from("direct:filter6")
+.setBody(constant("hello world"))
+.split(body().tokenize(""))
+    .setProperty("index", simple("${exchangeProperty.CamelSplitIndex}"))
+    .filter(simple("${exchangeProperty.index} % 2 == 0"))
+        .aggregate(constant(true), new org.apache.camel.processor.aggregate.StringAggregationStrategy())
+        .completionTimeout(100)
+.end();
+
+output:
+
+
+"hlowrd"
+
+
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

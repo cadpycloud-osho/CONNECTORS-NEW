@@ -1,0 +1,61 @@
+writeLinesWith:
+
+
+INPUT:
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+public class WriteLinesWithExample {
+
+    /**
+     * Replicates the DataWeave array creation and 'writeLinesWith' function.
+     * * @param count The number of lines to generate (1 to 5, based on DW output).
+     * @return A map containing the single, newline-separated string.
+     */
+    public static Map<String, String> writeLinesWith(int count) {
+        
+        // 1. Replicate: to(1, 5) map "Line $"
+        // Creates the list: ["Line 1", "Line 2", "Line 3", "Line 4", "Line 5"]
+        List<String> lines = IntStream.rangeClosed(1, count)
+                .mapToObj(i -> "Line " + i)
+                .collect(Collectors.toList());
+
+        // 2. Replicate: writeLinesWith "UTF-8"
+        // This joins the strings with the newline character (\n) and encodes the result.
+        // In JSON output, the binary is converted back to a literal string.
+        // String.join("\n", lines) performs the join operation.
+        String joinedString = String.join("\n", lines) + "\n"; // DataWeave often appends a final newline
+
+        // 3. Construct the output map
+        return Map.of("lines", joinedString);
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        
+        // Use 5 lines to match the DataWeave Output (which is usually correct despite source code variations)
+        Map<String, String> result = writeLinesWith(5);
+        
+        // --- Output Generation (Simulating JSON structure) ---
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        System.out.println("--- DataWeave writeLinesWith Equivalent Output ---");
+        
+        // The output prints the final JSON string, where the newline characters are preserved as literal \n
+        String jsonOutput = mapper.writeValueAsString(result);
+        System.out.println(jsonOutput);
+    }
+}
+
+OUTPUT:
+
+
+{
+  "lines": "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n"
+}

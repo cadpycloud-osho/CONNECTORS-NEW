@@ -1,0 +1,52 @@
+toString:
+
+example 1:
+
+input:
+
+import jakarta.mail.internet.ContentType;
+import java.util.Map;
+
+// MimeResult record/POJO:
+// public record MimeResult(String type, String subtype, Map<String, String> parameters) {}
+
+MimeResult input = new MimeResult("application", "json", Map.of());
+
+// Conversion logic inside MimeService.toString(input):
+ContentType contentType = new ContentType(input.type(), input.subtype(), new ParameterList());
+
+String result = contentType.toString(); 
+// result will be: "application/json"
+
+output:
+"application/json"
+
+----------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import jakarta.mail.internet.ContentType;
+import jakarta.mail.internet.ParameterList;
+import java.util.Map;
+
+// MimeResult record/POJO...
+
+MimeResult input = new MimeResult("multipart", "form-data", 
+    Map.of("boundary", "my-boundary"));
+
+// Conversion logic inside MimeService.toString(input):
+ParameterList paramList = new ParameterList();
+paramList.set("boundary", "my-boundary");
+
+ContentType contentType = new ContentType(input.type(), input.subtype(), paramList);
+
+String result = contentType.toString(); 
+// result will be: "multipart/form-data; boundary="my-boundary"" 
+// (Quotes added by JavaMail for compliance)
+
+
+output:
+"multipart/form-data; boundary=\"my-boundary\""

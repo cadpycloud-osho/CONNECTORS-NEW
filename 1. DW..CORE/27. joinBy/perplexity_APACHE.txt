@@ -1,0 +1,67 @@
+joinBy:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class JoinByProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        List<String> inputArray = exchange.getIn().getBody(List.class);
+        String result = String.join("-", inputArray);
+        
+        exchange.getIn().setBody(new JoinByResult(result));
+    }
+    
+    public static class JoinByResult {
+        @JsonProperty("hyphenate")
+        public String hyphenate;
+        
+        public JoinByResult(String hyphenate) {
+            this.hyphenate = hyphenate;
+        }
+    }
+}
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+
+public class JoinByRoute extends RouteBuilder {
+    @Produce("direct:start")
+    private ProducerTemplate template;
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .unmarshal().json(JsonLibrary.Jackson, List.class)
+            .process(new JoinByProcessor())
+            .marshal().json()
+            .to("mock:output");
+    }
+    
+    // Test method with input included
+    public void test() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        List<String> input = Arrays.asList("a", "b", "c");  // Input array
+        String jsonInput = mapper.writeValueAsString(input);
+        
+        String result = template.requestBody(jsonInput, String.class);
+        System.out.println("Output: " + result);
+    }
+}
+["a", "b", "c"]
+
+
+output:
+{"hyphenate": "a-b-c"}
+
+
+

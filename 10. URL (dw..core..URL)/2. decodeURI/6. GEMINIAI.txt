@@ -1,0 +1,53 @@
+decodeURI:
+
+
+
+input:
+
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriDecodeController {
+
+    private static final String ENCODED_INPUT = "http://asd/%20text%20to%20decode%20/text";
+
+    /**
+     * Helper method mirroring DataWeave's URL::decodeURI logic.
+     */
+    private String decodeUri(String encodedURI) {
+        try {
+            // URLDecoder handles percent-decoding
+            return URLDecoder.decode(encodedURI, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            // In a production app, handle this more gracefully
+            return "Decoding Error";
+        }
+    }
+
+    @GetMapping("/decode-uri")
+    public Map<String, String> getDecodedUri() {
+        
+        String decodedURI = decodeUri(ENCODED_INPUT);
+        
+        // Map the results to match the desired JSON structure
+        Map<String, String> output = new HashMap<>();
+        output.put("decodeURI", decodedURI);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "decodeURI": "http://asd/ text to decode /text"
+}
+

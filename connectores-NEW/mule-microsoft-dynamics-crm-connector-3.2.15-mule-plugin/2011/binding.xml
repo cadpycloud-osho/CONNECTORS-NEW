@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb"
+		  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+          xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance"
+          xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+          xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+		  xmlns:msser="http://schemas.microsoft.com/2003/10/Serialization/"   
+		  version="2.1">
+  <globalBindings generateElementProperty="false" mapSimpleTypeDef="true">
+    <serializable uid="1" />
+    <xjc:simple/>
+  </globalBindings>
+  
+  <bindings scd="~xsd:complexType">
+    <class name="ComplexTypeType"/>
+  </bindings>
+  <bindings scd="~xsd:simpleType">
+    <class name="SimpleTypeType"/>
+  </bindings>
+  <bindings scd="~xsd:group">
+    <class name="GroupType"/>
+  </bindings>
+  <bindings scd="~xsd:attributeGroup">
+    <class name="AttributeGroupType"/>
+  </bindings>
+  <bindings scd="~xsd:element">
+    <class name="ElementType"/>
+  </bindings>
+  <bindings scd="~xsd:attribute">
+    <class name="attributeType"/>
+  </bindings>
+</bindings>

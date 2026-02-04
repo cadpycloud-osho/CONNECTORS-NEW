@@ -1,0 +1,68 @@
+fail:
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+public class DwSizeOfFailTest {
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new SizeOfFailRoute());
+        context.start();
+
+        try {
+            context.createProducerTemplate().sendBody("direct:start", null);
+        } catch (Exception e) {
+            System.err.println("ERROR " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date()) + " ...");
+            System.err.println("*********************************");
+            System.err.println("Message               : \"" + e.getMessage());
+            System.err.println("...");
+        } finally {
+            Thread.sleep(1000);
+            context.stop();
+        }
+    }
+
+    static class SizeOfFailRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        List<Object> result = new ArrayList<>(); // empty array equivalent to var result = []
+                        
+                        // Simulate DataWeave: if(sizeOf(result) <= 0) fail('Data was empty') else result
+                        if (result.size() <= 0) {
+                            throw new RuntimeException("Data was empty");
+                        } else {
+                            exchange.getIn().setBody(result);
+                        }
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+ERROR 2026-01-26 09:58:xx,xxx ...
+*********************************
+Message               : "Data was empty"
+...
+Exception in thread "main" org.apache.camel.RuntimeCamelException: Data was empty
+
+
+
+

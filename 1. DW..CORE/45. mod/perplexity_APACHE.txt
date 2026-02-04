@@ -1,0 +1,32 @@
+mod:
+
+
+input:
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class ModRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:mod")
+            .process(exchange -> {
+                List<Double> result = Arrays.asList(
+                    3.0 % 2.0,  // 1.0
+                    4.0 % 2.0,  // 0.0
+                    2.2 % 2.0   // 0.2
+                );
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+
+output:
+[1, 0, 0.2]
+
+
+

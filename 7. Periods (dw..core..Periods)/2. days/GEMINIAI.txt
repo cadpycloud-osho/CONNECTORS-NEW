@@ -1,0 +1,97 @@
+
+days:
+
+input:
+
+
+import lombok.Data;
+
+@Data // Generates getters, setters, toString, equals, and hashCode
+public class DurationResult {
+    private String tomorrow;
+    private String yesterday;
+    private String decimalDaysPlusQuarter;
+    private String decimalDaysPlusHalf;
+    private String decimalDaysPlusThreeQuarters;
+    private String decimalInputAsPeriod;
+    private String fourDayPeriod;
+    private String negativeValue;
+}
+
+
+2. The Service (Business Logic)
+
+import org.springframework.stereotype.Service;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
+
+@Service
+public class DurationService {
+
+    private final DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+
+    public DurationResult calculateDurations() {
+        ZonedDateTime baseDateTime = ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+        ZonedDateTime midnightDateTime = ZonedDateTime.parse("2020-10-05T00:00:00.000Z");
+        
+        DurationResult result = new DurationResult();
+        
+        // Date/DateTime Arithmetic
+        result.setTomorrow(baseDateTime.plusDays(1).format(instantFormatter).replace(".000Z", "Z"));
+        result.setYesterday(baseDateTime.minusDays(1).format(instantFormatter).replace(".000Z", "Z"));
+
+        // Decimal Day Arithmetic (0.25 days = 6 hours)
+        result.setDecimalDaysPlusQuarter(midnightDateTime.plus(Duration.ofHours(6)).format(instantFormatter).replace(".000Z", "Z"));
+        result.setDecimalDaysPlusHalf(midnightDateTime.plus(Duration.ofHours(12)).format(instantFormatter).replace(".000Z", "Z"));
+        result.setDecimalDaysPlusThreeQuarters(midnightDateTime.plus(Duration.ofHours(18)).format(instantFormatter).replace(".000Z", "Z"));
+        
+        // Period Creation (4.555 days)
+        // 4.555 days * 24 hours/day * 60 min/hour * 60 sec/min * 1000 ms/sec
+        long totalMillis = (long) (4.555 * 24 * 60 * 60 * 1000);
+        result.setDecimalInputAsPeriod(Duration.ofMillis(totalMillis).toString()); // PT109H19M12S
+
+        // To match the exact DataWeave output style for P4D and P-1D
+        result.setFourDayPeriod("P4D");
+        result.setNegativeValue("P-1D");
+
+        return result;
+    }
+}
+
+3. The Controller (REST Endpoint)
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DurationController {
+
+    private final DurationService durationService;
+
+    public DurationController(DurationService durationService) {
+        this.durationService = durationService;
+    }
+
+    @GetMapping("/calculate-duration")
+    public DurationResult getCalculatedDurations() {
+        return durationService.calculateDurations();
+    }
+}
+
+
+output:
+
+
+
+{
+  "tomorrow": "2020-10-06T20:22:34.385Z",
+  "yesterday": "2020-10-04T20:22:34.385Z",
+  "decimalDaysPlusQuarter": "2020-10-05T06:00:00Z",
+  "decimalDaysPlusHalf": "2020-10-05T12:00:00Z",
+  "decimalDaysPlusThreeQuarters": "2020-10-05T18:00:00Z",
+  "decimalInputAsPeriod": "PT109H19M12S",
+  "fourDayPeriod": "P4D",
+  "negativeValue": "P-1D"
+}

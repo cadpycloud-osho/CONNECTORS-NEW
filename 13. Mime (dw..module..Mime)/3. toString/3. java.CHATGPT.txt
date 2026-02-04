@@ -1,0 +1,66 @@
+toString:
+
+
+input:
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String type = "application";
+        String subtype = "json";
+        Map<String, String> parameters = new HashMap<>();
+
+        String result = buildMime(type, subtype, parameters);
+
+        System.out.println(result);
+    }
+
+    private static String buildMime(String type, String subtype, Map<String, String> params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        if (!params.isEmpty()) {
+            params.forEach((k, v) -> sb.append(";").append(k).append("=").append(v));
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+application/json
+
+
+example 2:
+
+
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        String type = "multipart";
+        String subtype = "form-data";
+        Map<String, String> parameters = Map.of("boundary", "my-boundary");
+
+        String result = buildMime(type, subtype, parameters);
+
+        System.out.println(result);
+    }
+
+    private static String buildMime(String type, String subtype, Map<String, String> params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type).append("/").append(subtype);
+        params.forEach((k, v) -> sb.append(";").append(k).append("=").append(v));
+        return sb.toString();
+    }
+}
+
+output:
+
+multipart/form-data;boundary=my-boundary

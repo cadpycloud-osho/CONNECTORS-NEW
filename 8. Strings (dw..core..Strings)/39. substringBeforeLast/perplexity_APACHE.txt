@@ -1,0 +1,46 @@
+substringBeforeLast:
+
+input:
+
+import java.util.*;
+
+public class SubstringBeforeLastConverter {
+    public static String substringBeforeLast(String text, String separator) {
+        if (text == null) return null;
+        if (separator == null || separator.isEmpty()) return text.substring(0, text.length() - 1);
+        if (text.isEmpty()) return "";
+        
+        int pos = text.lastIndexOf(separator);
+        if (pos == -1) return "";
+        return text.substring(0, pos);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("a", substringBeforeLast(null, "'"));
+        result.put("b", substringBeforeLast("", "-"));
+        result.put("c", substringBeforeLast("abc", "b"));
+        result.put("d", substringBeforeLast("abcba", "b"));
+        result.put("e", substringBeforeLast("abc", "d"));
+        result.put("f", substringBeforeLast("abc", ""));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "abc",
+  "e": "",
+  "f": "ab"
+}
+
+
+
+

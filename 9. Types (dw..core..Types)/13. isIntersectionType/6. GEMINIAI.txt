@@ -1,0 +1,78 @@
+isIntersectionType:
+
+
+
+INPUT:
+
+package com.example.typecheck.service;
+
+import org.springframework.stereotype.Service;
+import java.util.Map;
+
+@Service
+public class IntersectionTypeCheckService {
+
+    // Define indicators for intersection and non-intersection types
+    private static final String INTERSECTION_INDICATOR = "&";
+    private static final String PRIMITIVE_BOOLEAN = "Boolean";
+
+    /**
+     * Helper method to simulate DataWeave's isIntersectionType() function.
+     * Checks if the given type representation contains the intersection operator.
+     */
+    private boolean isIntersectionType(String typeRepresentation) {
+        // In DW, AType is defined with the '&' operator.
+        // We check if the type's definition/representation contains this operator.
+        return typeRepresentation.contains(INTERSECTION_INDICATOR);
+    }
+
+    /**
+     * Converts the entire DataWeave script structure into a Map result.
+     */
+    public Map<String, Boolean> checkTypes() {
+        
+        // Emulating the type definitions and uses from the DW script:
+        // AType is represented by its definition string.
+        final String AType_Representation = "{name: String} & {age: Number}"; 
+        final String Builtin_Boolean = PRIMITIVE_BOOLEAN;
+
+        // Mimic the DataWeave transformation output structure:
+        // { a: isIntersectionType(AType), b: isIntersectionType(Boolean) }
+        return Map.of(
+            "a", isIntersectionType(AType_Representation),
+            "b", isIntersectionType(Builtin_Boolean)
+        );
+    }
+}
+
+
+package com.example.typecheck.controller;
+
+import com.example.typecheck.service.IntersectionTypeCheckService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+public class DataWeaveController {
+
+    private final IntersectionTypeCheckService intersectionTypeCheckService;
+
+    public DataWeaveController(IntersectionTypeCheckService intersectionTypeCheckService) {
+        this.intersectionTypeCheckService = intersectionTypeCheckService;
+    }
+
+    // Maps to http://localhost:8080/check-intersection-type
+    @GetMapping("/check-intersection-type")
+    public Map<String, Boolean> checkIntersectionType() {
+        // Calls the service method that holds the transformation logic
+        return intersectionTypeCheckService.checkTypes();
+    }
+}
+OUTPUT:
+
+{
+  "a": true,
+  "b": false
+}
+

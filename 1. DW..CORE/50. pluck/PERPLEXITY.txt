@@ -1,0 +1,75 @@
+pluck:
+
+
+example 1:
+
+
+input:
+
+
+@GetMapping("/pluck-object")
+public List<Map<String, Map<String, String>>> pluckObject() {
+    Map<String, String> input = Map.of("a", "b", "c", "d");
+    
+    return IntStream.range(0, input.size())
+        .mapToObj(index -> {
+            Map.Entry<String, String> entry = 
+                input.entrySet().stream().skip(index).findFirst().get();
+            Map<String, String> inner = Map.of(entry.getValue(), entry.getKey());
+            Map<String, Map<String, String>> outer = Map.of(
+                String.valueOf(index), inner);
+            return outer;
+        })
+        .collect(Collectors.toList());
+}
+
+
+output:
+
+[
+  {"0": {"b": "a"}},
+  {"1": {"d": "c"}}
+]
+
+
+----------------------------------------------------------------
+
+
+example 2:
+
+
+input:
+
+@GetMapping("/pluck-xml")
+public Map<String, Object> pluckXml() {
+    // Simulate XML parsing result
+    Map<String, Double> xmlPrices = Map.of(
+        "basic", 9.99, "premium", 53.00, "vip", 398.99
+    );
+    
+    List<String> keys = new ArrayList<>(xmlPrices.keySet());
+    List<Double> values = new ArrayList<>(xmlPrices.values());
+    List<Integer> indices = IntStream.range(0, xmlPrices.size())
+        .boxed().collect(Collectors.toList());
+    
+    Map<String, Object> result = new HashMap<>();
+    result.put("keys", keys);
+    result.put("values", values);
+    result.put("indices", indices);
+    
+    Map<String, Object> response = new HashMap<>();
+    response.put("result", result);
+    
+    return response;
+}
+
+
+output:
+
+{
+  "result": {
+    "keys": ["basic", "premium", "vip"],
+    "values": [9.99, 53.0, 398.99],
+    "indices": [0, 1, 2]
+  }
+}

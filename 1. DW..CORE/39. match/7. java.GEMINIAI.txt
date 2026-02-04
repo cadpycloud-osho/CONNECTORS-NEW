@@ -1,0 +1,150 @@
+match:
+
+
+example 1:
+
+
+input:
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+    /**
+     * DataWeave equivalent logic: 
+     * match("me@mulesoft.com", /([a-z]*)@([a-z]*)\.com/)
+     * Output:
+     * [ "me@mulesoft.com", "me", "mulesoft" ]
+     */
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input string
+        String inputString = "me@mulesoft.com";
+        
+        // 2. Define the Regex pattern
+        // The regex has two capturing groups: ([a-z]*) for the username and ([a-z]*) for the domain name
+        String regex = "([a-z]*)@([a-z]*)\\.com"; 
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(inputString);
+        
+        List<String> results = new ArrayList<>();
+
+        // 3. Perform the match operation (equivalent to DataWeave's match function)
+        if (matcher.find()) {
+            // Group 0: The full match (e.g., "me@mulesoft.com")
+            results.add(matcher.group(0)); 
+            
+            // Group 1: The first capturing group (e.g., "me")
+            results.add(matcher.group(1)); 
+            
+            // Group 2: The second capturing group (e.g., "mulesoft")
+            results.add(matcher.group(2)); 
+        }
+
+        // 4. Manually construct the final JSON array string (equivalent to Jackson's pretty printing)
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("[\n");
+
+        for (int i = 0; i < results.size(); i++) {
+            // JSON string element must be wrapped in double quotes
+            jsonBuilder.append("  \"").append(results.get(i)).append("\"");
+            
+            if (i < results.size() - 1) {
+                jsonBuilder.append(",\n");
+            } else {
+                jsonBuilder.append("\n");
+            }
+        }
+        
+        jsonBuilder.append("]");
+        
+        String outputJson = jsonBuilder.toString();
+        
+        System.out.println(outputJson);
+    }
+}
+
+output:
+
+
+[
+  "me@mulesoft.com",
+  "me",
+  "mulesoft"
+]
+
+-------------------------------------------------------------------
+
+
+
+example 2:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Main {
+
+    /**
+     * DataWeave equivalent logic: 
+     * [ "192.88.99.0/24", "192.168.0.0/16", "192.175.48.0/24" ] filter ($ matches /.*24/)
+     * Output:
+     * [ "192.88.99.0/24", "192.175.48.0/24" ]
+     */
+    public static void main(String[] args) throws Exception {
+        // 1. Define the input variables and array
+        String a = "192.88.99.0/24";
+        String b = "192.168.0.0/16";
+        String c = "192.175.48.0/24";
+        
+        List<String> inputArray = Arrays.asList(a, b, c);
+        List<String> filteredList = new ArrayList<>();
+
+        // 2. Define the filtering Regex pattern
+        // We filter for strings that match the pattern ".*24"
+        String filterRegex = ".*24"; 
+
+        for (String item : inputArray) {
+            // 3. Apply the filtering condition using Java's matches()
+            if (item.matches(filterRegex)) {
+                filteredList.add(item);
+            }
+        }
+
+        // 4. Manually construct the final JSON array string
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("[\n");
+
+        for (int i = 0; i < filteredList.size(); i++) {
+            // JSON string element must be wrapped in double quotes
+            jsonBuilder.append("  \"").append(filteredList.get(i)).append("\"");
+            
+            if (i < filteredList.size() - 1) {
+                jsonBuilder.append(",\n");
+            } else {
+                jsonBuilder.append("\n");
+            }
+        }
+        
+        jsonBuilder.append("]");
+        
+        String outputJson = jsonBuilder.toString();
+        
+        System.out.println(outputJson);
+    }
+}
+output:
+
+[
+  "192.88.99.0/24",
+  "192.175.48.0/24"
+]
+
+
+

@@ -1,0 +1,158 @@
+toLocalTime:
+
+
+example 1:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
+
+public class DataWeaveLocalTimeConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceTimeString = "23:57:59";
+
+    /**
+     * Mimics DataWeave's chained toLocalTime() with multiple formatters.
+     * Tries each formatter. Returns the parsed LocalTime upon success, or null if all fail.
+     */
+    private LocalTime chainedToLocalTime(String timeString, DateTimeFormatter... formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                // Attempt to parse with the current formatter
+                return LocalTime.parse(timeString, formatter);
+            } catch (DateTimeParseException e) {
+                // Swallow exception and continue to the next formatter
+            }
+        }
+        return null; // Return null if none succeed
+    }
+
+    public String getLocalTimeParsingJson() throws IOException {
+        
+        // Define formatters
+        // Note: Java uses 'n' for nanoseconds, but 'S' for fractions of seconds when parsing
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm:ss.S", Locale.US); // Expects fractional seconds (like .000)
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
+        
+        // --- Logic for Key 'a' (Chained Parsing) ---
+        // Try formatter1 (fails because "23:57:59" lacks fractional seconds), then formatter2 (succeeds)
+        LocalTime parsedTimeA = chainedToLocalTime(sourceTimeString, formatter1, formatter2);
+
+        // --- Logic for Key 'b' (Try/Error Handling) ---
+        String errorMessageB;
+        try {
+            // Only try the failing formatter (formatter1)
+            LocalTime.parse(sourceTimeString, formatter1);
+            errorMessageB = "No error occurred.";
+        } catch (DateTimeParseException e) {
+            // Capture the DataWeave specific error message
+            errorMessageB = "Could not find a valid formatter for '" + sourceTimeString + "'";
+        }
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes LocalTime using the standard ISO 8601 string format (e.g., "23:57:59")
+        if (parsedTimeA != null) {
+             root.put("a", parsedTimeA.toString());
+        } else {
+             root.putNull("a");
+        }
+       
+        root.put("b", errorMessageB);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveLocalTimeConverter converter = new DataWeaveLocalTimeConverter();
+        try {
+            String jsonOutput = converter.getLocalTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "a" : "23:57:59",
+  "b" : "Could not find a valid formatter for '23:57:59'"
+}
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class DataWeaveLocalTimeParsingConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String getLocalTimeParsingJson() throws IOException {
+        
+        // --- Logic for Key 'toLocalTimeEx' (Inferred Parsing) ---
+        String timeStringA = "23:57:59";
+        // Java's LocalTime.parse() recognizes standard ISO time formats by default.
+        LocalTime parsedTimeA = LocalTime.parse(timeStringA); 
+
+        // --- Logic for Key 'toLocalTimeEx2' (Custom Format Parsing) ---
+        String timeStringB = "13:44:12.283";
+        // DataWeave's 'n' (nanoseconds) is often represented by 'S' or 'n' in Java, 
+        // depending on precision. For milliseconds (3 decimal places), 'SSS' is often used,
+        // but LocalTime.parse() handles this format well without custom formatter.
+        // However, to be explicit like DW:
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS", Locale.US);
+        LocalTime parsedTimeB = LocalTime.parse(timeStringB, customFormatter);
+        
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the results to the JSON object
+        // Jackson serializes LocalTime using the standard ISO 8601 string format.
+        root.put("toLocalTimeEx", parsedTimeA.toString());
+        // For the time with fractions, toString() naturally includes them if present.
+        root.put("toLocalTimeEx2", parsedTimeB.toString());
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveLocalTimeParsingConverter converter = new DataWeaveLocalTimeParsingConverter();
+        try {
+            String jsonOutput = converter.getLocalTimeParsingJson();
+            System.out.println(jsonOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+{
+  "toLocalTimeEx" : "23:57:59",
+  "toLocalTimeEx2" : "13:44:12.283"
+}

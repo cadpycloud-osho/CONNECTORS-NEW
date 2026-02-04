@@ -1,0 +1,58 @@
+isUriType:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveUriTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processUriChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processUriChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AUri = Uri (type alias)
+        result.put("a", isUriType(Uri.class));
+        
+        // Built-in Uri type
+        result.put("b", isUriType(Uri.class));
+        
+        // String - not Uri
+        result.put("c", isUriType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isUriType(Class<?> type) {
+        // DataWeave Uri type check equivalent
+        // Returns true for Uri and its aliases (URL/URI representation)
+        return type == URI.class || 
+               type == Uri.class ||
+               "Uri".equals(type.getSimpleName()) ||
+               type.getName().contains("Uri");
+    }
+    
+    // Uri interface equivalent for DataWeave Uri type simulation
+    private interface Uri {}
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+
+

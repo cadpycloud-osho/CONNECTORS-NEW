@@ -1,0 +1,27 @@
+unionItems:
+
+unionItems(t: Type): Array<Type>
+
+unionItems(t: Type): Array<Type>
+Returns an array of all the types that define a given Union type. This function fails if the input is not a Union type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = String | Number
+output application/json
+---
+{
+   a: unionItems(AType)
+}
+
+
+DataWeave
+Output
+{
+  "a": ["String","Number"]
+}
+
+

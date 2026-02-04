@@ -1,0 +1,58 @@
+sumBy:
+
+
+input:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+
+@SpringBootApplication
+public class SumByDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SumByDemoApplication.class, args);
+    }
+}
+
+class Item {
+    public int a;
+    public Item(int a) { this.a = a; }
+}
+
+@RestController
+class SumByController {
+    
+    @GetMapping("/sumBy")
+    public Map<String, List<Integer>> sumByExample() {
+        List<Item> items = Arrays.asList(
+            new Item(1),
+            new Item(2),
+            new Item(3)
+        );
+        
+        // First syntax: stream map + sum
+        int sum1 = items.stream()
+                       .mapToInt(item -> item.a)
+                       .sum();
+        
+        // Second syntax: explicit function
+        int sum2 = items.stream()
+                       .mapToInt(item -> item.a)
+                       .sum();
+        
+        Map<String, List<Integer>> result = new HashMap<>();
+        result.put("sumBy", Arrays.asList(sum1, sum2));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "sumBy": [6, 6]
+}
+

@@ -1,0 +1,109 @@
+atBeginningOfWeek:
+
+
+
+
+
+example 1:
+
+
+input:
+
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/zoned-at-beginning-of-week")
+    public Map<String, String> getZonedBeginningOfWeek() {
+        ZonedDateTime input = ZonedDateTime.parse("2020-10-06T18:23:20.351-03:00");
+        ZonedDateTime beginning = input.toLocalDate()
+                                     .with(DayOfWeek.SUNDAY)
+                                     .atStartOfDay(input.getZone());
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfWeekDateTime", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfWeekDateTime": "2020-10-04T00:00-03:00"
+}
+
+
+------------------------------------------------------------------
+
+
+
+
+example 2:
+
+
+input:
+
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/local-at-beginning-of-week")
+    public Map<String, String> getLocalBeginningOfWeek() {
+        LocalDateTime input = LocalDateTime.parse("2020-10-06T18:23:20.351");
+        LocalDateTime beginning = input.toLocalDate()
+                                      .with(DayOfWeek.SUNDAY)
+                                      .atStartOfDay();
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfWeekLocalDateTime", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfWeekLocalDateTime": "2020-10-04T00:00"
+}
+
+
+------------------------------------------------------------------
+
+
+example 3:
+
+
+input:
+
+
+@RestController
+public class DateController {
+    
+    @GetMapping("/date-at-beginning-of-week")
+    public Map<String, String> getDateBeginningOfWeek() {
+        LocalDate input = LocalDate.parse("2020-10-06");
+        LocalDate beginning = input.with(DayOfWeek.SUNDAY);
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("atBeginningOfWeekDate", beginning.toString());
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "atBeginningOfWeekDate": "2020-10-04"
+}
+
+
+------------------------------------------------------------------
+
+
+
+
+
+

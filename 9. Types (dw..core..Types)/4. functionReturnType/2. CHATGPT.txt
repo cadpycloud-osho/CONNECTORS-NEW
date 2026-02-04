@@ -1,0 +1,49 @@
+functionReturnType:
+
+
+input:
+
+package com.example.demo.util;
+
+public class TypeUtils {
+
+    public static String functionReturnType(Class<?> returnType) {
+        if (returnType == null) return null;
+        return returnType.getSimpleName(); // e.g., Number → "Number"
+    }
+}
+
+package com.example.demo.controller;
+
+import com.example.demo.util.TypeUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class FunctionTypeController {
+
+    @GetMapping("/functionReturnType")
+    public Map<String, String> getFunctionReturnTypes() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        // Simulating AFunction = (String, Number) -> Number
+        result.put("a", TypeUtils.functionReturnType(Number.class));
+
+        // Simulating AFunction2 = () -> Number
+        result.put("b", TypeUtils.functionReturnType(Number.class));
+
+        return result;
+    }
+}
+
+output:
+
+{
+  "a": "Number",
+  "b": "Number"
+}
+
+

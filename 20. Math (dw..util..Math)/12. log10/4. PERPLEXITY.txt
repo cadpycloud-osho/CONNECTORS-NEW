@@ -1,0 +1,67 @@
+log10:
+
+
+input:
+
+@SpringBootApplication
+public class DataWeaveMathLog10Application {
+    public static void main(String[] args) {
+        SpringApplication.run(DataWeaveMathLog10Application.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/math/log10")
+@RequiredArgsConstructor
+class Log10Controller {
+    
+    private final MathService mathService;
+    
+    @GetMapping("/test")
+    public Map<String, Double> testLog10() {
+        return mathService.executeLog10Tests();
+    }
+}
+
+@Service
+class MathService {
+    
+    public Map<String, Double> executeLog10Tests() {
+        Map<String, Double> result = new HashMap<>();
+        
+        result.put("log1010", log10(10.0));
+        result.put("log1013", log10(0.13));
+        result.put("log10-20", log10(-20.0));
+        
+        return result;
+    }
+    
+    /**
+     * DataWeave log10() equivalent:
+     * Returns base-10 logarithm of x, or null if x <= 0
+     */
+    public Double log10(double x) {
+        // Check domain: x must be > 0
+        if (x <= 0.0) {
+            return null;
+        }
+        return Math.log10(x);
+    }
+}
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+output:
+
+{
+  "log1010": 1.0,
+  "log1013": -0.8860566476931632,
+  "log10-20": null
+}
+
+

@@ -1,0 +1,43 @@
+toUri:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ToUriRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .process(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    
+                    // toUri("https://www.google.com/")
+                    result.put("toUriExample", URI.create("https://www.google.com/").toString());
+                    
+                    exchange.getIn().setBody(result);
+                }
+            });
+    }
+}
+
+
+
+
+output:
+
+
+{
+  "toUriExample": "https://www.google.com/"
+}
+
+
+

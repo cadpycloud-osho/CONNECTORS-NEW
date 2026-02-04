@@ -1,0 +1,25 @@
+sumBy:
+
+sumBy<T>(@StreamCapable array: Array<T>, numberSelector: (T) -> Number): Number
+
+sumBy<T>(@StreamCapable array: Array<T>, numberSelector: (T) -> Number): Number
+Returns the sum of the values of the elements in an array.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+---
+{
+  "sumBy" : [
+    [ { a: 1 }, { a: 2 }, { a: 3 } ] sumBy $.a,
+    sumBy([ { a: 1 }, { a: 2 }, { a: 3 } ], (item) -> item.a)
+  ]
+}
+
+
+DataWeave
+Output
+{ "sumBy" : [ 6, 6 ] }

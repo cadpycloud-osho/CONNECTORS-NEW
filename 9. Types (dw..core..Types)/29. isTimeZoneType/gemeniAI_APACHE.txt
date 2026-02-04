@@ -1,0 +1,56 @@
+isTimeZoneType:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import java.time.ZoneId;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class TimeZoneTypeRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        
+        from("direct:checkTimeZone")
+            .process(exchange -> {
+                // Mapping the DataWeave source logic:
+                // a: The type definition ATimeZone
+                // b: The TimeZone keyword
+                // c: A different type (String)
+                Object refA = ZoneId.class;
+                Object refB = ZoneId.of("UTC"); // A ZoneId instance
+                Object refC = "UTC";           // A String representation
+
+                Map<String, Boolean> result = new LinkedHashMap<>();
+
+                // Logic: Check if it is the ZoneId class or an instance of it
+                result.put("a", isTimeZoneType(refA));
+                result.put("b", isTimeZoneType(refB));
+                result.put("c", isTimeZoneType(refC));
+
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json();
+    }
+
+    private boolean isTimeZoneType(Object obj) {
+        if (obj == null) return false;
+        
+        // Check if it's the class reference (ZoneId.class) or an actual instance
+        // Note: java.util.TimeZone is also checked for compatibility
+        return obj instanceof ZoneId || 
+               obj instanceof java.util.TimeZone || 
+               obj.equals(ZoneId.class);
+    }
+}
+
+output:
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

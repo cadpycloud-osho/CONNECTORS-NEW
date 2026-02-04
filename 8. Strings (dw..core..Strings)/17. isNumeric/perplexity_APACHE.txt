@@ -1,0 +1,53 @@
+isNumeric:
+
+
+
+input:
+
+import java.util.*;
+
+public class IsNumericConverter {
+    public static boolean isNumeric(String input) {
+        if (input == null || input.isEmpty() || input.trim().isEmpty()) return false;
+        
+        // Check if all characters are numeric Unicode digits
+        return input.chars().allMatch(Character::isDigit);
+    }
+    
+    public static void main(String[] args) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        result.put("a", isNumeric(null));
+        result.put("b", isNumeric(""));
+        result.put("c", isNumeric("  "));
+        result.put("d", isNumeric("123"));
+        result.put("e", isNumeric("१२३"));  // Devanagari digits
+        result.put("f", isNumeric("12 3"));
+        result.put("g", isNumeric("ab2c"));
+        result.put("h", isNumeric("12-3"));
+        result.put("i", isNumeric("12.3"));
+        result.put("j", isNumeric("-123"));
+        result.put("k", isNumeric("+123"));
+        
+        System.out.println(result);
+    }
+}
+
+
+
+output:
+
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+
+

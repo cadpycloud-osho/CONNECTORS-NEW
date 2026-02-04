@@ -1,0 +1,82 @@
+indexOf:
+
+
+INPUT:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+public class IndexOfListExample {
+
+    public static Map<String, Integer> calculateIndices() {
+        // Input Data
+        List<String> list1 = Arrays.asList("a", "b", "c", "d");
+        List<String> list2 = Arrays.asList("x", "w", "x");
+        List<String> list3 = Arrays.asList("a", "b", "c", "c");
+        String target = "c";
+        
+        // Calculations using List.indexOf()
+        int presentIndex = list1.indexOf(target);          // Expected: 2
+        int notPresentIndex = list2.indexOf(target);       // Expected: -1
+        int presentMoreThanOnceIndex = list3.indexOf(target); // Expected: 2 (first occurrence)
+        
+        // Return results as a Map (JSON equivalent)
+        return Map.of(
+            "present", presentIndex,
+            "notPresent", notPresentIndex,
+            "presentMoreThanOnce", presentMoreThanOnceIndex
+        );
+    }
+
+    public static void main(String[] args) {
+        Map<String, Integer> output = calculateIndices();
+        System.out.println("Input Logic: List.indexOf(\"c\")");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+OUTPUT:
+
+
+{present=2, notPresent=-1, presentMoreThanOnce=2}
+
+_______________________________________________________________________
+
+INPUT:
+
+import java.util.Map;
+
+public class IndexOfStringExample {
+
+    public static Map<String, Integer> calculateIndices() {
+        // Input Data
+        String string1 = "abcd";
+        String string2 = "xyz";
+        String string3 = "abcdc";
+        String target = "c";
+        
+        // Calculations using String.indexOf()
+        int presentIndex = string1.indexOf(target);          // Expected: 2
+        int notPresentIndex = string2.indexOf(target);       // Expected: -1
+        int presentMoreThanOnceIndex = string3.indexOf(target); // Expected: 2 (first occurrence)
+        
+        // Return results as a Map (JSON equivalent)
+        return Map.of(
+            "present", presentIndex,
+            "notPresent", notPresentIndex,
+            "presentMoreThanOnce", presentMoreThanOnceIndex
+        );
+    }
+
+    public static void main(String[] args) {
+        Map<String, Integer> output = calculateIndices();
+        System.out.println("Input Logic: String.indexOf(\"c\")");
+        System.out.println("Output (JSON equivalent): " + output);
+    }
+}
+
+OUTPUT:
+
+{present=2, notPresent=-1, presentMoreThanOnce=2}
+

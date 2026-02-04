@@ -1,0 +1,31 @@
+with:
+
+
+
+input:
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        String ssn = "987-65-4321";
+
+        // Replace all digits with 'x'
+        String maskedSsn = ssn.replaceAll("[0-9]", "x");
+
+        // Print JSON output manually
+        System.out.println("{");
+        System.out.println("  \"ssn\" : \"" + maskedSsn + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "ssn" : "xxx-xx-xxxx"
+}
+
+
+

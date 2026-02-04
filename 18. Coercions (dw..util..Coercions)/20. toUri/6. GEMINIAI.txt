@@ -1,0 +1,62 @@
+toUri:
+
+
+
+input:
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.net.URI;
+
+public class DataWeaveToUriConverter {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String sourceUriString = "https://www.google.com/";
+
+    /**
+     * Mimics DataWeave's toUri() by creating a Java URI object.
+     * @param uriString The string to convert.
+     * @return The URI object's string representation.
+     */
+    private String toUriString(String uriString) {
+        // URI.create() parses the string and throws an unchecked exception 
+        // if the string is not a valid URI, similar to how DW might handle an error.
+        URI uri = URI.create(uriString);
+        // We return the canonical string representation of the URI
+        return uri.toString();
+    }
+
+    public String getUriConversionJson() throws IOException {
+        
+        // --- Logic for 'toUriExample' ---
+        String resultUri = toUriString(sourceUriString);
+
+        // 1. Create the root JSON object
+        ObjectNode root = objectMapper.createObjectNode();
+
+        // 2. Add the result to the JSON object
+        root.put("toUriExample", resultUri);
+
+        // Convert the root object to a JSON string
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    }
+
+    public static void main(String[] args) {
+        DataWeaveToUriConverter converter = new DataWeaveToUriConverter();
+        try {
+            String jsonOutput = converter.getUriConversionJson();
+            System.out.println(jsonOutput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+
+
+{
+  "toUriExample" : "https://www.google.com/"
+}
+

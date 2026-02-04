@@ -1,0 +1,44 @@
+
+
+currentMilliseconds:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class TimerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // --- Option 1: Simple Language ---
+        // Best for logging or setting headers quickly
+        from("timer:tick?period=5000")
+            .routeId("Simple-Timer-Route")
+            .setBody(simple("{\"currentMilliseconds\": ${date:now:X}000}")) 
+            .log("Output via Simple: ${body}");
+
+        // --- Option 2: Java Processor ---
+        // Best for building structured Maps/JSON precisely like DataWeave
+        from("direct:getMillis")
+            .routeId("Processor-Timer-Route")
+            .process(exchange -> {
+                // System.currentTimeMillis() is the direct Java equivalent
+                long millis = System.currentTimeMillis();
+                
+                // Set the body as a Map to be marshaled to JSON
+                exchange.getIn().setBody(java.util.Map.of("currentMilliseconds", millis));
+            })
+            .marshal().json()
+            .log("Output via Processor: ${body}");
+    }
+}
+
+output:
+
+{
+  "currentMilliseconds": 1737472880000
+}
+
+

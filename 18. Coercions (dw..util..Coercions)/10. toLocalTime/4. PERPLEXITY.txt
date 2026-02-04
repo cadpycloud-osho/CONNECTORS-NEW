@@ -1,0 +1,95 @@
+toLocalTime:
+
+
+example 1:
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class TimeParsingApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(TimeParsingApplication.class, args);
+    }
+
+    @GetMapping("/parse-times")
+    public Map<String, Object> parseTimes() {
+        String input = "23:57:59";
+        
+        // Equivalent to DataWeave 'a' - tries multiple formats with fallback
+        DateTimeFormatter multiFormat = new DateTimeFormatterBuilder()
+            .appendPattern("HH:mm:ss.n")
+            .optionalStart()
+            .appendFraction(LocalTime.NANO_OF_SECOND, 0, 9, true)
+            .optionalEnd()
+            .appendPattern("HH:mm:ss")
+            .toFormatter();
+        
+        LocalTime resultA = LocalTime.parse(input, multiFormat);
+        
+        // Equivalent to DataWeave 'b' - single format, capture error message
+        String errorMessageB = null;
+        try {
+            DateTimeFormatter singleFormat = DateTimeFormatter.ofPattern("HH:mm:ss.n");
+            LocalTime.parse(input, singleFormat);
+        } catch (DateTimeParseException e) {
+            errorMessageB = e.getMessage();
+        }
+        
+        return Map.of(
+            "a", resultA,
+            "b", errorMessageB
+        );
+    }
+}
+
+
+output:
+
+
+{
+  "a": "23:57:59",
+  "b": "Text '23:57:59' could not be parsed at index 8"
+}
+
+------------------------------------------------------------------------
+
+example 2:
+
+
+input:
+
+@SpringBootApplication
+@RestController
+public class LocalTimeApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LocalTimeApp.class, args);
+    }
+
+    @GetMapping("/local-times")
+    public Map<String, String> parseLocalTimes() {
+        // Equivalent to DataWeave toLocalTime("23:57:59") - uses ISO_LOCAL_TIME fallback
+        LocalTime time1 = LocalTime.parse("23:57:59");
+        
+        // Equivalent to DataWeave toLocalTime("13:44:12.283", "HH:mm:ss.n")
+        DateTimeFormatter formatterWithNanos = DateTimeFormatter.ofPattern("HH:mm:ss.n");
+        LocalTime time2 = LocalTime.parse("13:44:12.283", formatterWithNanos);
+        
+        return Map.of(
+            "toLocalTimeEx", time1.toString(),
+            "toLocalTimeEx2", time2.toString()
+        );
+    }
+}
+
+
+output:
+
+{
+  "toLocalTimeEx": "23:57:59",
+  "toLocalTimeEx2": "13:44:12.283"
+}
+

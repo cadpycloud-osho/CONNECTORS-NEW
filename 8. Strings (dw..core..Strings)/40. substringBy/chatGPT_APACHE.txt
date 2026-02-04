@@ -1,0 +1,47 @@
+substringBy:
+
+
+input:
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SubstringByExample {
+
+    public static void main(String[] args) {
+        String input = "hello~world=here_data-weave";
+        List<String> result = substringBy(input, ch -> ch == '~' || ch == '=' || ch == '_');
+        System.out.println(result);
+    }
+
+    public static List<String> substringBy(String value, java.util.function.Predicate<Character> delimiterPredicate) {
+        List<String> parts = new ArrayList<>();
+        if (value == null || value.isEmpty()) {
+            return parts;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (char ch : value.toCharArray()) {
+            if (delimiterPredicate.test(ch)) {
+                if (sb.length() > 0) {
+                    parts.add(sb.toString());
+                    sb.setLength(0);
+                }
+            } else {
+                sb.append(ch);
+            }
+        }
+        if (sb.length() > 0) {
+            parts.add(sb.toString());
+        }
+        return parts;
+    }
+}
+
+
+
+output:
+
+["hello", "world", "here", "data-weave"]
+
+
+

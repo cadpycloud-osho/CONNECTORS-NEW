@@ -1,0 +1,30 @@
+currentMilliseconds:
+
+
+
+input:
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Long> result = new HashMap<>();
+
+        // Equivalent of DW currentMilliseconds()
+        result.put("currentMilliseconds", System.currentTimeMillis());
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{currentMilliseconds=1532923168900}
+
+

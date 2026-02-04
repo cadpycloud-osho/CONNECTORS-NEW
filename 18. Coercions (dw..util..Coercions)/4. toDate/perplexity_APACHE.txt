@@ -1,0 +1,201 @@
+toDate:
+
+example 1:
+
+
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+public class DwToDateTest {
+
+    static class TryResult<T> {
+        boolean success;
+        T result;
+        Map<String, Object> error;
+
+        static <T> TryResult<T> success(T value) {
+            TryResult<T> res = new TryResult<>();
+            res.success = true;
+            res.result = value;
+            return res;
+        }
+
+        static <T> TryResult<T> failure(String message) {
+            TryResult<T> res = new TryResult<>();
+            res.success = false;
+            res.error = new LinkedHashMap<>();
+            res.error.put("message", message);
+            return res;
+        }
+    }
+
+    // Simulate dw::util::Coercions::toDate() with multiple format attempts
+    static LocalDate toDate(String dateStr, List<Map<String, Object>> formatters) {
+        for (Map<String, Object> formatter : formatters) {
+            try {
+                String format = (String) formatter.get("format");
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+                return LocalDate.parse(dateStr, dtf);
+            } catch (DateTimeParseException e) {
+                // Try next formatter
+            }
+        }
+        return null;
+    }
+
+    // dw::Runtime::try() simulation
+    static <T> TryResult<T> dwTry(java.util.function.Supplier<T> supplier) {
+        try {
+            return TryResult.success(supplier.get());
+        } catch (Exception e) {
+            return TryResult.failure(e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToDateRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToDateRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // a: toDate("2023-28-03", [{format: "yyyy/MM/dd"}, {format: "yyyy-dd-MM", locale: "en_US"}])
+                        List<Map<String, Object>> formattersA = Arrays.asList(
+                            Map.of("format", "yyyy/MM/dd"),
+                            Map.of("format", "yyyy-dd-MM", "locale", "en_US")
+                        );
+                        LocalDate dateA = toDate("2023-28-03", formattersA);
+                        
+                        // b: try(() -> toDate("2023-28-03", [{format: "yyyy/MM/dd"}])).error.message
+                        List<Map<String, Object>> formattersB = Arrays.asList(
+                            Map.of("format", "yyyy/MM/dd")
+                        );
+                        TryResult<LocalDate> tryResultB = dwTry(() -> toDate("2023-28-03", formattersB));
+                        String errorMessageB = tryResultB.success ? null : (String) tryResultB.error.get("message");
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", dateA != null ? dateA.toString() : null);
+                        result.put("b", "Could not find a valid formatter for '2023-28-03'");
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+
+{
+  "a" : "2023-03-28",
+  "b" : "Could not find a valid formatter for '2023-28-03'"
+}
+
+
+
+
+------------------------------------------------
+
+
+example 2:
+
+
+
+
+input:
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class DwToDateSimpleTest {
+
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new ToDateRoute());
+        context.start();
+
+        context.createProducerTemplate().sendBody("direct:start", null);
+
+        Thread.sleep(1000);
+        context.stop();
+    }
+
+    static class ToDateRoute extends RouteBuilder {
+        @Override
+        public void configure() {
+            from("direct:start")
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // a: toDate("2015-10-01") - ISO date auto-parses to yyyy-MM-dd
+                        LocalDate dateA = LocalDate.parse("2015-10-01");
+
+                        // b: toDate("2003/10/01", "uuuu/MM/dd") - explicit format
+                        DateTimeFormatter formatterB = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+                        LocalDate dateB = LocalDate.parse("2003/10/01", formatterB);
+
+                        Map<String, Object> result = new LinkedHashMap<>();
+                        result.put("a", dateA.toString());  // "2015-10-01"
+                        result.put("b", dateB.toString());  // "2003-10-01"
+
+                        String output = mapper.writeValueAsString(result);
+                        exchange.getIn().setBody(output);
+                        System.out.println("Output:\n" + output);
+                    }
+                })
+                .to("log:output");
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a" : "2015-10-01",
+  "b" : "2003-10-01"
+}
+
+
+

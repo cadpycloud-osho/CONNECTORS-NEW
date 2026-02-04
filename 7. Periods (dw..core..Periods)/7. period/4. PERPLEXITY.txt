@@ -1,0 +1,68 @@
+period:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class PeriodsController {
+    
+    private static final DateTimeFormatter INSTANT_FMT = DateTimeFormatter.ISO_INSTANT;
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final Instant BASE_INSTANT = Instant.parse("2020-10-05T20:22:34.385Z");
+    private static final LocalDate BASE_DATE = LocalDate.parse("2020-10-05");
+
+    @GetMapping("/periods")
+    public Map<String, Object> getPeriods() {
+        // dayBeforeDateTime: Instant - 1 day
+        LocalDateTime baseLdt = BASE_INSTANT.atZone(ZoneOffset.UTC).toLocalDateTime();
+        LocalDateTime dayBeforeLdt = baseLdt.minusDays(1);
+        Instant dayBefore = dayBeforeLdt.toInstant(ZoneOffset.UTC);
+        
+        // dayAfterDate: LocalDate + 1 day
+        LocalDate dayAfter = BASE_DATE.plusDays(1);
+        
+        // yearMonthDayAfterDate: +1 year, +1 month, +1 day
+        LocalDate yearMonthDayAfter = BASE_DATE.plusYears(1).plusMonths(1).plusDays(1);
+        
+        String emptyPeriod = "P0D";
+        String constructPeriod = "P4Y11M28D";
+        int selectMonths = 11;
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("dayBeforeDateTime", INSTANT_FMT.format(dayBefore));
+        result.put("dayAfterDate", DATE_FMT.format(dayAfter));
+        result.put("yearMonthDayAfterDate", DATE_FMT.format(yearMonthDayAfter));
+        result.put("emptyPeriod", emptyPeriod);
+        result.put("constructPeriod", constructPeriod);
+        result.put("selectMonthsFromPeriod", selectMonths);
+        
+        return result;
+    }
+}
+
+
+
+output:
+
+{
+  "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+  "dayAfterDate": "2020-10-06",
+  "yearMonthDayAfterDate": "2021-11-06",
+  "emptyPeriod": "P0D",
+  "constructPeriod": "P4Y11M28D",
+  "selectMonthsFromPeriod": 11
+}
+
+

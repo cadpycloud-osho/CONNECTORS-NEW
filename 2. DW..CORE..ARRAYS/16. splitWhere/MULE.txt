@@ -1,0 +1,29 @@
+splitWhere:
+
+splitWhere<T>(array: Array<T>, condition: (item: T) -> Boolean): Pair<Array<T>, Array<T>>
+
+splitWhere<T>(array: Array<T>, condition: (item: T) -> Boolean): Pair<Array<T>, Array<T>>
+Splits an array into two at the first position where the condition is met.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var users = ["Mariano", "Leandro", "Julian", "Tomo"]
+---
+users splitWhere (item) -> item startsWith "Jul"
+
+DataWeave
+Output
+{
+  "l": [
+    "Mariano",
+    "Leandro"
+  ],
+  "r": [
+    "Julian",
+    "Tomo"
+  ]
+}

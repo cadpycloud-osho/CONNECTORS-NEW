@@ -1,0 +1,60 @@
+wrapIfMissing:
+
+
+
+input:
+
+@RestController
+@RequestMapping("/api")
+public class WrapIfMissingController {
+    
+    @GetMapping("/wrap")
+    public Map<String, Object> wrapIfMissingExamples() {
+        return Map.of(
+            "a", wrapIfMissing(null, "'"),
+            "b", wrapIfMissing("", "'"),
+            "c", wrapIfMissing("ab", "x"),
+            "d", wrapIfMissing("'ab'", "'"),
+            "e", wrapIfMissing("/", '/'),
+            "f", wrapIfMissing("a/b/c", '/'),
+            "g", wrapIfMissing("/a/b/c", '/'),
+            "h", wrapIfMissing("a/b/c/", '/')
+        );
+    }
+    
+    private String wrapIfMissing(String input, char wrapper) {
+        if (input == null) return null;
+        
+        boolean startsWithWrapper = !input.isEmpty() && input.charAt(0) == wrapper;
+        boolean endsWithWrapper = !input.isEmpty() && input.charAt(input.length() - 1) == wrapper;
+        
+        if (startsWithWrapper && endsWithWrapper) {
+            return input;
+        }
+        
+        StringBuilder sb = new StringBuilder(input);
+        if (!startsWithWrapper) {
+            sb.insert(0, wrapper);
+        }
+        if (!endsWithWrapper) {
+            sb.append(wrapper);
+        }
+        return sb.toString();
+    }
+}
+
+
+output:
+
+{
+  "a": null,
+  "b": "'",
+  "c": "xabx",
+  "d": "'ab'",
+  "e": "/",
+  "f": "/a/b/c/",
+  "g": "/a/b/c/",
+  "h": "/a/b/c/"
+}
+
+

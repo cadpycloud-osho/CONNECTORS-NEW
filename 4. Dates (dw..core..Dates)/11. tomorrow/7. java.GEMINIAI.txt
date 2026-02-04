@@ -1,0 +1,63 @@
+tomorrow:
+
+
+input:
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+
+    /**
+     * Retrieves the local date for tomorrow.
+     * This mimics the DataWeave 'tomorrow()' function.
+     * @return The date string for tomorrow in ISO 8601 format (YYYY-MM-DD).
+     */
+    public static String getTomorrowDate() {
+        // 1. Get the current date and add 1 day (DW: tomorrow())
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        
+        // 2. Format the date to the standard ISO output (DW output format)
+        // DateTimeFormatter.ISO_LOCAL_DATE produces the "YYYY-MM-DD" format
+        return tomorrow.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    /**
+     * Executes the full DataWeave transformation and formats the JSON output.
+     */
+    public static String runDataWeaveTransformation() {
+        // Calculate the date string for tomorrow
+        String tomorrowDateString = getTomorrowDate();
+        
+        // 3. Format the final JSON output
+        String jsonOutput = String.format("{\n  \"tomorrow\": \"%s\"\n}", tomorrowDateString);
+
+        System.out.println("--- Intermediate Data (For Context) ---");
+        System.out.println("DW Function: tomorrow()");
+        System.out.println("Tomorrow's Date String: " + tomorrowDateString);
+        System.out.println("---------------------------------------");
+        
+        return jsonOutput;
+    }
+
+    public static void main(String[] args) {
+        String output = runDataWeaveTransformation();
+        System.out.println("\nDataWeave JSON Output in Java:");
+        System.out.println(output);
+    }
+}
+
+
+output:
+
+--- Intermediate Data (For Context) ---
+DW Function: tomorrow()
+Tomorrow's Date String: 2025-12-17
+---------------------------------------
+
+DataWeave JSON Output in Java:
+{
+  "tomorrow": "2025-12-17"
+}
+
+

@@ -1,0 +1,56 @@
+intersectionItems:
+
+intersectionItems(t: Type): Array<Type>
+
+intersectionItems(t: Type): Array<Type>
+Returns an array of all the types that define a given Intersection type. This function fails if the input is not an Intersection type.
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Types
+type AType = {name: String} & {age: Number}
+output application/json
+---
+{
+   a: intersectionItems(AType)
+}
+
+
+
+DataWeave
+Output
+{
+  "a": ["Object","Object"]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

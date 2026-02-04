@@ -1,0 +1,76 @@
+everyEntry:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+import java.util.function.BiPredicate;
+
+public class EveryEntryRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:checkEveryEntry")
+            .routeId("Every-Entry-Route")
+            .process(exchange -> {
+                Map<String, Object> results = new LinkedHashMap<>();
+
+                // Define Predicates (Conditions)
+                BiPredicate<Object, String> isValueString = (v, k) -> v instanceof String;
+                BiPredicate<Object, String> isKeyA = (v, k) -> "a".equals(k);
+
+                // a: Empty object
+                results.put("a", checkEvery(new HashMap<>(), isValueString));
+                
+                // b: All values are strings
+                Map<String, Object> mapB = Map.of("a", "", "b", "123");
+                results.put("b", checkEvery(mapB, isValueString));
+
+                // c: Mixed values (contains an Integer)
+                Map<String, Object> mapC = Map.of("a", "", "b", 123);
+                results.put("c", checkEvery(mapC, isValueString));
+
+                // d: One key is "b", but predicate requires "a"
+                results.put("d", checkEvery(mapC, isKeyA));
+
+                // e: Only key is "a"
+                results.put("e", checkEvery(Map.of("a", ""), isKeyA));
+
+                // f: Null input (returns true in DataWeave)
+                results.put("f", checkEvery(null, isKeyA));
+
+                exchange.getIn().setBody(results);
+            })
+            .marshal().json()
+            .log("EveryEntry Results: ${body}");
+    }
+
+    /**
+     * Replicates dw::core::Objects::everyEntry
+     */
+    private boolean checkEvery(Map<String, Object> input, BiPredicate<Object, String> predicate) {
+        // DataWeave returns true for null or empty objects (vacuous truth)
+        if (input == null || input.isEmpty()) {
+            return true;
+        }
+        
+        // Java Streams allMatch returns true if every entry satisfies the predicate
+        return input.entrySet().stream()
+                .allMatch(entry -> predicate.test(entry.getValue(), entry.getKey()));
+    }
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false,
+  "d": false,
+  "e": true,
+  "f": true
+}
+

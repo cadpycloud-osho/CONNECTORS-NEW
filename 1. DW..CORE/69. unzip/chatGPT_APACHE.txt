@@ -1,0 +1,120 @@
+unzip:
+
+example 1:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        // Input list of pairs
+        java.util.List<java.util.List<Object>> input = java.util.Arrays.asList(
+            java.util.Arrays.asList(0, "a"),
+            java.util.Arrays.asList(1, "b"),
+            java.util.Arrays.asList(2, "c"),
+            java.util.Arrays.asList(3, "d")
+        );
+
+        // Prepare two separate lists
+        java.util.List<Object> first = new java.util.ArrayList<>();
+        java.util.List<Object> second = new java.util.ArrayList<>();
+
+        for (java.util.List<Object> pair : input) {
+            first.add(pair.get(0));
+            second.add(pair.get(1));
+        }
+
+        java.util.List<java.util.List<Object>> result = java.util.Arrays.asList(first, second);
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+[ [0, 1, 2, 3], ["a", "b", "c", "d"] ]
+
+
+-----------------------------------------------------------
+
+
+
+example 2:
+
+input:
+from("direct:start")
+    .process(exchange -> {
+        // Input list of lists
+        java.util.List<java.util.List<Object>> input = java.util.Arrays.asList(
+            java.util.Arrays.asList(0, "a"),
+            java.util.Arrays.asList(1, "a", "foo"),
+            java.util.Arrays.asList(2),
+            java.util.Arrays.asList(3, "a")
+        );
+
+        // Extract only the first element of each sublist
+        java.util.List<Object> firstElements = new java.util.ArrayList<>();
+        for (java.util.List<Object> sublist : input) {
+            if (!sublist.isEmpty()) {
+                firstElements.add(sublist.get(0));
+            }
+        }
+
+        exchange.getIn().setBody(firstElements);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+[0, 1, 2, 3]
+
+
+-----------------------------------------------------------
+
+
+example 3:
+
+input:
+
+from("direct:start")
+    .process(exchange -> {
+        // Input list of lists
+        java.util.List<java.util.List<Object>> input = java.util.Arrays.asList(
+            java.util.Arrays.asList(0,"a","W"),
+            java.util.Arrays.asList(1,"b","X"),
+            java.util.Arrays.asList(2,"c","Y"),
+            java.util.Arrays.asList(3,"d","Z")
+        );
+
+        // Determine the maximum sublist length
+        int maxLength = input.stream().mapToInt(java.util.List::size).max().orElse(0);
+
+        // Initialize output lists
+        java.util.List<java.util.List<Object>> result = new java.util.ArrayList<>();
+        for (int i = 0; i < maxLength; i++) {
+            result.add(new java.util.ArrayList<>());
+        }
+
+        // Fill result lists
+        for (java.util.List<Object> sublist : input) {
+            for (int i = 0; i < sublist.size(); i++) {
+                result.get(i).add(sublist.get(i));
+            }
+        }
+
+        exchange.getIn().setBody(result);
+    })
+    .log("Output: ${body}");
+
+
+output:
+
+[
+  [0, 1, 2, 3],
+  ["a", "b", "c", "d"],
+  ["W", "X", "Y", "Z"]
+]
+
+
+-----------------------------------------------------------

@@ -1,0 +1,27 @@
+avg(values: Array<Number>): Number
+
+
+input:
+
+from("direct:start")
+  .process().groovy("""
+    def input = [a: [-2, 2.5, -3.4, 3]]
+    def result = input.a.collect { Math.abs(it) }
+    def json = new groovy.json.JsonBuilder([a: result])
+    exchange.in.body = json.toString()
+  """)
+  .to("mock:result");
+
+
+output:
+
+{"a":[2,2.5,3.4,3]}
+
+
+Required dependency:
+
+xml
+<dependency>
+    <groupId>org.apache.camel</groupId>
+    <artifactId>camel-groovy</artifactId>
+</dependency>

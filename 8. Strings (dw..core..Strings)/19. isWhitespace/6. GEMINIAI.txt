@@ -1,0 +1,67 @@
+isWhitespace:
+
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class IsWhitespaceController {
+
+    /**
+     * Custom method to emulate DataWeave's isWhitespace(text) function.
+     * Returns true if the string is empty or contains ONLY whitespace characters.
+     * Returns false for null input.
+     */
+    private boolean isWhitespaceString(String input) {
+        // DataWeave returns false for null.
+        if (input == null) {
+            return false;
+        }
+
+        // DataWeave returns true for empty string.
+        if (input.isEmpty()) {
+            return true;
+        }
+
+        // Check if ALL characters in the string are whitespace.
+        return input.chars() // Get an IntStream of character codes
+                    .allMatch(Character::isWhitespace); // Check if every code is whitespace
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/check-is-whitespace")
+    public Map<String, Boolean> checkIsWhitespaceExamples() {
+        // Use LinkedHashMap to preserve the output order
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        
+        // Note: String "  " contains a non-breaking space (U+00A0) and a standard space (' ')
+        result.put("a", isWhitespaceString(null));
+        result.put("b", isWhitespaceString(""));
+        result.put("c", isWhitespaceString("  ")); // Passes: all characters are whitespace
+        result.put("d", isWhitespaceString("abc")); // Fails: contains letters
+        result.put("e", isWhitespaceString("ab2c")); // Fails: contains digits
+        result.put("f", isWhitespaceString("ab-c")); // Fails: contains hyphen
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+

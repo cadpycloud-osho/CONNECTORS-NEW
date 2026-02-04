@@ -1,0 +1,68 @@
+join:
+
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class JoinRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:join")
+            .process(exchange -> {
+                List<Map<String, String>> users = Arrays.asList(
+                    Map.of("id", "1", "name", "Mariano"),
+                    Map.of("id", "2", "name", "Leandro"),
+                    Map.of("id", "3", "name", "Julian"),
+                    Map.of("id", "5", "name", "Julian")
+                );
+                
+                List<Map<String, String>> products = Arrays.asList(
+                    Map.of("ownerId", "1", "name", "DataWeave"),
+                    Map.of("ownerId", "1", "name", "BAT"),
+                    Map.of("ownerId", "3", "name", "DataSense"),
+                    Map.of("ownerId", "4", "name", "SmartConnectors")
+                );
+                
+                // Inner join: user.id == product.ownerId
+                List<Map<String, Object>> result = new ArrayList<>();
+                
+                for (Map<String, String> user : users) {
+                    String userId = user.get("id");
+                    for (Map<String, String> product : products) {
+                        if (userId.equals(product.get("ownerId"))) {
+                            Map<String, Object> joined = new LinkedHashMap<>();
+                            joined.put("l", user);
+                            joined.put("r", product);
+                            result.add(joined);
+                        }
+                    }
+                }
+                
+                exchange.getIn().setBody(result);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+[
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "DataWeave" }
+  },
+  {
+    "l": { "id": "1", "name": "Mariano" },
+    "r": { "ownerId": "1", "name": "BAT" }
+  },
+  {
+    "l": { "id": "3", "name": "Julian" },
+    "r": { "ownerId": "3", "name": "DataSense" }
+  }
+]
+
+

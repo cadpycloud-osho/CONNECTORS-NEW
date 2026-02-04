@@ -1,0 +1,58 @@
+isTimeZoneType:
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveTimeZoneTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processTimeZoneChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processTimeZoneChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // ATimeZone = TimeZone (type alias)
+        result.put("a", isTimeZoneType(TimeZone.class));
+        
+        // Built-in TimeZone type
+        result.put("b", isTimeZoneType(TimeZone.class));
+        
+        // String - not TimeZone
+        result.put("c", isTimeZoneType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isTimeZoneType(Class<?> type) {
+        // DataWeave TimeZone type check equivalent
+        // Returns true for TimeZone and its aliases (timezone representation)
+        return type == TimeZone.class || 
+               "TimeZone".equals(type.getSimpleName()) ||
+               type.getName().contains("TimeZone");
+    }
+    
+    // TimeZone interface equivalent for DataWeave TimeZone type simulation
+    private interface TimeZone {}
+}
+
+
+output:
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+2
+
+

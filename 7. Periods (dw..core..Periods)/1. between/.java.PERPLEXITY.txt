@@ -1,0 +1,41 @@
+between:
+
+input:
+
+import java.time.LocalDate;
+import java.time.Period;
+
+public class Main {
+    public static void main(String[] args) {
+        // Define the dates using LocalDate.parse() with ISO date format
+        LocalDate date1a = LocalDate.parse("2010-12-12");
+        LocalDate date2a = LocalDate.parse("2010-12-10");
+        Period periodA = Period.between(date1a, date2a);
+        
+        LocalDate date1b = LocalDate.parse("2011-12-11");
+        LocalDate date2b = LocalDate.parse("2010-11-10");
+        Period periodB = Period.between(date1b, date2b);
+        
+        LocalDate date1c = LocalDate.parse("2020-02-29");
+        LocalDate date2c = LocalDate.parse("2020-03-30");
+        Period periodC = Period.between(date1c, date2c);
+        
+        // Print the periods as ISO-8601 strings
+        System.out.println("{");
+        System.out.println("  \"a\": \"" + periodA.toString() + "\",");
+        System.out.println("  \"b\": \"" + periodB.toString() + "\",");
+        System.out.println("  \"c\": \"" + periodC.toString() + "\"");
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+
+
+{
+  "a": "P2D",
+  "b": "P1Y1M1D",
+  "c": "P-1M-1D"
+}

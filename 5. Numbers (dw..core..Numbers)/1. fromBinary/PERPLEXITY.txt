@@ -1,0 +1,105 @@
+fromBinary:
+
+
+
+input:
+
+package com.example.binaryconverter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class BinaryConverterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BinaryConverterApplication.class, args);
+    }
+}
+
+@RestController
+class BinaryConverterController {
+
+    @GetMapping("/convert")
+    public Map<String, Object> convertBinaryStrings() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        // "a": fromBinary("-10") => Treat as negative binary number
+        result.put("a", fromBinary("-10"));
+
+        // large binary string for "b"
+        String binaryB = "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000";
+        result.put("b", fromBinary(binaryB));
+
+        // binary "0"
+        result.put("c", fromBinary("0"));
+
+        // null input for "d"
+        result.put("d", null);
+
+        // binary "100"
+        result.put("e", fromBinary("100"));
+
+        return result;
+    }
+
+    private Object fromBinary(String binaryStr) {
+        if (binaryStr == null) {
+            return null;
+        }
+        binaryStr = binaryStr.trim();
+        if (binaryStr.isEmpty()) {
+            return null;
+        }
+
+        try {
+            boolean isNegative = false;
+            if (binaryStr.startsWith("-")) {
+                isNegative = true;
+                binaryStr = binaryStr.substring(1);
+            }
+
+            // Convert binary string to BigInteger
+            BigInteger decimalValue = new BigInteger(binaryStr, 2);
+
+            if (isNegative) {
+                decimalValue = decimalValue.negate();
+            }
+
+            // Returning as number: for large values BigInteger, else int/long
+            // To match DataWeave output, let's return the BigInteger as String (JSON supports big numbers as strings usually)
+            if (decimalValue.bitLength() <= 31) { // fits in Integer
+                return decimalValue.intValue();
+            } else if (decimalValue.bitLength() <= 63) { // fits in Long
+                return decimalValue.longValue();
+            } else {
+                return decimalValue.toString(); // for larger numbers use string representation
+            }
+        } catch (Exception e) {
+            // In case of invalid input, return null or handle accordingly
+            return null;
+        }
+    }
+}
+
+
+
+output:
+
+{
+  "a": -2,
+  "b": "100000000000000000000000000000000000000000000000000000000000000",
+  "c": 0,
+  "d": null,
+  "e": 4
+}
+
+
+
+

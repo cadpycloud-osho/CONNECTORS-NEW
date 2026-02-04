@@ -1,0 +1,46 @@
+isRangeType:
+
+
+
+input:
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static class Range {
+        int start;
+        int end;
+
+        public Range(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+    }
+
+    public static boolean isRangeType(Class<?> type) {
+        return Range.class.isAssignableFrom(type);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
+        Class<?> ARange = Range.class;
+
+        result.put("a", isRangeType(ARange));
+        result.put("b", isRangeType(Range.class));
+        result.put("c", isRangeType(String.class));
+
+        System.out.println(result);
+    }
+}
+
+
+output:
+
+
+{a=true, b=true, c=false}
+
+

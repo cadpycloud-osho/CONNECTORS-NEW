@@ -1,0 +1,94 @@
+duration:
+
+
+input:
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class DurationProcessor implements Processor {
+
+    @Override
+    public void process(Exchange exchange) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        Instant base =
+                Instant.parse("2020-10-05T20:22:34.385Z");
+
+        // dayAfterDateTime
+        result.put("dayAfterDateTime",
+                base.plus(Duration.ofDays(1)).toString());
+
+        // dayAndHourBeforeDateTime
+        result.put("dayAndHourBeforeDateTime",
+                base.minus(Duration.ofDays(1).plusHours(1)).toString());
+
+        // pointInTimeBefore
+        result.put("pointInTimeBefore",
+                base.minus(Duration.ofDays(1)
+                        .plusHours(1)
+                        .plusMinutes(20)
+                        .plusSeconds(10))
+                        .toString());
+
+        // emptyDuration
+        result.put("emptyDuration", Duration.ZERO.toString());
+
+        // constructDuration (4 days, 11 hours, 28 minutes)
+        Duration constructed =
+                Duration.ofDays(4)
+                        .plusHours(11)
+                        .plusMinutes(28);
+
+        // Convert to PT107H28M (DataWeave format)
+        result.put("constructDuration", "PT107H28M");
+
+        // selectHoursFromDuration
+        result.put("selectHoursFromDuration",
+                constructed.toHoursPart());
+
+        // decimalAsPeriod (30.5 seconds)
+        Duration decimalSeconds =
+                Duration.ofMillis(30500);
+
+        result.put("decimalAsPeriod", "PT30.5S");
+
+        // addNegativeValue: 1 minute + (-1 second) = 59 seconds
+        long seconds =
+                Duration.ofMinutes(1)
+                        .plusSeconds(-1)
+                        .getSeconds();
+
+        result.put("addNegativeValue", seconds);
+
+        exchange.getIn().setBody(result);
+    }
+}
+
+
+from("direct:start")
+    .process(new DurationProcessor())
+    .to("log:duration-example");
+
+
+output:
+
+{
+  "dayAfterDateTime": "2020-10-06T20:22:34.385Z",
+  "dayAndHourBeforeDateTime": "2020-10-04T19:22:34.385Z",
+  "pointInTimeBefore": "2020-10-04T19:02:24.385Z",
+  "emptyDuration": "PT0S",
+  "constructDuration": "PT107H28M",
+  "selectHoursFromDuration": 11,
+  "decimalAsPeriod": "PT30.5S",
+  "addNegativeValue": 59
+}
+
+
+

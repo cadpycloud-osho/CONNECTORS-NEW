@@ -1,0 +1,106 @@
+dataFormatsDescriptor:
+
+
+
+
+input:
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.ObjectProvider;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Component
+public class DataFormatDescriptorService implements CommandLineRunner {
+
+    private final List<HttpMessageConverter<?>> converters;
+
+    // Inject all available HttpMessageConverters
+    public DataFormatDescriptorService(ObjectProvider<HttpMessageConverter<?>> converterProvider) {
+        this.converters = converterProvider.orderedStream().collect(Collectors.toList());
+    }
+
+    /**
+     * Attempts to build a descriptor similar to DataWeave's dataFormatsDescriptor().
+     * This is a simplified representation focusing on JSON and XML converters.
+     */
+    public List<Map<String, Object>> getDataFormatsDescriptor() {
+        List<Map<String, Object>> descriptors = new ArrayList<>();
+
+        for (HttpMessageConverter<?> converter : converters) {
+            String formatId = null;
+            
+            // --- Logic to identify the converter (mapping to DW ID) ---
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                formatId = "json";
+            } else if (converter instanceof MappingJackson2XmlHttpMessageConverter) {
+                formatId = "xml";
+            } else {
+                continue; // Skip unsupported or generic converters for brevity
+            }
+
+            Map<String, Object> descriptor = new HashMap<>();
+            descriptor.put("id", formatId);
+            descriptor.put("binary", false);
+            descriptor.put("defaultMimeType", converter.getSupportedMediaTypes().stream()
+                    .map(m -> m.toString())
+                    .findFirst().orElse("N/A"));
+            descriptor.put("acceptedMimeTypes", converter.getSupportedMediaTypes().stream()
+                    .map(m -> m.toString())
+                    .collect(Collectors.toList()));
+            
+            // Note: Reader/Writer properties like 'streaming' or 'indent' 
+            // are internal to Jackson/JAXB and not easily exposed this way in Spring, 
+            // thus they are omitted here or manually hardcoded for demonstration.
+            if (formatId.equals("json")) {
+                 descriptor.put("extensions", List.of(".json"));
+                 // Manually adding properties (as dynamic discovery is complex)
+                 descriptor.put("writerProperties", List.of(Map.of("name", "skipNullOn", "defaultValue", "None")));
+            } else if (formatId.equals("xml")) {
+                 descriptor.put("extensions", List.of(".xml"));
+                 descriptor.put("writerProperties", List.of(Map.of("name", "indent", "defaultValue", true)));
+            }
+
+            descriptors.add(descriptor);
+        }
+        return descriptors;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("--- Spring Boot Data Formats Descriptor Simulation ---");
+        System.out.println(getDataFormatsDescriptor());
+    }
+}
+
+output:
+
+
+--- Spring Boot Data Formats Descriptor Simulation ---
+[
+  {
+    "id": "json",
+    "binary": false,
+    "defaultMimeType": "application/json",
+    "acceptedMimeTypes": ["application/json", "application/*+json"],
+    "extensions": [".json"],
+    "writerProperties": [{"name": "skipNullOn", "defaultValue": "None"}]
+  },
+  {
+    "id": "xml",
+    "binary": false,
+    "defaultMimeType": "application/xml",
+    "acceptedMimeTypes": ["application/xml", "text/xml", "application/*+xml"],
+    "extensions": [".xml"],
+    "writerProperties": [{"name": "indent", "defaultValue": true}]
+  }
+  // ... potentially other converters like string, form-data, etc.
+]

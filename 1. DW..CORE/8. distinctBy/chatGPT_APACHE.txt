@@ -1,0 +1,121 @@
+distinctBy:
+
+
+example 1:
+
+input:
+from("direct:arrayDistinct")
+.setBody(constant(List.of(0,1,2,3,3,2,1,4)))
+.split(body())
+    .distinct(simple("${body}"))
+    .aggregate(constant(true),
+        org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy.INSTANCE)
+    .completionTimeout(100)
+.end();
+
+
+
+output:
+[0, 1, 2, 3, 4]
+
+
+
+
+-----------------------------------------------------------------
+
+
+example 2:
+
+input:
+from("direct:authorDistinct")
+.setBody(simple("${body[author]}"))
+.split(body())
+    .distinct(simple("${body}"))
+    .aggregate(constant(true),
+        org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy.INSTANCE)
+    .completionTimeout(100)
+.end();
+
+
+
+output:
+
+[
+  "James McGovern",
+  "Per Bothner",
+  "Kurt Cagle",
+  "James Linn",
+  "Vaidyanathan Nagarajan"
+]
+
+
+
+-----------------------------------------------------------------
+
+example 3:
+
+input:
+
+from("direct:objectDistinct")
+.split(simple("${body.entrySet()}"))
+    .distinct(simple("${body.value}"))
+    .aggregate(constant(true),
+        org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy.INSTANCE)
+    .completionTimeout(100)
+.end();
+
+
+output:
+
+{ "a": "b", "a": "B" }
+
+
+
+-----------------------------------------------------------------
+
+example 4:
+
+input:
+<book>
+  <title>"XQuery Kick Start"</title>
+  <author>James Linn</author>
+  <author>Per Bothner</author>
+  <author>James McGovern</author>
+  <author>James McGovern</author>
+</book>
+
+from("direct:xmlDistinct")
+.split(xpath("/book/author/text()"))
+    .distinct(simple("${body}"))
+    .aggregate(constant(true),
+        org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy.INSTANCE)
+    .completionTimeout(100)
+.end();
+
+
+output:
+
+<authors>
+  <author>James Linn</author>
+  <author>Per Bothner</author>
+  <author>James McGovern</author>
+</authors>
+
+
+
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

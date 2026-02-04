@@ -1,0 +1,46 @@
+months:
+
+
+input:
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_INSTANT;
+        Instant base = Instant.parse("2020-10-05T20:22:34.385Z");
+        LocalDateTime baseLdt = base.atZone(ZoneOffset.UTC).toLocalDateTime();
+
+        // nextMonth: add 1 month (preserves day/time)
+        LocalDateTime nextMonthLdt = baseLdt.plusMonths(1);
+        Instant nextMonth = nextMonthLdt.toInstant(ZoneOffset.UTC);
+        
+        // fourMonthPeriod: P4M representation
+        String fourMonthPeriod = "P4M";
+        
+        // addNegativeValue: months(-1) + months(2) = 1 month
+        long addNegativeValue = -1 + 2;
+
+        // JSON output matching DataWeave exactly
+        System.out.println("{");
+        System.out.println("  \"nextMonth\": \"" + fmt.format(nextMonth) + "\",");
+        System.out.println("  \"fourMonthPeriod\": \"" + fourMonthPeriod + "\",");
+        System.out.println("  \"addNegativeValue\": " + addNegativeValue);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+
+

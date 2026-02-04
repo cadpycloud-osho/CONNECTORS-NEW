@@ -1,0 +1,57 @@
+isLowerCase:
+
+
+input:
+
+import java.util.*;
+
+public class IsLowerCaseExample {
+
+    public static void main(String[] args) {
+
+        Map<String, Boolean> output = new LinkedHashMap<>();
+
+        output.put("a", isLowerCase(null));
+        output.put("b", isLowerCase(""));
+        output.put("c", isLowerCase(" "));
+        output.put("d", isLowerCase("abc"));
+        output.put("e", isLowerCase("aBC"));
+        output.put("f", isLowerCase("a c"));
+        output.put("g", isLowerCase("a1c"));
+        output.put("h", isLowerCase("a/c"));
+        output.put("i", isLowerCase("mulesöft")); // ö is lowercase Unicode
+        output.put("j", isLowerCase("mulesÖft")); // Ö is uppercase Unicode
+
+        System.out.println(output);
+    }
+
+    private static boolean isLowerCase(String str) {
+        if (str == null || str.isEmpty()) return false;
+
+        for (char c : str.toCharArray()) {
+            if (!Character.isLetter(c)) continue; // skip non-letters
+            if (!Character.isLowerCase(c)) return false;
+        }
+
+        return true;
+    }
+}
+
+
+
+output:
+
+
+{
+ "a": false,
+ "b": false,
+ "c": false,
+ "d": true,
+ "e": false,
+ "f": false,
+ "g": false,
+ "h": false,
+ "i": true,
+ "j": false
+}
+

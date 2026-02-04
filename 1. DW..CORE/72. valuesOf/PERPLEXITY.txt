@@ -1,0 +1,31 @@
+valuesOf:
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class ValuesOfController {
+
+    @GetMapping("/valuesOf")
+    public Map<String, List<Object>> valuesOf() {
+        Map<String, Object> inputMap = Map.of(
+            "a", true,
+            "b", 1
+        );
+        
+        List<Object> values = new java.util.ArrayList<>(inputMap.values());
+        
+        return Map.of("valuesOf", values);
+    }
+}
+
+output:
+
+{
+  "valuesOf": [true, 1]
+}

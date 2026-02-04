@@ -1,0 +1,30 @@
+indexWhere:
+
+indexWhere<T>(array: Array<T>, condition: (item: T) -> Boolean): Number
+
+indexWhere<T>(array: Array<T>, condition: (item: T) -> Boolean): Number
+Returns the index of the first occurrence of an element that matches a condition within the array. If no element matches the condition, the function returns -1.
+
+
+
+
+
+Source
+%dw 2.0
+import * from dw::core::Arrays
+output application/json
+var users = ["Mariano", "Leandro", "Julian"]
+---
+users indexWhere (item) -> item startsWith "Jul"
+
+DataWeave
+Output
+2
+
+
+
+
+
+
+
+

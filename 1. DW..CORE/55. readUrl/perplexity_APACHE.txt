@@ -1,0 +1,159 @@
+readUrl:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+
+public class ReadUrlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:readUrl")
+            .to("https://jsonplaceholder.typicode.com/posts/1?bridgeEndpoint=true")
+            .unmarshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+}
+
+
+--------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.util.*;
+
+public class ClasspathJsonToCsvRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:classpathJsonToCsv")
+            .setBody(simple("{\"results\":[{\"profile\":{\"firstName\":\"john\",\"lastName\":\"doe\",\"email\":\"johndoe@demo.com\"}},{\"profile\":{\"firstName\":\"jane\",\"lastName\":\"doe\",\"email\":\"janedoe@demo.com\"}}]}"))
+            .unmarshal().json(JsonLibrary.Jackson)
+            .process(exchange -> {
+                List<Map<String, Object>> input = exchange.getIn().getBody(List.class);
+                List<Map<String, String>> profiles = new ArrayList<>();
+                
+                // Extract results[].profile matching DataWeave
+                List<Map<String, Object>> results = (List<Map<String, Object>>) input.get(0).get("results");
+                for (Map<String, Object> result : results) {
+                    profiles.add((Map<String, String>) result.get("profile"));
+                }
+                
+                StringBuilder csv = new StringBuilder();
+                csv.append("firstName,lastName,email\n");
+                
+                for (Map<String, String> profile : profiles) {
+                    csv.append(profile.get("firstName")).append(",")
+                       .append(profile.get("lastName")).append(",")
+                       .append(profile.get("email")).append("\n");
+                }
+                
+                exchange.getIn().setBody(csv.toString());
+            })
+            .setHeader("Content-Type", constant("text/csv"))
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+firstName,lastName,email
+john,doe,johndoe@demo.com
+jane,doe,janedoe@demo.com
+
+
+--------------------------------------------------------
+
+
+example 3:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.dataformat.csv.CsvDataFormat;
+
+public class CsvReadUrlRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        CsvDataFormat csvFormat = new CsvDataFormat();
+        csvFormat.setHeader(false);  // Matches DataWeave {"header": false}
+        csvFormat.setUseMaps(true);  // Returns Map objects with column_N keys
+        
+        from("direct:csvReadUrl")
+            .to("https://mywebsite.com/data.csv?bridgeEndpoint=true")
+            .unmarshal(csvFormat)
+            .to("log:output?showAll=true");
+    }
+}
+
+
+
+output:
+
+[
+  {
+    "column_0": "Max",
+    "column_1": "the Mule", 
+    "column_2": "MuleSoft"
+  }
+]
+
+
+--------------------------------------------------------
+
+
+example 4:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ReadDwlClasspathRoute extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+        from("direct:readDwl")
+            .setBody(simple("{\"firstName\":\"Somebody\",\"lastName\":\"Special\"}"))
+            .unmarshal().json(JsonLibrary.Jackson)
+            .process(exchange -> {
+                JsonNode jsonNode = exchange.getIn().getBody(JsonNode.class);
+                // Simulate DataWeave execution: read .dwl → parse input → extract firstName
+                String firstName = jsonNode.get("firstName").asText();
+                exchange.getIn().setBody(firstName);
+            })
+            .setHeader("Content-Type", constant("application/json"))
+            .to("log:output?showAll=true");
+    }
+}
+
+
+output:
+
+"Somebody"
+
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+

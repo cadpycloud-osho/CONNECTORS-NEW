@@ -1,0 +1,61 @@
+period:
+
+
+
+input:
+
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
+public class Main {
+    public static void main(String[] args) {
+        DateTimeFormatter instantFmt = DateTimeFormatter.ISO_INSTANT;
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        
+        Instant baseInstant = Instant.parse("2020-10-05T20:22:34.385Z");
+        LocalDate baseDate = LocalDate.parse("2020-10-05");
+        LocalDateTime baseLdt = baseInstant.atZone(ZoneOffset.UTC).toLocalDateTime();
+
+        // dayBeforeDateTime: subtract 1 day from Instant (via LocalDateTime)
+        LocalDateTime dayBeforeLdt = baseLdt.minusDays(1);
+        Instant dayBefore = dayBeforeLdt.toInstant(ZoneOffset.UTC);
+        
+        // dayAfterDate: add 1 day to LocalDate
+        LocalDate dayAfter = baseDate.plusDays(1);
+        
+        // yearMonthDayAfterDate: +1Y +1M +1D
+        LocalDate yearMonthDayAfter = baseDate.plusYears(1).plusMonths(1).plusDays(1);
+        
+        String emptyPeriod = "P0D";
+        String constructPeriod = "P4Y11M28D";
+        int selectMonths = 11;
+
+        // JSON output matching DataWeave exactly
+        System.out.println("{");
+        System.out.println("  \"dayBeforeDateTime\": \"" + instantFmt.format(dayBefore) + "\",");
+        System.out.println("  \"dayAfterDate\": \"" + dateFmt.format(dayAfter) + "\",");
+        System.out.println("  \"yearMonthDayAfterDate\": \"" + dateFmt.format(yearMonthDayAfter) + "\",");
+        System.out.println("  \"emptyPeriod\": \"" + emptyPeriod + "\",");
+        System.out.println("  \"constructPeriod\": \"" + constructPeriod + "\",");
+        System.out.println("  \"selectMonthsFromPeriod\": " + selectMonths);
+        System.out.println("}");
+    }
+}
+
+
+output:
+
+{
+  "dayBeforeDateTime": "2020-10-04T20:22:34.385Z",
+  "dayAfterDate": "2020-10-06",
+  "yearMonthDayAfterDate": "2021-11-06",
+  "emptyPeriod": "P0D",
+  "constructPeriod": "P4Y11M28D",
+  "selectMonthsFromPeriod": 11
+}
+
+

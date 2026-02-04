@@ -1,0 +1,102 @@
+compose:
+
+example 1:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class ComposeUrlRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:composeUrl")
+            .routeId("URL-Compose-Route")
+            .process(exchange -> {
+                // 1. Inputs
+                String baseUrl = "http://examplewebsite.com/";
+                String page = "/page.html";
+                String urlPath = "content folder";
+
+                // 2. Logic: URL Encode the dynamic part
+                // StandardCharsets.UTF_8 is the standard for modern web encoding
+                String encodedPath = URLEncoder.encode(urlPath, StandardCharsets.UTF_8)
+                                              .replace("+", "%20"); // URLEncoder uses + for spaces
+
+                // 3. Assemble the string
+                // Logic: parts[0] + encodedValue[0] + parts[1]
+                String finalUrl = baseUrl + encodedPath + page;
+
+                // 4. Wrap in Map for JSON output
+                java.util.Map<String, String> response = new java.util.HashMap<>();
+                response.put("encodedURL", finalUrl);
+
+                exchange.getIn().setBody(response);
+            })
+            // 5. Output application/json
+            .marshal().json()
+            .log("Composed URL: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "encodedURL": "http://examplewebsite.com/content%20folder/page.html"
+}
+
+
+---------------------------------------------------------
+
+example 2:
+
+input:
+
+import org.apache.camel.builder.RouteBuilder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+public class ComposeInterpolationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        from("direct:composeInterpolated")
+            .routeId("URL-Interpolation-Route")
+            .process(exchange -> {
+                // 1. Define the variable
+                String urlPath = "content folder";
+
+                // 2. Logic: Replicate DataWeave's automatic encoding
+                // Java's URLEncoder converts ' ' to '+', but DW (and URLs) use '%20'
+                String encodedPath = URLEncoder.encode(urlPath, StandardCharsets.UTF_8)
+                                              .replace("+", "%20");
+
+                // 3. Construct the final string (similar to $(urlPath))
+                String finalUrl = "http://examplewebsite.com/" + encodedPath + "/page.html";
+
+                // 4. Set the JSON response body
+                exchange.getIn().setBody(Map.of("encodedURL", finalUrl));
+            })
+            // 5. Output application/json
+            .marshal().json()
+            .log("Interpolated URL: ${body}");
+    }
+}
+
+
+
+output:
+
+{
+  "encodedURL": "http://examplewebsite.com/content%20folder/page.html"
+}
+
+
+---------------------------------------------------------

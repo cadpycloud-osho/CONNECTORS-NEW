@@ -1,0 +1,60 @@
+dasherize:
+
+
+input:
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class DasherizeController {
+
+    /**
+     * Custom method to emulate DataWeave's dasherize() function.
+     * Converts a string to kebab-case (hyphenated lowercase).
+     */
+    private String dasherizeString(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // 1. Replace spaces and underscores with a hyphen
+        String temp = input.replaceAll("[\\s_]+", "-");
+        
+        // 2. Insert a hyphen before any uppercase letter that follows a lowercase letter (for camelCase)
+        // 3. Convert the entire string to lowercase
+        return temp
+            .replaceAll("([a-z])([A-Z])", "$1-$2") 
+            .toLowerCase();
+    }
+
+    /**
+     * Endpoint equivalent to the DataWeave expression block.
+     */
+    @GetMapping("/dasherize-examples")
+    public Map<String, String> getDasherizeExamples() {
+        // Use LinkedHashMap to preserve the output order (a, b, c, d)
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", dasherizeString("customer"));
+        result.put("b", dasherizeString("customer_first_name"));
+        result.put("c", dasherizeString("customer NAME"));
+        result.put("d", dasherizeString("customerName"));
+        
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+
+

@@ -1,0 +1,60 @@
+isTypeType:
+
+
+input:
+
+
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DataWeaveTypeTypeRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+        from("direct:start")
+            .transform().method(this, "processTypeTypeChecks")
+            .marshal().json(JsonLibrary.Jackson)
+            .to("log:output?showAll=true");
+    }
+    
+    public Map<String, Boolean> processTypeTypeChecks() {
+        Map<String, Boolean> result = new HashMap<>();
+        
+        // AType = Type (type alias)
+        result.put("a", isTypeType(Type.class));
+        
+        // Built-in Type type (meta-type)
+        result.put("b", isTypeType(Type.class));
+        
+        // String - not Type
+        result.put("c", isTypeType(String.class));
+        
+        return result;
+    }
+    
+    private boolean isTypeType(Class<?> type) {
+        // DataWeave Type type check equivalent (meta-type for all types)
+        // Returns true for Type and its aliases
+        return type == Type.class || 
+               "Type".equals(type.getSimpleName()) ||
+               type.getName().contains("Type") && 
+               type.getName().endsWith("Type");
+    }
+    
+    // Type interface equivalent for DataWeave Type meta-type simulation
+    private interface Type {}
+}
+
+
+output:
+
+
+
+{
+  "a": true,
+  "b": true,
+  "c": false
+}
+

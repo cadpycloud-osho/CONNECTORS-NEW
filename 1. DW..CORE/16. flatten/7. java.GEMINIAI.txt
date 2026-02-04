@@ -1,0 +1,136 @@
+flatten:
+
+
+example 1:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Input: arrayOfArrays = [array1, array2, array3]
+        List<Integer> array1 = Arrays.asList(1, 2, 3);
+        List<Integer> array2 = Arrays.asList(4, 5, 6);
+        List<Integer> array3 = Arrays.asList(7, 8, 9);
+        
+        // The nested structure
+        List<List<Integer>> arrayOfArrays = Arrays.asList(array1, array2, array3);
+
+        // DataWeave: flatten(arrayOfArrays)
+        // Java Streams: Uses flatMap to convert Stream<List<Integer>> to Stream<Integer>
+        List<Integer> flattenedArray = arrayOfArrays.stream()
+            // List::stream converts each inner List<Integer> into a Stream<Integer>
+            .flatMap(List::stream) 
+            .collect(Collectors.toList());
+
+        System.out.println("--- DataWeave Example 1 Conversion ---");
+        System.out.println("Input: " + arrayOfArrays);
+        System.out.println("Output (Flattened Array): " + flattenedArray);
+    }
+}
+
+
+output:
+
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+____________________________________________________________________
+
+
+example 2:
+
+
+
+input:
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// --- Helper Classes to define the structure ---
+
+// Corresponds to the inner object: { name : "Shoki", id : 5678 }
+class UserDetail {
+    private String name;
+    private int id;
+    
+    public UserDetail(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    // toString method for easy printing of the output
+    @Override
+    public String toString() {
+        return "{" + "name='" + name + '\'' + ", id=" + id + '}';
+    }
+}
+
+// Corresponds to the structure inside the 'user' array: { group: "dev", myarray: [...] }
+class UserGroup {
+    private String group;
+    // This is the array we want to extract and flatten
+    private List<UserDetail> myarray; 
+
+    public UserGroup(String group, List<UserDetail> myarray) {
+        this.group = group;
+        this.myarray = myarray;
+    }
+
+    // Getter required for the mapping step
+    public List<UserDetail> getMyarray() {
+        return myarray;
+    }
+}
+
+// --- Main Logic ---
+
+public class Main {
+
+    public static void main(String[] args) {
+        // DataWeave Input: myData.user
+        List<UserGroup> userList = Arrays.asList(
+            new UserGroup("dev", Arrays.asList(
+                new UserDetail("Shoki", 5678),
+                new UserDetail("Mariano", 9123)
+            )),
+            new UserGroup("test", Arrays.asList(
+                new UserDetail("Sai", 2001),
+                new UserDetail("Peter", 2002)
+            ))
+        );
+
+        // DataWeave: flatten(myData.user.myarray)
+        List<UserDetail> flattenedUsers = userList.stream()
+            // 1. .map(UserGroup::getMyarray): Corresponds to myData.user.myarray
+            //    This creates a Stream of the nested lists: Stream<List<UserDetail>>
+            .map(UserGroup::getMyarray) 
+            
+            // 2. .flatMap(List::stream): Corresponds to flatten(...)
+            //    This flattens the Stream<List<UserDetail>> into a single Stream<UserDetail>
+            .flatMap(List::stream) 
+            .collect(Collectors.toList());
+
+        System.out.println("--- DataWeave Example 2 Conversion ---");
+        System.out.println("Output (Flattened User List):");
+        flattenedUsers.forEach(System.out::println);
+    }
+}
+
+
+output:
+
+{name='Shoki', id=5678}
+{name='Mariano', id=9123}
+{name='Sai', id=2001}
+{name='Peter', id=2002}
+
+
+____________________________________________________________________

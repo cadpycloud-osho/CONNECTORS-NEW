@@ -1,0 +1,77 @@
+rightPad:
+
+
+
+input:
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- Core DataWeave Logic ---
+        String a = PadUtil.rightPad(null, 3);
+        String b = PadUtil.rightPad("", 3);
+        String c = PadUtil.rightPad("bat", 5);
+        String d = PadUtil.rightPad("bat", 3);
+        String e = PadUtil.rightPad("bat", -1);
+        // ----------------------------
+        
+        // Manually constructing the JSON-like output structure for pure Java console output
+        String output = String.format(
+            "{\n  \"a\": %s,\n  \"b\": %s,\n  \"c\": %s,\n  \"d\": %s,\n  \"e\": %s\n}",
+            formatJsonString(a), 
+            formatJsonString(b), 
+            formatJsonString(c), 
+            formatJsonString(d), 
+            formatJsonString(e)
+        );
+
+        System.out.println(output);
+    }
+    
+    // The utility method is included here for completeness.
+    public static class PadUtil {
+        public static String rightPad(String str, int size) {
+            if (str == null) {
+                return null;
+            }
+            if (size <= str.length()) {
+                return str;
+            }
+
+            int pads = size - str.length();
+            StringBuilder sb = new StringBuilder(str);
+            
+            // We can use String.repeat(pads) in Java 11+ for better performance
+            // but the loop is used for maximum compatibility across Java versions.
+            for (int i = 0; i < pads; i++) {
+                sb.append(' '); 
+            }
+
+            return sb.toString();
+        }
+    }
+
+    /**
+     * Helper to format the Java String result into a valid JSON string (with quotes)
+     * or the JSON literal 'null'.
+     */
+    private static String formatJsonString(String value) {
+        // If the Java String is null, return the JSON literal "null". Otherwise, quote the string value.
+        // We ensure the quotes are present for non-null strings.
+        return value == null ? "null" : "\"" + value + "\"";
+    }
+}
+
+
+
+output:
+
+
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}

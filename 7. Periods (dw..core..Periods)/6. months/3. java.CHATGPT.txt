@@ -1,0 +1,64 @@
+months:
+
+
+input:
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        ZonedDateTime dateTime =
+                ZonedDateTime.parse("2020-10-05T20:22:34.385Z");
+
+        ZonedDateTime nextMonth = dateTime.plusMonths(1);
+
+        Period fourMonthPeriod = Period.ofMonths(4);
+
+        Period addNegativeValue =
+                Period.ofMonths(-1).plus(Period.ofMonths(2));
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("nextMonth",
+                nextMonth.format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
+        result.put("fourMonthPeriod", fourMonthPeriod.toString());
+        result.put("addNegativeValue", addNegativeValue.getMonths());
+
+        System.out.println(toJson(result));
+    }
+
+    private static String toJson(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder("{\n");
+        int i = 0;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            sb.append("  \"").append(entry.getKey()).append("\": ");
+            if (entry.getValue() instanceof String) {
+                sb.append("\"").append(entry.getValue()).append("\"");
+            } else {
+                sb.append(entry.getValue());
+            }
+            if (++i < map.size()) sb.append(",");
+            sb.append("\n");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+}
+
+
+
+output:
+
+{
+  "nextMonth": "2020-11-05T20:22:34.385Z",
+  "fourMonthPeriod": "P4M",
+  "addNegativeValue": 1
+}
+
+
+

@@ -1,0 +1,33 @@
+toPeriod:
+
+
+
+input:
+
+import java.time.Duration;
+import java.time.Period;
+import java.util.Map;
+
+public class Main {
+    
+    public static void main(String[] args) {
+        // Equivalent to DataWeave toPeriod("P1D")
+        Period period1 = Period.parse("P1D");
+        
+        // Equivalent to DataWeave toPeriod("PT1H1M")
+        Duration duration2 = Duration.parse("PT1H1M");
+        
+        System.out.println("Result: " + Map.of(
+            "toPeriodEx1", period1.toString(),
+            "toPeriodEx2", duration2.toString()
+        ));
+    }
+}
+
+
+output:
+
+Result: {toPeriodEx1=P1D, toPeriodEx2=PT1H1M}
+
+
+

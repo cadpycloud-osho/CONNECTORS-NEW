@@ -1,0 +1,64 @@
+toDateOrNull:
+
+
+
+input:
+
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("a", toDateOrNull(
+                "2023-28-03",
+                new Format("yyyy/MM/dd", null),
+                new Format("yyyy-dd-MM", Locale.US)
+        ));
+
+        result.put("b", toDateOrNull(
+                "2023-28-03",
+                new Format("yyyy/MM/dd", null)
+        ));
+
+        System.out.println(result);
+    }
+
+    private static LocalDate toDateOrNull(String value, Format... formats) {
+        for (Format f : formats) {
+            try {
+                DateTimeFormatter formatter =
+                        f.locale == null
+                                ? DateTimeFormatter.ofPattern(f.pattern)
+                                : DateTimeFormatter.ofPattern(f.pattern, f.locale);
+
+                return LocalDate.parse(value, formatter);
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
+    }
+
+    static class Format {
+        String pattern;
+        Locale locale;
+
+        Format(String pattern, Locale locale) {
+            this.pattern = pattern;
+            this.locale = locale;
+        }
+    }
+}
+
+
+output:
+
+{a=2023-03-28, b=null}
+

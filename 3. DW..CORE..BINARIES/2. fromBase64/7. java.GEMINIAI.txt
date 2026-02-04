@@ -1,0 +1,59 @@
+fromBase64:
+
+
+
+input:
+
+
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    /**
+     * Converts a Base64 encoded string into a raw byte array.
+     * This mimics the DataWeave 'fromBase64(payload)' function.
+     * @param base64String The Base64 encoded input string (the DW payload).
+     * @return The decoded raw byte array (the DW output).
+     */
+    public static byte[] decodeBase64(String base64String) {
+        // Use the built-in Base64 decoder to get the raw bytes
+        return Base64.getDecoder().decode(base64String);
+    }
+
+    public static void main(String[] args) {
+        // 1. Define the input payload (Base64 string)
+        // Equivalent to the input 'payload' in Mule/DataWeave
+        String inputPayload = "SGVsbG8sIHNlY3JldCE=";
+
+        // 2. Perform the decoding (DW: fromBase64(payload))
+        byte[] decodedBytes = decodeBase64(inputPayload);
+
+        // --- Output Section ---
+        
+        // The DataWeave output type is application/octet-stream (raw binary).
+        // For demonstration purposes in Java, we'll convert the bytes back to a 
+        // readable string and also print the byte array details.
+        
+        // Print the raw byte array structure
+        System.out.println("--- Raw Byte Array (Application/Octet-Stream Output) ---");
+        System.out.print("Decoded Bytes (Hex): ");
+        for (byte b : decodedBytes) {
+            // Print byte in hex format
+            System.out.printf("%02X ", b);
+        }
+        System.out.println();
+        
+        // Print the human-readable string representation of the bytes
+        String decodedString = new String(decodedBytes, StandardCharsets.UTF_8);
+        System.out.println("Decoded Text: " + decodedString);
+    }
+}
+
+
+output:
+
+--- Raw Byte Array (Application/Octet-Stream Output) ---
+Decoded Bytes (Hex): 48 65 6C 6C 6F 2C 20 73 65 63 72 65 74 21 
+Decoded Text: Hello, secret!
+

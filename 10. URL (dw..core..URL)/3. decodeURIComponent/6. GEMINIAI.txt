@@ -1,0 +1,68 @@
+decodeURIComponent:
+
+
+input:
+
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class UriComponentDecodeController {
+
+    /**
+     * Helper method mirroring DataWeave's URL::decodeURIComponent logic.
+     */
+    private String decodeUriComponent(String encodedComponent) {
+        try {
+            return URLDecoder.decode(encodedComponent, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "Decoding Error";
+        }
+    }
+
+    @GetMapping("/decode-uri-component")
+    public Map<String, Map<String, String>> getDecodedUriComponent() {
+        
+        // DataWeave input strings
+        String input1 = "%20PATH/%20TO%20/DECODE%20";
+        String input2 = "%3B%2C%2F%3F%3A%40%26%3D";
+        String input3 = "%2D%5F%2E%21%7E%2A%27%28%29%24";
+
+        // Perform decoding
+        String decoded1 = decodeUriComponent(input1);
+        String decoded2 = decodeUriComponent(input2);
+        String decoded3 = decodeUriComponent(input3);
+        
+        // Map the results to match the desired nested JSON structure
+        Map<String, String> innerMap = new HashMap<>();
+        // NOTE: Keys are intentionally duplicated to match the DW output structure
+        innerMap.put("decodeURIComponent1", decoded1);
+        innerMap.put("decodeURIComponent2", decoded2);
+        innerMap.put("decodeURIComponent3", decoded3);
+        
+        // Map the final output structure: { "decodeURIComponent": {...} }
+        Map<String, Map<String, String>> output = new HashMap<>();
+        // We use a single key "decodeURIComponent" for the outer map
+        output.put("decodeURIComponent", innerMap);
+        
+        return output; 
+    }
+}
+
+output:
+
+{
+  "decodeURIComponent": {
+    "decodeURIComponent1": " PATH/ TO /DECODE ",
+    "decodeURIComponent2": ";,/?:@&=",
+    "decodeURIComponent3": "-_.!~*'()$"
+  }
+}
+
+

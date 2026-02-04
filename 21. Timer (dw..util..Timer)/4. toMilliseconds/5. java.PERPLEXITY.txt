@@ -1,0 +1,42 @@
+toMilliseconds:
+
+
+
+input:
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+
+public class Main {
+    
+    private static final DateTimeFormatter ISO_FORMAT = 
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    
+    public static void main(String[] args) {
+        Map<String, Long> result = toMilliseconds();
+        System.out.println(result);
+    }
+    
+    /**
+     * DataWeave Timer.toMilliseconds() equivalent:
+     * Converts ISO 8601 datetime to milliseconds since Unix epoch
+     */
+    public static Map<String, Long> toMilliseconds() {
+        String isoDateTime = "2018-07-23T22:03:04.829Z";
+        return Map.of("toMilliseconds", toMilliseconds(isoDateTime));
+    }
+    
+    public static long toMilliseconds(String isoDateTime) {
+        LocalDateTime dateTime = LocalDateTime.parse(isoDateTime, ISO_FORMAT);
+        ZonedDateTime zonedDateTime = dateTime.atZone(ZoneOffset.UTC);
+        return zonedDateTime.toInstant().toEpochMilli();
+    }
+}
+
+
+output:
+
+{toMilliseconds=1532383384829}
+
+

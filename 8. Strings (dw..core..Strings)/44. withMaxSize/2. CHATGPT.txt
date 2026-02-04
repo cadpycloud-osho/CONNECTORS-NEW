@@ -1,0 +1,54 @@
+withMaxSize:
+
+
+
+input:
+
+package com.example.demo.util;
+
+public class StringUtils {
+
+    public static String withMaxSizeDW(String input, int maxSize) {
+        if (input == null) return null;               // null stays null
+        if (maxSize <= 0 || maxSize >= input.length()) return input;
+        return input.substring(0, maxSize);
+    }
+}
+package com.example.demo.controller;
+
+import com.example.demo.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestController
+public class WithMaxSizeController {
+
+    @GetMapping("/withmaxsize")
+    public Map<String, String> withMaxSizeExample() {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        result.put("a", StringUtils.withMaxSizeDW("123", 10));
+        result.put("b", StringUtils.withMaxSizeDW("123", 3));
+        result.put("c", StringUtils.withMaxSizeDW("123", 2));
+        result.put("d", StringUtils.withMaxSizeDW("123", 0));
+        result.put("e", StringUtils.withMaxSizeDW(null, 23));
+
+        return result;
+    }
+}
+
+
+output:
+
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "123",
+  "e": null
+}
+
+
